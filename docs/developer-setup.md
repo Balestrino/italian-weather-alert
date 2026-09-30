@@ -96,6 +96,15 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 docker compose config --quiet
 ```
 
+To reproduce the 66% CI statement coverage gate, run the isolated database integration tests with the two pinned test images:
+
+```sh
+docker pull postgres:16-alpine
+docker pull rustfs/rustfs:1.0.0
+go test -tags=integration -p 2 -coverpkg=./cmd/...,./internal/... -coverprofile=/tmp/iwa-coverage.out ./cmd/... ./internal/...
+go tool cover -func=/tmp/iwa-coverage.out | tail -1
+```
+
 For a running **throwaway** stack, `python3 scripts/smoke-compose.py` exercises dependency failure and recovery; it temporarily stops RustFS and starts it again. Do not run that smoke test against an operational instance.
 
 To stop this local project:

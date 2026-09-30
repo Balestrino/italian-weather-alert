@@ -127,7 +127,7 @@ func TestClassificationJobPersistsVersionedDecision(t *testing.T) {
 	}
 	retained := documents.New(pool, &integrationObjects{})
 	url := "https://comune.example/notice"
-	version, err := retained.Retain(ctx, documents.Acquisition{ID: "classification-fixture", SourceID: "calcinaia-municipal", Configuration: 1, URL: url, Metadata: json.RawMessage(`{"source_category":""}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "calcinaia-municipal", Configuration: 1, MediaType: "text/html", Bytes: []byte(`<!-- js-view-dom-id-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --><main><h1>Allerta meteo</h1><p>Per rischio idraulico il Comune dispone la chiusura del sottopasso dalle ore 18.</p></main>`)}}})
+	version, err := retained.Retain(ctx, documents.Acquisition{ID: "classification-fixture", SourceID: "calcinaia-municipal", Configuration: 1, URL: url, Metadata: json.RawMessage(`{"source_category":""}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "calcinaia-municipal", Configuration: 1, MediaType: "text/html", Bytes: []byte(`<!-- js-view-dom-id-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --><main><div class="js-view-dom-id-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"><h1>Allerta meteo</h1><p>Per rischio idraulico il Comune dispone la chiusura del sottopasso dalle ore 18.</p></div></main>`)}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,7 +195,9 @@ func TestClassificationJobPersistsVersionedDecision(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	secondBody := strings.Replace(string(originalBody), strings.Repeat("a", 64), strings.Repeat("b", 64), 1)
+	// The generated comment alone no longer creates a raw version. A changed
+	// generated class does, while the reviewed manifest policy still reuses it.
+	secondBody := strings.Replace(string(originalBody), `class="js-view-dom-id-`+strings.Repeat("a", 64)+`"`, `class="js-view-dom-id-`+strings.Repeat("b", 64)+`"`, 1)
 	second, err := retained.Retain(ctx, documents.Acquisition{ID: "equivalent-classification", SourceID: "calcinaia-municipal", Configuration: 1, URL: url, Metadata: json.RawMessage(`{"source_category":""}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "calcinaia-municipal", Configuration: 1, MediaType: "text/html", Bytes: []byte(secondBody)}}})
 	if err != nil {
 		t.Fatal(err)
