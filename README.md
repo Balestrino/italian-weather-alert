@@ -4,7 +4,7 @@
 [![Coverage](https://github.com/Balestrino/italian-weather-alert/actions/workflows/coverage.yml/badge.svg)](https://github.com/Balestrino/italian-weather-alert/actions/workflows/coverage.yml)
 [![License: GPL-3.0-only](https://img.shields.io/badge/License-GPL--3.0--only-blue.svg)](LICENSE)
 
-![Go 1.25](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)
+![Go 1.27](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)
 ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 ![RustFS](https://img.shields.io/badge/RustFS-S3%20storage-5C4EE5)
 ![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
@@ -50,17 +50,18 @@ The assistant should show the regional warning and any municipal measures separa
 
 ## For developers
 
-From a checkout of this repository, with Go 1.25:
+From a checkout of this repository, with Go 1.27.1:
 
 ```sh
 go test ./...
 go vet ./...
 go build ./cmd/...
+go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 ```
 
 The [developer setup guide](docs/developer-setup.md) walks through the local Compose stack, secrets, migrations, and optional worker configuration. [Verified JSON API and MCP examples](deploy/public-usage.md) show the five query groups against a local service. The [API/MCP contract](deploy/public-api-mcp.md) describes the interface in more detail.
 
-The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go coverage workflow passed its 30% unit-test coverage floor; the measured percentage appears in that workflow's run summary. Neither badge measures the completeness of alert-source coverage.
+The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go coverage workflow passed its 30% unit-test coverage floor; the measured percentage appears in that workflow's run summary. A separate security workflow checks for known reachable Go vulnerabilities on pushes, pull requests, and weekly. None of these checks measures the completeness of alert-source coverage.
 
 The public test suite keeps synthetic cases. Raw source captures and internal regression evidence are retained separately until their redistribution terms and contents have been reviewed.
 

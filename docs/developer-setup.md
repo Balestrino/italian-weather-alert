@@ -2,7 +2,7 @@
 
 This guide brings up an isolated local IWA stack for development. It uses the Compose services in this repository: PostgreSQL, RustFS, Crawl4AI, the read-only public API/MCP listener, and the private administration listener. The worker is a separate step because it needs a real inference-provider credential.
 
-Commands below assume a POSIX shell on a machine with Docker Engine and the Docker Compose plugin. Run them from the repository root. Python 3 and `curl` are used by the setup and verification commands; Go 1.25 is needed for native builds and tests. Allow several gigabytes of free disk space for the container images, especially Crawl4AI.
+Commands below assume a POSIX shell on a machine with Docker Engine and the Docker Compose plugin. Run them from the repository root. Python 3 and `curl` are used by the setup and verification commands; Go 1.27.1 is needed for native builds and tests. Allow several gigabytes of free disk space for the container images, especially Crawl4AI.
 
 ## 1. Choose an isolated local project
 
@@ -90,6 +90,7 @@ The worker can fetch configured sources and call external inference services, wh
 go test ./...
 go vet ./...
 go build ./cmd/...
+go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 docker compose config --quiet
 ```
 
