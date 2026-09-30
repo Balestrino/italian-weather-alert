@@ -20,6 +20,8 @@ Use public official URLs when possible. Do not include private contact details, 
 
 Start with a focused issue or pull request. Keep regional warnings and municipal measures separately attributed. New sources need an official referral, a defined scope, access and reuse checks, representative examples, and explicit limitations; a source candidate is not accepted public coverage. Link to the authority's original publication and explain what the proposed source would cover.
 
+Read the [OpenSpec plans and progress](openspec/README.md) before changing an existing capability. Update the relevant change specification and task checklist with the implementation, or propose a new change when the behavior is new. Checked tasks are a dated project snapshot, not a claim that a source is publicly accepted.
+
 For Go changes, run:
 
 ```sh
