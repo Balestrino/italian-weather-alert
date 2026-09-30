@@ -14,6 +14,7 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o /iwa ./cmd/iwa \
 FROM alpine:3.22
 ARG VCS_REF=unknown
 LABEL org.opencontainers.image.revision=$VCS_REF
+LABEL org.opencontainers.image.source="https://github.com/Balestrino/italian-weather-alert"
 RUN apk add --no-cache ca-certificates poppler-utils postgresql16-client
 COPY --from=build /iwa /iwa
 COPY --from=build /iwa-inference-probe /iwa-inference-probe

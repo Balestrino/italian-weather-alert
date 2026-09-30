@@ -1,6 +1,6 @@
 # Public progress snapshot
 
-These checkboxes reflect the private project task list on 30 September 2026. A checked item records project work; it does not by itself establish public source acceptance, public deployment, or that unpublished evidence is available in this repository. Operational notes and private evidence references are maintained separately.
+The original checkboxes reflect the private project task list on 30 September 2026. Section 12 records new public-checkout release work and must be verified independently. A checked item records project work; it does not by itself establish public source acceptance, public deployment, or that unpublished evidence is available in this repository. Operational notes and private evidence references are maintained separately.
 
 ## 1. Verify evidence and external contracts
 
@@ -111,3 +111,11 @@ These checkboxes reflect the private project task list on 30 September 2026. A c
 - [x] 11.3 Complete Pontedera's scoped source dossier and preview configuration; verify direct channels, associated-service competence where relevant, access/reuse and representative publications before its trial.
 - [x] 11.4 Complete Cascina's scoped source dossier and preview configuration; verify official referrals, access/reuse and representative publications before its trial.
 - [ ] 11.5 Apply the same evaluation, observation and separate public-activation gates to each additional municipality; deliver individual accepted/pending reports before claiming complete five-municipality local coverage.
+
+## 12. Environment separation and release operations
+
+- [ ] 12.1 Document existing development, isolated staging and planned dedicated production topology, including data and secret boundaries, release checks, manual approval, image identity and rollback without claiming operational readiness.
+- [x] 12.2 Provide and validate a staging image build/publish helper that records the exact public GHCR digest of a clean revision; document production digest-only deployment with local rebuilding disabled.
+- [x] 12.3 Create a separate staging checkout and Compose project on the current VM with distinct PostgreSQL/RustFS volumes, secrets, ports and image tag; validate readiness and isolation without changing the existing development project or enabling unreviewed live collection.
+- [ ] 12.4 Publish and test-pull an approved public GHCR image and record its digest; keep the operator's production approval as a separate explicit step.
+- [ ] 12.5 Record the production six-hour data-loss and one-hour recovery targets in the PBS runbook, with an initial three-hour backup cadence, retention and age-alert procedure. Complete actual backup, alert and timed isolated restore verification through tasks 8.2, 8.3 and 10.2 before asserting those targets are met.

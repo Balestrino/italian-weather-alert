@@ -1,0 +1,11 @@
+# Use with compose.yaml on the dedicated production VM. Production pulls only
+# the operator-approved IWA_APP_IMAGE digest and must never build locally.
+services:
+  public:
+    build: !reset null
+  admin:
+    build: !reset null
+  worker:
+    build: !reset null
+  backup:
+    build: !reset null
