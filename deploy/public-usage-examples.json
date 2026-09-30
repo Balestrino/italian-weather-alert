@@ -1,0 +1,63 @@
+{
+  "kind": "synthetic_local_service_usage_examples",
+  "protocol_version": "2026-07-28",
+  "examples": [
+    {
+      "id": "discovery",
+      "description": "Discover Calcinaia by its six-digit ISTAT code.",
+      "api_path": "/v1/municipalities?istat=050004&evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z",
+      "mcp_tool": "discover_municipalities",
+      "mcp_arguments": {
+        "istat": "050004",
+        "evaluation_time": "2026-09-17T12:00:00Z",
+        "known_at": "2026-09-17T11:30:00Z"
+      }
+    },
+    {
+      "id": "situation",
+      "description": "Read the municipality situation at fixed evaluation and knowledge times.",
+      "api_path": "/v1/municipalities/050004/situation?evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z",
+      "mcp_tool": "get_municipality_situation",
+      "mcp_arguments": {
+        "municipality_istat": "050004",
+        "evaluation_time": "2026-09-17T12:00:00Z",
+        "known_at": "2026-09-17T11:30:00Z"
+      }
+    },
+    {
+      "id": "search",
+      "description": "Search regional vigilance facts.",
+      "api_path": "/v1/search?kind=regional&product=vigilance&evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z",
+      "mcp_tool": "search_alerts",
+      "mcp_arguments": {
+        "kind": "regional",
+        "product": "vigilance",
+        "evaluation_time": "2026-09-17T12:00:00Z",
+        "known_at": "2026-09-17T11:30:00Z"
+      }
+    },
+    {
+      "id": "document",
+      "description": "Read a document and its retained versions.",
+      "api_path": "/v1/documents/7?include_versions=true&evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z",
+      "mcp_tool": "get_document",
+      "mcp_arguments": {
+        "document_id": "7",
+        "include_versions": true,
+        "evaluation_time": "2026-09-17T12:00:00Z",
+        "known_at": "2026-09-17T11:30:00Z"
+      }
+    },
+    {
+      "id": "coverage_history",
+      "description": "Read regional/local source coverage and the retained history boundary.",
+      "api_path": "/v1/sources/coverage?municipality_istat=050004&evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z",
+      "mcp_tool": "get_source_coverage",
+      "mcp_arguments": {
+        "municipality_istat": "050004",
+        "evaluation_time": "2026-09-17T12:00:00Z",
+        "known_at": "2026-09-17T11:30:00Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iwa.invalid/contracts/mvp.schema.json",
+  "$defs": {
+    "Temporal": {
+      "type": "object",
+      "properties": {
+        "original": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "precision": {
+          "type": "string",
+          "enum": [
+            "instant",
+            "date",
+            "interval",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "instant": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "end_instant": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assumption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "original",
+        "precision",
+        "instant",
+        "date",
+        "end_instant",
+        "timezone",
+        "assumption"
+      ],
+      "additionalProperties": false
+    },
+    "Evidence": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "passage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "document_id",
+        "version_id",
+        "source_url",
+        "page",
+        "locator",
+        "passage"
+      ],
+      "additionalProperties": false
+    },
+    "Dimension": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          }
+        }
+      },
+      "required": [
+        "state",
+        "limitations",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "Quality": {
+      "type": "object",
+      "properties": {
+        "provenance": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "interpretation": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "updating": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "not_verified",
+                "ok",
+                "failed",
+                "delayed",
+                "suspended"
+              ]
+            },
+            "last_attempt_at": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "last_complete_check_at": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "delay_threshold_seconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "state",
+            "last_attempt_at",
+            "last_complete_check_at",
+            "delay_threshold_seconds",
+            "limitations"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "provenance",
+        "interpretation",
+        "updating"
+      ],
+      "additionalProperties": false
+    },
+    "Municipality": {
+      "type": "object",
+      "properties": {
+        "istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mapping_version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mapping_limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "local_coverage": {
+          "type": "string",
+          "enum": [
+            "enabled",
+            "pending",
+            "outside_scope",
+            "suspended"
+          ]
+        }
+      },
+      "required": [
+        "istat",
+        "name",
+        "zones",
+        "mapping_version",
+        "mapping_limitations",
+        "local_coverage"
+      ],
+      "additionalProperties": false
+    },
+    "Document": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "official_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "copy_url": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "publication": {
+          "$ref": "#/$defs/Temporal"
+        },
+        "modification": {
+          "$ref": "#/$defs/Temporal"
+        },
+        "acquired_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "interpreted_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "interpretation_run_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quality": {
+          "$ref": "#/$defs/Quality"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "document_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "official_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "acquired",
+                  "unavailable",
+                  "uninterpretable",
+                  "restricted"
+                ]
+              }
+            },
+            "required": [
+              "document_id",
+              "official_url",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "version_id",
+        "source_id",
+        "issuer",
+        "publisher",
+        "kind",
+        "official_url",
+        "copy_url",
+        "sha256",
+        "publication",
+        "modification",
+        "acquired_at",
+        "interpreted_at",
+        "interpretation_run_id",
+        "quality",
+        "attachments"
+      ],
+      "additionalProperties": false
+    },
+    "Measure": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "revision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "municipality_istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "action": {
+          "type": "string"
+        },
+        "place": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "territorial_scope": {
+          "type": "string"
+        },
+        "validity": {
+          "$ref": "#/$defs/Temporal"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "current",
+            "future",
+            "expired",
+            "cancelled",
+            "superseded",
+            "undetermined"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          }
+        },
+        "quality": {
+          "$ref": "#/$defs/Quality"
+        },
+        "related_measure_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "relationship_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "undetermined",
+            "not_applicable"
+          ]
+        },
+        "newer_uninterpreted_document_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "id",
+        "issuer",
+        "revision_id",
+        "municipality_istat",
+        "action",
+        "place",
+        "territorial_scope",
+        "validity",
+        "status",
+        "evidence",
+        "quality",
+        "related_measure_ids",
+        "relationship_status",
+        "newer_uninterpreted_document_ids"
+      ],
+      "additionalProperties": false
+    },
+    "RegionalWarning": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "enum": [
+            "vigilance",
+            "criticality",
+            "monitoring"
+          ]
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "minor_network_hydro",
+            "main_network_hydraulic",
+            "thunderstorms",
+            "wind",
+            "coastal_waves",
+            "snow",
+            "ice"
+          ]
+        },
+        "official_risk_label": {
+          "type": "string"
+        },
+        "zone": {
+          "type": "string"
+        },
+        "mapping_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "green",
+            "yellow",
+            "orange",
+            "red",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "validity": {
+          "$ref": "#/$defs/Temporal"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "current",
+            "future",
+            "expired",
+            "cancelled",
+            "superseded",
+            "undetermined"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          }
+        },
+        "quality": {
+          "$ref": "#/$defs/Quality"
+        }
+      },
+      "required": [
+        "id",
+        "product",
+        "risk",
+        "official_risk_label",
+        "zone",
+        "mapping_version",
+        "level",
+        "validity",
+        "status",
+        "evidence",
+        "quality"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string"
+        },
+        "territory": {
+          "type": "string"
+        },
+        "declared_sections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "public_state": {
+          "type": "string",
+          "enum": [
+            "enabled",
+            "pending",
+            "suspended",
+            "outside_scope"
+          ]
+        },
+        "coverage_status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "accepted_declared_scope",
+            "accepted_with_limitations"
+          ]
+        },
+        "coverage_limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "quality": {
+          "$ref": "#/$defs/Quality"
+        }
+      },
+      "required": [
+        "source_id",
+        "product",
+        "territory",
+        "declared_sections",
+        "public_state",
+        "coverage_status",
+        "coverage_limitations",
+        "quality"
+      ],
+      "additionalProperties": false
+    },
+    "OperationalPhase": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "municipality_istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "authority": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "validity": {
+          "$ref": "#/$defs/Temporal"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          }
+        },
+        "quality": {
+          "$ref": "#/$defs/Quality"
+        }
+      },
+      "required": [
+        "id",
+        "municipality_istat",
+        "authority",
+        "phase",
+        "validity",
+        "evidence",
+        "quality"
+      ],
+      "additionalProperties": false
+    },
+    "Situation": {
+      "type": "object",
+      "properties": {
+        "municipality": {
+          "$ref": "#/$defs/Municipality"
+        },
+        "local_measures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Measure"
+          }
+        },
+        "operational_phases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationalPhase"
+          }
+        },
+        "regional_products": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegionalWarning"
+          }
+        },
+        "documents_requiring_attention": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Document"
+          }
+        },
+        "coverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Coverage"
+          }
+        }
+      },
+      "required": [
+        "municipality",
+        "local_measures",
+        "operational_phases",
+        "regional_products",
+        "documents_requiring_attention",
+        "coverage"
+      ],
+      "additionalProperties": false
+    },
+    "Meta": {
+      "type": "object",
+      "properties": {
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "served_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "view_expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "history_start": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "history_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "dataset_version",
+        "evaluation_time",
+        "served_at",
+        "view_expires_at",
+        "history_start",
+        "history_gaps",
+        "limitations",
+        "next_cursor"
+      ],
+      "additionalProperties": false
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "invalid_parameters",
+            "ambiguous_municipality",
+            "unknown_identifier",
+            "unsupported_area",
+            "mapping_unavailable",
+            "cursor_expired",
+            "cursor_mismatch",
+            "rate_limited",
+            "service_unavailable",
+            "copy_access_disabled",
+            "copy_access_restricted"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "retry_after_seconds": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Municipality"
+          }
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retry_after_seconds",
+        "candidates"
+      ],
+      "additionalProperties": false
+    },
+    "discover_municipalitiesInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "postal_code": {
+          "type": "string",
+          "pattern": "^[0-9]{5}$"
+        },
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "known_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "get_municipality_situationInput": {
+      "type": "object",
+      "properties": {
+        "municipality_istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "known_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "municipality_istat"
+      ],
+      "additionalProperties": false
+    },
+    "search_alertsInput": {
+      "type": "object",
+      "properties": {
+        "municipality_istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "zone": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "document",
+            "measure",
+            "regional"
+          ]
+        },
+        "product": {
+          "type": "string",
+          "enum": [
+            "vigilance",
+            "criticality",
+            "monitoring"
+          ]
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "minor_network_hydro",
+            "main_network_hydraulic",
+            "thunderstorms",
+            "wind",
+            "coastal_waves",
+            "snow",
+            "ice"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "current",
+            "future",
+            "expired",
+            "cancelled",
+            "superseded",
+            "undetermined"
+          ]
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "known_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "get_documentInput": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "include_versions": {
+          "type": "boolean"
+        },
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "known_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "document_id"
+      ],
+      "additionalProperties": false
+    },
+    "get_source_coverageInput": {
+      "type": "object",
+      "properties": {
+        "municipality_istat": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string"
+        },
+        "dataset_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "known_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "page_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "discover_municipalitiesOutput": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Municipality"
+              }
+            },
+            "meta": {
+              "$ref": "#/$defs/Meta"
+            }
+          },
+          "required": [
+            "data",
+            "meta"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/$defs/Error"
+            },
+            "served_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "error",
+            "served_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "get_municipality_situationOutput": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/$defs/Situation"
+            },
+            "meta": {
+              "$ref": "#/$defs/Meta"
+            }
+          },
+          "required": [
+            "data",
+            "meta"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/$defs/Error"
+            },
+            "served_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "error",
+            "served_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "search_alertsOutput": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Document"
+                  },
+                  {
+                    "$ref": "#/$defs/Measure"
+                  },
+                  {
+                    "$ref": "#/$defs/RegionalWarning"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "$ref": "#/$defs/Meta"
+            }
+          },
+          "required": [
+            "data",
+            "meta"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/$defs/Error"
+            },
+            "served_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "error",
+            "served_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "get_documentOutput": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "document": {
+                  "$ref": "#/$defs/Document"
+                },
+                "versions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/Document"
+                  }
+                }
+              },
+              "required": [
+                "document",
+                "versions"
+              ],
+              "additionalProperties": false
+            },
+            "meta": {
+              "$ref": "#/$defs/Meta"
+            }
+          },
+          "required": [
+            "data",
+            "meta"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/$defs/Error"
+            },
+            "served_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "error",
+            "served_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "get_source_coverageOutput": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Coverage"
+              }
+            },
+            "meta": {
+              "$ref": "#/$defs/Meta"
+            }
+          },
+          "required": [
+            "data",
+            "meta"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "error": {
+              "$ref": "#/$defs/Error"
+            },
+            "served_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "error",
+            "served_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

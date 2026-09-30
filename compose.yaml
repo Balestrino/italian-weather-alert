@@ -1,0 +1,189 @@
+name: iwa
+
+x-app: &app
+  build: .
+  image: ${IWA_APP_IMAGE:-iwa-app:local}
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  secrets: [postgres_password, crawl_token]
+  networks: [backend, listeners]
+  depends_on:
+    postgres:
+      condition: service_healthy
+    rustfs:
+      condition: service_started
+    crawl4ai:
+      condition: service_started
+  healthcheck:
+    test: [CMD, /iwa, check]
+    interval: 30s
+    timeout: 5s
+    retries: 3
+    start_period: 60s
+
+x-env: &env
+  IWA_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+  IWA_CRAWL_TOKEN_FILE: /run/secrets/crawl_token
+
+services:
+  public:
+    <<: *app
+    secrets: [postgres_password, crawl_token, public_cursor_key, rustfs_access_key, rustfs_secret_key]
+    environment:
+      <<: *env
+      IWA_ROLE: public
+      IWA_LISTEN: 0.0.0.0:8080
+      IWA_PUBLIC_RATE_ALLOWANCE: ${IWA_PUBLIC_RATE_ALLOWANCE:-120}
+      IWA_PUBLIC_RATE_WINDOW_SECONDS: ${IWA_PUBLIC_RATE_WINDOW_SECONDS:-60}
+      IWA_PUBLIC_MAX_PAGE_SIZE: ${IWA_PUBLIC_MAX_PAGE_SIZE:-100}
+      IWA_PUBLIC_TRUSTED_PROXIES: ${IWA_PUBLIC_TRUSTED_PROXIES:-}
+      IWA_PUBLIC_VIEW_TTL_SECONDS: ${IWA_PUBLIC_VIEW_TTL_SECONDS:-1800}
+      IWA_PUBLIC_CURSOR_KEY_FILE: /run/secrets/public_cursor_key
+      IWA_PUBLIC_COPY_ACCESS_ENABLED: ${IWA_PUBLIC_COPY_ACCESS_ENABLED:-false}
+      IWA_PUBLIC_BASE_URL: ${IWA_PUBLIC_BASE_URL:-}
+      IWA_RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
+      IWA_RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
+      IWA_RUSTFS_BUCKET: iwa-originals
+    ports: ["127.0.0.1:${IWA_PUBLIC_PORT:-8080}:8080"]
+  admin:
+    <<: *app
+    secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key]
+    environment:
+      <<: *env
+      IWA_RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
+      IWA_RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
+      IWA_RUSTFS_BUCKET: iwa-originals
+      IWA_ROLE: admin
+      IWA_LISTEN: 0.0.0.0:8081
+      IWA_CONTAINER_ADMIN: "true"
+      IWA_ADMIN_TAILSCALE_ORIGIN: ${IWA_ADMIN_TAILSCALE_ORIGIN:-}
+    ports: ["127.0.0.1:${IWA_ADMIN_PORT:-8081}:8081"]
+  worker:
+    <<: *app
+    command: [worker]
+    secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key, regolo_api_key, notifications_config]
+    environment:
+      <<: *env
+      IWA_RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
+      IWA_RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
+      IWA_RUSTFS_BUCKET: iwa-originals
+      IWA_REGOLO_API_KEY_FILE: /run/secrets/regolo_api_key
+      IWA_REGOLO_GATE_SCOPE: ${IWA_REGOLO_GATE_SCOPE:-regolo-primary}
+      IWA_OCR_GATE_SCOPE: ${IWA_OCR_GATE_SCOPE:-}
+      IWA_PREFLIGHT_SOURCES: ${IWA_PREFLIGHT_SOURCES:-}
+      IWA_INTERPRETATION_REUSE_SOURCES: ${IWA_INTERPRETATION_REUSE_SOURCES:-}
+      IWA_OCR_REUSE_SOURCES: ${IWA_OCR_REUSE_SOURCES:-}
+      IWA_SEGMENT_CHECKPOINT_SOURCES: ${IWA_SEGMENT_CHECKPOINT_SOURCES:-}
+      IWA_OUTPUT_FIX_SOURCES: ${IWA_OUTPUT_FIX_SOURCES:-}
+      IWA_OCR_REUSE_ENABLED: ${IWA_OCR_REUSE_ENABLED:-false}
+      IWA_OCR_RENDERER_ID: ${IWA_OCR_RENDERER_ID:-}
+      IWA_QWEN_GATE_SCOPE: ${IWA_QWEN_GATE_SCOPE:-}
+      IWA_EMBEDDING_GATE_SCOPE: ${IWA_EMBEDDING_GATE_SCOPE:-}
+      IWA_PROVIDER_FAILURE_THRESHOLD: ${IWA_PROVIDER_FAILURE_THRESHOLD:-3}
+      IWA_PROVIDER_COOLDOWN_SECONDS: ${IWA_PROVIDER_COOLDOWN_SECONDS:-60}
+      IWA_PROVIDER_MAX_COOLDOWN_SECONDS: ${IWA_PROVIDER_MAX_COOLDOWN_SECONDS:-900}
+      IWA_SEMANTIC_LINKING_ENABLED: ${IWA_SEMANTIC_LINKING_ENABLED:-false}
+      IWA_NOTIFICATIONS_CONFIG_FILE: /run/secrets/notifications_config
+      IWA_ROLE: worker
+    networks: [backend, inference_egress]
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=320m"]
+    healthcheck:
+      disable: true
+  backup:
+    <<: *app
+    command: [backup-worker]
+    secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key, backups_config]
+    environment:
+      <<: *env
+      IWA_ROLE: worker
+      IWA_RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
+      IWA_RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
+      IWA_RUSTFS_BUCKET: iwa-originals
+      IWA_BACKUPS_CONFIG_FILE: /run/secrets/backups_config
+    networks: [backend, backup_egress]
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=${IWA_BACKUP_TMPFS_SIZE:-1g}"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_started
+    healthcheck:
+      disable: true
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: iwa
+      POSTGRES_DB: iwa
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    networks: [backend]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U iwa -d iwa"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  rustfs:
+    image: rustfs/rustfs:1.0.0
+    environment:
+      RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
+      RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
+      RUSTFS_CONSOLE_ENABLE: "false"
+    secrets: [rustfs_access_key, rustfs_secret_key]
+    volumes: ["rustfs_data:/data"]
+    networks: [backend]
+    healthcheck:
+      test: [CMD, curl, -fsS, -o, /dev/null, http://127.0.0.1:9000/health/ready]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  crawl4ai:
+    image: unclecode/crawl4ai:0.9.3
+    command:
+      - bash
+      - -c
+      - read -r CRAWL4AI_API_TOKEN < /run/secrets/api_token; export CRAWL4AI_API_TOKEN; exec bash entrypoint.sh
+    environment:
+      GUNICORN_BIND: 0.0.0.0:11235
+    secrets:
+      - source: crawl_token
+        target: api_token
+    shm_size: 1gb
+    networks: [backend, crawl_egress]
+    healthcheck:
+      test: [CMD, curl, -fsS, -o, /dev/null, http://127.0.0.1:11235/health]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+networks:
+  backend:
+    internal: true
+  crawl_egress: {}
+  inference_egress: {}
+  backup_egress: {}
+  listeners: {}
+volumes:
+  postgres_data: {}
+  rustfs_data: {}
+secrets:
+  postgres_password:
+    file: ./.secrets/postgres_password
+  rustfs_access_key:
+    file: ./.secrets/rustfs_access_key
+  rustfs_secret_key:
+    file: ./.secrets/rustfs_secret_key
+  crawl_token:
+    file: ./.secrets/crawl_token
+  regolo_api_key:
+    file: ${IWA_REGOLO_API_KEY_PATH:-./.secrets/regolo_api_key}
+  public_cursor_key:
+    file: ./.secrets/public_cursor_key
+  notifications_config:
+    file: ${IWA_NOTIFICATIONS_CONFIG_PATH:-./.secrets/notifications_config.json}
+  backups_config:
+    file: ${IWA_BACKUPS_CONFIG_PATH:-./.secrets/backups_config.json}

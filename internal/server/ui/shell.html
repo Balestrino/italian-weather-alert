@@ -1,0 +1,14 @@
+{{define "shell-head"}}<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{.Title}} · IWA</title><link rel="stylesheet" href="/admin/assets/admin.css"><script src="/admin/assets/admin.js" defer></script></head>
+<body><a class="skip" href="#content">Vai al contenuto</a><div class="workspace">
+<aside class="sidebar"><a class="brand" href="/admin/">iwa<span>/ops</span></a><p class="eyebrow">CONSOLE OPERATIVA</p>
+<details class="navigation" open><summary>Menu di navigazione</summary><nav aria-label="Navigazione principale">
+<a href="/admin/regions" {{if eq .Section "regions"}}aria-current="page"{{end}}>01 <span>Regioni</span></a>
+<a href="/admin/operations/" {{if or (eq .Section "home") (eq .Section "sources") (eq .Section "jobs") (eq .Section "documents") (eq .Section "findings") (eq .Section "usage") (eq .Section "alerts")}}aria-current="page"{{end}}>02 <span>Operazioni</span></a>
+<a href="/admin/backups" {{if eq .Section "system"}}aria-current="page"{{end}}>03 <span>Sistema</span></a>
+</nav></details><div class="sidebar-foot">IWA / Territori<br><span>Amministrazione privata</span></div></aside>
+<div class="main-column"><header class="topbar"><span>console / {{.Section}}</span><span class="badge">ACCESSO PRIVATO</span></header>
+<main id="content" tabindex="-1">{{if or (eq .Section "home") (eq .Section "sources") (eq .Section "jobs") (eq .Section "documents") (eq .Section "findings") (eq .Section "usage") (eq .Section "alerts")}}<nav class="subnav" aria-label="Strumenti operativi"><a href="/admin/operations/">Panoramica</a><a href="/admin/alerts">Oggi e domani</a><a href="/admin/operations/sources">Fonti</a><a href="/admin/operations/jobs">Job</a><a href="/admin/operations/documents">Documenti</a><a href="/admin/operations/findings">Qualità</a><a href="/admin/operations/usage">Consumi</a></nav>{{end}}<details data-shortcut-help hidden class="shortcut-help"><summary>Aiuto tastiera</summary><p><kbd>/</kbd> cerca nella pagina · <kbd>Esc</kbd> cancella la ricerca o chiude il menu. Le scorciatoie non eseguono operazioni.</p><label class="check-label"><input type="checkbox" id="shortcuts-enabled" checked> Abilita scorciatoie a carattere singolo</label></details><div class="page-heading"><div><p class="eyebrow">IWA · OPERAZIONI</p><h1>{{.Title}}</h1></div>{{if .Refresh}}<a class="button secondary" href="">Aggiorna vista</a>{{end}}</div>
+{{end}}
+{{define "shell-foot"}}</main><footer>Viste operative su dati conservati · IWA</footer></div></div></body></html>{{end}}
+{{define "system-nav"}}<nav class="subnav" aria-label="Gestione del sistema"><a href="/admin/backups">Backup</a><a href="/admin/notifications">Incidenti</a><a href="/admin/observation-campaigns">Campagne</a><a href="/admin/processing-evaluations">Valutazioni</a><a href="/admin/release-readiness">Readiness MVP</a><a href="/health/ready">Dipendenze</a></nav>{{end}}

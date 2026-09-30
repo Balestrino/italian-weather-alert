@@ -1,0 +1,90 @@
+{
+  "authority": "ISTAT",
+  "version": "2026-09-15",
+  "official_url": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx",
+  "source_sha256": "83842076860450f7e482daecea6b7a769f5f93d0bf5b0d48802b44896d7a26d5",
+  "derived_from": "docs/nazionale/registri/comuni-italia.csv",
+  "derived_sha256": "428bc75a6272923a33a9a4ad4a0fd4e6c4845af1663b5c0db8fa11eedd20620c",
+  "regions": [
+    {
+      "code": "01",
+      "name": "Piemonte"
+    },
+    {
+      "code": "02",
+      "name": "Valle d'Aosta/Vallée d'Aoste"
+    },
+    {
+      "code": "03",
+      "name": "Lombardia"
+    },
+    {
+      "code": "04",
+      "name": "Trentino-Alto Adige/Südtirol"
+    },
+    {
+      "code": "05",
+      "name": "Veneto"
+    },
+    {
+      "code": "06",
+      "name": "Friuli-Venezia Giulia"
+    },
+    {
+      "code": "07",
+      "name": "Liguria"
+    },
+    {
+      "code": "08",
+      "name": "Emilia-Romagna"
+    },
+    {
+      "code": "09",
+      "name": "Toscana"
+    },
+    {
+      "code": "10",
+      "name": "Umbria"
+    },
+    {
+      "code": "11",
+      "name": "Marche"
+    },
+    {
+      "code": "12",
+      "name": "Lazio"
+    },
+    {
+      "code": "13",
+      "name": "Abruzzo"
+    },
+    {
+      "code": "14",
+      "name": "Molise"
+    },
+    {
+      "code": "15",
+      "name": "Campania"
+    },
+    {
+      "code": "16",
+      "name": "Puglia"
+    },
+    {
+      "code": "17",
+      "name": "Basilicata"
+    },
+    {
+      "code": "18",
+      "name": "Calabria"
+    },
+    {
+      "code": "19",
+      "name": "Sicilia"
+    },
+    {
+      "code": "20",
+      "name": "Sardegna"
+    }
+  ]
+}

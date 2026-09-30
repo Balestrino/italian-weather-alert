@@ -1,0 +1,21 @@
+# Local credentials and environment settings
+.env
+.env.*
+!.env.example
+!.env.*.example
+.claude/settings.local.json
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local Python caches
+__pycache__/
+*.py[cod]
+.venv/
+
+# Runtime secrets and local build output
+.secrets/
+bin/

@@ -1,0 +1,25 @@
+name: Coverage
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      - name: Measure Go unit-test coverage
+        run: |
+          profile="$RUNNER_TEMP/coverage.out"
+          go test -coverprofile="$profile" ./cmd/... ./internal/...
+          measured=$(go tool cover -func="$profile" | awk '$1 == "total:" { sub(/%/, "", $3); print $3 }')
+          printf 'Go statement coverage: **%s%%** (minimum 30%%)\n' "$measured" >> "$GITHUB_STEP_SUMMARY"
+          awk -v measured="$measured" 'BEGIN { if (measured + 0 < 30) { print "Coverage below 30%"; exit 1 } }'

@@ -1,0 +1,30 @@
+{{define "bulletin"}}<article class="alert-card"><h4>{{alertLabel .Product}}</h4><p><span class="badge">Bollettino acquisito</span> · {{.Source}}</p>
+<p>Emissione: {{if .Issued}}{{.Issued}}{{else}}non disponibile{{end}}</p>
+<p>Validità dichiarata: {{range .Validity}}{{.}}; {{else}}non attribuibile a una data{{end}}</p>
+{{if .NoCriticalityText}}<p>Il testo del bollettino riporta assenza di criticità. Questa indicazione non costituisce una verifica dei livelli per singola zona o giornata.</p>{{end}}
+<p>Versione conservata {{.Version}} · Acquisito {{.AcquiredAt.Format "02/01/2006 15:04 MST"}} · Ultimo controllo completo: {{if .LastChecked}}{{.LastChecked.Format "02/01/2006 15:04 MST"}}{{else}}non disponibile{{end}}</p>
+<a href="{{.URL}}" rel="noreferrer">Consulta il bollettino ufficiale</a></article>{{end}}
+{{define "alert-evidence"}}{{range .}}<p><a href="{{.SourceURL}}" rel="noreferrer">Fonte ufficiale</a> · Versione {{.VersionID}}{{if .Page}} · Pagina {{.Page}}{{end}}{{if .Passage}}<q>{{.Passage}}</q>{{end}}</p>{{else}}<p>Evidenza non disponibile.</p>{{end}}{{end}}
+{{define "regional-alert"}}<article class="alert-card"><h4>{{.OfficialRiskLabel}} · Zona {{.Zone}}</h4><p>Livello: <strong>{{alertLabel .Level}}</strong> · {{alertLabel .Status}}</p><p>{{.Validity.Original}}</p>{{template "alert-evidence" .Evidence}}{{template "alert-quality" .Quality}}</article>{{end}}
+{{define "local-alert"}}<article class="alert-card"><h4>{{.Action}}</h4><p>{{if .Issuer}}{{.Issuer}} · {{end}}Comune ISTAT {{.MunicipalityISTAT}}{{if .Place}} · {{.Place}}{{end}}</p><p>{{alertLabel .Status}} · {{.Validity.Original}}</p>{{if .NewerUninterpretedDocumentIDs}}<p>Attenzione: esistono aggiornamenti ancora da interpretare.</p>{{end}}{{template "alert-evidence" .Evidence}}{{template "alert-quality" .Quality}}</article>{{end}}
+{{define "alert-quality"}}{{range .Provenance.Limitations}}<p>Provenienza: {{.}}</p>{{end}}{{range .Interpretation.Limitations}}<p>Interpretazione: {{.}}</p>{{end}}{{range .Updating.Limitations}}<p>Aggiornamento: {{.}}</p>{{end}}{{end}}
+{{define "alerts"}}{{template "shell-head" (shell "Oggi e domani" "alerts")}}
+{{template "alert-content" .}}
+{{template "shell-foot"}}{{end}}
+
+{{define "alerts-unavailable"}}{{template "shell-head" (shell "Oggi e domani" "alerts")}}<section class="panel"><h2>Dati non disponibili</h2><p>Allerte temporaneamente non disponibili. Riprova più tardi oppure torna alla <a href="/admin/">panoramica</a>.</p></section>{{template "shell-foot"}}{{end}}
+
+{{define "alert-content"}}<p class="intro">Allerte meteo ufficiali e provvedimenti comunali collegati al meteo.</p>
+<p>Date nel fuso Europe/Rome · Vista aggiornata {{.ObservedAt.Format "02/01/2006 15:04 MST"}}. La consultazione legge i dati conservati e non avvia nuove elaborazioni.</p>
+<p>La copertura dipende dalle fonti raccolte e dai risultati disponibili. Dati mancanti o ancora da consolidare non equivalgono ad assenza di allerte. Per decisioni operative consulta sempre la fonte ufficiale.</p>
+{{if .FactsUnavailable}}<p class="panel" role="status">Risultati consolidati parzialmente non disponibili: la vista potrebbe essere incompleta. I bollettini acquisiti restano consultabili.</p>{{end}}
+<div class="alert-days">{{range .Days}}<section class="panel alert-day"><h2>{{.Label}} <span>{{.Date}}</span></h2>
+<section><h3>Allerte meteo ufficiali</h3>{{range .Regional}}{{template "regional-alert" .}}{{else}}<p>Nessuna allerta consolidata disponibile per questa giornata. Non è una conferma di assenza di allerte.</p>{{end}}
+{{range .Bulletins}}{{template "bulletin" .}}{{else}}<p>Nessun bollettino acquisito con validità esplicita per questa giornata.</p>{{end}}</section>
+<section><h3>Provvedimenti comunali</h3>{{range .Measures}}{{template "local-alert" .}}{{else}}<p>Nessun provvedimento consolidato disponibile per questa giornata. Documenti ancora da elaborare o validità non determinata potrebbero rendere la vista incompleta.</p>{{end}}</section>
+</section>{{end}}</div>
+{{if or .UndatedBulletins .UndatedRegional .UndatedMeasures}}<section class="panel"><h2>Validità da verificare</h2><p>Questi dati non hanno una validità attribuibile con certezza a oggi o domani.</p>
+{{range .UndatedBulletins}}{{template "bulletin" .}}{{end}}
+{{range .UndatedRegional}}{{template "regional-alert" .}}{{end}}
+{{range .UndatedMeasures}}{{template "local-alert" .}}{{end}}</section>{{end}}
+{{end}}

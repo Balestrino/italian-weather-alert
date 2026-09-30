@@ -1,0 +1,1069 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IWA MVP public read-only API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/municipalities": {
+      "get": {
+        "operationId": "discover_municipalities",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "istat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{6}$"
+            }
+          },
+          {
+            "name": "postal_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{5}$"
+            }
+          },
+          {
+            "name": "dataset_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "evaluation_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "known_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published results with explicit limitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or cursor mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Copy restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identifier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ambiguous municipality",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Expired view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unsupported area or missing mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Shared IP allowance exhausted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before next allowed attempt",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/discover_municipalitiesOutput/oneOf/1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/municipalities/{municipality_istat}/situation": {
+      "get": {
+        "operationId": "get_municipality_situation",
+        "parameters": [
+          {
+            "name": "municipality_istat",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{6}$"
+            }
+          },
+          {
+            "name": "dataset_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "evaluation_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "known_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published results with explicit limitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or cursor mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Copy restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identifier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ambiguous municipality",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Expired view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unsupported area or missing mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Shared IP allowance exhausted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before next allowed attempt",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_municipality_situationOutput/oneOf/1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/search": {
+      "get": {
+        "operationId": "search_alerts",
+        "parameters": [
+          {
+            "name": "municipality_istat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{6}$"
+            }
+          },
+          {
+            "name": "zone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "document",
+                "measure",
+                "regional"
+              ]
+            }
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "vigilance",
+                "criticality",
+                "monitoring"
+              ]
+            }
+          },
+          {
+            "name": "risk",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "minor_network_hydro",
+                "main_network_hydraulic",
+                "thunderstorms",
+                "wind",
+                "coastal_waves",
+                "snow",
+                "ice"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "current",
+                "future",
+                "expired",
+                "cancelled",
+                "superseded",
+                "undetermined"
+              ]
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "dataset_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "evaluation_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "known_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published results with explicit limitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or cursor mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Copy restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identifier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ambiguous municipality",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Expired view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unsupported area or missing mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Shared IP allowance exhausted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before next allowed attempt",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/search_alertsOutput/oneOf/1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/documents/{document_id}": {
+      "get": {
+        "operationId": "get_document",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "include_versions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "dataset_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "evaluation_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "known_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published results with explicit limitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or cursor mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Copy restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identifier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ambiguous municipality",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Expired view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unsupported area or missing mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Shared IP allowance exhausted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before next allowed attempt",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sources/coverage": {
+      "get": {
+        "operationId": "get_source_coverage",
+        "parameters": [
+          {
+            "name": "municipality_istat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{6}$"
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "evaluation_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "known_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published results with explicit limitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or cursor mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Copy restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identifier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ambiguous municipality",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Expired view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unsupported area or missing mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Shared IP allowance exhausted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before next allowed attempt",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_source_coverageOutput/oneOf/1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/documents/{document_id}/versions/{version_id}/content": {
+      "get": {
+        "operationId": "get_document_content",
+        "summary": "Download an archived document version",
+        "description": "Disabled by default. Requires public copy access and current source publication permission. Returns the original bytes as an attachment.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original retained bytes; Content-Type reflects the original media type.",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Copy access disabled or restricted by current source policy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown document or version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Storage unavailable or content integrity failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Shared IP allowance exhausted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./contratto.schema.json#/$defs/get_documentOutput/oneOf/1"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds before next allowed attempt",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Current IWA public server"
+    }
+  ]
+}

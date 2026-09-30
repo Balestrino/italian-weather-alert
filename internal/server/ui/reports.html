@@ -1,0 +1,4 @@
+{{define "report"}}{{template "shell-head" .Shell}}{{template "system-nav"}}<nav class="subnav">{{range .Links}}<a href="{{.URL}}">{{.Label}}</a>{{end}}</nav>
+{{if eq .Shell.Title "Campagne osservative"}}{{range rows .Result}}{{if .id}}<p><a href="/admin/observation-campaigns/{{path .id}}">Campagna {{.id}}</a></p>{{end}}{{end}}{{end}}
+{{template "report-records" .Result}}{{template "shell-foot"}}{{end}}
+{{define "report-records"}}{{range rows .}}<details class="report-record" open><summary>{{recordTitle .}}</summary><dl>{{range $key,$value:=.}}<dt>{{label $key}}</dt><dd><pre>{{json $value}}</pre></dd>{{end}}</dl></details>{{else}}<p class="panel">Nessun record nel perimetro selezionato.</p>{{end}}{{end}}
