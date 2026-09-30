@@ -4,6 +4,8 @@ This guide brings up an isolated local IWA stack for development. It uses the Co
 
 Commands below assume a POSIX shell on a machine with Docker Engine and the Docker Compose plugin. Run them from the repository root. Python 3 and `curl` are used by the setup and verification commands; Go 1.27.1 is needed for native builds and tests. Allow several gigabytes of free disk space for the container images, especially Crawl4AI.
 
+Before changing an existing capability, read the [OpenSpec plans and progress](../openspec/README.md). This checkout includes OpenSpec skills and commands for supported agents; [Agent tools](agent-tools.md) explains how to use them. The OpenSpec CLI is needed only to run those workflows. It is not required to build, test, or run the Compose stack below.
+
 ## 1. Choose an isolated local project
 
 Use a separate checkout if the machine already hosts an IWA installation. In the shell used for all commands in this guide, set a distinct Compose project, image tag, and host ports:
