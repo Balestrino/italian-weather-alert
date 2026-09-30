@@ -22,6 +22,8 @@ Start with a focused issue or pull request. Keep regional warnings and municipal
 
 Read the [OpenSpec plans and progress](openspec/README.md) before changing an existing capability. Update the relevant change specification and task checklist with the implementation, or propose a new change when the behavior is new. Checked tasks are a dated project snapshot, not a claim that a source is publicly accepted.
 
+Every plan, fix, code, documentation, and operations commit needs a dated entry in [CHANGELOG.md](CHANGELOG.md). Install the shared hook once per checkout with `git config core.hooksPath .githooks`. After staging your changes, use `python3 scripts/changelog.py record --kind Fixed --summary "Describe the user-visible change"` (choose a suitable kind). The command writes and stages the Unreleased entry. The hook adds a path-based fallback if you forget; use an explicit summary when the path names do not explain the change. CI checks each change commit, including commits made without the hook. Make the `changelog` CI job a required status check on protected branches to prevent bypassing it during merge.
+
 For Go changes, run:
 
 ```sh

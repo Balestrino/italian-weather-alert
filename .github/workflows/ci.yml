@@ -8,6 +8,18 @@ permissions:
   contents: read
 
 jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Test changelog recorder
+        run: python3 -m unittest scripts/test_changelog.py
+      - name: Require changelog entry in each change commit
+        env:
+          CHANGELOG_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python3 scripts/changelog.py check --base "$CHANGELOG_BASE"
   go:
     runs-on: ubuntu-latest
     steps:
