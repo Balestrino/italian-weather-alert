@@ -114,7 +114,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 
 ## 12. Environment separation and release operations
 
-- [ ] 12.1 Document existing development, isolated staging and planned dedicated production topology, including data and secret boundaries, release checks, manual approval, image identity and rollback without claiming operational readiness.
+- [x] 12.1 Document existing development, isolated staging and planned dedicated production topology, including data and secret boundaries, release checks, manual approval, image identity and rollback without claiming operational readiness.
 - [x] 12.2 Provide and validate a staging image build/publish helper that records the exact public GHCR digest of a clean revision; document production digest-only deployment with local rebuilding disabled.
 - [x] 12.3 Create a separate staging checkout and Compose project on the current VM with distinct PostgreSQL/RustFS volumes, secrets, ports and image tag; validate readiness and isolation without changing the existing development project or enabling unreviewed live collection.
 - [ ] 12.4 Publish and test-pull an approved public GHCR image and record its digest; keep the operator's production approval as a separate explicit step.

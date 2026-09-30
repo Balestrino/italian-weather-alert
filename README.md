@@ -61,6 +61,8 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 
 The [developer setup guide](docs/developer-setup.md) walks through the local Compose stack, secrets, migrations, and optional worker configuration. [Verified JSON API and MCP examples](deploy/public-usage.md) show the five query groups against a local service. The [API/MCP contract](deploy/public-api-mcp.md) describes the interface in more detail.
 
+The [environment guide](docs/environments.md) explains how the existing development stack, isolated staging stack and planned dedicated production VM relate. [Release operations](deploy/release-operations.md) describe staging checks, manually approved GHCR image digests and the production backup/restore targets. Publishing the code does not by itself activate a public service or an alert source.
+
 The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go unit and isolated database integration tests passed a 66% statement coverage floor; the measured percentage appears in that workflow's run summary. A separate security workflow checks for known reachable Go vulnerabilities on pushes, pull requests, and weekly. None of these checks measures the completeness of alert-source coverage.
 
 The public test suite keeps synthetic cases. Raw source captures and internal regression evidence are retained separately until their redistribution terms and contents have been reviewed.
@@ -81,6 +83,7 @@ The code and the information it produces are provided on a best-effort, **“as 
 - [OpenSpec plans and progress](openspec/README.md)
 - [Agent workflows and optional tools](docs/agent-tools.md)
 - [Developer setup](docs/developer-setup.md), [public API/MCP examples](deploy/public-usage.md), and [API/MCP contract](deploy/public-api-mcp.md)
+- [Development, staging and production](docs/environments.md) and [release operations](deploy/release-operations.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 Original IWA code is licensed under [GPL-3.0-only](LICENSE). Selected third-party data and retained source files have separate terms recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The public repository contains only reviewed source snapshots; the broader internal research evidence is kept separately.
