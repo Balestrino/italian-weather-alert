@@ -71,10 +71,10 @@ type Version struct {
 
 const MaxAcquisitionBytes = 32 << 20
 
-// Drupal Views generates a new opaque DOM marker on every response. It is not
-// publication content: ignore just this comment for version identity while
-// retaining the first response's original bytes unchanged.
-var drupalViewDOMID = regexp.MustCompile(`<!-- js-view-dom-id-[0-9a-f]{64} -->`)
+// Drupal Views generates a new opaque DOM marker on every response. It can
+// appear in comments and CSS classes; neither changes publication content.
+// Retain the first response's original bytes unchanged.
+var drupalViewDOMID = regexp.MustCompile(`js-view-dom-id-[0-9a-f]{64}`)
 
 func digest(b []byte) string       { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
 func objectKey(hash string) string { return "sha256/" + hash[:2] + "/" + hash }
@@ -146,7 +146,7 @@ func prepare(a Acquisition) (Acquisition, []Reference, string, bool, error) {
 	for i := range contentRefs {
 		contentRefs[i].Configuration = 0
 		if contentRefs[i].Missing == "" && strings.HasPrefix(strings.ToLower(contentRefs[i].MediaType), "text/html") {
-			contentRefs[i].Hash = digest(drupalViewDOMID.ReplaceAll(a.Resources[i].Bytes, []byte("<!-- js-view-dom-id -->")))
+			contentRefs[i].Hash = digest(drupalViewDOMID.ReplaceAll(a.Resources[i].Bytes, []byte("js-view-dom-id")))
 		} else if contentRefs[i].Missing == "" && contentRefs[i].Role == "resource" && (a.SourceID == "cfr-criticality" || a.SourceID == "cfr-vigilance") {
 			// CFR regenerates its print PDF and PNG graphics on every request.
 			// Only known transport metadata is ignored; retained object hashes

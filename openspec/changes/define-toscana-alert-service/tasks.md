@@ -38,6 +38,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 - [x] 3.5 Integrate vigilance, criticality/alert and monitoring independently through the verified contracts and selected CFR routes from 1.3/1.13/1.14, polling every 10 minutes by default and respecting longer 429 backoff. Compare levels, zones, validity and graphical information against retained samples without treating OCR text as proof of map color, turning monitoring into a new alert level or treating event-driven silence as a missing product.
 - [x] 3.6 Prevent a municipal document HTTP 404/410 from starving later targets; persist per-target failure/status and bounded retries, keep checks incomplete during deferral, retain recovery evidence, and verify with unit/integration tests and a deployed Calcinaia check.
 - [x] 3.7 Support an evidence-backed disposition for a previously discovered 404/410 URL absent from later configured listings; preserve failure/check history, exclude only the reviewed source/configuration/URL, reactivate on rediscovery, and verify the Calcinaia check after deployment without asserting missing-page equivalence.
+- [x] 3.8 Ignore generated Drupal Views DOM identifiers in comments and class names when deciding HTML content identity, retain exact originals, and verify equivalent responses reuse a version while substantive changes still create one in isolated storage tests.
 
 ## 4. OCR, classification and interpretation
 

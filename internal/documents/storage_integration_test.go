@@ -21,9 +21,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/registry"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/minio/minio-go/v7"
-	"github.com/Balestrino/italian-weather-alert/internal/registry"
 )
 
 // Own an isolated PostgreSQL container. No fixture is written to the Compose DB.
@@ -288,6 +288,22 @@ func TestRetentionPostgresRustFS(t *testing.T) {
 	must(err)
 	if !bytes.Contains(retainedView, []byte("js-view-dom-id-aaaaaaaa")) {
 		t.Fatal("retained first original was modified")
+	}
+	view.ID = "view-class-first"
+	view.Resources[0].Bytes = []byte("<html><div class=\"js-view-dom-id-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\">Notice</div></html>")
+	classView, err := store.Retain(ctx, view)
+	must(err)
+	view.ID = "view-class-equivalent"
+	view.Resources[0].Bytes = []byte("<html><div class=\"js-view-dom-id-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\">Notice</div></html>")
+	equivalentClass, err := store.Retain(ctx, view)
+	must(err)
+	if equivalentClass.ID != classView.ID {
+		t.Fatal("transport-only Drupal class created a new version")
+	}
+	retainedClass, err := store.Read(ctx, classView.ID, view.URL)
+	must(err)
+	if !bytes.Contains(retainedClass, []byte("js-view-dom-id-aaaaaaaa")) {
+		t.Fatal("retained class original was modified")
 	}
 	view.ID = "view-updated"
 	view.Resources[0].Bytes = []byte("<html>Changed notice<!-- js-view-dom-id-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --> unchanged</html>")

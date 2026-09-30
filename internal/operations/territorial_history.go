@@ -39,7 +39,18 @@ const territorialHistorySQL = `WITH events AS(
  UNION ALL
  SELECT 'source-'||e.id,'source',e.source_id,e.actor,e.created_at,e.revision,0,0,e.kind,e.evidence,NULL FROM registry_events e
  UNION ALL
- SELECT 'document-'||v.id,'document',d.source_id,'',v.first_acquired_at,COALESCE((SELECT configuration FROM retained_acquisitions WHERE version_id=v.id ORDER BY acquired_at LIMIT 1),0),v.id,0,'acquired',jsonb_build_object('url',d.official_url,'metadata',v.metadata),NULL FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
+ SELECT 'document-'||v.id,
+ CASE WHEN EXISTS (
+   SELECT 1 FROM registry_configurations c
+   CROSS JOIN LATERAL jsonb_array_elements_text(COALESCE(c.body->'sections','[]'::jsonb)) section(url)
+   WHERE c.source_id=d.source_id AND c.revision=r.configuration AND c.body->>'access_method'='crawl4ai'
+   AND (d.official_url=section.url OR
+     (COALESCE(c.body#>>'{discovery,pagination_parameter}','')<>'' AND
+      starts_with(d.official_url,split_part(section.url,'?',1) || '?' || (c.body#>>'{discovery,pagination_parameter}') || '=')))
+ ) THEN 'listing' ELSE 'document' END,
+ d.source_id,'',v.first_acquired_at,r.configuration,v.id,0,'acquired',jsonb_build_object('url',d.official_url,'metadata',v.metadata),NULL
+ FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
+ JOIN retained_resources r ON r.version_id=v.id AND r.role='original'
  UNION ALL
  SELECT 'check-'||c.id,'source',c.source_id,c.worker_id,c.finished_at,c.configuration,0,0,CASE WHEN c.complete THEN 'succeeded' ELSE COALESCE(c.error_code,'failed') END,jsonb_build_object('started_at',c.started_at,'reachable',c.reachable,'content_recognized',c.content_recognized),NULL FROM acquisition_checks c
  UNION ALL
@@ -54,7 +65,7 @@ const territorialHistorySQL = `WITH events AS(
  WHERE NOT EXISTS(SELECT 1 FROM processing_run_attempts pa WHERE pa.queue_job_id=j.id AND pa.queue_attempt_number=a.number)
  ), scoped AS(
  SELECT e.* FROM events e LEFT JOIN LATERAL(SELECT a.region_code,a.municipality_istat FROM territorial_source_associations a WHERE a.source_id=e.source_id AND a.recorded_at<=e.recorded_at ORDER BY a.recorded_at DESC,a.id DESC LIMIT 1)a ON e.source_id<>''
- WHERE (e.region=$1 OR (a.region_code=$1 AND ($2='' OR a.municipality_istat=$2))) AND ($3='' OR e.source_id=$3) AND ($4='' OR e.kind=$4) AND ($5::timestamptz IS NULL OR e.recorded_at>=$5) AND ($6::timestamptz IS NULL OR e.recorded_at<=$6) AND e.recorded_at<=$7)
+ WHERE (e.region=$1 OR (a.region_code=$1 AND ($2='' OR a.municipality_istat=$2))) AND ($3='' OR e.source_id=$3) AND ($4='all' OR ($4='' AND e.kind<>'listing') OR e.kind=$4) AND ($5::timestamptz IS NULL OR e.recorded_at>=$5) AND ($6::timestamptz IS NULL OR e.recorded_at<=$6) AND e.recorded_at<=$7)
  SELECT id,kind,COALESCE(source_id,''),actor,recorded_at,revision,version_id,job_id,outcome,evidence FROM scoped WHERE ($8::timestamptz IS NULL OR (recorded_at,id)<($8,$9)) ORDER BY recorded_at DESC,id DESC LIMIT $10`
 
 func (s *Store) TerritorialHistory(ctx context.Context, region, istat string, f TerritorialHistoryFilter, at time.Time) (TerritorialHistory, error) {
@@ -62,7 +73,7 @@ func (s *Store) TerritorialHistory(ctx context.Context, region, istat string, f 
 	if f.Limit == 0 {
 		f.Limit = 50
 	}
-	if f.Limit < 1 || f.Limit > 100 || !slices.Contains([]string{"", "configuration", "source", "document", "processing"}, f.Kind) || len(f.Source) > 200 || (f.From != nil && f.Through != nil && f.Through.Before(*f.From)) {
+	if f.Limit < 1 || f.Limit > 100 || !slices.Contains([]string{"", "all", "configuration", "source", "document", "listing", "processing"}, f.Kind) || len(f.Source) > 200 || (f.From != nil && f.Through != nil && f.Through.Before(*f.From)) {
 		return result, ErrInvalid
 	}
 	result.Filter = f

@@ -63,9 +63,15 @@ Municipal acceptance SHALL identify configured channels and sections, evaluated 
 ### Requirement: Retained acquisition and versions
 The service SHALL retain original document bytes where permitted, source URL, acquisition time, hash, available publication/update metadata and interpretation version. It SHALL detect changes at stable URLs, preserve prior versions within retention, and avoid duplicate versions for unchanged content. An unchanged successful check SHALL NOT change publication time. Required linked resources SHALL be included or explicitly reported missing.
 
+Generated transport-only Drupal Views DOM identifiers in HTML comments or class names SHALL NOT create a new content version. The retained original SHALL remain byte-exact, and changes to listing content or document provisions SHALL still create versions.
+
 #### Scenario: A page is revised without a new URL
 - **WHEN** a known municipal page changes its provisions
 - **THEN** the changed version is retained alongside its prior version and interpretation provenance
+
+#### Scenario: A listing response changes only its generated DOM identifier
+- **WHEN** repeated HTML responses differ only in a generated Drupal Views DOM identifier
+- **THEN** they share one content version while the first retained original remains byte-exact
 
 ### Requirement: Necessary attachments and ordinances
 The service SHALL acquire linked attachments and ordinances when needed to establish a measure, territory or validity. If an attachment cannot be accessed or interpreted, it SHALL expose the available official document or link and identify the fields that cannot be determined. It SHALL NOT substitute bulletin validity or page expiry for a duration specified only in the ordinance.

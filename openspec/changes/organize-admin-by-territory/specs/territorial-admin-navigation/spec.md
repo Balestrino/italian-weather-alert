@@ -53,6 +53,8 @@ Regional and municipal results SHALL distinguish retained documents, pending or 
 ### Requirement: Inspectable territorial history
 Region and municipality history SHALL include separate filters for configuration and enablement events, source operations, acquired document versions and processing outcomes. It SHALL expose timestamp, actor where recorded, source, revision or version, outcome and evidence links. Date and source filters, deterministic ordering and pagination SHALL operate on the whole scope. Past records SHALL retain their original territorial attribution. Missing actors, incomplete retention and unavailable history SHALL be labeled explicitly; current state SHALL NOT replace historical values.
 
+Retained listing-page snapshots SHALL be identified separately from acquired document versions. The default history view SHALL omit listing snapshots to keep operational events readable; an explicit listing filter and an all-events filter SHALL expose the complete retained history with the same ordering, evidence links and pagination.
+
 #### Scenario: Inspect a configuration change and later result
 - **WHEN** an operator selects a date range in municipal history
 - **THEN** they can inspect source configuration revisions and the document versions and processing outcomes recorded in that range with their original provenance
@@ -60,6 +62,10 @@ Region and municipality history SHALL include separate filters for configuration
 #### Scenario: History after disablement
 - **WHEN** a region or source is disabled
 - **THEN** its preserved results and history remain navigable and clearly identify the current disabled state
+
+#### Scenario: Inspect listing evidence without obscuring notices
+- **WHEN** a municipal source retains listing pages and discovered notices during a check
+- **THEN** default history shows the notice versions and other operational events, while the listing and all-events filters expose the listing snapshots
 
 ### Requirement: Accessible and compatible contextual actions
 Territorial pages SHALL work without JavaScript, at a 390px viewport and 200% zoom, with keyboard navigation, visible focus and text status labels. Existing administrative deep links and JSON requests SHALL remain compatible. Contextual actions SHALL preserve source revision and operator checks and return to the relevant territory using validated local destinations. Host/Origin protections, no-store responses, private local assets, output escaping and public-router isolation SHALL remain effective.

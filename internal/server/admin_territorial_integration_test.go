@@ -7,8 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/Balestrino/italian-weather-alert/internal/acquisition"
 	"github.com/Balestrino/italian-weather-alert/internal/classification"
 	"github.com/Balestrino/italian-weather-alert/internal/documents"
@@ -20,6 +18,8 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/processing"
 	"github.com/Balestrino/italian-weather-alert/internal/publicquery"
 	"github.com/Balestrino/italian-weather-alert/internal/registry"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http/httptest"
 	"net/url"
 	"os"
@@ -280,6 +280,66 @@ func TestTerritorialHistoryScopeAndPagination(t *testing.T) {
 	retired, err := ops.TerritorialHistory(ctx, "09", "909000", f, through)
 	if err != nil || len(retired.Entries) != 1 {
 		t.Fatal(retired, err)
+	}
+}
+
+func TestTerritorialHistorySeparatesListingSnapshots(t *testing.T) {
+	ctx := context.Background()
+	p := territorialAdminDB(t)
+	adoptTestMunicipalities(t, p, "09", 1)
+	reg := registry.New(p)
+	for _, err := range []error{
+		reg.CreateAuthority(ctx, registry.Authority{ID: "a", Name: "a", OfficialURL: "https://example.test"}),
+		reg.CreateChannel(ctx, registry.Channel{ID: "c", PublisherID: "a", Platform: "web", URL: "https://example.test"}),
+		reg.CreateSource(ctx, registry.Source{ID: "s", AuthorityID: "a", ChannelID: "c", ProductID: "municipal", Territory: "909000"}, registry.Configuration{URL: "https://example.test", Sections: []string{"https://example.test/notizie"}, AccessMethod: "crawl4ai", Discovery: registry.Discovery{PaginationParameter: "page"}, Attribution: "fixture"}, "test"),
+		reg.CreateSource(ctx, registry.Source{ID: "direct", AuthorityID: "a", ChannelID: "c", ProductID: "municipal", Territory: "909000"}, registry.Configuration{URL: "https://example.test", Sections: []string{"https://example.test/direct"}, AccessMethod: "html", Attribution: "fixture"}, "test"),
+	} {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	from := time.Now().UTC().Add(time.Second)
+	for i, item := range []struct{ source, raw string }{
+		{"s", "https://example.test/notizie"},
+		{"s", "https://example.test/notizie?page=1"},
+		{"s", "https://example.test/novita/avviso"},
+		{"direct", "https://example.test/direct"},
+	} {
+		var documentID, versionID int64
+		hash := strings.Repeat(string(rune('a'+i)), 64)
+		if err := p.QueryRow(ctx, "INSERT INTO retained_documents(source_id,official_url) VALUES($1,$2) RETURNING id", item.source, item.raw).Scan(&documentID); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := p.Exec(ctx, "INSERT INTO retained_objects(hash,object_key,byte_size) VALUES($1,$2,1)", hash, "fixture/"+hash); err != nil {
+			t.Fatal(err)
+		}
+		if err := p.QueryRow(ctx, "INSERT INTO retained_versions(document_id,content_hash,first_acquired_at,complete,metadata) VALUES($1,$2,$3,true,'{}') RETURNING id", documentID, hash, from.Add(time.Duration(i)*time.Second)).Scan(&versionID); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := p.Exec(ctx, "INSERT INTO retained_resources(version_id,url,role,required,source_id,configuration,media_type,object_hash,missing) VALUES($1,$2,'original',true,$3,1,'text/html',$4,'')", versionID, item.raw, item.source, hash); err != nil {
+			t.Fatal(err)
+		}
+	}
+	reader := operations.New(p)
+	for kind, want := range map[string]int{"": 1, "document": 1, "listing": 2, "all": 3} {
+		page, err := reader.TerritorialHistory(ctx, "09", "909000", operations.TerritorialHistoryFilter{Source: "s", Kind: kind, From: &from}, from.Add(10*time.Second))
+		if err != nil || len(page.Entries) != want {
+			t.Fatalf("kind %q: %d entries, want %d: %v", kind, len(page.Entries), want, err)
+		}
+	}
+	direct, err := reader.TerritorialHistory(ctx, "09", "909000", operations.TerritorialHistoryFilter{Source: "direct", Kind: "document", From: &from}, from.Add(10*time.Second))
+	if err != nil || len(direct.Entries) != 1 {
+		t.Fatal("direct source was classified as a listing", direct, err)
+	}
+	listingFilter := operations.TerritorialHistoryFilter{Source: "s", Kind: "listing", From: &from, Limit: 1}
+	first, err := reader.TerritorialHistory(ctx, "09", "909000", listingFilter, from.Add(10*time.Second))
+	if err != nil || len(first.Entries) != 1 || first.Next == "" {
+		t.Fatal("listing history did not paginate", first, err)
+	}
+	listingFilter.After = first.Next
+	second, err := reader.TerritorialHistory(ctx, "09", "909000", listingFilter, from.Add(10*time.Second))
+	if err != nil || len(second.Entries) != 1 || second.Entries[0].ID == first.Entries[0].ID || second.Next != "" {
+		t.Fatal("listing history pagination did not advance", second, err)
 	}
 }
 
