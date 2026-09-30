@@ -79,6 +79,7 @@ The code and the information it produces are provided on a best-effort, **“as 
 
 - [Documentation index](docs/README.md) and [national coverage tracker](docs/coverage.md)
 - [OpenSpec plans and progress](openspec/README.md)
+- [Agent workflows and optional tools](docs/agent-tools.md)
 - [Developer setup](docs/developer-setup.md), [public API/MCP examples](deploy/public-usage.md), and [API/MCP contract](deploy/public-api-mcp.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 

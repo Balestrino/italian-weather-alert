@@ -15,4 +15,4 @@ The checklists are a **30 September 2026 snapshot** of work tracked in the priva
 
 Open tasks include the Toscana observational trial and public readiness gates, off-host backup and restore verification, the evening report rollout, and parts of the provider efficiency rollout. See each `tasks.md` for the precise checklist.
 
-For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The OpenSpec CLI can read this directory; local editor or agent plugins are optional and are not required to inspect the plans.
+For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The repository includes [OpenSpec agent workflows](../docs/agent-tools.md); an agent or CLI is not required to inspect the plans.

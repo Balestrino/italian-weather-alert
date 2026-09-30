@@ -4,6 +4,10 @@
 !.env.example
 !.env.*.example
 .claude/settings.local.json
+.claude/settings.json
+.codex/config.toml
+.gemini/settings.json
+.codegraph/
 
 # Operating system and editor files
 .DS_Store
