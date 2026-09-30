@@ -21,5 +21,5 @@ jobs:
           profile="$RUNNER_TEMP/coverage.out"
           go test -coverprofile="$profile" ./cmd/... ./internal/...
           measured=$(go tool cover -func="$profile" | awk '$1 == "total:" { sub(/%/, "", $3); print $3 }')
-          printf 'Go statement coverage: **%s%%** (minimum 30%%)\n' "$measured" >> "$GITHUB_STEP_SUMMARY"
-          awk -v measured="$measured" 'BEGIN { if (measured + 0 < 30) { print "Coverage below 30%"; exit 1 } }'
+          printf 'Go statement coverage: **%s%%** (minimum 66%%)\n' "$measured" >> "$GITHUB_STEP_SUMMARY"
+          awk -v measured="$measured" 'BEGIN { if (measured + 0 < 66) { print "Coverage below 66%"; exit 1 } }'

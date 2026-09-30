@@ -61,7 +61,7 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 
 The [developer setup guide](docs/developer-setup.md) walks through the local Compose stack, secrets, migrations, and optional worker configuration. [Verified JSON API and MCP examples](deploy/public-usage.md) show the five query groups against a local service. The [API/MCP contract](deploy/public-api-mcp.md) describes the interface in more detail.
 
-The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go coverage workflow passed its 30% unit-test coverage floor; the measured percentage appears in that workflow's run summary. A separate security workflow checks for known reachable Go vulnerabilities on pushes, pull requests, and weekly. None of these checks measures the completeness of alert-source coverage.
+The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go coverage workflow passed its 66% unit-test coverage floor; the measured percentage appears in that workflow's run summary. A separate security workflow checks for known reachable Go vulnerabilities on pushes, pull requests, and weekly. None of these checks measures the completeness of alert-source coverage.
 
 The public test suite keeps synthetic cases. Raw source captures and internal regression evidence are retained separately until their redistribution terms and contents have been reviewed.
 
