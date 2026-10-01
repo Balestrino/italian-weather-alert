@@ -4,8 +4,8 @@ All tasks below are implementation work and remain unchecked in this proposal. R
 
 ## 1. Explicit service selection
 
-- [ ] 1.1 Add `processing-worker` and `application-backup` profiles to the base worker and backup services; verify resolved default development/staging select only public, admin, postgres, rustfs and crawl4ai, and each optional profile selects its own worker without the other.
-- [ ] 1.2 Preserve production's separate profile membership, replacing inherited worker profiles when needed; verify default production selects no services, the core profile excludes both workers, `production-worker` selects the processing worker, and `processing-worker` does not select it.
+- [x] 1.1 Add `processing-worker` and `application-backup` profiles to the base worker and backup services; verify resolved default development/staging select only public, admin, postgres, rustfs and crawl4ai, and each optional profile selects its own worker without the other.
+- [x] 1.2 Preserve production's separate profile membership, replacing inherited worker profiles when needed; verify default production selects no services, the core profile excludes both workers, `production-worker` selects the processing worker, and `processing-worker` does not select it.
 
 ## 2. CLI and admin source controls
 
@@ -21,8 +21,8 @@ All tasks below are implementation work and remain unchecked in this proposal. R
 
 ## 4. Deployment validation
 
-- [ ] 4.1 Extend deployment configuration checks to validate default and explicit background service sets for every environment; verify missing/default-enabled profiles and production profile inheritance fail with an environment/service diagnosis, while full topology and inactive-production checks still pass.
-- [ ] 4.2 Add focused environment regression coverage for default exclusion, independent profile selection, production inheritance, explicit service targets and inactive-worker runtime compatibility; verify `python3 scripts/test_environment_operations.py` and `python3 scripts/check-deployment-config.py` pass without operational startup, source acquisition, provider calls or notifications.
+- [x] 4.1 Extend deployment configuration checks to validate default and explicit background service sets for every environment; verify missing/default-enabled profiles and production profile inheritance fail with an environment/service diagnosis, while full topology and inactive-production checks still pass.
+- [x] 4.2 Add focused environment regression coverage for default exclusion, independent profile selection, production inheritance, explicit service targets and inactive-worker runtime compatibility; verify `python3 scripts/test_environment_operations.py` and `python3 scripts/check-deployment-config.py` pass without operational startup, source acquisition, provider calls or notifications.
 
 ## 5. Operator procedure and completion
 

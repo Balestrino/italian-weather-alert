@@ -16,7 +16,7 @@ services:
     pids_limit: 128
   worker:
     build: !reset null
-    profiles: [production-worker]
+    profiles: !override [production-worker]
     cpus: 1.5
     mem_limit: 768m
     pids_limit: 256

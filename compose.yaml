@@ -62,6 +62,7 @@ services:
     ports: ["127.0.0.1:${IWA_ADMIN_PORT:-8081}:8081"]
   worker:
     <<: *app
+    profiles: [processing-worker]
     command: [worker]
     secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key, regolo_api_key, notifications_config]
     environment:
@@ -99,6 +100,7 @@ services:
       disable: true
   backup:
     <<: *app
+    profiles: [application-backup]
     command: [backup-worker]
     secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key, backups_config]
     environment:

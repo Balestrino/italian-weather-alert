@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -36,12 +37,34 @@ def validate_config(environment: Environment, config: dict) -> None:
             raise EnvironmentError('Named volume differs from the selected project namespace.')
 
 
+def validate_background_selection(environment: Environment, config: dict) -> None:
+    """Resolve profiles without starting services or requiring provider keys."""
+    production = environment.name == 'production'
+    worker_profile = 'production-worker' if production else 'processing-worker'
+    for service, profile in (('worker', worker_profile), ('backup', 'application-backup')):
+        if config['services'].get(service, {}).get('profiles') != [profile]:
+            raise EnvironmentError(f'{environment.name} {service} must use only the {profile} profile.')
+    default = set() if production else set(CORE)
+    core_options = ('--profile', 'production') if production else ()
+    selections = [((), default),
+                  (core_options + ('--profile', worker_profile), set(CORE) | {'worker'}),
+                  (core_options + ('--profile', 'application-backup'), set(CORE) | {'backup'})]
+    if production:
+        selections += [(('--profile', 'production'), set(CORE)),
+                       (('--profile', 'processing-worker'), set())]
+    for options, expected in selections:
+        selected = set(json.loads(environment.capture(*options, 'config', '--format', 'json'))['services'])
+        if selected != expected:
+            raise EnvironmentError(f'{environment.name} background service selection differs for {options or "default startup"}: ' + ', '.join(sorted(selected ^ expected)))
+
+
 def templates() -> None:
     configs = {}
     for name in PROJECTS:
         environment = Environment(name, example=True)
         config = environment.config(all_services=True)
         validate_config(environment, config)
+        validate_background_selection(environment, config)
         configs[name] = config
     production = Environment('production', example=True)
     if production.config()['services']:
@@ -62,7 +85,7 @@ def templates() -> None:
     core_memory = sum(int(configs['production']['services'][s]['mem_limit']) for s in CORE)
     if core_memory > 4 * 1024**3:
         raise EnvironmentError('Production core memory ceilings exceed the template budget.')
-    print('PASS: example topology, isolated paths/volumes/ports, restart policies, image-only staging/production and production ceilings.')
+    print('PASS: example topology, isolated paths/volumes/ports, restart policies, opt-in workers, image-only staging/production and production ceilings.')
     print('Production example is prepared with no default active services; its image placeholder is not deployment-ready. Host recovery and capacity are not verified by this check.')
 
 
@@ -165,6 +188,7 @@ def main() -> int:
             environment = Environment(args.environment)
             config = environment.config(all_services=True)
             validate_config(environment, config)
+            validate_background_selection(environment, config)
             selected = config['services']['admin']['image']
             print(f'PASS: {environment.name} local configuration; project={environment.project}; application_image={selected}')
             if environment.name == 'production':

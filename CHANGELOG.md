@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Changed] Make collection and backup workers opt-in in development and staging; verify isolated production profile selection
 - 2026-10-01 [Planned] Extend the processing plan with hierarchical region/municipality/source controls in CLI and admin, independent of worker startup and public publication
 - 2026-10-01 [Planned] Plan explicit development and staging background worker activation with production profile isolation and controlled shared-host processing
 ## 0.1.0 - 2026-10-01
