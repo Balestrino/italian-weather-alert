@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Changed] Apply the additive municipal migration and update development admin; verify live controls and readiness while preserving the existing collector and record partial image alignment.
 - 2026-10-01 [Changed] Document explicit worker selection, environment-scoped territorial and source controls, compatible rollback and separately scheduled collector handover; record synthetic verification.
 - 2026-10-01 [Added] Provide audited CLI and admin activation controls for regions, municipalities and source collection, with native forms and territorial blocking status.
 - 2026-10-01 [Added] Add audited municipality enablement and hierarchical acquisition/inference gates while preserving existing collection eligibility

@@ -38,3 +38,9 @@ IWA_BROWSER_NODE="<node-executable>" IWA_PLAYWRIGHT_MODULE="<playwright-module-p
 `go test -race ./...`, `go vet ./...`, `go build ./cmd/...`, strict OpenSpec validation and local documentation-link/whitespace checks passed. `govulncheck@v1.8.0` found no reachable vulnerabilities; it also reported vulnerabilities in imported packages/modules that the code does not call.
 
 No operational worker was stopped, started or recreated for this change. Profiles do not stop an existing collector. Apply the [adoption and handover procedure](environments.md#adoption-and-collector-handover) only during the separately scheduled rollout, preserving the current collector until the reviewed production collector is ready. An older worker image that ignores municipal disablement cannot safely process after those controls are in use; preserve additive data and keep processing stopped until a compatible rollback image is selected.
+
+## Subsequent development admin update
+
+The development admin was subsequently rebuilt and updated with the additive municipal migration. A private pre-migration database snapshot and prior configuration were retained. Live read-only checks verified native regional/municipal controls, history, source guidance, CLI status and listener readiness. Source collection/publication flags and territorial eligibility matched their pre-migration state, and the existing public, processing and backup containers retained their identities and start times.
+
+The development smoke check passed. The complete runtime image-alignment check reports the deliberate partial rollout: admin uses the new image while the other application services retain their prior image. Those services require a separate deliberate update before whole-environment release validation can pass. Production collector handover was not performed. Detailed runtime evidence remains private.
