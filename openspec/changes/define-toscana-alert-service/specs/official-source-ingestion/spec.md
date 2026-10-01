@@ -73,6 +73,10 @@ Generated transport-only Drupal Views DOM identifiers in HTML comments or class 
 - **WHEN** repeated HTML responses differ only in a generated Drupal Views DOM identifier
 - **THEN** they share one content version while the first retained original remains byte-exact
 
+#### Scenario: Distinct retained versions have equivalent interpretation inputs
+- **WHEN** separate retained versions contain the same substantive HTML evidence under a reviewed interpretation policy
+- **THEN** contiguous preflight grouping and classification reuse avoid duplicate provider calls while retaining each version's provenance
+
 ### Requirement: Necessary attachments and ordinances
 The service SHALL acquire linked attachments and ordinances when needed to establish a measure, territory or validity. If an attachment cannot be accessed or interpreted, it SHALL expose the available official document or link and identify the fields that cannot be determined. It SHALL NOT substitute bulletin validity or page expiry for a duration specified only in the ordinance.
 

@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Fixed] Update integration fixtures for Drupal identifier deduplication and equivalent-version reuse
 - 2026-10-01 [Changed] Verify shared checkout migration for development and staging
 - 2026-10-01 [Changed] Support isolated development and staging from one public checkout
 - 2026-09-30 [Added] Add automatic changelog recording and per-commit CI enforcement for repository changes.

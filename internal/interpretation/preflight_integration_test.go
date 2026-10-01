@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/Balestrino/italian-weather-alert/internal/classification"
 	"github.com/Balestrino/italian-weather-alert/internal/documents"
 	"github.com/Balestrino/italian-weather-alert/internal/extraction"
@@ -20,6 +19,7 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/ocr"
 	"github.com/Balestrino/italian-weather-alert/internal/processing"
 	"github.com/Balestrino/italian-weather-alert/internal/registry"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func TestPreflightContiguousGroups(t *testing.T) {
@@ -45,19 +45,24 @@ func TestPreflightContiguousGroups(t *testing.T) {
 	retained := documents.New(pool, &interpretationObjects{})
 	p := &Preflight{Documents: retained, Renderer: preflightRenderer{}, Configuration: "cfg", RendererIdentity: "renderer", Sources: map[string]bool{source: true}}
 	s := New(pool, jobs.New(pool), inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
-	retain := func(id, text string) documents.Version {
+	retain := func(id, marker, text, mediaType string) documents.Version {
 		t.Helper()
-		b := []byte(`<div class="js-view-dom-id-` + strings.Repeat(id, 64) + `">` + text + `</div>`)
-		v, e := retained.Retain(ctx, documents.Acquisition{ID: id, SourceID: source, Configuration: 1, URL: "https://example.org/notice", Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{{URL: "https://example.org/notice", SourceID: source, Configuration: 1, Role: "original", Required: true, MediaType: "text/html", Bytes: b}}})
+		b := []byte(`<div class="js-view-dom-id-` + strings.Repeat(marker, 64) + `">` + text + `</div>`)
+		v, e := retained.Retain(ctx, documents.Acquisition{ID: id, SourceID: source, Configuration: 1, URL: "https://example.org/notice", Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{{URL: "https://example.org/notice", SourceID: source, Configuration: 1, Role: "original", Required: true, MediaType: mediaType, Bytes: b}}})
 		if e != nil {
 			t.Fatal(e)
 		}
 		return v
 	}
-	a := retain("a", "Warning A")
-	b := retain("b", "Warning A")
-	c := retain("c", "Warning B")
-	d := retain("d", "Warning A")
+	a := retain("a", "a", "Warning A", "text/html")
+	if collapsed := retain("b-marker", "b", "Warning A", "text/html"); collapsed.ID != a.ID {
+		t.Fatal("generated identifier created a version")
+	}
+	// Content-Type variations retain distinct versions, but preflight treats
+	// their equivalent HTML evidence as one contiguous interpretation group.
+	b := retain("b", "b", "Warning A", "text/html; charset=utf-8")
+	c := retain("c", "c", "Warning B", "text/html")
+	d := retain("d", "d", "Warning A", "text/html; charset=UTF-8")
 	if a.ID == b.ID || b.ID == c.ID || c.ID == d.ID {
 		t.Fatal("fixture must retain distinct versions for preflight grouping")
 	}
@@ -85,7 +90,7 @@ func TestPreflightContiguousGroups(t *testing.T) {
 	if _, e := pool.Exec(ctx, `INSERT INTO interpretation_archives VALUES($1,now(),now(),'test')`, d.ID); e != nil {
 		t.Fatal(e)
 	}
-	f := retain("e", "Warning A")
+	f := retain("e", "e", "Warning A", "TEXT/HTML")
 	dec, e := s.Prepare(ctx, p, f.ID)
 	if e != nil || dec.RepresentativeID != f.ID {
 		t.Fatalf("archive boundary %+v %v", dec, e)
@@ -179,7 +184,7 @@ func TestPreflightContiguousGroups(t *testing.T) {
 	if _, err := s.Automatic(ctx, AcquisitionEvent{DocumentVersionID: a.ID, EvidenceHash: a.Hash, ContentChanged: true, At: now.Add(4 * time.Minute)}); err != nil {
 		t.Fatalf("scheduled unchanged version after catalog rotation: %v", err)
 	}
-	g := retain("g", "Warning A")
+	g := retain("g", "g", "Warning A", "text/html; charset=us-ascii")
 	if dec, err := s.Prepare(ctx, &rotated, g.ID); err != nil || dec.RepresentativeID != g.ID {
 		t.Fatalf("new version must use new catalog boundary: %+v %v", dec, err)
 	}

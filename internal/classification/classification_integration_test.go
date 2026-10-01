@@ -17,13 +17,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/Balestrino/italian-weather-alert/internal/documents"
 	"github.com/Balestrino/italian-weather-alert/internal/inference"
 	"github.com/Balestrino/italian-weather-alert/internal/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/ocr"
 	"github.com/Balestrino/italian-weather-alert/internal/processing"
 	"github.com/Balestrino/italian-weather-alert/internal/registry"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func classificationTestDB(t *testing.T) *pgxpool.Pool {
@@ -195,10 +195,18 @@ func TestClassificationJobPersistsVersionedDecision(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The generated comment alone no longer creates a raw version. A changed
-	// generated class does, while the reviewed manifest policy still reuses it.
+	// Generated Drupal identifiers alone do not create a new version.
 	secondBody := strings.Replace(string(originalBody), `class="js-view-dom-id-`+strings.Repeat("a", 64)+`"`, `class="js-view-dom-id-`+strings.Repeat("b", 64)+`"`, 1)
-	second, err := retained.Retain(ctx, documents.Acquisition{ID: "equivalent-classification", SourceID: "calcinaia-municipal", Configuration: 1, URL: url, Metadata: json.RawMessage(`{"source_category":""}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "calcinaia-municipal", Configuration: 1, MediaType: "text/html", Bytes: []byte(secondBody)}}})
+	collapsed, err := retained.Retain(ctx, documents.Acquisition{ID: "equivalent-classification-marker", SourceID: "calcinaia-municipal", Configuration: 1, URL: url, Metadata: json.RawMessage(`{"source_category":""}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "calcinaia-municipal", Configuration: 1, MediaType: "text/html", Bytes: []byte(secondBody)}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if collapsed.ID != version.ID {
+		t.Fatal("generated identifier created a version")
+	}
+	// A different Content-Type parameter retains a separate raw version, while
+	// the reviewed manifest still recognizes the same substantive evidence.
+	second, err := retained.Retain(ctx, documents.Acquisition{ID: "equivalent-classification", SourceID: "calcinaia-municipal", Configuration: 1, URL: url, Metadata: json.RawMessage(`{"source_category":""}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "calcinaia-municipal", Configuration: 1, MediaType: "text/html; charset=utf-8", Bytes: []byte(secondBody)}}})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -39,6 +39,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 - [x] 3.6 Prevent a municipal document HTTP 404/410 from starving later targets; persist per-target failure/status and bounded retries, keep checks incomplete during deferral, retain recovery evidence, and verify with unit/integration tests and a deployed Calcinaia check.
 - [x] 3.7 Support an evidence-backed disposition for a previously discovered 404/410 URL absent from later configured listings; preserve failure/check history, exclude only the reviewed source/configuration/URL, reactivate on rediscovery, and verify the Calcinaia check after deployment without asserting missing-page equivalence.
 - [x] 3.8 Ignore generated Drupal Views DOM identifiers in comments and class names when deciding HTML content identity, retain exact originals, and verify equivalent responses reuse a version while substantive changes still create one in isolated storage tests.
+- [x] 3.9 Update integration fixtures after Drupal identifier deduplication; verify marker-only responses share a retained version and separately retained equivalent HTML still exercises contiguous preflight grouping and classification reuse.
 
 ## 4. OCR, classification and interpretation
 
