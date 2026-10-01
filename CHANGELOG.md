@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Changed] Stop staging and rebuild development applications with the optional public status frontend.
 - 2026-10-01 [Changed] Organize architecture, component and operations guides; update documentation links and verification records
 - 2026-10-01 [Added] Add an independent public status frontend with coverage, freshness and bounded API reads
 - 2026-10-01 [Changed] Separate backend services, private backoffice and public transports; relocate embedded API contracts
