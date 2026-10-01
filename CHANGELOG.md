@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Added] Add an independent public status frontend with coverage, freshness and bounded API reads
 - 2026-10-01 [Changed] Separate backend services, private backoffice and public transports; relocate embedded API contracts
 - 2026-10-01 [Fixed] Enforce environment targeting, image-preserving releases and container-readable secrets; clarify setup and validation
 - 2026-10-01 [Planned] Harden environment operations, release identity, fresh-download setup and host readiness verification

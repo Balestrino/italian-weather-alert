@@ -6,7 +6,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 
 | Change | Done | Open |
 | --- | ---: | ---: |
-| [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 2 | 4 |
+| [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 4 | 2 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 77 | 10 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |

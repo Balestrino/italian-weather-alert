@@ -7,8 +7,8 @@
 
 ## 2. Public frontend
 
-- [ ] 2.1 Add the independent public status command and embedded UI with bounded reads, error states and cursor navigation; verify synthetic availability, escaping, pagination, limits and route-isolation tests.
-- [ ] 2.2 Bundle the frontend binary and provide an explicit optional standalone Compose example; verify image build and resolved configuration without starting project services.
+- [x] 2.1 Add the independent public status command and embedded UI with bounded reads, error states and cursor navigation; verify synthetic availability, escaping, pagination, limits and route-isolation tests.
+- [x] 2.2 Bundle the frontend binary and provide an explicit optional standalone Compose example; verify image build and resolved configuration without starting project services.
 
 ## 3. Documentation and final verification
 

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stato del servizio | Italian Weather Alert</title>
+  <link rel="stylesheet" href="/assets/status.css">
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">Italian Weather Alert</p><h1>Stato del servizio</h1>
+      <p>Disponibilità, copertura pubblicata e aggiornamento delle fonti sono informazioni distinte.</p>
+      <a class="button" href="/">Aggiorna e riparti dalla prima pagina</a>
+    </header>
+    <section aria-labelledby="availability">
+      <h2 id="availability">Disponibilità tecnica</h2>
+      <p class="state">{{.Availability}}</p>
+      <p>Verifica effettuata il {{timeLabel .ObservedAt}}. La disponibilità tecnica non garantisce che tutte le fonti siano aggiornate.</p>
+    </section>
+    <section aria-labelledby="coverage">
+      <h2 id="coverage">Copertura delle fonti</h2>
+      <p>Ogni fonte indica il proprio ambito. La presenza di una regione o di un comune non implica una copertura completa.</p>
+      {{if .CoverageError}}
+        <p role="status">{{.CoverageError}}</p>
+      {{else}}
+        <p>Risposta del servizio: {{timeLabel .ServedAt}}. Elenco relativo alla pagina corrente{{if .LaterPage}}, successiva alla prima{{end}}.</p>
+        {{range .Limitations}}<p class="note">{{.}}</p>{{end}}
+        {{if .Sources}}
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Stato delle fonti">
+            <table><caption>Pubblicazione, ambito e ultimo controllo completo</caption>
+              <thead><tr><th scope="col">Fonte e territorio</th><th scope="col">Pubblicazione</th><th scope="col">Ambito</th><th scope="col">Aggiornamento</th></tr></thead>
+              <tbody>{{range .Sources}}<tr>
+                <th scope="row">{{.ID}}<span>{{label .Product}} · {{.Territory}}</span></th>
+                <td>{{label .PublicState}}</td>
+                <td>{{label .CoverageStatus}}{{range .CoverageLimitations}}<p class="note">{{.}}</p>{{end}}</td>
+                <td>{{label .Quality.Updating.State}}<span>Ultimo controllo completo: {{timeLabel .Quality.Updating.LastCompleteAt}}</span>{{range .Quality.Updating.Limitations}}<p class="note">{{.}}</p>{{end}}</td>
+              </tr>{{end}}</tbody>
+            </table>
+          </div>
+        {{else}}<p>Nessuna fonte restituita per questa pagina. Questo risultato non indica assenza di allerte.</p>{{end}}
+        {{if .NextURL}}<nav aria-label="Paginazione"><a class="button" href="{{.NextURL}}">Pagina successiva delle fonti</a></nav>{{end}}
+      {{end}}
+    </section>
+    <footer><p>IWA è un progetto indipendente. Questa pagina descrive il servizio e non sostituisce le pubblicazioni ufficiali delle autorità regionali e comunali.</p></footer>
+  </main>
+</body>
+</html>

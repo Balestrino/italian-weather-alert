@@ -1,0 +1,25 @@
+# Optional standalone project, attached only to the selected public listener network.
+# No dependency on backend readiness, credentials or the private data network.
+name: ${IWA_FRONTEND_PROJECT:-iwa-frontend}
+services:
+  frontend:
+    profiles: [public-frontend]
+    image: ${IWA_APP_IMAGE:-iwa-app:local}
+    entrypoint: [/iwa-frontend]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      IWA_PUBLIC_BACKEND_URL: ${IWA_PUBLIC_BACKEND_URL:-http://public:8080}
+      IWA_FRONTEND_LISTEN: 0.0.0.0:8082
+    ports: ["127.0.0.1:${IWA_FRONTEND_PORT:-8082}:8082"]
+    networks: [public_api]
+    cpus: 0.25
+    mem_limit: 64m
+    pids_limit: 64
+
+networks:
+  public_api:
+    external: true
+    name: ${IWA_FRONTEND_NETWORK:-iwa_listeners}
