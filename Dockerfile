@@ -4,10 +4,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd/ cmd/
 COPY internal/ internal/
-COPY docs/prerequisiti-mvp/embed.go docs/prerequisiti-mvp/embed.go
-COPY docs/prerequisiti-mvp/mcp-tools.json docs/prerequisiti-mvp/mcp-tools.json
-COPY docs/prerequisiti-mvp/openapi.json docs/prerequisiti-mvp/openapi.json
-COPY docs/prerequisiti-mvp/contratto.schema.json docs/prerequisiti-mvp/contratto.schema.json
+COPY api/ api/
 RUN CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o /iwa ./cmd/iwa \
  && CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o /iwa-inference-probe ./cmd/iwa-inference-probe
 

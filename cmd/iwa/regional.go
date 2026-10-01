@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/config"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/Balestrino/italian-weather-alert/internal/config"
-	"github.com/Balestrino/italian-weather-alert/internal/documents"
-	"github.com/Balestrino/italian-weather-alert/internal/domain"
 	"log/slog"
 	"os"
 	"strconv"

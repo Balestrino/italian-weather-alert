@@ -16,12 +16,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/config"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/Balestrino/italian-weather-alert/internal/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/config"
-	"github.com/Balestrino/italian-weather-alert/internal/documents"
-	"github.com/Balestrino/italian-weather-alert/internal/inference"
-	"github.com/Balestrino/italian-weather-alert/internal/ocr"
 )
 
 type review struct {

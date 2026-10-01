@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/Balestrino/italian-weather-alert/internal/inference"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 	"os"
 	"path/filepath"
 	"strings"

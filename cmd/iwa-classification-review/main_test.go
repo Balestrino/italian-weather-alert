@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Balestrino/italian-weather-alert/internal/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/inference"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 	"testing"
 )
 
