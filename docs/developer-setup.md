@@ -1,118 +1,86 @@
 # Developer setup
 
-This guide brings up an isolated local IWA stack for development. It uses the Compose services in this repository: PostgreSQL, RustFS, Crawl4AI, the read-only public API/MCP listener, and the private administration listener. The worker is a separate step because it needs a real inference-provider credential.
+This procedure runs development (`iwa`) with PostgreSQL, RustFS, Crawl4AI and the public/admin HTTP listeners. It works from a Git clone or an extracted ZIP; no agent tool is required. Read [environment prerequisites and existing-installation guidance](environments.md) first. If this Docker host already has an `iwa` project or volumes, preserve its credentials/settings instead of following the fresh-copy steps.
 
-For the current VM's separate development and staging Compose projects in one checkout, and the planned production VM, see [Environments](environments.md). Release images, approvals and recovery checks are documented in [Release operations](../deploy/release-operations.md).
+## 1. Prepare a fresh development project
 
-Commands below assume a POSIX shell on a machine with Docker Engine and the Docker Compose plugin. Run them from the repository root. Python 3 and `curl` are used by the setup and verification commands; Go 1.27.1 is needed for native builds and tests. Allow several gigabytes of free disk space for the container images, especially Crawl4AI.
-
-Before changing an existing capability, read the [OpenSpec plans and progress](../openspec/README.md). This checkout includes OpenSpec skills and commands for supported agents; [Agent tools](agent-tools.md) explains how to use them. The OpenSpec CLI is needed only to run those workflows. It is not required to build, test, or run the Compose stack below.
-
-## 1. Choose an isolated local project
-
-For a disposable local project, set a distinct Compose project, image tag, and host ports in the shell used for all commands. For the existing development and staging projects, use the explicit wrapper in [Environments](environments.md) instead.
+Run from the repository root:
 
 ```sh
-export COMPOSE_PROJECT_NAME=iwa-dev
-export IWA_APP_IMAGE=iwa-app:dev
-export IWA_PUBLIC_PORT=18080
-export IWA_ADMIN_PORT=18081
+mkdir -p .local/development
+install -m 600 deploy/development.env.example .local/development.env
+python3 scripts/init-secrets.py --directory .local/development/secrets
+scripts/compose-env.sh development config --quiet
 ```
 
-Compose binds the two HTTP ports to `127.0.0.1`. PostgreSQL, RustFS, Crawl4AI, and the workers have no host ports. The export values above are examples; choose free ports if 18080 or 18081 are occupied. Keep the same values when you later run `docker compose` commands.
+The ignored environment file selects development's image and loopback ports, defaulting to `8080` and `8081`. Edit these ports if occupied. The wrapper clears shell overrides; persistent values belong in `.local/development.env`. Secret generation preserves existing values and creates disabled notification/backup configurations. It does not create an inference-provider key.
 
-## 2. Initialize local configuration
+## 2. Start dependencies and initialize storage
 
 ```sh
-python3 scripts/init-secrets.py
-docker compose config --quiet
+scripts/compose-env.sh development up -d --wait --wait-timeout 180 postgres rustfs crawl4ai
+scripts/compose-env.sh development build admin
+scripts/compose-env.sh development run --rm --no-deps --pull never admin migrate
+scripts/compose-env.sh development run --rm --no-deps --pull never admin storage-init
 ```
 
-The script creates `.secrets/` with PostgreSQL, RustFS, Crawl4AI, and public cursor secrets, plus disabled notification and backup configurations. It preserves existing values. Both `.secrets/` and the optional `.env` file are ignored by Git. Compose defaults are enough for this local setup; put persistent, nonsecret overrides such as the host ports in your own `.env` if you prefer.
+Migration prepares the application schema; storage initialization prepares the private object bucket. Both commands require the admin role. They do not import or enable sources. Preserve existing PostgreSQL credentials when retaining database volumes.
 
-| Setting | Default | Purpose |
-| --- | --- | --- |
-| `COMPOSE_PROJECT_NAME` | `iwa` | Compose project and volume namespace; use `iwa-dev` for an isolated checkout. |
-| `IWA_APP_IMAGE` | `iwa-app:local` | Local application image tag. |
-| `IWA_PUBLIC_PORT` / `IWA_ADMIN_PORT` | `8080` / `8081` | Loopback host ports for API/MCP and administration. |
-| `IWA_REGOLO_API_KEY_PATH` | `./.secrets/regolo_api_key` | Existing provider key file, needed only when starting the worker. |
-| `IWA_SEMANTIC_LINKING_ENABLED` | `false` | Optional semantic retrieval in the worker. |
-| `IWA_PUBLIC_COPY_ACCESS_ENABLED` | `false` | Application-mediated retained copies on the public listener. |
-
-Do not replace the PostgreSQL password while keeping an existing PostgreSQL volume: the database was initialized with the earlier value. For a local run, leave public copy access, semantic linking, notifications, and backups at their disabled defaults.
-
-## 3. Start dependencies and initialize storage
+## 3. Start and check the listeners
 
 ```sh
-docker compose up -d --wait --wait-timeout 180 postgres rustfs crawl4ai
-docker compose build admin
-docker compose run --rm --no-deps admin migrate
-docker compose run --rm --no-deps admin storage-init
+scripts/compose-env.sh development up -d --no-build --pull never --wait --wait-timeout 180 public admin
+scripts/compose-env.sh development ps
+python3 scripts/smoke-compose.py development
+python3 scripts/check-deployment-config.py --environment development --runtime
+curl --fail http://127.0.0.1:8080/health/ready
+curl --fail http://127.0.0.1:8081/health/ready
+curl --fail http://127.0.0.1:8081/admin/status
 ```
 
-The migration creates the application schema. `storage-init` prepares the object store for retained documents. Both are admin-only commands. These steps do not import or publicly enable any alert source.
+Open [the administration UI](http://127.0.0.1:8081/admin/). The public JSON API is `http://127.0.0.1:8080/v1/` and MCP is `http://127.0.0.1:8080/mcp`. Substitute configured ports in URLs. A new database has no accepted sources, so empty public results are expected. The [coverage tracker](coverage.md) does not import runtime sources automatically.
 
-## 4. Start the two HTTP listeners
+## 4. Configure source work and optional collection
+
+Administration at `/admin/sources` supports authority/channel records, source drafts, acquisition previews and separate collection/publication controls. Use synthetic or authorized fixtures. Record official referrals, product/territory scope, access/reuse conditions and representative examples; preview before collection activation. A preview is not source acceptance or public enablement. Geography data in `docs/` are research inputs; runtime dataset registration and selection are explicit operations.
+
+Only start `worker` when a controlled source and the intended provider are configured. Put the real provider key in `.local/development/secrets/regolo_api_key`, or set `IWA_REGOLO_API_KEY_PATH` in `.local/development.env` to another private readable file. The file must contain one nonempty line and be readable by application UID 65532, through its mode or a deliberate ACL. Keep it inside an owner-private directory; never put the key in `.env` or a command argument.
 
 ```sh
-docker compose up -d --wait --wait-timeout 180 public admin
-docker compose ps
-curl --fail http://127.0.0.1:18080/health/ready
-curl --fail http://127.0.0.1:18081/health/ready
-curl --fail http://127.0.0.1:18081/admin/status
+scripts/compose-env.sh development up -d --no-build --pull never worker
+scripts/compose-env.sh development logs --tail=100 worker
 ```
 
-Open the administration UI at [http://127.0.0.1:18081/admin/](http://127.0.0.1:18081/admin/). The JSON API uses `http://127.0.0.1:18080/v1/`; the MCP endpoint is `http://127.0.0.1:18080/mcp`. Substitute your chosen host ports in these URLs. See the [verified API and MCP examples](../deploy/public-usage.md) for requests against a populated local fixture.
+Collection/provider requests can incur charges. Notifications, semantic linking, public retained-copy access and application backups start disabled. The optional `backup` service needs its own reviewed configuration; the whole-VM production strategy uses off-host PBS instead.
 
-A new database has no accepted alert sources. Empty coverage or search results are expected until source data is explicitly configured and reviewed. The [national coverage tracker](coverage.md) is documentation, not an automatic source import.
-
-## 5. Configure sources for development
-
-The administration UI at `/admin/sources` supports authority and channel records, source drafts, previews, and separate collection and publication controls.
-
-For source work, record the official referral, territory, product, access and reuse conditions, sections to check, and representative examples. Preview the configured revision before enabling collection. A successful preview does not certify complete regional or municipal coverage; observation, acceptance, and public enablement are separate steps. Use synthetic or otherwise authorized fixtures for ordinary development.
-
-Municipality and CAP data in `docs/` are research inputs. They are not automatically selected as runtime geography datasets by this setup; dataset registration and selection are explicit administration steps.
-
-## 6. Add the worker only when needed
-
-`scripts/init-secrets.py` does **not** create a Regolo API key. The `worker` service requires a real key file containing one nonempty line. Put it at the default ignored path `.secrets/regolo_api_key`, or set `IWA_REGOLO_API_KEY_PATH` to an existing private file that the container can read. The generated secret files use mode `0644` inside a host directory with mode `0700`; a custom key file must likewise be readable by the container user. Do not put the key in `.env` or a command argument.
-
-After configuring an intended test source and the key file:
+## 5. Test, update and manage development
 
 ```sh
-docker compose up -d worker
-docker compose ps worker
-docker compose logs --tail=100 worker
-```
-
-The worker can fetch configured sources and call external inference services, which may incur charges. The `backup` service is separate and its generated configuration is disabled. Review the configured source, model provider, and OCR settings before testing real acquisition or interpretation.
-
-## 7. Run checks and stop the stack
-
-```sh
+python3 -m unittest scripts/test_environment_operations.py
+python3 scripts/check-deployment-config.py
 go test ./...
 go vet ./...
 go build ./cmd/...
 go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
-docker compose config --quiet
 ```
 
-To reproduce the 66% CI statement coverage gate, run the isolated database integration tests with the two pinned test images:
+Before changing a capability, read [OpenSpec plans and progress](../openspec/README.md). [Agent tools](agent-tools.md) are optional contributor tools. Integration coverage instructions are in [CONTRIBUTING.md](../CONTRIBUTING.md). For an opt-in fresh-snapshot Compose rehearsal using unique temporary projects and generated credentials, run `python3 scripts/rehearse-environments.py --run` on a host with spare capacity. It builds an image, starts disposable services, exercises a disposable RustFS outage and removes only its own containers/volumes/image afterward. It does not prove a VM reboot or production readiness.
+
+An ordinary restart does not rebuild your code. To deploy changed development code deliberately, first rerun applicable tests, then:
 
 ```sh
-docker pull postgres:16-alpine
-docker pull rustfs/rustfs:1.0.0
-go test -tags=integration -p 2 -coverpkg=./cmd/...,./internal/... -coverprofile=/tmp/iwa-coverage.out ./cmd/... ./internal/...
-go tool cover -func=/tmp/iwa-coverage.out | tail -1
+scripts/compose-env.sh development build admin
+scripts/compose-env.sh development run --rm --no-deps --pull never admin migrate
+scripts/compose-env.sh development up -d --no-build --pull never --wait --wait-timeout 180 public admin
 ```
 
-For a running **throwaway** stack, `python3 scripts/smoke-compose.py` exercises dependency failure and recovery; it temporarily stops RustFS and starts it again. Do not run that smoke test against an operational instance.
-
-To stop this local project:
+Update any already activated worker separately with the same selected image and its reviewed configuration. Keep a compatible prior image/configuration for rollback and preserve data volumes and additive migrations. For releases, use the separate [staging/production procedure](../deploy/release-operations.md).
 
 ```sh
-docker compose down
+scripts/compose-env.sh development logs --tail=100 public admin postgres rustfs crawl4ai
+scripts/compose-env.sh development stop
+scripts/compose-env.sh development start --wait --wait-timeout 180 postgres rustfs crawl4ai public admin
+scripts/compose-env.sh development down
 ```
 
-`down` keeps the PostgreSQL and RustFS volumes and leaves `.secrets/` intact. To diagnose startup trouble, run `docker compose ps` and `docker compose logs --tail=100 public admin postgres rustfs crawl4ai`. A readiness response of 503 means at least one dependency is unavailable; a healthy container by itself does not prove source coverage or interpretation quality.
+`stop`/`start` operate on existing containers. `down` retains PostgreSQL/RustFS volumes and private files. A readiness response of 503 means a dependency is unavailable; inspect the selected project's status and logs. Do not use `down -v` as routine recovery. Ordinary smoke checks change no services; [planned fault injection](environments.md#planned-failure-checks) requires an explicit interruption option.

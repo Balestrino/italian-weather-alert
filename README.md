@@ -61,7 +61,7 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 
 The [developer setup guide](docs/developer-setup.md) walks through the local Compose stack, secrets, migrations, and optional worker configuration. [Verified JSON API and MCP examples](deploy/public-usage.md) show the five query groups against a local service. The [API/MCP contract](deploy/public-api-mcp.md) describes the interface in more detail.
 
-The [environment guide](docs/environments.md) explains how the existing development stack, isolated staging stack and planned dedicated production VM relate. [Release operations](deploy/release-operations.md) describe staging checks, manually approved GHCR image digests and the production backup/restore targets. Publishing the code does not by itself activate a public service or an alert source.
+The [environment guide](docs/environments.md) explains how the development, isolated staging and prepared production projects on one shared host relate. [Release operations](deploy/release-operations.md) describe staging checks, manually approved GHCR image digests and the production backup/restore targets. Publishing the code does not by itself activate a public service or an alert source.
 
 The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go unit and isolated database integration tests passed a 66% statement coverage floor; the measured percentage appears in that workflow's run summary. A separate security workflow checks for known reachable Go vulnerabilities on pushes, pull requests, and weekly. None of these checks measures the completeness of alert-source coverage.
 

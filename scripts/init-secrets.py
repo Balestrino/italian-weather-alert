@@ -20,6 +20,7 @@ for name in ('postgres_password', 'rustfs_access_key', 'rustfs_secret_key', 'cra
     # Parent 0700 protects host access; container services run with distinct UIDs
     # and Compose bind-mounted secrets must be readable by their runtime user.
     with os.fdopen(fd, 'w') as out:
+        os.fchmod(out.fileno(), 0o644)
         out.write(secrets.token_hex(32) + '\n')
 for name in ('notifications_config.json', 'backups_config.json'):
     try:
@@ -27,5 +28,6 @@ for name in ('notifications_config.json', 'backups_config.json'):
     except FileExistsError:
         continue
     with os.fdopen(fd, 'w') as out:
+        os.fchmod(out.fileno(), 0o644)
         out.write('{"enabled":false}\n')
 print('Local service secret files ready; existing values preserved.')

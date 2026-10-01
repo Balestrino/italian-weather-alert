@@ -18,8 +18,13 @@ fi
 
 command -v git >/dev/null
 command -v docker >/dev/null
-repo_root=$(git rev-parse --show-toplevel)
+command -v python3 >/dev/null
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 cd "$repo_root"
+if [[ ! -e .git ]] || ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+  echo 'Release images require a Git checkout with an identified revision; clone the repository instead of using a ZIP download.' >&2
+  exit 2
+fi
 
 if [[ -n $(git status --porcelain --untracked-files=normal) ]]; then
   echo 'Release checkout has uncommitted or untracked files.' >&2
@@ -49,6 +54,7 @@ if [[ $actual_revision != "$revision" ]]; then
   exit 1
 fi
 
+python3 scripts/environment_config.py --verify-staging-release "$image_tag" "$revision"
 docker push "$image_tag"
 image_digest=$(docker image inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$image_tag" | awk -v prefix="$image_repository@" 'index($0, prefix) == 1 { print; exit }')
 if [[ -z $image_digest ]]; then

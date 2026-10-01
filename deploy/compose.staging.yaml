@@ -1,0 +1,10 @@
+# Staging runs the candidate built once by scripts/release-image.sh.
+services:
+  public:
+    build: !reset null
+  admin:
+    build: !reset null
+  worker:
+    build: !reset null
+  backup:
+    build: !reset null

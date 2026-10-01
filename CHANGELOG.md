@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Fixed] Enforce environment targeting, image-preserving releases and container-readable secrets; clarify setup and validation
+- 2026-10-01 [Planned] Harden environment operations, release identity, fresh-download setup and host readiness verification
 - 2026-10-01 [Changed] Prepare inactive production Compose project on shared host with resource limits
 - 2026-10-01 [Fixed] Update integration fixtures for Drupal identifier deduplication and equivalent-version reuse
 - 2026-10-01 [Changed] Verify shared checkout migration for development and staging

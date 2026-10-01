@@ -1,49 +1,119 @@
 # Development, staging and production
 
-IWA publishes its source code publicly. A public code release does not by itself mean that a public API/MCP service or a particular alert source is active. See the [coverage tracker](coverage.md) for documented source status and the [release operations guide](../deploy/release-operations.md) for the deployment gate.
+IWA uses three Docker Compose projects from one repository directory on one host. Code publication, deployment and alert-source acceptance are separate steps; see the [coverage tracker](coverage.md).
 
-| Environment | Location and purpose | Data and access |
-| --- | --- | --- |
-| Development | Existing `iwa` Compose project on the current VM, managed from the shared public checkout; day-to-day code and source work. | Keeps its current PostgreSQL/RustFS volumes and private secrets. HTTP listeners bind to localhost; operator access may use a restricted tailnet. |
-| Staging | Separate `iwa-staging` Compose project from the same checkout on the current VM; build and test a release candidate. | Independent PostgreSQL/RustFS volumes, secrets, image reference and loopback ports. Initially empty; use controlled fixtures for release checks. No live collection or paid inference is enabled by setup. |
-| Production | Prepared `iwa-production` Compose project on this VM; no production services are running. The future public API/MCP route will use the HTTPS reverse proxy and administration will stay private. | Independent PostgreSQL/RustFS volumes and secrets, distinct loopback ports, resource ceilings, and only an operator-approved image digest. Off-host PBS protection and public source activation remain separate readiness steps. |
+| Environment | Compose project | Public / admin ports | Settings / secrets | Application image |
+| --- | --- | --- | --- | --- |
+| Development | `iwa` | `8080` / `8081` | `.local/development.env` / `.local/development/secrets/` | Explicit local builds |
+| Staging | `iwa-staging` | `28080` / `28081` | `.local/staging.env` / `.local/staging/secrets/` | Candidate built once by the release helper |
+| Production | `iwa-production` | `38080` / `38081` | `.local/production.env` / `.local/production/secrets/` | Operator-approved GHCR digest |
 
-All three projects share host CPU, memory and disk even though their data is separated. Check capacity before starting production or running heavy development and staging jobs. Never change the existing development Compose project name merely to relabel it: named volumes are scoped by the project name. A whole-host outage affects all three projects.
+These are example ports; select free loopback ports in each private environment file. Only public/admin HTTP listeners publish host ports, bound to `127.0.0.1`. Databases, object storage, crawlers and workers have no host ports. A new installation has no accepted sources or live collection. Production preparation selects no services and creates no containers.
 
-## Configure development and staging from one checkout
+All projects share CPU, RAM and disk. Their named volumes, networks and credentials are separate, but a host outage affects every environment. Review capacity and off-host recovery before production activation.
 
-Use one checkout on the current VM and keep each environment's ignored settings and secrets in its own directory. The [Compose file](../compose.yaml) selects the secret directory with `IWA_SECRETS_DIR`; [secret initialization](../scripts/init-secrets.py) accepts `--directory`. Never share the PostgreSQL password or object-store keys between the projects. The wrapper requires an explicit environment, removes inherited `IWA_` and `COMPOSE_` overrides, and fixes the Compose project name.
+## Prerequisites
+
+Use Bash, Python 3.9 or newer, Docker Engine with its Compose plugin, and curl. The environment commands and overlays were tested with Docker Compose **v5.5.1**; verify an older plugin can parse the `!reset` overlays using the template check below before proceeding. Git is required for release images; basic setup and management also work from an extracted ZIP. Go 1.27.1 is needed only for native builds and Go tests. Docker pulls/builds need network access and several gigabytes of disk, especially for Crawl4AI.
+
+Run commands from the repository root unless a command uses an absolute script path. The wrapper itself also works from another working directory.
 
 ```sh
-mkdir -p .local/development .local/staging
-cp deploy/development.env.example .local/development.env
-cp deploy/staging.env.example .local/staging.env
-scripts/compose-env.sh development config --quiet
-scripts/compose-env.sh staging config --quiet
+docker compose version
+python3 scripts/check-deployment-config.py
 ```
 
-For an existing installation, copy its current private secrets and environment settings into the appropriate ignored `.local/` paths **before running the configuration checks above**; do not regenerate credentials for existing volumes. For a fresh empty project, run `python3 scripts/init-secrets.py --directory .local/development/secrets` or the corresponding staging path before its first start. Preserve the development project name `iwa` so its named volumes remain attached. Choose free loopback ports if the examples are occupied. `iwa-staging` keeps separate networks and named volumes. Set staging's `IWA_APP_IMAGE` to the exact tag printed by `scripts/release-image.sh build` before starting application services. The [developer setup guide](developer-setup.md) supplies the dependency, migration, storage initialization and readiness commands; run them through `scripts/compose-env.sh staging`. Keep `worker` stopped unless a specific release check requires it and an operator has configured a controlled source and provider key. A new staging database has no accepted sources, so empty results are expected.
+The default checker validates committed **templates**, without starting services or certifying host readiness.
 
-Verify the two installations independently with `scripts/compose-env.sh development ps` and `scripts/compose-env.sh staging ps`, their project names, host ports and volume names. Staging should have its own `iwa-staging_postgres_data` and `iwa-staging_rustfs_data` volumes; the existing development volume names and contents must remain untouched. Do not run `docker compose down -v` on either installation as part of routine release work.
+## Existing installation: preserve its state
 
-## Data boundaries
+If `iwa` or `iwa-staging` already exists on this Docker host, adopt its settings and credentials before following fresh setup. Check `docker compose ls` and `docker volume ls`. Never initialize new credentials against existing database volumes or change the `iwa` project name to relabel development.
 
-Use synthetic or otherwise authorized fixtures in the public repository. Development and staging must not point to the same live database or RustFS bucket/volume. If staging needs a representative data copy, transfer PostgreSQL and RustFS together from one consistent point in time, keep the copy private, and disable collection, outbound inference and notifications until its configuration has been reviewed. A database-only copy can leave evidence references broken.
+Keep the existing PostgreSQL password, RustFS keys, crawl token, cursor key and any provider/notification configuration in the appropriate ignored `.local/<environment>/secrets/` directory. Copy current private settings into `.local/<environment>.env`; inspect paths and selected images before startup. Do not blindly replace existing environment files with examples. Existing custom file permissions/ACLs are preserved by secret initialization.
 
-Production starts with its own state. Code promotion never copies development or staging data into production. Source configuration, source acceptance, collection activation and public enablement require their own operator review.
+The fixed volume names are `iwa_postgres_data` / `iwa_rustfs_data`, `iwa-staging_postgres_data` / `iwa-staging_rustfs_data`, and `iwa-production_postgres_data` / `iwa-production_rustfs_data`. Routine stop, upgrade and rollback keep them. Do not use `down -v` as routine maintenance.
 
-## Prepared production project
+## Fresh development
 
-Production uses the same checkout with the [production overlay](../deploy/compose.production.yaml). Its ignored settings are `.local/production.env` and its private files are under `.local/production/secrets`. On this host they have been initialized without starting containers. The example uses loopback ports `38080` and `38081`, separate from development and staging. Its image digest remains a placeholder until an approved release is published.
+For an empty Docker host, follow the complete [developer setup](developer-setup.md). It initializes development, migrates the database, prepares storage and starts both listeners without an inference-provider key.
 
-For a new host or a replacement checkout, prepare the files without starting services:
+## Fresh staging
+
+Use a Git checkout for a release candidate. Staging uses the [staging overlay](../deploy/compose.staging.yaml), which removes application build directives. Start from a clean identified revision and keep the checkout unchanged through validation and publication.
 
 ```sh
+mkdir -p .local/staging
+install -m 600 deploy/staging.env.example .local/staging.env
+python3 scripts/init-secrets.py --directory .local/staging/secrets
+scripts/release-image.sh build
+```
+
+Set `IWA_APP_IMAGE` in `.local/staging.env` to the exact tag printed by the build helper. Then run:
+
+```sh
+scripts/compose-env.sh staging config --quiet
+scripts/compose-env.sh staging up -d --wait --wait-timeout 180 postgres rustfs crawl4ai
+scripts/compose-env.sh staging run --rm --no-deps --pull never admin migrate
+scripts/compose-env.sh staging run --rm --no-deps --pull never admin storage-init
+scripts/compose-env.sh staging up -d --no-build --pull never --wait --wait-timeout 180 public admin
+python3 scripts/smoke-compose.py staging
+python3 scripts/check-deployment-config.py --environment staging --runtime
+curl --fail http://127.0.0.1:28080/health/ready
+curl --fail http://127.0.0.1:28081/admin/status
+```
+
+No application build belongs in these staging steps. Test controlled fixtures using [release operations](../deploy/release-operations.md), then publish that candidate. Workers and inference remain off unless explicitly configured for the intended check.
+
+## Prepare production without activating it
+
+For a fresh empty production project:
+
+```sh
+mkdir -p .local/production
 install -m 600 deploy/production.env.example .local/production.env
 python3 scripts/init-secrets.py --directory .local/production/secrets
-python3 scripts/check-deployment-config.py
 scripts/compose-env.sh production config --quiet
 scripts/compose-env.sh production ps --all
+python3 scripts/check-deployment-config.py --environment production --runtime
 ```
 
-The production overlay assigns every service to a profile. With no profile selected, `docker compose up` selects no production services. The `production` profile contains the public/admin listeners and their dependencies; `production-worker` and `application-backup` are separate. The application backup worker remains disabled while whole-VM PBS backup is the selected strategy. The overlay also sets CPU, RAM and process ceilings; these do not bound named-volume growth or prove sufficient capacity for real traffic. [Release operations](../deploy/release-operations.md) lists the validation and approval required before starting production.
+The example image remains a placeholder until an approved release is published. Configuration, status, logs and stop/teardown commands remain available with that placeholder. Production image operations require `ghcr.io/...@sha256:` followed by 64 hexadecimal characters, and application builds are rejected. Digest syntax alone does not prove publication or operator approval.
+
+The `production` profile selects the five core services; `production-worker` and `application-backup` are separate. Profiles control selection: explicitly targeting a service can activate its profile. They do not replace deployment approval. Use the complete [production deployment and rollback procedure](../deploy/release-operations.md) after host readiness passes. Keep the application backup worker disabled while off-host PBS protects the whole VM.
+
+## Routine management
+
+Always select the environment explicitly. For example, these commands target staging:
+
+```sh
+scripts/compose-env.sh staging ps --all
+scripts/compose-env.sh staging logs --tail=100 public admin postgres rustfs crawl4ai
+scripts/compose-env.sh staging logs --follow --tail=100 admin
+python3 scripts/check-deployment-config.py --environment staging
+python3 scripts/check-deployment-config.py --environment staging --runtime
+python3 scripts/smoke-compose.py staging
+scripts/compose-env.sh staging stop
+scripts/compose-env.sh staging start --wait --wait-timeout 180 postgres rustfs crawl4ai public admin
+```
+
+Use `development` for development. For activated production use `scripts/compose-env.sh production --profile production <command>` for core-service stop/start, and explicitly include `--profile production-worker` when managing an activated worker. `start` restarts existing containers; fresh startup and changed configuration use the initialization/deployment sequences, not a bare `up`. `down` removes containers/networks but retains named data volumes.
+
+The wrapper clears inherited `IWA_` / `COMPOSE_` variables and rejects project, configuration-file, environment-file and project-directory overrides. Put settings in the chosen environment file. Use `--profile`, `--dry-run`, `--ansi`, `--progress` and `--parallel` as supported leading options. Staging/production builds and watch/rebuild operations are rejected. Using Docker directly remains an operator capability, so avoid bypassing these guardrails in routine work.
+
+Runtime checks show configured images, running revision labels and checkout revisions. Differences are visible; checks never automatically rebuild or redeploy. Core services must be healthy and mounted to the selected project's data and secrets. Optional inactive workers and absent unused provider keys are allowed. Runtime restart-policy differences require a planned rollout; editing Compose alone does not change existing containers. `unless-stopped` restarts activated services after an unexpected exit or host restart, while intentionally stopped services stay stopped.
+
+## Planned failure checks
+
+Ordinary smoke checks are nondisruptive. Fault injection stops and restarts only the selected project's RustFS and needs a planned interruption on a throwaway or explicitly scheduled development/staging stack:
+
+```sh
+python3 scripts/smoke-compose.py staging --allow-interruption
+```
+
+The check verifies runtime project/port/mount identity before stopping anything, attempts recovery even if an assertion fails, and refuses production fault injection. Schedule it explicitly when staging is operational.
+
+## Data and credential boundaries
+
+Generate separate credentials for fresh projects. New files use mode `0644` inside a host directory with mode `0700`, independent of umask, so the container users can read their bind-mounted secrets. Existing credentials and custom permissions are preserved. A private provider key must be readable by its container UID (65532 for the application); repair its mode/ACL deliberately rather than regenerating it. Runtime checks test mounted-file readability without printing values.
+
+Never point development and staging to the same database or RustFS storage. If staging needs a private representative copy, transfer PostgreSQL and RustFS together from a consistent point, and disable collection, inference and notifications before using it. Code promotion does not copy data or activate sources. Keep private files, operational evidence and unpublished captures outside commits.

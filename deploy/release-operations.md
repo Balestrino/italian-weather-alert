@@ -10,24 +10,24 @@ Use one clean Git revision in the shared checkout. Run CI-equivalent tests and t
 scripts/release-image.sh build
 ```
 
-The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Use `scripts/compose-env.sh staging` to start dependencies, migrate and initialize storage as described in the [developer setup guide](../docs/developer-setup.md), then bring up the public and admin listeners with the tested image. Keep the worker off unless the change requires a controlled source or inference check.
+The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Follow the exact [staging initialization commands](../docs/environments.md#fresh-staging), which reuse that candidate for migrations, storage initialization and listener startup with rebuilding disabled. Keep the worker off unless the change requires a controlled source or inference check.
 
 Every release check includes:
 
 1. Passing Go test, race, vet, build, integration coverage and vulnerability workflows for the intended revision.
-2. Successful `docker compose config --quiet`, staging migration and storage initialization, healthy PostgreSQL/RustFS/Crawl4AI and both HTTP listeners.
+2. Successful `scripts/compose-env.sh staging config --quiet`, staging migration/storage initialization, healthy dependencies/listeners, `python3 scripts/smoke-compose.py staging`, and `python3 scripts/check-deployment-config.py --environment staging --runtime`.
 3. Representative JSON API and MCP queries against known staging fixtures, truthful coverage/updating state, and absence of administration on the public listener. Check the administrative listener only from its restricted path.
 4. Review of logs, failed jobs, source status and any change-specific source or inference regression. A code pass does not accept or publicly enable a source.
 
-The [Compose fault-injection test](../scripts/smoke-compose.py) stops RustFS; run it only on a disposable project or during an explicitly planned staging interruption. Do not use it as a routine production smoke check.
+The ordinary [Compose smoke check](../scripts/smoke-compose.py) changes no services. Its `staging --allow-interruption` option stops/restarts staging RustFS and belongs only on a throwaway stack or a planned staging interruption; production interruption is rejected.
 
-After the staging checks, authenticate to GHCR using private credentials and run `scripts/release-image.sh publish`. This pushes the tested local image and prints a `ghcr.io/...@sha256:...` reference. The first GHCR package is private by default; an operator must explicitly make the image public before using anonymous production pulls. Record the Git revision, staging results, published digest, prior production digest and operator approval together. A public image contains application code, never deployment secrets. Keep at least the previous compatible digest available for rollback.
+After the staging checks, authenticate to GHCR using private credentials and run `scripts/release-image.sh publish`. Publication first compares the configured and running staging application image IDs/revision labels with the clean-revision candidate and refuses a mismatch before pushing. It then pushes the tested local image and prints a `ghcr.io/...@sha256:...` reference. The first GHCR package is private by default; an operator must explicitly make the image public before using anonymous production pulls. Record the Git revision, staging results, published digest, prior production digest and operator approval together. A public image contains application code, never deployment secrets. Keep at least the previous compatible digest available for rollback.
 
 ## Prepared production project and resource limits
 
 The prepared project uses ignored `.local/production.env` and `.local/production/secrets` in the shared checkout. [The environment wrapper](../scripts/compose-env.sh) fixes the `iwa-production` project name and adds [compose.production.yaml](compose.production.yaml), which removes local build directives. The example reserves loopback ports `38080` and `38081`; the proxy and private operator route have not been connected to them. The image remains a placeholder until an approved digest replaces it. `config` and `ps --all` are safe preparation checks; neither starts containers.
 
-Every production service has a profile, so an unqualified `up` selects no service. The `production` profile contains the listeners, PostgreSQL, RustFS and Crawl4AI. The `production-worker` profile is separate, and the `application-backup` profile is not used while PBS protects the VM. The initial per-container ceilings are:
+Every production service has a profile, so an unqualified `up` selects no service after valid image selection. An explicitly named service can activate its own profile; profiles do not constitute deployment approval. The `production` profile contains the listeners, PostgreSQL, RustFS and Crawl4AI. The `production-worker` profile is separate, and the `application-backup` profile is not used while PBS protects the VM. The initial per-container ceilings are:
 
 | Service | RAM | CPU |
 | --- | ---: | ---: |
@@ -37,15 +37,76 @@ Every production service has a profile, so an unqualified `up` selects no servic
 | Worker, when separately enabled | 768 MiB | 1.5 |
 | Application backup, normally disabled | 512 MiB | 0.5 |
 
-The five core services can reach **3.5 GiB** in aggregate; the worker adds **0.75 GiB**. These are ceilings, not measured requirements. Named volumes have no disk quota, and a container may fail if its limit is too low. Rehearse the expected workload in staging, measure host headroom and disk growth, and adjust the limits before approving production startup. With 8 GiB RAM and a 50 GiB disk on the shared VM, concurrent development/staging activity and the current free disk require a capacity decision before activation.
+The five core services can reach **3.5 GiB** in aggregate; the worker adds **0.75 GiB**. These are ceilings, not measured requirements. Named volumes have no disk quota, and a container may fail if its limit is too low. Rehearse the expected workload in staging, measure host headroom and disk growth, and adjust the limits before approving production startup. Account for all environments, the OS, image-build peaks and database/object growth. Review sustained RAM or disk use above the agreed 70% threshold. Choose host expansion, adjusted limits/retention or workload scheduling from measurements before activation; a template budget alone cannot show sufficient headroom.
+
+## Controlled fixture procedure
+
+Use only synthetic or authorized fixtures. Keep staging workers off, leave provider keys absent, and keep notifications disabled during fixture validation. The repository already provides a reproducible synthetic transport corpus and an isolated PostgreSQL fixture covering all five query groups:
+
+```sh
+go test ./internal/server -run TestPublishedUsageExamplesAgainstLocalService -v
+go test -tags=integration ./internal/publicquery -run TestFiveSharedPublicQueryGroups -v
+```
+
+These tests create their own fixture service/database; they do not populate or modify the running staging database. They test the examples in [public-usage-examples.json](public-usage-examples.json), including retained versions, municipal measures, regional facts, coverage and public/admin separation. Record their result alongside the exact candidate's runtime checks. On fresh staging, additionally verify empty coverage/search are truthful and discover the expected MCP tool surface:
+
+```sh
+curl --fail http://127.0.0.1:28080/v1/sources/coverage
+curl --fail 'http://127.0.0.1:28080/v1/search?kind=document'
+curl --fail -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' --data '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' http://127.0.0.1:28080/mcp
+```
+
+For release checks requiring populated staging, prepare a consistent private synthetic database/object fixture through the documented administration and retention interfaces. Record its known records, version IDs, object hashes, expected query results and limitations. Transfer database and objects together; keep collection/inference/notifications disabled. Run the [five API/MCP examples](public-usage.md) against the selected staging ports, replacing automated fixture IDs/times with those in the reviewed fixture. Do not label automated fixture acceptance as acceptance of a real alert source. An empty staging query alone is insufficient evidence for a data-processing release.
 
 ## Production deployment
 
-Before deployment, replace `IWA_APP_IMAGE` in `.local/production.env` with the **approved digest** and set public proxy trust, public origin and private administration origin for the actual route. Use `--no-build` on application starts. Do not run a production build or use a moving `latest` tag. Production keeps its own empty data and secrets; code promotion does not copy development or staging evidence.
+Before deployment, select the **approved digest** in `.local/production.env` and set proxy trust, public origin and private administration origin for the reviewed route. Digest syntax is enforced before image-consuming operations; local diagnostics with the preparation placeholder remain usable. Builds are rejected. Record the prior digest/configuration, a recent recoverable PBS backup and working backup alerts, and migration compatibility with the prior image. Complete concurrent-load, restore and routing readiness checks before approving initial activation.
 
-Before each deployment, record the current digest, confirm a recent recoverable PBS backup and that its alerts are working, verify the proposed migration remains compatible with the previous image, and check `scripts/compose-env.sh production --profile production config --quiet`. For initial startup, bring up PostgreSQL, RustFS and Crawl4AI under the `production` profile, pull the approved image, run the admin `migrate` and `storage-init` commands, then start public and admin with `--no-build --wait`. Start the worker only after its provider and source settings have been reviewed, by explicitly selecting `production-worker` as well as `production`. For an update, apply the same migration and health sequence while preserving volumes and source publication controls. Do not select `application-backup` while whole-VM PBS protection is in use.
+After approval, initial startup is:
 
-After deployment, check the external HTTPS API/MCP route, local readiness, exact private admin boundary, source-check ages, a known document/evidence reference, worker errors and backup monitoring. A failed application release rolls back to the previous compatible image digest and configuration. Do not reverse additive database migrations or delete PostgreSQL/RustFS volumes as an application rollback. An incompatible or corrupt data state requires stopping writers and a coordinated recovery of database and objects; decide explicitly how to handle data written after the selected backup.
+```sh
+scripts/compose-env.sh production --profile production config --quiet
+scripts/compose-env.sh production --profile production pull public admin postgres rustfs crawl4ai
+scripts/compose-env.sh production --profile production up -d --no-build --wait --wait-timeout 180 postgres rustfs crawl4ai
+scripts/compose-env.sh production --profile production run --rm --no-deps --pull never admin migrate
+scripts/compose-env.sh production --profile production run --rm --no-deps --pull never admin storage-init
+scripts/compose-env.sh production --profile production up -d --no-build --pull never --wait --wait-timeout 180 public admin
+python3 scripts/check-deployment-config.py --environment production --runtime
+python3 scripts/smoke-compose.py production
+curl --fail http://127.0.0.1:38080/health/ready
+curl --fail http://127.0.0.1:38081/health/ready
+```
+
+The private admin listener must remain reachable only through the reviewed SSH/tailnet path. Check external HTTPS API/MCP separately, including trusted client-address forwarding, absence of admin/configuration routes, truthful coverage/source ages and known document/evidence references. Production retains its own state; no data copy or source activation occurs as part of image promotion.
+
+Only after provider/source settings are reviewed and collection is deliberately authorized, enable the optional worker:
+
+```sh
+scripts/compose-env.sh production --profile production --profile production-worker up -d --no-build --pull never worker
+scripts/compose-env.sh production --profile production --profile production-worker logs --tail=100 worker
+```
+
+Its provider key belongs in `.local/production/secrets/regolo_api_key` or the private configured path and must be readable by application UID 65532. Do not select `application-backup` while whole-VM PBS protection is in use.
+
+## Upgrade and rollback
+
+Validate a new candidate in staging, publish it and obtain approval for its exact digest. Record a pre-release backup and the current compatible digest/configuration. Change only the intended private image/configuration settings, then repeat production pull, migration, storage initialization, listener startup and health checks above. Update an already activated worker explicitly with its reviewed settings. Application changes may need scheduled writer interruption; migrations must remain compatible with the prior image.
+
+For application rollback, restore the **previous compatible digest and configuration** in `.local/production.env`, pull it and recreate listeners without rebuilding:
+
+```sh
+scripts/compose-env.sh production --profile production pull public admin
+scripts/compose-env.sh production --profile production up -d --no-build --pull never --wait --wait-timeout 180 public admin
+python3 scripts/smoke-compose.py production
+```
+
+Roll back an activated worker separately with both profiles, and verify known evidence references, source ages and backup monitoring. Preserve additive migrations, database/object volumes and acquired evidence. Never use `down -v` or reverse migrations as an image rollback. An incompatible/corrupt data state requires stopping writers and restoring PostgreSQL plus RustFS together; explicitly decide how to handle post-backup data.
+
+## Roll out dependency restart policies
+
+All services now declare `unless-stopped`, but an already created container retains its prior policy until updated. After confirming recovery protection, capture selected container image IDs/mounts/policies privately, obtain the dependency IDs using the selected wrapper's `ps -q postgres rustfs crawl4ai`, and verify their project/service labels. Apply `docker update --restart unless-stopped` only to those verified IDs. This changes restart policies without rebuilding/recreating containers or replacing volumes. Verify unchanged image IDs/mounts and run the selected runtime/readiness checks. Record prior policies for rollback.
+
+Reboot recovery needs an actual disposable-host rehearsal, then a separately scheduled current-host restart after the restore check. A nondisruptive runtime check does not prove a host reboot or a one-hour restore target.
 
 ## PBS backup and recovery target
 
