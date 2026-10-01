@@ -12,7 +12,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 89 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 18 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 6 | 0 |
+| [Automatic changelog](changes/automate-changelog/proposal.md) | 8 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |

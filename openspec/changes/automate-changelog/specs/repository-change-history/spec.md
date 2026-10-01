@@ -28,3 +28,7 @@ A software release SHALL preserve dated history under a version/date section and
 #### Scenario: Development continues after a release
 - **WHEN** a contributor records a new staged change
 - **THEN** the recorder adds its dated entry under Unreleased without modifying versioned history
+
+#### Scenario: A patch release is prepared
+- **WHEN** development changes are grouped for the next patch version
+- **THEN** the changelog preserves those dated entries under the patch version/date heading, OpenAPI and MCP implementation metadata identify the same software version, release notes summarize the changes and upgrade considerations, and historical releases remain unchanged

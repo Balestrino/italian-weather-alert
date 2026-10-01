@@ -90,7 +90,7 @@ The code and the information it produces are provided on a best-effort, **“as 
 - [Agent workflows and optional tools](docs/development/agent-tools.md)
 - [Developer setup](docs/development/setup.md), [public API/MCP examples](docs/backend/public-usage.md), and [API/MCP contract](docs/backend/public-api-mcp.md)
 - [Development, staging and production](docs/operations/environments.md) and [release operations](docs/operations/releases.md)
-- [Changelog](CHANGELOG.md) and [v0.1.0 release notes](docs/releases/v0.1.0.md)
+- [Changelog](CHANGELOG.md) and [v0.1.1 release notes](docs/releases/v0.1.1.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 Original IWA code is licensed under [GPL-3.0-only](LICENSE). Selected third-party data and retained source files have separate terms recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The public repository contains only reviewed source snapshots; the broader internal research evidence is kept separately.

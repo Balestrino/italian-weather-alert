@@ -4,6 +4,9 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+## 0.1.1 - 2026-10-01
+
+- 2026-10-01 [Changed] Bump the software patch version to 0.1.1, align OpenAPI/MCP metadata, and prepare versioned changelog history and patch release notes.
 - 2026-10-01 [Changed] Apply the additive municipal migration and update development admin; verify live controls and readiness while preserving the existing collector and record partial image alignment.
 - 2026-10-01 [Changed] Document explicit worker selection, environment-scoped territorial and source controls, compatible rollback and separately scheduled collector handover; record synthetic verification.
 - 2026-10-01 [Added] Provide audited CLI and admin activation controls for regions, municipalities and source collection, with native forms and territorial blocking status.
@@ -11,6 +14,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 - 2026-10-01 [Changed] Make collection and backup workers opt-in in development and staging; verify isolated production profile selection
 - 2026-10-01 [Planned] Extend the processing plan with hierarchical region/municipality/source controls in CLI and admin, independent of worker startup and public publication
 - 2026-10-01 [Planned] Plan explicit development and staging background worker activation with production profile isolation and controlled shared-host processing
+
 ## 0.1.0 - 2026-10-01
 
 - 2026-10-01 [Added] Prepare the first software release with versioned history, pilot release notes and development-to-main promotion guidance.
