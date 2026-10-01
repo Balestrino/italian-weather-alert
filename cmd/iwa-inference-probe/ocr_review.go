@@ -6,7 +6,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/Balestrino/italian-weather-alert/internal/inference"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 )
 
 // reviewedOCRAdapter is opt-in, local evidence for a caller-selected reviewed

@@ -63,9 +63,19 @@ Municipal acceptance SHALL identify configured channels and sections, evaluated 
 ### Requirement: Retained acquisition and versions
 The service SHALL retain original document bytes where permitted, source URL, acquisition time, hash, available publication/update metadata and interpretation version. It SHALL detect changes at stable URLs, preserve prior versions within retention, and avoid duplicate versions for unchanged content. An unchanged successful check SHALL NOT change publication time. Required linked resources SHALL be included or explicitly reported missing.
 
+Generated transport-only Drupal Views DOM identifiers in HTML comments or class names SHALL NOT create a new content version. The retained original SHALL remain byte-exact, and changes to listing content or document provisions SHALL still create versions.
+
 #### Scenario: A page is revised without a new URL
 - **WHEN** a known municipal page changes its provisions
 - **THEN** the changed version is retained alongside its prior version and interpretation provenance
+
+#### Scenario: A listing response changes only its generated DOM identifier
+- **WHEN** repeated HTML responses differ only in a generated Drupal Views DOM identifier
+- **THEN** they share one content version while the first retained original remains byte-exact
+
+#### Scenario: Distinct retained versions have equivalent interpretation inputs
+- **WHEN** separate retained versions contain the same substantive HTML evidence under a reviewed interpretation policy
+- **THEN** contiguous preflight grouping and classification reuse avoid duplicate provider calls while retaining each version's provenance
 
 ### Requirement: Necessary attachments and ordinances
 The service SHALL acquire linked attachments and ordinances when needed to establish a measure, territory or validity. If an attachment cannot be accessed or interpreted, it SHALL expose the available official document or link and identify the fields that cannot be determined. It SHALL NOT substitute bulletin validity or page expiry for a duration specified only in the ordinance.
@@ -80,6 +90,10 @@ Structured conclusions SHALL be supported by identifiable passages or explicit v
 #### Scenario: A newer document cannot be interpreted
 - **WHEN** a new official document is acquired but its measures cannot be established
 - **THEN** document metadata and the official link are available with an interpretation warning, no unsupported measures are asserted, and preceding affected states disclose the newer uninterpreted publication
+
+#### Scenario: An extraction response fails validation
+- **WHEN** a structured extraction response fails envelope, evidence or model-consistency validation
+- **THEN** the service privately preserves the request and verbatim response, attempt/window identity, finish reason and diagnostic code without credentials, retries or successful checkpoints; a capture failure stops the job with an explicit diagnostic-storage error
 
 ### Requirement: Configurable checks and complete-check status
 The service SHALL support per-source configurable check intervals defaulting to 10 minutes and independent delay thresholds defaulting to 30 minutes since the last complete successful check. A complete check SHALL cover the declared sections, relevant listings and documents requiring revision checks, with successful content recognition. Reachability alone SHALL NOT reset the complete-check time. The first failed check SHALL be visible immediately; a source without a successful baseline SHALL be reported as not yet verified. These settings SHALL NOT be advertised as end-to-end delivery guarantees.
@@ -102,6 +116,10 @@ Collection SHALL respect source constraints and upstream retry instructions, use
 #### Scenario: An occasional channel has no new notice
 - **WHEN** a complete check finds no changes and no publication is expected
 - **THEN** the check succeeds without a missing-publication alarm
+
+#### Scenario: A reviewed stale document remains unavailable
+- **WHEN** a previously discovered document still returns HTTP 404/410 and complete later traversals of the configured listings no longer contain it
+- **THEN** an operator may record an evidence-backed exclusion scoped to its source, configuration and URL, preserving acquisitions, failed checks and unavailable-target history; rediscovery automatically restores the target to checking
 
 ### Requirement: Internal quality monitoring and DPC comparison
 The internal monitoring system SHALL retain diagnostic evidence for availability, timeliness and interpretation correctness, including ambiguous relationships, omitted publications, source disagreements and parsing failures. It SHALL support assessment of code and process improvements against retained cases. It SHALL NOT introduce editorial approval, manual content correction or a publication gate for individual notices. DPC products SHALL be used only for internal comparison in the first release, with comparison scope and non-comparability explicit; they SHALL NOT overwrite regional values or appear as public warning products.
@@ -172,12 +190,24 @@ Segment results SHALL be merged through validation that rejects unsupported asse
 - **WHEN** a notice reopens an underpass and explicitly retains closure of cemeteries and a dog exercise area
 - **THEN** both retained closures and the bounded reopening remain represented with literal operative evidence, without deriving times from page metadata or revoking other restrictions
 
+#### Scenario: A notice opens the municipal civil-protection centre
+- **WHEN** an operative passage explicitly states that the named municipal civil-protection centre will be open
+- **THEN** the evaluated extraction configuration can represent its activation with literal evidence, without treating an unrelated office opening as activation or borrowing the regional alert's validity
+
 ### Requirement: Durable processing and bounded retries
 Processing SHALL preserve job states, errors and attempt history across restarts, prevent duplicate public effects from resumed work, and support a configurable maximum initially three total attempts for temporary processing errors with increasing waits. Ambiguity in readable content SHALL NOT itself trigger repeated attempts. Exhausted processing SHALL preserve acquired evidence and an explicit failure state.
 
 #### Scenario: Processing fails repeatedly
 - **WHEN** a temporary interpretation error exhausts the configured attempt count
 - **THEN** automatic attempts stop, failure remains visible, acquired evidence is preserved, and an operator can explicitly relaunch the job
+
+#### Scenario: A completed incident leaves a temporary recovery restriction
+- **WHEN** the selected incident jobs have succeeded but their persistent recovery scope still defers ordinary work
+- **THEN** an operator preserves the prior policy and call ledger, validates a bounded representative canary, and explicitly releases the temporary restriction without resetting job attempts, removing archives, bypassing provider holds or enabling public sources
+
+#### Scenario: A selected recovery schedules measure dependencies
+- **WHEN** embedding or linking work identifies its document through an extraction run
+- **THEN** the recovery guard applies the parent document's scope and quarantine, permits allowed dependencies, and retains the shared provider-call cap
 
 ### Requirement: Measured quality before source publication
 Source acceptance SHALL include human-reviewed expected outputs for observed cases and labeled simulations, covering irrelevant notices, omissions, partial reopenings, exceptions, conflicting dates, newer uninterpreted documents and scanned attachments. A missed relevant notice or unsupported asserted measure in evaluation SHALL block public activation of the affected source until correction and successful re-evaluation. Evaluation SHALL also report indeterminate fields and extraction usefulness. An observational collection trial SHALL last at least seven days and SHALL be extended for unresolved problems or insufficient observations; retained cases SHALL exercise significant events absent from the trial.
@@ -192,6 +222,10 @@ Each interpretation SHALL identify its model, instruction/configuration versions
 #### Scenario: A model configuration changes
 - **WHEN** an operator selects failed documents for reprocessing after evaluation
 - **THEN** only the selected scope is reprocessed, each new run is versioned, and previous results remain traceable
+
+#### Scenario: A reprocessing identity includes a selection and input manifest
+- **WHEN** the classification run identity exceeds the store's identifier bound
+- **THEN** a deterministic digest preserves all identity components and isolates distinct selections while existing bounded identities remain unchanged
 
 #### Scenario: A published interpretation is found defective
 - **WHEN** the operator suspends new interpretations for that source
@@ -212,18 +246,22 @@ The service SHALL support private SMTP/recipient configuration and send administ
 - **THEN** email reports the incident, sends reminders according to configuration and reports recovery without emailing every failed check
 
 ### Requirement: Configurable backups and verified recovery
-The MVP deployment SHALL protect the dedicated service VM through off-host Proxmox Backup Server whole-VM backups covering structured data, acquired originals in the VM-hosted S3-compatible storage and configuration required for recovery. Backup schedule and retention SHALL be configurable deployment values and documented before operational readiness. The production backup plan SHALL target no more than six hours of lost data, schedule backups with margin for a delayed or failed job, and alert operators before the latest successful recoverable backup exceeds that age. A separate application-level object-storage backup SHALL NOT be required while whole-VM protection is active. Backup failures SHALL be visible to operators and routed through the selected operational notification path. An isolated restoration rehearsal SHALL precede public activation and verify service startup, document/evidence references, retained versions and truthful updating status. The rehearsal SHALL time recovery from outage detection to verified public API/MCP service against a one-hour target; configuration alone SHALL NOT be reported as meeting that target.
+The MVP deployment SHALL protect the shared service VM through off-host Proxmox Backup Server whole-VM backups covering all three environments' structured data, acquired originals in VM-hosted S3-compatible storage and configuration required for recovery. Backup schedule and retention SHALL be configurable deployment values and documented before operational readiness. The production backup plan SHALL target no more than six hours of lost data, schedule backups with margin for a delayed or failed job, and alert operators before the latest successful recoverable backup exceeds that age. A separate production application-level object-storage backup SHALL NOT be required while whole-VM protection is active. Backup failures SHALL be visible to operators and routed through the selected operational notification path. An isolated restoration rehearsal SHALL precede public activation and verify service startup, document/evidence references, retained versions and truthful updating status. The rehearsal SHALL time recovery from outage detection to verified public API/MCP service against a one-hour target; configuration alone SHALL NOT be reported as meeting that target.
 
 #### Scenario: A backup is restored on a replacement host
 - **WHEN** a whole-VM PBS backup is restored into an isolated replacement environment
 - **THEN** the service starts with its database and original-document storage, retained records resolve their evidence, and pre-backup checks are not described as newly successful
 
 ### Requirement: Isolated development and staging with approved image promotion
-The existing current-VM installation and its data SHALL remain the development environment. Staging on that VM SHALL have an independent checkout, Compose project, PostgreSQL and RustFS volumes, secret files, image reference and loopback ports. Staging SHALL use its own controlled test data; a copy from another environment requires a deliberate, consistent transfer of both database and objects. Production SHALL run on a dedicated VM with its own data and secrets. A release image SHALL be built from an identified revision, tested in staging, published to the public GitHub Container Registry and identified by immutable digest. Production SHALL use that exact digest without rebuilding and SHALL require explicit operator approval. Passing software checks SHALL NOT by itself activate a source or establish public source acceptance.
+The existing current-VM installation and its data SHALL remain the development environment. Development, staging and production SHALL use separate Compose project names, PostgreSQL and RustFS volumes, secret files, image references and loopback ports from one shared checkout on that VM. Staging SHALL use its own controlled test data; a copy from another environment requires a deliberate, consistent transfer of both database and objects. Production SHALL remain stopped while only its configuration is prepared, and its services SHALL have explicit CPU and memory ceilings with no default active profile. The production worker SHALL require separate selection. Before production activation, operators SHALL validate host capacity under concurrent workloads and rehearse off-host backup recovery from a host failure. A release image SHALL be built from an identified revision, tested in staging, published to the public GitHub Container Registry and identified by immutable digest. Production SHALL use that exact digest without rebuilding and SHALL require explicit operator approval. Passing software checks SHALL NOT by itself activate a source or establish public source acceptance.
 
 #### Scenario: Development and staging run on the same VM
 - **WHEN** staging starts while the existing development installation remains in place
 - **THEN** its Compose resources, data, secrets and listener ports do not overlap with development, and development's existing project identity and volumes are preserved
+
+#### Scenario: Production is configured but not started
+- **WHEN** the production project is prepared in the shared checkout
+- **THEN** its ports, secrets and named volumes are distinct, no production services are selected by default or created, and its resource ceilings are visible in the resolved Compose configuration
 
 #### Scenario: An operator approves a staged release
 - **WHEN** the recorded staging checks pass for a published image digest and the operator approves that digest
@@ -235,3 +273,34 @@ The service MAY collect and interpret the four configured MVP sources internally
 #### Scenario: Internal collection begins before infrastructure hardening
 - **WHEN** the operator enables a successfully previewed source on the current 30-GiB VM while SMTP, PBS and continuous telemetry are deferred
 - **THEN** collection and interpretation run internally, the source remains publicly disabled, operational limitations are recorded and infrastructure tasks remain incomplete
+
+### Requirement: Optional source-scoped local inference fallback
+An explicitly configured local chat endpoint MAY replace an unavailable remote chat provider for selected sources. The service SHALL select a complete model-specific runner before creating an interpretation run, preserve separate provider gates and immutable configurations, and record the actual requested/returned model without assigning remote prices to local calls. Remote recovery controls, retries, archives, suspension and equivalent-copy restrictions SHALL remain effective.
+
+#### Scenario: The remote provider is held or cooling down
+- **WHEN** a quota/authentication hold or temporary availability circuit prevents remote processing for a selected source
+- **THEN** a configured local chat runner can process the job without reopening the remote gate; recovery probes and a restored remote provider retain preference
+
+#### Scenario: Both providers are unavailable
+- **WHEN** the remote and configured local providers are blocked
+- **THEN** queued jobs wait before claiming, preserving attempt budgets and failure evidence
+
+#### Scenario: A provider failure first establishes a hold
+- **WHEN** an eligible remote job establishes an account hold or availability circuit
+- **THEN** a subsequent attempt within the existing budget may select a separate local run; successful results and schema/evidence failures do not trigger another model call
+
+#### Scenario: A local model has limited capabilities
+- **WHEN** a local model supports text but does not have evaluated vision or compatible embedding support
+- **THEN** only evaluated text stages use that fallback, OCR/embedding keep their own controls and unresolved dependencies remain visible
+
+#### Scenario: Local-model validation is requested
+- **WHEN** opt-in live tests are run against a selected local endpoint
+- **THEN** synthetic Italian cases exercise relevance, negative controls, measure extraction and update linking through production request/parsing contracts; mock success alone is not presented as model acceptance
+
+#### Scenario: An equivalent copy has a compatible result from either model
+- **WHEN** provider-free materialization finds a primary cache hit, or a specific primary reuse miss with an eligible local cache hit
+- **THEN** it uses the compatible result without contacting either transport, keeps model/configuration boundaries and does not extend the queue attempt budget
+
+#### Scenario: Image OCR has been separately evaluated
+- **WHEN** image input is enabled on the local server and its synthetic OCR test passes
+- **THEN** explicitly enabled OCR may select its own local image configuration, renderer/reuse identity and call receipts; semantic embeddings retain independent capability requirements

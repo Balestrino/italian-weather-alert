@@ -21,6 +21,7 @@ These checkboxes reflect the private project task list on 30 September 2026. A c
 - [x] 3.1 Add regional overview and complete municipality list/detail readers with region validation, search, province/coverage filters and deterministic pagination; test municipalities without sources, more than one page, full-scope counts and bounded query counts.
 - [x] 3.2 Add territorial result readers for retained documents, processing states and consolidated regional/local facts independent of public enablement; test two-region isolation, today/tomorrow Europe/Rome boundaries, missing mappings, partial zones, uncertain validity and unpublished results.
 - [x] 3.3 Add a composed territorial history reader with date/source/kind filters and stable pagination over configuration, source, document and processing events; test equal timestamps, historical membership changes, retired municipalities, disabled territories and explicit retention/unavailable states.
+- [x] 3.4 Classify retained listing snapshots from their source configuration, omit them from default territorial history, and provide explicit listing and all-events filters; verify older snapshots and document versions remain independently accessible in synthetic PostgreSQL fixtures.
 
 ## 4. Region and municipality interface
 

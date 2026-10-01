@@ -23,7 +23,7 @@ jobs:
       - name: Measure Go test coverage
         run: |
           profile="$RUNNER_TEMP/coverage.out"
-          go test -tags=integration -p 2 -coverpkg=./cmd/...,./internal/... -coverprofile="$profile" ./cmd/... ./internal/...
+          go test -tags=integration -p 2 -coverpkg=./cmd/...,./internal/...,./api/... -coverprofile="$profile" ./cmd/... ./internal/... ./api/...
           measured=$(go tool cover -func="$profile" | awk '$1 == "total:" { sub(/%/, "", $3); print $3 }')
           printf 'Go statement coverage: **%s%%** (minimum 66%%)\n' "$measured" >> "$GITHUB_STEP_SUMMARY"
           awk -v measured="$measured" 'BEGIN { if (measured + 0 < 66) { print "Coverage below 66%"; exit 1 } }'

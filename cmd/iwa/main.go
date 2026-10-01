@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Balestrino/italian-weather-alert/internal/backoffice"
+	"github.com/Balestrino/italian-weather-alert/internal/platform/httpserver"
 	"log/slog"
 	"net"
 	"net/http"
@@ -13,34 +15,34 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/backups"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/config"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/diagnostics"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/embedding"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/evaluation"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/extraction"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/health"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/interpretation"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/linking"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/notifications"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/observation"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/operations"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/publiccopy"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/publicquery"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/publicview"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/transport/httpapi"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/trialcost"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/workerdiag"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/Balestrino/italian-weather-alert/internal/acquisition"
-	"github.com/Balestrino/italian-weather-alert/internal/backups"
-	"github.com/Balestrino/italian-weather-alert/internal/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/config"
-	"github.com/Balestrino/italian-weather-alert/internal/diagnostics"
-	"github.com/Balestrino/italian-weather-alert/internal/documents"
-	"github.com/Balestrino/italian-weather-alert/internal/domain"
-	"github.com/Balestrino/italian-weather-alert/internal/embedding"
-	"github.com/Balestrino/italian-weather-alert/internal/evaluation"
-	"github.com/Balestrino/italian-weather-alert/internal/extraction"
-	"github.com/Balestrino/italian-weather-alert/internal/health"
-	"github.com/Balestrino/italian-weather-alert/internal/inference"
-	"github.com/Balestrino/italian-weather-alert/internal/interpretation"
-	"github.com/Balestrino/italian-weather-alert/internal/jobs"
-	"github.com/Balestrino/italian-weather-alert/internal/linking"
-	"github.com/Balestrino/italian-weather-alert/internal/notifications"
-	"github.com/Balestrino/italian-weather-alert/internal/observation"
-	"github.com/Balestrino/italian-weather-alert/internal/ocr"
-	"github.com/Balestrino/italian-weather-alert/internal/operations"
-	"github.com/Balestrino/italian-weather-alert/internal/processing"
-	"github.com/Balestrino/italian-weather-alert/internal/publiccopy"
-	"github.com/Balestrino/italian-weather-alert/internal/publicquery"
-	"github.com/Balestrino/italian-weather-alert/internal/publicview"
-	"github.com/Balestrino/italian-weather-alert/internal/registry"
-	"github.com/Balestrino/italian-weather-alert/internal/server"
-	"github.com/Balestrino/italian-weather-alert/internal/trialcost"
-	"github.com/Balestrino/italian-weather-alert/internal/workerdiag"
 )
 
 func main() {
@@ -664,15 +666,25 @@ func run() bool {
 			handlers[embedding.Kind] = embeddingRunner.Handler()
 			linkingRunner.SemanticConfiguration = embeddingCatalog.ConfigurationVersionID
 		}
+		localFallback, fallbackErr := config.LoadLocalFallback()
+		if fallbackErr != nil {
+			slog.Error("local fallback configuration invalid")
+			return false
+		}
+		gateBindings, err = addLocalFallback(ctx, gateStore, gatePolicy, localFallback, gateBindings, handlers, classificationRunner, extractionRunner, linkingRunner, ocrRunner)
+		if err != nil {
+			slog.Error("local fallback initialization failed")
+			return false
+		}
 		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, semanticEnabled)
 		interpretationScheduler.Preflight, err = makePreflight(ctx, pool, retained, inferenceConfig, rollout)
 		if err != nil {
 			slog.Error("preflight configuration invalid")
 			return false
 		}
-		handlers[ocr.Kind] = interpretationScheduler.OCRHandler(ocrRunner.Handler())
-		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(classificationRunner.Handler())
-		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(extractionRunner.Handler())
+		handlers[ocr.Kind] = interpretationScheduler.OCRHandler(handlers[ocr.Kind])
+		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(handlers[classification.Kind])
+		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(handlers[extraction.Kind])
 		if semanticEnabled {
 			handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
 		}
@@ -806,7 +818,7 @@ func run() bool {
 		return false
 	}
 	slog.Info("service started", "role", c.Role)
-	publicLimits := server.PublicLimits{Allowance: c.PublicAllowance, Window: c.PublicWindow, MaxPageSize: c.PublicMaxPageSize, TrustedProxies: c.PublicTrustedProxies}
+	publicLimits := httpapi.PublicLimits{Allowance: c.PublicAllowance, Window: c.PublicWindow, MaxPageSize: c.PublicMaxPageSize, TrustedProxies: c.PublicTrustedProxies}
 	var copyDocuments *documents.Store
 	if c.Role == "public" && c.PublicCopyAccess {
 		storage, loadErr := config.LoadStorage()
@@ -826,8 +838,8 @@ func run() bool {
 		slog.Error("public copy access initialization failed")
 		return false
 	}
-	publicRuntime := server.PublicRuntime{Limits: publicLimits, Views: publicview.New(pool), ViewLifetime: c.PublicViewLifetime, CursorKey: []byte(c.PublicCursorKey), Copies: copyAccess}
-	handler := server.HandlerWithPublicRuntime(c.Role, checks, publicquery.New(pool), publicRuntime)
+	publicRuntime := httpapi.PublicRuntime{Limits: publicLimits, Views: publicview.New(pool), ViewLifetime: c.PublicViewLifetime, CursorKey: []byte(c.PublicCursorKey), Copies: copyAccess}
+	var adminRuntime backoffice.AdminRuntime
 	if c.Role == "admin" {
 		storage, loadErr := config.LoadStorage()
 		if loadErr != nil {
@@ -846,9 +858,10 @@ func run() bool {
 		evaluations := evaluation.New(pool)
 		adminScheduler := interpretation.New(pool, jobs.New(pool), inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
 		adminScheduler.Evaluations = evaluations
-		handler = server.HandlerWithAdministration(checks, server.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)})
+		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
 	}
-	if err := server.Serve(ctx, ln, handler); err != nil {
+	handler := listenerHandler(c.Role, checks, publicquery.New(pool), publicRuntime, adminRuntime)
+	if err := httpserver.Serve(ctx, ln, handler); err != nil {
 		slog.Error("service stopped unexpectedly")
 		return false
 	}

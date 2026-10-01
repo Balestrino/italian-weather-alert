@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Balestrino/italian-weather-alert/internal/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/extraction"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/extraction"
 )
 
 type auditCall struct {

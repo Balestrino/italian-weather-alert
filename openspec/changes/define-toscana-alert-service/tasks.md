@@ -38,6 +38,8 @@ The original checkboxes reflect the private project task list on 30 September 20
 - [x] 3.5 Integrate vigilance, criticality/alert and monitoring independently through the verified contracts and selected CFR routes from 1.3/1.13/1.14, polling every 10 minutes by default and respecting longer 429 backoff. Compare levels, zones, validity and graphical information against retained samples without treating OCR text as proof of map color, turning monitoring into a new alert level or treating event-driven silence as a missing product.
 - [x] 3.6 Prevent a municipal document HTTP 404/410 from starving later targets; persist per-target failure/status and bounded retries, keep checks incomplete during deferral, retain recovery evidence, and verify with unit/integration tests and a deployed Calcinaia check.
 - [x] 3.7 Support an evidence-backed disposition for a previously discovered 404/410 URL absent from later configured listings; preserve failure/check history, exclude only the reviewed source/configuration/URL, reactivate on rediscovery, and verify the Calcinaia check after deployment without asserting missing-page equivalence.
+- [x] 3.8 Ignore generated Drupal Views DOM identifiers in comments and class names when deciding HTML content identity, retain exact originals, and verify equivalent responses reuse a version while substantive changes still create one in isolated storage tests.
+- [x] 3.9 Update integration fixtures after Drupal identifier deduplication; verify marker-only responses share a retained version and separately retained equivalent HTML still exercises contiguous preflight grouping and classification reuse.
 
 ## 4. OCR, classification and interpretation
 
@@ -101,7 +103,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 ## 10. MVP release readiness
 
 - [ ] 10.1 Review separate acceptance reports for vigilance, criticality/alert, monitoring and Calcinaia across API/MCP, seven risks, scanned attachments, history and operational failure states; verify each accepted scope can be enabled independently, partial coverage is never described as complete and full MVP readiness requires all four scopes.
-- [ ] 10.2 Verify Compose relocation to the dedicated 4-vCPU/8-GiB/80-GiB VM behind the existing HTTPS reverse proxy, sole trusted `X-Forwarded-For` hop, private administration through SSH tunnel or configured tailnet-only Tailscale Serve, external model endpoints, existing SMTP path, PBS backup/isolated restore, capacity thresholds and rollback procedures; deliver a readiness record before any separately authorized deployment.
+- [ ] 10.2 Verify production on the shared VM behind the existing HTTPS reverse proxy, sole trusted `X-Forwarded-For` hop, private administration through SSH tunnel or configured tailnet-only Tailscale Serve, external model endpoints, existing SMTP path, independent environment resources, concurrent-load capacity thresholds, PBS backup/isolated restore after host failure and rollback procedures; deliver a readiness record before any separately authorized deployment.
 - [x] 10.3 Support the operator-requested direct private Tailscale Serve dashboard: validate one explicit HTTPS tailnet origin, preserve local access and cross-site/Host protections, keep loopback backend/public isolation, test and verify the running Serve endpoint, and document access/rollback. This does not complete overall deployment readiness in 10.2.
 
 ## 11. Subsequent planned local rollout
@@ -119,3 +121,31 @@ The original checkboxes reflect the private project task list on 30 September 20
 - [x] 12.3 Create a separate staging checkout and Compose project on the current VM with distinct PostgreSQL/RustFS volumes, secrets, ports and image tag; validate readiness and isolation without changing the existing development project or enabling unreviewed live collection.
 - [ ] 12.4 Publish and test-pull an approved public GHCR image and record its digest; keep the operator's production approval as a separate explicit step.
 - [ ] 12.5 Record the production six-hour data-loss and one-hour recovery targets in the PBS runbook, with an initial three-hour backup cadence, retention and age-alert procedure. Complete actual backup, alert and timed isolated restore verification through tasks 8.2, 8.3 and 10.2 before asserting those targets are met.
+- [x] 12.6 Support one public checkout for development and staging with separate ignored environment files and secret directories, fixed Compose project names, unchanged named volumes, and checks that prevent accidental cross-environment configuration. Document release handling from a clean shared revision.
+- [x] 12.7 Migrate the existing development and staging Compose projects to the shared checkout; preserve data and credentials, verify mounts, readiness and isolation, and retire the private checkout from active deployment use without deleting its unique evidence.
+- [x] 12.8 Prepare an inactive `iwa-production` project in the shared checkout with separate ignored settings, secrets and ports; require explicit profiles, a digest-only image placeholder and initial CPU/RAM ceilings, and verify resolved configuration plus absence of production containers without starting services.
+
+## Public environment verification — 1 October 2026
+
+The [environment hardening change](../harden-environment-operations/tasks.md) and [disposable rehearsal summary](../../../docs/operations/environment-verification.md) verify the public checkout’s environment tooling, including task 12.6. Backup/restore and VM reboot checks were handed to the operator at their request; that handoff does not certify readiness. Tasks 1.8, 8.2, 8.3, 10.2, 12.4 and 12.5 remain open until their actual operational results exist. Repository configuration changes do not apply restart policies to existing containers automatically.
+
+## 13. Development acquisition and interpretation recovery — 1 October 2026
+
+- [x] 13.1 Review a stale unavailable municipal target against complete configured listings, record a scoped disposition without erasing evidence, and verify a fresh complete development acquisition check.
+- [x] 13.2 Verify the completed incident recovery, preserve its policy and ledger privately, validate representative interpretation work in a bounded canary, and release the obsolete development scope restriction while preserving normal retry, archive and provider controls.
+- [x] 13.3 Document repeatable operational recovery, run development runtime/readiness checks, and record validation without changing source acceptance or production activation.
+- [x] 13.4 Preserve rejected extraction request/response evidence, fail closed on diagnostic storage failure, verify private append-only capture with synthetic tests, and validate the source-scoped output correction on development.
+- [x] 13.5 Resolve embedding/linking recovery scope through their extraction run, preserve document quarantine and call limits, and verify allowed child jobs can finish a selected recovery pipeline.
+- [x] 13.6 Bound classification run identities containing reprocessing selections and manifests; preserve existing short keys, isolate distinct selections, and verify selected live reprocessing succeeds.
+- [x] 13.7 Recognize literal opening of an explicitly named municipal civil-protection centre as activation in the selected output correction; preserve legacy validation, reject unrelated/negated openings and avoid borrowing alert validity.
+- [ ] 13.8 Restore provider entitlement for a credential-wide quota hold, resume through a controlled probe, relaunch the reviewed failed OCR job and verify ordinary interpretation progress without a renewed rejection. Requires an active provider account or replacement credential; application fixes alone do not complete this step.
+
+## 14. Optional local Qwen fallback — 1 October 2026
+
+- [x] 14.1 Add an opt-in, source-scoped local chat endpoint and choose complete runner configurations before processing; preserve actual model/configuration provenance, provider scopes, prices and compatible cache boundaries.
+- [x] 14.2 Test primary preference, quota/circuit failover, local unavailability, source boundaries, strict output failures, preserved attempt limits and pre-claim deferral against synthetic providers and PostgreSQL.
+- [x] 14.3 Add opt-in live local-model classification, extraction, linking and image OCR tests with synthetic Italian notices, long-document cases and literal evidence checks; distinguish transport mocks from real model validation and report unsupported capabilities.
+- [x] 14.4 Deploy the evaluated fallback on development within the selected source scope, preserve the remote hold and prior image/settings, and verify representative local runs plus service stability.
+- [x] 14.5 Document local model setup, runtime configuration, rollback and the explicit OCR/embedding capability boundaries without claiming acceptance of untested stages.
+
+The local fallback was verified with repository checks, isolated PostgreSQL tests, real local Qwen text/image tests and a bounded development canary. Reviewed local quote presentation and civil-protection extraction corrections retain strict contiguous evidence and independent immutable versions. Development acquisition completed a fresh municipal check, OCR and representative text interpretation succeeded, and ordinary processing resumed with the credential-wide remote hold preserved. Semantic embedding work remains separately blocked by remote entitlement; task 13.8, source acceptance and production readiness remain open. Private captures, deployment settings, dumps and call ledgers are excluded from the public repository. See [local fallback operations](../../../docs/operations/local-llm-fallback.md).

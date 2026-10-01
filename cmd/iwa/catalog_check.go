@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/config"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/extraction"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/Balestrino/italian-weather-alert/internal/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/config"
-	"github.com/Balestrino/italian-weather-alert/internal/extraction"
-	"github.com/Balestrino/italian-weather-alert/internal/ocr"
-	"github.com/Balestrino/italian-weather-alert/internal/processing"
 	"time"
 )
 

@@ -77,6 +77,12 @@ services:
       IWA_OCR_REUSE_SOURCES: ${IWA_OCR_REUSE_SOURCES:-}
       IWA_SEGMENT_CHECKPOINT_SOURCES: ${IWA_SEGMENT_CHECKPOINT_SOURCES:-}
       IWA_OUTPUT_FIX_SOURCES: ${IWA_OUTPUT_FIX_SOURCES:-}
+      IWA_LOCAL_FALLBACK_ENABLED: ${IWA_LOCAL_FALLBACK_ENABLED:-false}
+      IWA_LOCAL_FALLBACK_ENDPOINT: ${IWA_LOCAL_FALLBACK_ENDPOINT:-}
+      IWA_LOCAL_FALLBACK_MODEL: ${IWA_LOCAL_FALLBACK_MODEL:-}
+      IWA_LOCAL_FALLBACK_SOURCES: ${IWA_LOCAL_FALLBACK_SOURCES:-}
+      IWA_LOCAL_FALLBACK_TIMEOUT_SECONDS: ${IWA_LOCAL_FALLBACK_TIMEOUT_SECONDS:-180}
+      IWA_LOCAL_FALLBACK_OCR_ENABLED: ${IWA_LOCAL_FALLBACK_OCR_ENABLED:-false}
       IWA_OCR_REUSE_ENABLED: ${IWA_OCR_REUSE_ENABLED:-false}
       IWA_OCR_RENDERER_ID: ${IWA_OCR_RENDERER_ID:-}
       IWA_QWEN_GATE_SCOPE: ${IWA_QWEN_GATE_SCOPE:-}
@@ -113,6 +119,7 @@ services:
       disable: true
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: iwa
       POSTGRES_DB: iwa
@@ -127,6 +134,7 @@ services:
       retries: 5
   rustfs:
     image: rustfs/rustfs:1.0.0
+    restart: unless-stopped
     environment:
       RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
       RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
@@ -142,6 +150,7 @@ services:
       start_period: 30s
   crawl4ai:
     image: unclecode/crawl4ai:0.9.3
+    restart: unless-stopped
     command:
       - bash
       - -c
@@ -172,18 +181,18 @@ volumes:
   rustfs_data: {}
 secrets:
   postgres_password:
-    file: ./.secrets/postgres_password
+    file: ${IWA_SECRETS_DIR:-./.secrets}/postgres_password
   rustfs_access_key:
-    file: ./.secrets/rustfs_access_key
+    file: ${IWA_SECRETS_DIR:-./.secrets}/rustfs_access_key
   rustfs_secret_key:
-    file: ./.secrets/rustfs_secret_key
+    file: ${IWA_SECRETS_DIR:-./.secrets}/rustfs_secret_key
   crawl_token:
-    file: ./.secrets/crawl_token
+    file: ${IWA_SECRETS_DIR:-./.secrets}/crawl_token
   regolo_api_key:
-    file: ${IWA_REGOLO_API_KEY_PATH:-./.secrets/regolo_api_key}
+    file: ${IWA_REGOLO_API_KEY_PATH:-${IWA_SECRETS_DIR:-./.secrets}/regolo_api_key}
   public_cursor_key:
-    file: ./.secrets/public_cursor_key
+    file: ${IWA_SECRETS_DIR:-./.secrets}/public_cursor_key
   notifications_config:
-    file: ${IWA_NOTIFICATIONS_CONFIG_PATH:-./.secrets/notifications_config.json}
+    file: ${IWA_NOTIFICATIONS_CONFIG_PATH:-${IWA_SECRETS_DIR:-./.secrets}/notifications_config.json}
   backups_config:
-    file: ${IWA_BACKUPS_CONFIG_PATH:-./.secrets/backups_config.json}
+    file: ${IWA_BACKUPS_CONFIG_PATH:-${IWA_SECRETS_DIR:-./.secrets}/backups_config.json}

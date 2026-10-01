@@ -34,6 +34,12 @@ A municipality's presence in the national registry does **not** mean its alert s
 
 The implementation uses Go, PostgreSQL for structured data and durable jobs, RustFS for retained originals, Crawl4AI for source collection, and Docker Compose for the local stack. Inference providers are configurable; their output does not replace source evidence.
 
+## Application components
+
+The repository keeps one Go module with separate areas for the [backend](docs/backend/README.md), [private backoffice](docs/backoffice/README.md) and [public status frontend](docs/frontend/README.md). Backend services live in `internal/backend`, administration in `internal/backoffice`, and public presentation in `internal/frontend`. Public API/MCP contracts live in `api/public`.
+
+The status frontend runs independently through `go run ./cmd/iwa-frontend` and reports backend availability, source publication coverage and updating information separately. It uses public HTTP reads without database or operator credentials; it can display unavailable backend information. It does not activate a public deployment or enable alert sources. See the [architecture guide](docs/architecture/README.md) for dependencies and the layout migration.
+
 ## Coverage today
 
 The first source rollout is in **Tuscany**. The internal pilot covers the three distinct regional products and the Calcinaia municipal channel. Livorno, Pisa, Pontedera, and Cascina have candidate municipal configurations at different preview stages; each still needs its own observation and acceptance before public enablement.
@@ -59,9 +65,9 @@ go build ./cmd/...
 go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 ```
 
-The [developer setup guide](docs/developer-setup.md) walks through the local Compose stack, secrets, migrations, and optional worker configuration. [Verified JSON API and MCP examples](deploy/public-usage.md) show the five query groups against a local service. The [API/MCP contract](deploy/public-api-mcp.md) describes the interface in more detail.
+The [developer setup guide](docs/development/setup.md) walks through the local Compose stack, secrets, migrations, and optional worker configuration. [Verified JSON API and MCP examples](docs/backend/public-usage.md) show the five query groups against a local service. The [API/MCP contract](docs/backend/public-api-mcp.md) describes the interface in more detail.
 
-The [environment guide](docs/environments.md) explains how the existing development stack, isolated staging stack and planned dedicated production VM relate. [Release operations](deploy/release-operations.md) describe staging checks, manually approved GHCR image digests and the production backup/restore targets. Publishing the code does not by itself activate a public service or an alert source.
+The [environment guide](docs/operations/environments.md) explains how the development, isolated staging and prepared production projects on one shared host relate. [Release operations](docs/operations/releases.md) describe staging checks, manually approved GHCR image digests and the production backup/restore targets. Publishing the code does not by itself activate a public service or an alert source.
 
 The **CI** badge reports the Go test, vet, and build workflow. The **Coverage** badge reports whether the Go unit and isolated database integration tests passed a 66% statement coverage floor; the measured percentage appears in that workflow's run summary. A separate security workflow checks for known reachable Go vulnerabilities on pushes, pull requests, and weekly. None of these checks measures the completeness of alert-source coverage.
 
@@ -81,9 +87,10 @@ The code and the information it produces are provided on a best-effort, **“as 
 
 - [Documentation index](docs/README.md) and [national coverage tracker](docs/coverage.md)
 - [OpenSpec plans and progress](openspec/README.md)
-- [Agent workflows and optional tools](docs/agent-tools.md)
-- [Developer setup](docs/developer-setup.md), [public API/MCP examples](deploy/public-usage.md), and [API/MCP contract](deploy/public-api-mcp.md)
-- [Development, staging and production](docs/environments.md) and [release operations](deploy/release-operations.md)
+- [Agent workflows and optional tools](docs/development/agent-tools.md)
+- [Developer setup](docs/development/setup.md), [public API/MCP examples](docs/backend/public-usage.md), and [API/MCP contract](docs/backend/public-api-mcp.md)
+- [Development, staging and production](docs/operations/environments.md) and [release operations](docs/operations/releases.md)
+- [Changelog](CHANGELOG.md) and [v0.1.0 release notes](docs/releases/v0.1.0.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 Original IWA code is licensed under [GPL-3.0-only](LICENSE). Selected third-party data and retained source files have separate terms recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The public repository contains only reviewed source snapshots; the broader internal research evidence is kept separately.

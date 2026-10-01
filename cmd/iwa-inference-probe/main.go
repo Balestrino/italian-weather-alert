@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Balestrino/italian-weather-alert/internal/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/config"
-	"github.com/Balestrino/italian-weather-alert/internal/inference"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/config"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 )
 
 func main() {

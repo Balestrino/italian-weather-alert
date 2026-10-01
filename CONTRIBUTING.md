@@ -22,6 +22,8 @@ Start with a focused issue or pull request. Keep regional warnings and municipal
 
 Read the [OpenSpec plans and progress](openspec/README.md) before changing an existing capability. Update the relevant change specification and task checklist with the implementation, or propose a new change when the behavior is new. Checked tasks are a dated project snapshot, not a claim that a source is publicly accepted.
 
+Every plan, fix, code, documentation, and operations commit needs a dated entry in [CHANGELOG.md](CHANGELOG.md). Install the shared hook once per checkout with `git config core.hooksPath .githooks`. After staging your changes, use `python3 scripts/changelog.py record --kind Fixed --summary "Describe the user-visible change"` (choose a suitable kind). The command writes and stages the Unreleased entry. The hook adds a path-based fallback if you forget; use an explicit summary when the path names do not explain the change. CI checks each change commit, including commits made without the hook. Make the `changelog` CI job a required status check on protected branches to prevent bypassing it during merge.
+
 For Go changes, run:
 
 ```sh
@@ -31,9 +33,9 @@ go build ./cmd/...
 go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 ```
 
-The [developer setup guide](docs/developer-setup.md) explains installation, local configuration, and stack checks. Use synthetic fixtures for ordinary tests. Include real source material only when its provenance and reuse terms are recorded. Describe what changed, how you checked it, and any known gaps in your pull request.
+The [developer setup guide](docs/development/setup.md) explains installation, local configuration, and stack checks. Use synthetic fixtures for ordinary tests. Include real source material only when its provenance and reuse terms are recorded. Describe what changed, how you checked it, and any known gaps in your pull request.
 
-Changes intended for a deployed release are checked on the isolated staging stack described in [Environments](docs/environments.md). Production uses only a manually approved image digest after the [release checks](deploy/release-operations.md); a passing pull request or staging test does not activate an alert source.
+Changes intended for a deployed release are checked on the isolated staging stack described in [Environments](docs/operations/environments.md). Production uses only a manually approved image digest after the [release checks](docs/operations/releases.md); a passing pull request or staging test does not activate an alert source.
 
 ## What happens to a source report
 

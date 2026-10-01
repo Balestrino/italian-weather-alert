@@ -22,4 +22,5 @@ __pycache__/
 
 # Runtime secrets and local build output
 .secrets/
+.local/
 bin/
