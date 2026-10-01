@@ -6,9 +6,9 @@ IWA publishes its source code publicly. A public code release does not by itself
 | --- | --- | --- |
 | Development | Existing `iwa` Compose project on the current VM, managed from the shared public checkout; day-to-day code and source work. | Keeps its current PostgreSQL/RustFS volumes and private secrets. HTTP listeners bind to localhost; operator access may use a restricted tailnet. |
 | Staging | Separate `iwa-staging` Compose project from the same checkout on the current VM; build and test a release candidate. | Independent PostgreSQL/RustFS volumes, secrets, image reference and loopback ports. Initially empty; use controlled fixtures for release checks. No live collection or paid inference is enabled by setup. |
-| Production | Planned dedicated VM; public API/MCP behind the HTTPS reverse proxy and private administration through the configured operator path. | Independent data and secrets, off-host PBS protection, and only an operator-approved image digest. Public source activation remains a separate decision. |
+| Production | Prepared `iwa-production` Compose project on this VM; no production services are running. The future public API/MCP route will use the HTTPS reverse proxy and administration will stay private. | Independent PostgreSQL/RustFS volumes and secrets, distinct loopback ports, resource ceilings, and only an operator-approved image digest. Off-host PBS protection and public source activation remain separate readiness steps. |
 
-Development and staging share host CPU, memory and disk even after their data is separated. Check capacity before starting both and avoid heavy development jobs during a release check. Never change the existing development Compose project name merely to relabel it: named volumes are scoped by the project name.
+All three projects share host CPU, memory and disk even though their data is separated. Check capacity before starting production or running heavy development and staging jobs. Never change the existing development Compose project name merely to relabel it: named volumes are scoped by the project name. A whole-host outage affects all three projects.
 
 ## Configure development and staging from one checkout
 
@@ -31,3 +31,19 @@ Verify the two installations independently with `scripts/compose-env.sh developm
 Use synthetic or otherwise authorized fixtures in the public repository. Development and staging must not point to the same live database or RustFS bucket/volume. If staging needs a representative data copy, transfer PostgreSQL and RustFS together from one consistent point in time, keep the copy private, and disable collection, outbound inference and notifications until its configuration has been reviewed. A database-only copy can leave evidence references broken.
 
 Production starts with its own state. Code promotion never copies development or staging data into production. Source configuration, source acceptance, collection activation and public enablement require their own operator review.
+
+## Prepared production project
+
+Production uses the same checkout with the [production overlay](../deploy/compose.production.yaml). Its ignored settings are `.local/production.env` and its private files are under `.local/production/secrets`. On this host they have been initialized without starting containers. The example uses loopback ports `38080` and `38081`, separate from development and staging. Its image digest remains a placeholder until an approved release is published.
+
+For a new host or a replacement checkout, prepare the files without starting services:
+
+```sh
+install -m 600 deploy/production.env.example .local/production.env
+python3 scripts/init-secrets.py --directory .local/production/secrets
+python3 scripts/check-deployment-config.py
+scripts/compose-env.sh production config --quiet
+scripts/compose-env.sh production ps --all
+```
+
+The production overlay assigns every service to a profile. With no profile selected, `docker compose up` selects no production services. The `production` profile contains the public/admin listeners and their dependencies; `production-worker` and `application-backup` are separate. The application backup worker remains disabled while whole-VM PBS backup is the selected strategy. The overlay also sets CPU, RAM and process ceilings; these do not bound named-volume growth or prove sufficient capacity for real traffic. [Release operations](../deploy/release-operations.md) lists the validation and approval required before starting production.

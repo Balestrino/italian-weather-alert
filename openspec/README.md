@@ -6,7 +6,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 
 | Change | Done | Open |
 | --- | ---: | ---: |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 73 | 10 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 74 | 10 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 18 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 4 | 0 |

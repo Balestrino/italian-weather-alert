@@ -1,11 +1,44 @@
-# Use with compose.yaml on the dedicated production VM. Production pulls only
-# the operator-approved IWA_APP_IMAGE digest and must never build locally.
+# Use with compose.yaml on the shared host. Profiles keep this prepared project
+# stopped until an operator selects production services explicitly. Limits are
+# initial ceilings to validate under staging load before production activation.
 services:
   public:
     build: !reset null
+    profiles: [production]
+    cpus: 0.5
+    mem_limit: 256m
+    pids_limit: 128
   admin:
     build: !reset null
+    profiles: [production]
+    cpus: 0.5
+    mem_limit: 256m
+    pids_limit: 128
   worker:
     build: !reset null
+    profiles: [production-worker]
+    cpus: 1.5
+    mem_limit: 768m
+    pids_limit: 256
   backup:
     build: !reset null
+    profiles: [application-backup]
+    cpus: 0.5
+    mem_limit: 512m
+    pids_limit: 128
+  postgres:
+    profiles: [production]
+    cpus: 1.0
+    mem_limit: 768m
+    pids_limit: 256
+  rustfs:
+    profiles: [production]
+    cpus: 1.0
+    mem_limit: 768m
+    pids_limit: 256
+  crawl4ai:
+    profiles: [production]
+    cpus: 1.5
+    mem_limit: 1536m
+    pids_limit: 512
+    shm_size: 512m
