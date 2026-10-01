@@ -50,3 +50,16 @@ func TestRegionalEntryAndLegacyOperations(t *testing.T) {
 		}
 	}
 }
+
+func TestTerritorialControlReturnScope(t *testing.T) {
+	for _, raw := range []string{"", "/admin/regions", "/admin/regions?state=disabled", "/admin/regions/09?tab=configuration", "/admin/regions/09?tab=municipalities&search=Comune&province=PR&coverage=none&after=cursor"} {
+		if _, err := territoryControlReturn(raw, "09", "municipalities"); err != nil {
+			t.Fatalf("valid return %q: %v", raw, err)
+		}
+	}
+	for _, raw := range []string{"https://example.test/admin/regions", "//example.test/admin/regions", "/admin/regions/03?tab=municipalities", "/admin/regions?state=unknown", "/admin/regions?state=all&state=disabled", "/admin/regions?extra=value", "/admin/regions/09?tab=municipalities&enabled=true", "/admin/regions/09?tab=results", "/admin/regions/09?tab=configuration&search=Comune", "/admin/regions/09?tab=municipalities&coverage=wrong", "/admin/regions#fragment", "/admin/%72egions"} {
+		if _, err := territoryControlReturn(raw, "09", "municipalities"); err == nil {
+			t.Fatalf("invalid return accepted %q", raw)
+		}
+	}
+}

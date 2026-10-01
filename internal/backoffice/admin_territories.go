@@ -27,6 +27,7 @@ type AdminTerritoryConfiguration interface {
 	Region(context.Context, string) (domain.Region, error)
 	ConfigureRegion(context.Context, string, int, domain.RegionConfiguration, string) (int, error)
 	SetRegionEnabled(context.Context, string, int, bool, string) (int, error)
+	SetMunicipalityEnabled(context.Context, string, string, int, bool, string) (int, error)
 	AdoptMunicipalities(context.Context, []byte, domain.MunicipalityImport, string, int, string) (string, error)
 	TerritoryMigrationReport(context.Context) (domain.TerritoryMigrationReport, error)
 }
@@ -47,6 +48,18 @@ var territoryTemplates = template.Must(uiTemplates("territories", template.FuncM
 		}
 		return "Disabilitata"
 	},
+	"blockedReason": func(reason string) string {
+		switch reason {
+		case "region_disabled":
+			return "Sospeso: regione disabilitata"
+		case "municipality_disabled":
+			return "Sospeso: comune disabilitato"
+		case "municipality_retired":
+			return "Sospeso: comune fuori dall’anagrafica attuale"
+		default:
+			return "Territorio abilitato"
+		}
+	},
 	"base64":     func(s string) string { return base64.StdEncoding.EncodeToString([]byte(s)) },
 	"hasProfile": func(p []string, v string) bool { return slices.Contains(p, v) }, "json": adminJSON, "alertLabel": alertLabel, "path": url.PathEscape,
 }).ParseFS(adminUI, "ui/territories.html", "ui/territory.html", "ui/territory_setup.html", "ui/alerts.html"))
@@ -55,6 +68,7 @@ type regionsPage struct {
 	Overview    operations.TerritorialOverview
 	State       string
 	Unavailable bool
+	Controls    bool
 }
 
 func adminTerritoryRoutes(mux *http.ServeMux, a AdminRuntime) {
@@ -68,7 +82,7 @@ func adminTerritoryRoutes(mux *http.ServeMux, a AdminRuntime) {
 			http.Error(w, "Filtro non valido", 400)
 			return
 		}
-		page := regionsPage{State: state}
+		page := regionsPage{State: state, Controls: a.TerritoryConfig != nil}
 		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 		defer cancel()
 		if a.Territories == nil {
@@ -99,6 +113,7 @@ type territoryPage struct {
 	Municipality           *operations.TerritorialMunicipality
 	Region                 domain.Region
 	Title, Base, Tab       string
+	ReturnTo               string
 	Municipalities         operations.MunicipalityPage
 	Sources                []operations.TerritorialSource
 	Results                operations.TerritorialResults
@@ -163,6 +178,15 @@ func territoryDetail(w http.ResponseWriter, r *http.Request, a AdminRuntime, ist
 		page.Municipality = &m
 		page.Title = m.Name
 		page.Base += "/municipalities/" + url.PathEscape(m.ISTAT)
+	}
+	if tab == "municipalities" {
+		ret := url.Values{"tab": {"municipalities"}}
+		for _, key := range []string{"search", "province", "coverage", "after"} {
+			if q.Get(key) != "" {
+				ret.Set(key, q.Get(key))
+			}
+		}
+		page.ReturnTo = page.Base + "?" + ret.Encode()
 	}
 	next := ""
 	switch tab {

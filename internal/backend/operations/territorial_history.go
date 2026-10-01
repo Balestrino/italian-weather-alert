@@ -35,6 +35,8 @@ const territorialHistorySQL = `WITH events AS(
  SELECT 'region-'||e.id id,'configuration' kind,''::text source_id,e.actor,e.recorded_at,e.revision,0::bigint version_id,0::bigint job_id,e.kind outcome,jsonb_build_object('configuration',v.configuration,'enabled',v.enabled) evidence,e.region_code region
  FROM territorial_region_events e JOIN territorial_region_versions v ON v.region_code=e.region_code AND v.revision=e.revision WHERE e.region_code=$1
  UNION ALL
+ SELECT 'municipality-'||e.id,'configuration','',e.actor,e.recorded_at,e.revision,0,0,e.kind,jsonb_build_object('istat',e.istat,'enabled',e.enabled),e.region_code FROM territorial_municipality_events e WHERE e.region_code=$1 AND ($2='' OR e.istat=$2)
+ UNION ALL
  SELECT 'config-'||c.source_id||'-'||c.revision,'configuration',c.source_id,c.actor,c.created_at,c.revision,0,0,'configuration',c.body,NULL FROM registry_configurations c
  UNION ALL
  SELECT 'source-'||e.id,'source',e.source_id,e.actor,e.created_at,e.revision,0,0,e.kind,e.evidence,NULL FROM registry_events e

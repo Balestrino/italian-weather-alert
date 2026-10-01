@@ -93,6 +93,7 @@ type MunicipalityFilter struct {
 }
 type TerritorialMunicipality struct {
 	RegionCode, DatasetID, ISTAT, Name, Province string
+	Activation                                   domain.MunicipalityState
 	Historical                                   bool
 	Sources, Collecting                          int64
 }
@@ -125,7 +126,7 @@ func parseMunicipalityCursor(raw string) (string, string, error) {
 }
 
 const municipalityListSQL = `WITH source_counts AS(SELECT a.region_code,a.municipality_istat,count(*) sources,count(*) FILTER(WHERE s.collection_enabled) collecting FROM territorial_current_sources a JOIN registry_sources s ON s.id=a.source_id GROUP BY a.region_code,a.municipality_istat), matching AS(
- SELECT m.region_code,m.dataset_id,m.istat,g.name,g.province,COALESCE(c.sources,0) sources,COALESCE(c.collecting,0) collecting FROM territorial_municipalities m JOIN geography_municipalities g ON g.dataset_id=m.dataset_id AND g.istat=m.istat LEFT JOIN source_counts c ON c.region_code=m.region_code AND c.municipality_istat=m.istat
+ SELECT m.region_code,m.dataset_id,m.istat,g.name,g.province,COALESCE(c.sources,0) sources,COALESCE(c.collecting,0) collecting,COALESCE(st.revision,0) revision,COALESCE(st.enabled,false) enabled FROM territorial_municipalities m LEFT JOIN territorial_municipality_state st ON st.region_code=m.region_code AND st.istat=m.istat JOIN geography_municipalities g ON g.dataset_id=m.dataset_id AND g.istat=m.istat LEFT JOIN source_counts c ON c.region_code=m.region_code AND c.municipality_istat=m.istat
  WHERE m.region_code=$1 AND m.dataset_id=$2 AND ($3='' OR strpos(lower(g.name),lower($3))>0 OR strpos(g.istat,$3)>0) AND ($4='' OR g.province=$4)
  AND ($5='' OR ($5='none' AND COALESCE(c.sources,0)=0) OR ($5='configured' AND c.sources>0) OR ($5='collecting' AND c.collecting>0))) `
 
@@ -158,16 +159,18 @@ func (s *Store) Municipalities(ctx context.Context, region string, f Municipalit
 	if err = tx.QueryRow(ctx, municipalityListSQL+`SELECT count(*) FROM matching`, args...).Scan(&result.Total); err != nil {
 		return result, err
 	}
-	rows, err := tx.Query(ctx, municipalityListSQL+`SELECT region_code,dataset_id,istat,name,province,sources,collecting FROM matching WHERE ($6='' OR (name,istat)>($6,$7)) ORDER BY name,istat LIMIT $8`, append(args, name, istat, f.Limit+1)...)
+	rows, err := tx.Query(ctx, municipalityListSQL+`SELECT region_code,dataset_id,istat,name,province,sources,collecting,revision,enabled FROM matching WHERE ($6='' OR (name,istat)>($6,$7)) ORDER BY name,istat LIMIT $8`, append(args, name, istat, f.Limit+1)...)
 	if err != nil {
 		return result, err
 	}
 	for rows.Next() {
 		var m TerritorialMunicipality
-		if err = rows.Scan(&m.RegionCode, &m.DatasetID, &m.ISTAT, &m.Name, &m.Province, &m.Sources, &m.Collecting); err != nil {
+		if err = rows.Scan(&m.RegionCode, &m.DatasetID, &m.ISTAT, &m.Name, &m.Province, &m.Sources, &m.Collecting, &m.Activation.Revision, &m.Activation.Enabled); err != nil {
 			rows.Close()
 			return result, err
 		}
+		m.Activation.RegionCode, m.Activation.ISTAT, m.Activation.RegionEnabled = m.RegionCode, m.ISTAT, result.Region.Enabled
+		m.Activation.ResolveEligibility()
 		result.Items = append(result.Items, m)
 	}
 	err = rows.Err()
@@ -184,12 +187,14 @@ func (s *Store) Municipalities(ctx context.Context, region string, f Municipalit
 }
 func (s *Store) Municipality(ctx context.Context, region, istat string) (TerritorialMunicipality, error) {
 	var m TerritorialMunicipality
-	err := s.pool.QueryRow(ctx, `SELECT m.region_code,m.dataset_id,m.istat,g.name,g.province,(m.dataset_id IS DISTINCT FROM v.configuration->>'municipality_dataset'),(SELECT count(*) FROM territorial_current_sources a WHERE a.region_code=m.region_code AND a.municipality_istat=m.istat),(SELECT count(*) FROM territorial_current_sources a JOIN registry_sources s ON s.id=a.source_id WHERE a.region_code=m.region_code AND a.municipality_istat=m.istat AND s.collection_enabled)
- FROM territorial_municipalities m JOIN geography_municipalities g ON g.dataset_id=m.dataset_id AND g.istat=m.istat JOIN geography_datasets d ON d.id=m.dataset_id JOIN territorial_regions r ON r.code=m.region_code LEFT JOIN territorial_region_versions v ON v.region_code=r.code AND v.revision=r.revision
- WHERE m.region_code=$1 AND m.istat=$2 ORDER BY (m.dataset_id=v.configuration->>'municipality_dataset') DESC NULLS LAST,d.verified_at DESC,d.id DESC LIMIT 1`, region, istat).Scan(&m.RegionCode, &m.DatasetID, &m.ISTAT, &m.Name, &m.Province, &m.Historical, &m.Sources, &m.Collecting)
+	err := s.pool.QueryRow(ctx, `SELECT m.region_code,m.dataset_id,m.istat,g.name,g.province,(m.dataset_id IS DISTINCT FROM v.configuration->>'municipality_dataset'),(SELECT count(*) FROM territorial_current_sources a WHERE a.region_code=m.region_code AND a.municipality_istat=m.istat),(SELECT count(*) FROM territorial_current_sources a JOIN registry_sources s ON s.id=a.source_id WHERE a.region_code=m.region_code AND a.municipality_istat=m.istat AND s.collection_enabled),COALESCE(st.revision,0),COALESCE(st.enabled,false),r.enabled
+ FROM territorial_municipalities m JOIN geography_municipalities g ON g.dataset_id=m.dataset_id AND g.istat=m.istat JOIN geography_datasets d ON d.id=m.dataset_id LEFT JOIN territorial_municipality_state st ON st.region_code=m.region_code AND st.istat=m.istat JOIN territorial_regions r ON r.code=m.region_code LEFT JOIN territorial_region_versions v ON v.region_code=r.code AND v.revision=r.revision
+ WHERE m.region_code=$1 AND m.istat=$2 ORDER BY (m.dataset_id=v.configuration->>'municipality_dataset') DESC NULLS LAST,d.verified_at DESC,d.id DESC LIMIT 1`, region, istat).Scan(&m.RegionCode, &m.DatasetID, &m.ISTAT, &m.Name, &m.Province, &m.Historical, &m.Sources, &m.Collecting, &m.Activation.Revision, &m.Activation.Enabled, &m.Activation.RegionEnabled)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return m, domain.ErrTerritoryNotFound
 	}
+	m.Activation.RegionCode, m.Activation.ISTAT, m.Activation.Historical = m.RegionCode, m.ISTAT, m.Historical
+	m.Activation.ResolveEligibility()
 	return m, err
 }
 

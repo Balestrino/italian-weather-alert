@@ -7,3 +7,6 @@ td details{margin:0;padding:6px 8px}td details[open]{min-width:260px}td details 
 .alert-days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.alert-day{min-width:0}.alert-day h2 span{display:block;font-size:1rem;color:var(--muted);margin-top:8px}.alert-day section+section{border-top:1px solid var(--line);margin-top:24px;padding-top:12px}.alert-card{border:1px solid var(--line);border-radius:8px;padding:16px;margin:16px 0;overflow-wrap:anywhere}.alert-card h4{margin-top:0}.alert-card q{display:block;margin-top:8px}.alert-card p{font-size:.95rem}@media(max-width:1000px){.alert-days{grid-template-columns:1fr}}
 
 .territory-tabs{border-bottom:1px solid var(--line);margin-bottom:24px}.territory-tabs a{padding:8px 4px}.territory-tabs a[aria-current]{color:var(--text);border-bottom:2px solid var(--accent);font-weight:700}.subnav a[aria-current]{font-weight:700}table{width:100%}.table-wrap{max-width:100%;overflow-x:auto}
+
+/* Keep territorial controls usable at narrow widths and 200% zoom. */
+.topbar{flex-wrap:wrap}.navigation a{min-width:0;overflow-wrap:anywhere}.page-heading{flex-wrap:wrap}

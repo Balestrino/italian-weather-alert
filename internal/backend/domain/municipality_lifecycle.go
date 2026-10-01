@@ -33,7 +33,14 @@ func (s *Store) MunicipalityState(ctx context.Context, region, istat string) (Mu
 	if err != nil {
 		return v, err
 	}
+	v.ResolveEligibility()
+	return v, nil
+}
+
+// ResolveEligibility describes territorial admission, independently of source flags and worker execution.
+func (v *MunicipalityState) ResolveEligibility() {
 	v.Eligible = v.Enabled && v.RegionEnabled && !v.Historical
+	v.BlockedBy = ""
 	switch {
 	case !v.RegionEnabled:
 		v.BlockedBy = "region_disabled"
@@ -42,7 +49,6 @@ func (s *Store) MunicipalityState(ctx context.Context, region, istat string) (Mu
 	case v.Historical:
 		v.BlockedBy = "municipality_retired"
 	}
-	return v, nil
 }
 
 func (s *Store) SetMunicipalityEnabled(ctx context.Context, region, istat string, expected int, enabled bool, actor string) (int, error) {

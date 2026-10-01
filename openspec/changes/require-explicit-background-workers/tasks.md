@@ -1,6 +1,6 @@
 # Tasks
 
-All tasks below are implementation work and remain unchecked in this proposal. Repository verification uses synthetic fixtures and configuration resolution; it does not activate or stop operational workers. Production rollout and the live collector handover remain separate operations under the existing release procedure.
+Checked tasks record repository implementation verified with synthetic fixtures; unchecked tasks remain open. Repository verification uses synthetic fixtures and configuration resolution; it does not activate or stop operational workers. Production rollout and the live collector handover remain separate operations under the existing release procedure.
 
 ## 1. Explicit service selection
 
@@ -9,15 +9,15 @@ All tasks below are implementation work and remain unchecked in this proposal. R
 
 ## 2. CLI and admin source controls
 
-- [ ] 2.1 Add admin-role CLI commands for source collection enablement, suspension and state inspection, reusing existing registry operations with validated source/revision/actor arguments and JSON results; verify command parsing, role enforcement, operator-safe nonzero failure and successful state changes in synthetic fixtures without starting a worker or making acquisition/provider calls.
-- [ ] 2.2 Preserve the admin panel's collection controls and add CLI/admin guidance separating source enablement from worker execution and public publication; verify synthetic integration cases give equivalent CLI/admin outcomes for valid activation, missing preview, stale revision, policy/territorial restrictions, audit identity, suspension and cross-interface state visibility while the worker is absent.
+- [x] 2.1 Add admin-role CLI commands for source collection enablement, suspension and state inspection, reusing existing registry operations with validated source/revision/actor arguments and JSON results; verify command parsing, role enforcement, operator-safe nonzero failure and successful state changes in synthetic fixtures without starting a worker or making acquisition/provider calls.
+- [x] 2.2 Preserve the admin panel's collection controls and add CLI/admin guidance separating source enablement from worker execution and public publication; verify synthetic integration cases give equivalent CLI/admin outcomes for valid activation, missing preview, stale revision, policy/territorial restrictions, audit identity, suspension and cross-interface state visibility while the worker is absent.
 
 ## 3. Territorial activation hierarchy
 
 - [x] 3.1 Add an additive, audited municipality lifecycle with validated region/ISTAT identity, expected revision, disabled defaults for new identities and compatibility backfill for municipalities with existing configured local sources; verify synthetic migration, stale revision, wrong membership, dataset replacement and retired-identity history cases without modifying immutable geography or existing migration checksums.
 - [x] 3.2 Extend shared territorial execution admission for acquisition, queued document/inference jobs and manual previews/interpretation to honor municipality gates for local sources with region-first locking; verify parent disablement blocks new work, admitted work may finish, regional/other municipal sources remain unaffected by one municipality's disablement, and re-enable preserves child/source choices without enqueuing a catch-up batch.
-- [ ] 3.3 Add explicit region enable/disable actions to `/admin/regions` and municipal enable/disable actions to Configura regione → Comuni, with configured/effective status, blocking reasons and lifecycle history; verify native forms, actor/revision checks, territorial context, filter/pagination retention, keyboard use, 390px viewport and 200% zoom using synthetic fixtures.
-- [ ] 3.4 Add dedicated CLI region/municipality enable, disable and status commands using the shared domain lifecycle; verify CLI/admin parity, explicit environment scope, prerequisite/conflict errors, JSON state results, no automatic source/public activation and no worker or provider side effects.
+- [x] 3.3 Add explicit region enable/disable actions to `/admin/regions` and municipal enable/disable actions to Configura regione → Comuni, with configured/effective status, blocking reasons and lifecycle history; verify native forms, actor/revision checks, territorial context, filter/pagination retention, keyboard use, 390px viewport and 200% zoom using synthetic fixtures.
+- [x] 3.4 Add dedicated CLI region/municipality enable, disable and status commands using the shared domain lifecycle; verify CLI/admin parity, explicit environment scope, prerequisite/conflict errors, JSON state results, no automatic source/public activation and no worker or provider side effects.
 
 ## 4. Deployment validation
 

@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Added] Provide audited CLI and admin activation controls for regions, municipalities and source collection, with native forms and territorial blocking status.
 - 2026-10-01 [Added] Add audited municipality enablement and hierarchical acquisition/inference gates while preserving existing collection eligibility
 - 2026-10-01 [Changed] Make collection and backup workers opt-in in development and staging; verify isolated production profile selection
 - 2026-10-01 [Planned] Extend the processing plan with hierarchical region/municipality/source controls in CLI and admin, independent of worker startup and public publication
