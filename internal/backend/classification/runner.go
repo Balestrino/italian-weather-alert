@@ -70,6 +70,16 @@ func Enqueue(ctx context.Context, queue *jobs.Store, policy inference.RetryPolic
 	return queue.Enqueue(ctx, request)
 }
 
+func classificationRunKey(versionID int64, contentHash, configuration, selectionID, manifestSuffix string) string {
+	key := fmt.Sprintf("classification:%d:%s:%s:%s", versionID, contentHash, configuration, selectionID) + manifestSuffix
+	// Preserve existing identities while bounding keys that include reprocessing
+	// selections and manifests to the processing store's 200-byte limit.
+	if len(key) <= 200 {
+		return key
+	}
+	return fmt.Sprintf("classification:%d:%x", versionID, sha256.Sum256([]byte(key)))
+}
+
 func (r *Runner) Handler() jobs.Handler {
 	return func(ctx context.Context, job jobs.Job) (jobs.Result, error) {
 		var payload Payload
@@ -136,7 +146,7 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	if len(version.Resources) > 0 {
 		sourceID = &version.Resources[0].SourceID
 	}
-	run, err := r.Processing.StartRun(ctx, processing.RunRequest{IdempotencyKey: fmt.Sprintf("classification:%d:%s:%s:%s", version.ID, content.Hash, r.ConfigurationVersion, payload.SelectionID) + manifestSuffix, Workload: payload.Workload, Stage: "classification", ConfigurationVersionID: r.ConfigurationVersion, SourceID: sourceID, DocumentVersionID: &version.ID, Subject: subject, CreatedAt: now().UTC()})
+	run, err := r.Processing.StartRun(ctx, processing.RunRequest{IdempotencyKey: classificationRunKey(version.ID, content.Hash, r.ConfigurationVersion, payload.SelectionID, manifestSuffix), Workload: payload.Workload, Stage: "classification", ConfigurationVersionID: r.ConfigurationVersion, SourceID: sourceID, DocumentVersionID: &version.ID, Subject: subject, CreatedAt: now().UTC()})
 	if err != nil {
 		return jobs.Result{}, classFailure("classification_run_unavailable", true)
 	}

@@ -32,6 +32,7 @@ type classificationStore interface {
 }
 
 type processingStore interface {
+	RecordInvalidOutput(context.Context, processing.InvalidOutput) error
 	StartRun(context.Context, processing.RunRequest) (processing.Run, error)
 	StartAttempt(context.Context, processing.AttemptStart) (processing.Attempt, error)
 	FinishAttempt(context.Context, processing.AttemptFinish) (processing.Attempt, error)
@@ -287,6 +288,19 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 			code := InvalidOutputReason(response.Content, response.FinishReason, window, parseErr)
 			if parseErr == nil {
 				code = "extraction_output_model_changed"
+			}
+			requestBytes, marshalErr := json.Marshal(request)
+			captureCtx, cancelCapture := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+			captureErr := marshalErr
+			if captureErr == nil {
+				captureErr = r.Processing.RecordInvalidOutput(captureCtx, processing.InvalidOutput{RunID: attempt.RunID, AttemptNumber: attempt.Number, SegmentOrdinal: window.Ordinal, Request: requestBytes, Response: []byte(response.Content), FinishReason: response.FinishReason, ErrorCode: code, Cached: cached, CreatedAt: now().UTC()})
+			}
+			cancelCapture()
+			if captureErr != nil {
+				if err := r.finish(ctx, attempt, now(), "failed", usage, nil, "extraction_diagnostic_unavailable"); err != nil {
+					return jobs.Result{}, failure("extraction_attempt_unavailable", true)
+				}
+				return jobs.Result{}, failure("extraction_diagnostic_unavailable", false)
 			}
 			return r.persist(ctx, attempt, withStatus(base, "uninterpreted", reason), "failed", usage, nil, code)
 		}

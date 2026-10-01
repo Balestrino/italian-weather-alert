@@ -104,6 +104,9 @@ Runtime checks show configured images, running revision labels and checkout revi
 
 ## Planned failure checks
 
+For source-specific collection failures and persistent interpretation limits,
+follow [development acquisition recovery](acquisition-recovery.md).
+
 Ordinary smoke checks are nondisruptive. Fault injection stops and restarts only the selected project's RustFS and needs a planned interruption on a throwaway or explicitly scheduled development/staging stack:
 
 ```sh

@@ -284,7 +284,7 @@ func parseCompactWindowV2(raw string, window Window) ([]Measure, error) {
 					support = append(support, Evidence{Quote: quotes[reference]})
 				}
 			}
-			if len(support) == len(candidate.Evidence.Kind) && kindSupportedByEvidence(candidate.Kind, support) && !kindSupportedByEvidence(candidate.Kind, operativeEvidenceOutsideHeading(support, window)) {
+			if len(support) == len(candidate.Evidence.Kind) && windowKindSupportedByEvidence(candidate.Kind, support, window) && !windowKindSupportedByEvidence(candidate.Kind, operativeEvidenceOutsideHeading(support, window), window) {
 				headingOnly++
 				continue
 			}
@@ -607,7 +607,7 @@ func expandCompactMeasureV2(ordinal int, candidate compactWireMeasureV2, window 
 	if !window.legacyLiteral {
 		kindEvidence = operativeEvidenceOutsideHeading(kindEvidence, window)
 	}
-	if !kindSupportedByEvidence(candidate.Kind, kindEvidence) {
+	if !windowKindSupportedByEvidence(candidate.Kind, kindEvidence, window) {
 		return Measure{}, ErrEvidence
 	}
 	if !valueInEvidence(candidate.Subject, selectedByField["subject"]) {
@@ -647,7 +647,7 @@ func expandCompactMeasureV2(ordinal int, candidate compactWireMeasureV2, window 
 		if temporalReferencesOnlyMetadata(raw.Evidence, quotes) {
 			continue
 		}
-		if candidate.Kind == "activation" && !referencesContainActivation(raw.Evidence, quotes) {
+		if candidate.Kind == "activation" && !referencesContainActivation(raw.Evidence, quotes, window) {
 			continue
 		}
 		selected, err := appendEvidence(raw.Field, raw.Evidence)
@@ -680,9 +680,9 @@ func temporalReferencesOnlyMetadata(references []int, quotes []string) bool {
 	return len(references) > 0
 }
 
-func referencesContainActivation(references []int, quotes []string) bool {
+func referencesContainActivation(references []int, quotes []string, window Window) bool {
 	for _, reference := range references {
-		if reference >= 0 && reference < len(quotes) && activationPredicate(strings.ToLower(quotes[reference])) {
+		if reference >= 0 && reference < len(quotes) && windowKindSupportedByEvidence("activation", []Evidence{{Quote: quotes[reference]}}, window) {
 			return true
 		}
 	}
@@ -910,6 +910,21 @@ func kindSupportedByEvidence(kind string, evidence []Evidence) bool {
 	default:
 		return false
 	}
+}
+
+// Opening an explicitly named civil-protection centre is an operational
+// activation; ordinary office openings and negated statements are not.
+var civilProtectionOpening = regexp.MustCompile(`(?i)\b(?:coc\s*\(centro operativo comunale\)|centro operativo comunale)\s+(?:sarà|sara|è|resta|rimane)\s+aperto\b`)
+
+func windowKindSupportedByEvidence(kind string, evidence []Evidence, window Window) bool {
+	if kind == "activation" && !window.legacyLiteral {
+		for _, item := range evidence {
+			if civilProtectionOpening.MatchString(item.Quote) {
+				return true
+			}
+		}
+	}
+	return kindSupportedByEvidence(kind, evidence)
 }
 
 func activationPredicate(value string) bool {

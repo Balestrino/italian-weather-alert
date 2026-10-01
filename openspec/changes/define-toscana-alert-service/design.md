@@ -15,6 +15,15 @@ The authenticated task-9.1 runs after the first bounded-segmentation implementat
 
 ## Goals / Non-Goals
 
+The development recovery procedure is documented in
+[acquisition recovery](../../../docs/operations/acquisition-recovery.md). Reviewed
+stale-target decisions preserve history and reactivate on rediscovery. Temporary
+incident restrictions are explicitly released after a bounded canary; embedding
+and linking inherit their extraction run's document scope. Rejected extraction
+responses use the existing private append-only diagnostic store, and oversized
+classification identities use a deterministic digest while preserving existing
+bounded keys. These operations do not establish public source acceptance.
+
 **Goals:** evidence-supported output, independent quality dimensions, revision-aware local measures, reproducible internal diagnosis, equivalent public interfaces and sustainable anonymous access.
 
 **Non-Goals:** autonomous discovery of new source channels, manual editing or approval of individual public notices, mandatory local model inference, complete historical reconstruction or public administration. Initial public limits are an operational guardrail rather than a capacity guarantee; concrete route/tool names are recorded in the completed technical contract (task 1.7), with live verification still required.

@@ -128,3 +128,14 @@ The original checkboxes reflect the private project task list on 30 September 20
 ## Public environment verification — 1 October 2026
 
 The [environment hardening change](../harden-environment-operations/tasks.md) and [disposable rehearsal summary](../../../docs/operations/environment-verification.md) verify the public checkout’s environment tooling, including task 12.6. Backup/restore and VM reboot checks were handed to the operator at their request; that handoff does not certify readiness. Tasks 1.8, 8.2, 8.3, 10.2, 12.4 and 12.5 remain open until their actual operational results exist. Repository configuration changes do not apply restart policies to existing containers automatically.
+
+## 13. Development acquisition and interpretation recovery — 1 October 2026
+
+- [x] 13.1 Review a stale unavailable municipal target against complete configured listings, record a scoped disposition without erasing evidence, and verify a fresh complete development acquisition check.
+- [x] 13.2 Verify the completed incident recovery, preserve its policy and ledger privately, validate representative interpretation work in a bounded canary, and release the obsolete development scope restriction while preserving normal retry, archive and provider controls.
+- [x] 13.3 Document repeatable operational recovery, run development runtime/readiness checks, and record validation without changing source acceptance or production activation.
+- [x] 13.4 Preserve rejected extraction request/response evidence, fail closed on diagnostic storage failure, verify private append-only capture with synthetic tests, and validate the source-scoped output correction on development.
+- [x] 13.5 Resolve embedding/linking recovery scope through their extraction run, preserve document quarantine and call limits, and verify allowed child jobs can finish a selected recovery pipeline.
+- [x] 13.6 Bound classification run identities containing reprocessing selections and manifests; preserve existing short keys, isolate distinct selections, and verify selected live reprocessing succeeds.
+- [x] 13.7 Recognize literal opening of an explicitly named municipal civil-protection centre as activation in the selected output correction; preserve legacy validation, reject unrelated/negated openings and avoid borrowing alert validity.
+- [ ] 13.8 Restore provider entitlement for a credential-wide quota hold, resume through a controlled probe, relaunch the reviewed failed OCR job and verify ordinary interpretation progress without a renewed rejection. Requires an active provider account or replacement credential; application fixes alone do not complete this step.

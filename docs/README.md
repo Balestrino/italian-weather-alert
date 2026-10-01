@@ -11,6 +11,7 @@ Italian Weather Alert is an independent, best-effort project to make Italian reg
 - [Environments](operations/environments.md): one-host projects, fresh/existing setup, routine management and data separation.
 - [Environment verification](operations/environment-verification.md): disposable rehearsal results and operational checks still outstanding.
 - [Release operations](operations/releases.md): image approval, deployment checks and PBS recovery targets.
+- [Acquisition recovery](operations/acquisition-recovery.md): stale municipal URLs, temporary interpretation limits and bounded development validation.
 - [OpenSpec plans and progress](../openspec/README.md): change proposals, capability specifications, and dated task checklists.
 - [Agent tools](development/agent-tools.md): included OpenSpec skills and optional local integrations.
 - [Public API/MCP contract](backend/public-api-mcp.md) and [usage examples](backend/public-usage.md).

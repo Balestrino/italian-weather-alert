@@ -52,10 +52,20 @@ func (f fakeClassifications) Get(context.Context, int64) (classification.Result,
 }
 
 type fakeProcessing struct {
+	invalidOutputs    []processing.InvalidOutput
+	captureErr        error
 	lastConfiguration string
 	run               processing.Run
 	attempts          int
 	finished          []processing.AttemptFinish
+}
+
+func (f *fakeProcessing) RecordInvalidOutput(_ context.Context, v processing.InvalidOutput) error {
+	if f.captureErr != nil {
+		return f.captureErr
+	}
+	f.invalidOutputs = append(f.invalidOutputs, v)
+	return nil
 }
 
 func (f *fakeProcessing) StartRun(_ context.Context, request processing.RunRequest) (processing.Run, error) {

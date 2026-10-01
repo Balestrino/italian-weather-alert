@@ -25,12 +25,12 @@ func (s *Store) RecordInvalidOutput(ctx context.Context, v InvalidOutput) error 
 	}
 	ih, rh := sha256.Sum256(v.Request), sha256.Sum256(v.Response)
 	inputHash, responseHash := hex.EncodeToString(ih[:]), hex.EncodeToString(rh[:])
-	// Only classification attempts may use this capture path.
+	// Only structured text interpretation attempts may use this capture path.
 	var stage string
 	if err := s.pool.QueryRow(ctx, `SELECT stage FROM processing_runs WHERE id=$1`, v.RunID).Scan(&stage); err != nil {
 		return err
 	}
-	if stage != "classification" {
+	if stage != "classification" && stage != "extraction" {
 		return ErrInvalid
 	}
 	response := v.Response

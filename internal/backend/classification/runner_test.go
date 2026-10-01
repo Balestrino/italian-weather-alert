@@ -61,6 +61,9 @@ func (f *fakeProcessing) RecordInvalidOutput(_ context.Context, v processing.Inv
 	return nil
 }
 func (f *fakeProcessing) StartRun(_ context.Context, request processing.RunRequest) (processing.Run, error) {
+	if len(request.IdempotencyKey) > 200 {
+		return processing.Run{}, processing.ErrInvalid
+	}
 	f.lastConfiguration = request.ConfigurationVersionID
 	if request.Stage != "classification" || request.DocumentVersionID == nil {
 		return processing.Run{}, errors.New("bad run")

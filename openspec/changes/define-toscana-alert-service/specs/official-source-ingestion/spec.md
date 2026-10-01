@@ -91,6 +91,10 @@ Structured conclusions SHALL be supported by identifiable passages or explicit v
 - **WHEN** a new official document is acquired but its measures cannot be established
 - **THEN** document metadata and the official link are available with an interpretation warning, no unsupported measures are asserted, and preceding affected states disclose the newer uninterpreted publication
 
+#### Scenario: An extraction response fails validation
+- **WHEN** a structured extraction response fails envelope, evidence or model-consistency validation
+- **THEN** the service privately preserves the request and verbatim response, attempt/window identity, finish reason and diagnostic code without credentials, retries or successful checkpoints; a capture failure stops the job with an explicit diagnostic-storage error
+
 ### Requirement: Configurable checks and complete-check status
 The service SHALL support per-source configurable check intervals defaulting to 10 minutes and independent delay thresholds defaulting to 30 minutes since the last complete successful check. A complete check SHALL cover the declared sections, relevant listings and documents requiring revision checks, with successful content recognition. Reachability alone SHALL NOT reset the complete-check time. The first failed check SHALL be visible immediately; a source without a successful baseline SHALL be reported as not yet verified. These settings SHALL NOT be advertised as end-to-end delivery guarantees.
 
@@ -112,6 +116,10 @@ Collection SHALL respect source constraints and upstream retry instructions, use
 #### Scenario: An occasional channel has no new notice
 - **WHEN** a complete check finds no changes and no publication is expected
 - **THEN** the check succeeds without a missing-publication alarm
+
+#### Scenario: A reviewed stale document remains unavailable
+- **WHEN** a previously discovered document still returns HTTP 404/410 and complete later traversals of the configured listings no longer contain it
+- **THEN** an operator may record an evidence-backed exclusion scoped to its source, configuration and URL, preserving acquisitions, failed checks and unavailable-target history; rediscovery automatically restores the target to checking
 
 ### Requirement: Internal quality monitoring and DPC comparison
 The internal monitoring system SHALL retain diagnostic evidence for availability, timeliness and interpretation correctness, including ambiguous relationships, omitted publications, source disagreements and parsing failures. It SHALL support assessment of code and process improvements against retained cases. It SHALL NOT introduce editorial approval, manual content correction or a publication gate for individual notices. DPC products SHALL be used only for internal comparison in the first release, with comparison scope and non-comparability explicit; they SHALL NOT overwrite regional values or appear as public warning products.
@@ -182,12 +190,24 @@ Segment results SHALL be merged through validation that rejects unsupported asse
 - **WHEN** a notice reopens an underpass and explicitly retains closure of cemeteries and a dog exercise area
 - **THEN** both retained closures and the bounded reopening remain represented with literal operative evidence, without deriving times from page metadata or revoking other restrictions
 
+#### Scenario: A notice opens the municipal civil-protection centre
+- **WHEN** an operative passage explicitly states that the named municipal civil-protection centre will be open
+- **THEN** the evaluated extraction configuration can represent its activation with literal evidence, without treating an unrelated office opening as activation or borrowing the regional alert's validity
+
 ### Requirement: Durable processing and bounded retries
 Processing SHALL preserve job states, errors and attempt history across restarts, prevent duplicate public effects from resumed work, and support a configurable maximum initially three total attempts for temporary processing errors with increasing waits. Ambiguity in readable content SHALL NOT itself trigger repeated attempts. Exhausted processing SHALL preserve acquired evidence and an explicit failure state.
 
 #### Scenario: Processing fails repeatedly
 - **WHEN** a temporary interpretation error exhausts the configured attempt count
 - **THEN** automatic attempts stop, failure remains visible, acquired evidence is preserved, and an operator can explicitly relaunch the job
+
+#### Scenario: A completed incident leaves a temporary recovery restriction
+- **WHEN** the selected incident jobs have succeeded but their persistent recovery scope still defers ordinary work
+- **THEN** an operator preserves the prior policy and call ledger, validates a bounded representative canary, and explicitly releases the temporary restriction without resetting job attempts, removing archives, bypassing provider holds or enabling public sources
+
+#### Scenario: A selected recovery schedules measure dependencies
+- **WHEN** embedding or linking work identifies its document through an extraction run
+- **THEN** the recovery guard applies the parent document's scope and quarantine, permits allowed dependencies, and retains the shared provider-call cap
 
 ### Requirement: Measured quality before source publication
 Source acceptance SHALL include human-reviewed expected outputs for observed cases and labeled simulations, covering irrelevant notices, omissions, partial reopenings, exceptions, conflicting dates, newer uninterpreted documents and scanned attachments. A missed relevant notice or unsupported asserted measure in evaluation SHALL block public activation of the affected source until correction and successful re-evaluation. Evaluation SHALL also report indeterminate fields and extraction usefulness. An observational collection trial SHALL last at least seven days and SHALL be extended for unresolved problems or insufficient observations; retained cases SHALL exercise significant events absent from the trial.
@@ -202,6 +222,10 @@ Each interpretation SHALL identify its model, instruction/configuration versions
 #### Scenario: A model configuration changes
 - **WHEN** an operator selects failed documents for reprocessing after evaluation
 - **THEN** only the selected scope is reprocessed, each new run is versioned, and previous results remain traceable
+
+#### Scenario: A reprocessing identity includes a selection and input manifest
+- **WHEN** the classification run identity exceeds the store's identifier bound
+- **THEN** a deterministic digest preserves all identity components and isolates distinct selections while existing bounded identities remain unchanged
 
 #### Scenario: A published interpretation is found defective
 - **WHEN** the operator suspends new interpretations for that source

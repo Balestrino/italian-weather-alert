@@ -8,13 +8,15 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | --- | ---: | ---: |
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 77 | 10 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 84 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 18 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 4 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
+
+The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Provider entitlement restoration remains a separate open step. These checks do not complete source acceptance or production readiness.
 
 Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/operations/environment-verification.md).
 

@@ -138,6 +138,30 @@ func TestRecoveryScopeConcurrentCapAndFailure(t *testing.T) {
 			t.Fatal("pre-claim quarantine scope incorrect", v, e)
 		}
 	}
+	if e := s.RegisterConfiguration(ctx, ConfigurationVersion{ID: "recovery-extraction", Name: "recovery-extraction", Stage: "extraction", Revision: "1", LogicVersion: "test", Settings: json.RawMessage(`{}`), CreatedAt: now}); e != nil {
+		t.Fatal(e)
+	}
+	for _, version := range []int64{1, 2} {
+		parent, e := s.StartRun(ctx, RunRequest{IdempotencyKey: fmt.Sprint("parent-", version), Workload: "ordinary", Stage: "extraction", ConfigurationVersionID: "recovery-extraction", DocumentVersionID: &version, Subject: json.RawMessage(`{}`), CreatedAt: now})
+		if e != nil {
+			t.Fatal(e)
+		}
+		for _, kind := range []string{"embed_measure", "link_measure_update"} {
+			body, _ := json.Marshal(map[string]int64{"extraction_run_id": parent.ID, "measure_ordinal": 1})
+			child, e := queue.Enqueue(ctx, jobs.EnqueueRequest{Queue: "inference", Kind: kind, IdempotencyKey: fmt.Sprint(kind, version), Payload: body, MaxAttempts: 3, RetryBase: time.Second, AvailableAt: now})
+			if e != nil {
+				t.Fatal(e)
+			}
+			if e = s.DeferRecoveryJobs(ctx, now); e != nil {
+				t.Fatal(e)
+			}
+			var at time.Time
+			var tries int
+			if e = pool.QueryRow(ctx, `SELECT available_at,attempt_count FROM processing_jobs WHERE id=$1`, child.ID).Scan(&at, &tries); e != nil || tries != 0 || at.After(now) != (version == 1) {
+				t.Fatal("child document scope/quarantine incorrect", version, kind, e)
+			}
+		}
+	}
 	if _, e := s.FinishAttempt(ctx, AttemptFinish{RunID: outside.ID, Number: 1, FinishedAt: now.Add(time.Second), Outcome: "failed", ErrorCode: "classification_diagnostic_unavailable", Usage: Usage{Status: "unavailable"}}); e != nil {
 		t.Fatal(e)
 	}
