@@ -1,6 +1,14 @@
-# Release images and production recovery
+# Software releases, images and production recovery
 
 This is the public procedure for preparing and checking an IWA release. The production Compose project is configured on the same VM as development and staging but has not been started; PBS backup and public source readiness remain open. Keep actual hostnames, credentials, backup records and approval evidence in private operational records. The [environment guide](environments.md) describes all three projects.
+
+## Versioned software releases
+
+The first software release is [v0.1.0](../releases/v0.1.0.md), an internal-pilot baseline. A Git tag and GitHub release identify published source code. Image publication and production activation follow the separate checks below.
+
+Prepare software releases on `dev`: move the dated entries being released from `CHANGELOG.md` into a version/date section, keep exactly one `## Unreleased` section for future changes, and add a new dated entry describing the release preparation. Keep the release notes concise, covering the available features, installation references and known limits. Preserve historical entries and keep private deployment evidence out of the notes.
+
+Run the changelog check against `origin/main`, and promote `dev` through a pull request after CI, Coverage and Security pass for its current head. Use a merge commit to retain the per-commit history. Wait for the required workflows on the merged `main` revision, then create an annotated `v<version>` tag on that exact revision and publish the reviewed notes as a GitHub release. Align `dev` with the merged `main` history before continuing development. A version below 1.0 remains subject to interface changes; notes must explicitly state the source and service readiness limits.
 
 ## Image identity and manual approval
 

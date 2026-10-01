@@ -17,3 +17,14 @@ A shared pre-commit hook SHALL automatically insert and stage a fallback entry f
 #### Scenario: Hook is bypassed
 - **WHEN** a change commit is pushed without a dated changelog entry
 - **THEN** the CI changelog check fails and identifies the offending commit
+
+### Requirement: Versioned software history
+A software release SHALL preserve dated history under a version/date section and retain exactly one Unreleased section for future recording. Release preparation SHALL add a dated entry and publish notes that describe pilot limitations without implying source acceptance or production activation. The version tag and GitHub release SHALL identify the merged main revision after CI, Coverage and Security pass.
+
+#### Scenario: First software release is prepared
+- **WHEN** the development changes are grouped for version 0.1.0
+- **THEN** their dated entries remain under the versioned heading, release preparation has its own dated entry and Unreleased remains available
+
+#### Scenario: Development continues after a release
+- **WHEN** a contributor records a new staged change
+- **THEN** the recorder adds its dated entry under Unreleased without modifying versioned history

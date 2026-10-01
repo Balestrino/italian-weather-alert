@@ -10,6 +10,8 @@ Keep one human-readable `CHANGELOG.md` with dated Unreleased bullets. `scripts/c
 
 The initial changelog records the current fix and this mechanism. Entries describe repository changes only. They do not state that a source was accepted, the service was deployed, or private evidence was published.
 
+Software releases move the existing dated bullets into a version/date section and retain exactly one empty Unreleased section for the next changes. Release preparation adds its own dated bullet, so reorganizing history still satisfies per-commit enforcement. The recorder continues to write only under Unreleased; versioned sections are preserved. Reviewed pilot notes are committed with the release preparation. Promotion retains history through a `dev` to `main` merge; tag and GitHub publication target the merged revision after its workflows pass. Container publication and production approval remain separate operational work.
+
 ## Validation
 
 Use temporary synthetic Git repositories to verify automatic insertion, idempotence, blocked unstaged changelog edits, and CI detection of a bypassed hook. Run the repository's Go and static checks after integration.
