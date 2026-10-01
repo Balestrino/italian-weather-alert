@@ -45,6 +45,7 @@ type Runner struct {
 	Model                           string
 	ConfigurationVersion            string
 	PriceVersion                    *string
+	DisableThinking                 bool
 	Now                             func() time.Time
 }
 
@@ -254,12 +255,19 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 		}
 		var response inference.Response
 		var callErr error
+		request := pageRequest(r.Model, page)
+		if r.DisableThinking {
+			request.ChatTemplateKwargs = &inference.ChatTemplateOptions{EnableThinking: false}
+		}
+		if r.Adapter.Name() == "local-openai-chat" {
+			request = inference.LocalChatRequest(request)
+		}
 		if r.Artifacts != nil {
-			response, callErr = r.callOwned(ctx, artifact, pageRequest(r.Model, page), func(response inference.Response) error {
+			response, callErr = r.callOwned(ctx, artifact, request, func(response inference.Response) error {
 				return r.Artifacts.CompleteArtifact(ctx, artifact, makePage(response), now())
 			})
 		} else {
-			response, callErr = r.Adapter.Complete(ctx, pageRequest(r.Model, page))
+			response, callErr = r.Adapter.Complete(ctx, request)
 		}
 
 		if deferred, deferErr := inference.FinishDeferral(ctx, r.Processing, attempt, callErr); deferred {

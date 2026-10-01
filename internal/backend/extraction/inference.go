@@ -1440,3 +1440,13 @@ func cleanPointer(value *string) *string {
 	}
 	return &clean
 }
+
+// LocalWindowRequest records the evaluated local instructions before hashing.
+func LocalWindowRequest(model string, window Window) (inference.Request, error) {
+	request, err := WindowRequest(model, window)
+	if err != nil {
+		return inference.Request{}, err
+	}
+	request.Messages[0].Content, _ = json.Marshal(LocalPromptBody)
+	return inference.LocalChatRequest(request), nil
+}

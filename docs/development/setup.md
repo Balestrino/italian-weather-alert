@@ -55,6 +55,8 @@ scripts/compose-env.sh development logs --tail=100 worker
 
 Collection/provider requests can incur charges. Notifications, semantic linking, public retained-copy access and application backups start disabled. The optional `backup` service needs its own reviewed configuration; the whole-VM production strategy uses off-host PBS instead.
 
+For an evaluated local Qwen chat/image alternative, see [local LLM fallback](../operations/local-llm-fallback.md). Its configuration and live tests are opt-in and source-scoped.
+
 ## 5. Test, update and manage development
 
 ```sh

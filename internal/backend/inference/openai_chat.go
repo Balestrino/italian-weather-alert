@@ -52,8 +52,10 @@ func (a *OpenAIChat) Complete(ctx context.Context, request Request) (Response, e
 		MaxTokens           int                  `json:"max_tokens,omitempty"`
 		SkipSpecialTokens   *bool                `json:"skip_special_tokens,omitempty"`
 		ChatTemplateKwargs  *ChatTemplateOptions `json:"chat_template_kwargs,omitempty"`
+		Temperature         *float64             `json:"temperature,omitempty"`
+		Seed                *int64               `json:"seed,omitempty"`
 		Stream              bool                 `json:"stream"`
-	}{request.Model, request.Messages, request.ResponseFormat, request.MaxCompletionTokens, request.MaxTokens, request.SkipSpecialTokens, request.ChatTemplateKwargs, false})
+	}{request.Model, request.Messages, request.ResponseFormat, request.MaxCompletionTokens, request.MaxTokens, request.SkipSpecialTokens, request.ChatTemplateKwargs, request.Temperature, request.Seed, false})
 	if err != nil {
 		return Response{}, ErrInvalid
 	}

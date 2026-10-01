@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-01 [Added] Add source-scoped local Qwen chat/image fallback and real model tests; preserve strict evidence, compatible reuse and provider history
 - 2026-10-01 [Fixed] Repair interpretation recovery scope, bounded reprocessing identities and evidence diagnostics; restore development acquisition and document provider entitlement recovery
 - 2026-10-01 [Changed] Stop staging and rebuild development applications with the optional public status frontend.
 - 2026-10-01 [Changed] Organize architecture, component and operations guides; update documentation links and verification records

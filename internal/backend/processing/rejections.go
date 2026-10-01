@@ -49,14 +49,29 @@ func (s *Store) ClearRejection(ctx context.Context, scope, model, configuration,
 	return tx.Commit(ctx)
 }
 
-type GateBinding struct{ Kind, Scope, Model string }
+type GateBinding struct {
+	Kind, Scope, Model string
+	Fallback           *FallbackBinding
+}
 
 func (s *Store) DeferHeldJobs(ctx context.Context, bindings []GateBinding, now time.Time) error {
 	for _, b := range bindings {
+		fallback := FallbackBinding{}
+		if b.Fallback != nil {
+			fallback = *b.Fallback
+		}
+		fallbackFilter := ""
+		if b.Fallback != nil {
+			fallbackFilter = ` AND NOT (` + fallbackSourceSQL + ` AND ` + fallbackPrimaryBlockedSQL + ` AND NOT ` + fallbackLocalBlockedSQL + `)`
+		}
+		arguments := []any{b.Kind, b.Scope, b.Model, now.UTC()}
+		if b.Fallback != nil {
+			arguments = append(arguments, fallback.Scope, fallback.Model, fallback.Sources)
+		}
 		_, err := s.pool.Exec(ctx, `UPDATE processing_jobs j SET available_at=GREATEST(j.available_at,g.wait_until),last_error_code='provider_scope_held',last_error_detail='waiting for provider recovery',updated_at=$4
  FROM (SELECT max(CASE WHEN state='held' THEN $4::timestamptz+interval '1 minute' ELSE GREATEST(available_at,COALESCE(probe_expires_at,available_at)) END) wait_until
  FROM processing_provider_gates WHERE scope=$2 AND model IN ('*',$3) AND state<>'closed') g
- WHERE j.archived_at IS NULL AND j.queue='inference' AND j.kind=$1 AND j.state IN ('queued','retry_wait') AND g.wait_until>$4`, b.Kind, b.Scope, b.Model, now.UTC())
+ WHERE j.archived_at IS NULL AND j.queue='inference' AND j.kind=$1 AND j.state IN ('queued','retry_wait') AND g.wait_until>$4`+fallbackFilter, arguments...)
 		if err != nil {
 			return err
 		}

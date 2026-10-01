@@ -273,3 +273,34 @@ The service MAY collect and interpret the four configured MVP sources internally
 #### Scenario: Internal collection begins before infrastructure hardening
 - **WHEN** the operator enables a successfully previewed source on the current 30-GiB VM while SMTP, PBS and continuous telemetry are deferred
 - **THEN** collection and interpretation run internally, the source remains publicly disabled, operational limitations are recorded and infrastructure tasks remain incomplete
+
+### Requirement: Optional source-scoped local inference fallback
+An explicitly configured local chat endpoint MAY replace an unavailable remote chat provider for selected sources. The service SHALL select a complete model-specific runner before creating an interpretation run, preserve separate provider gates and immutable configurations, and record the actual requested/returned model without assigning remote prices to local calls. Remote recovery controls, retries, archives, suspension and equivalent-copy restrictions SHALL remain effective.
+
+#### Scenario: The remote provider is held or cooling down
+- **WHEN** a quota/authentication hold or temporary availability circuit prevents remote processing for a selected source
+- **THEN** a configured local chat runner can process the job without reopening the remote gate; recovery probes and a restored remote provider retain preference
+
+#### Scenario: Both providers are unavailable
+- **WHEN** the remote and configured local providers are blocked
+- **THEN** queued jobs wait before claiming, preserving attempt budgets and failure evidence
+
+#### Scenario: A provider failure first establishes a hold
+- **WHEN** an eligible remote job establishes an account hold or availability circuit
+- **THEN** a subsequent attempt within the existing budget may select a separate local run; successful results and schema/evidence failures do not trigger another model call
+
+#### Scenario: A local model has limited capabilities
+- **WHEN** a local model supports text but does not have evaluated vision or compatible embedding support
+- **THEN** only evaluated text stages use that fallback, OCR/embedding keep their own controls and unresolved dependencies remain visible
+
+#### Scenario: Local-model validation is requested
+- **WHEN** opt-in live tests are run against a selected local endpoint
+- **THEN** synthetic Italian cases exercise relevance, negative controls, measure extraction and update linking through production request/parsing contracts; mock success alone is not presented as model acceptance
+
+#### Scenario: An equivalent copy has a compatible result from either model
+- **WHEN** provider-free materialization finds a primary cache hit, or a specific primary reuse miss with an eligible local cache hit
+- **THEN** it uses the compatible result without contacting either transport, keeps model/configuration boundaries and does not extend the queue attempt budget
+
+#### Scenario: Image OCR has been separately evaluated
+- **WHEN** image input is enabled on the local server and its synthetic OCR test passes
+- **THEN** explicitly enabled OCR may select its own local image configuration, renderer/reuse identity and call receipts; semantic embeddings retain independent capability requirements

@@ -666,15 +666,25 @@ func run() bool {
 			handlers[embedding.Kind] = embeddingRunner.Handler()
 			linkingRunner.SemanticConfiguration = embeddingCatalog.ConfigurationVersionID
 		}
+		localFallback, fallbackErr := config.LoadLocalFallback()
+		if fallbackErr != nil {
+			slog.Error("local fallback configuration invalid")
+			return false
+		}
+		gateBindings, err = addLocalFallback(ctx, gateStore, gatePolicy, localFallback, gateBindings, handlers, classificationRunner, extractionRunner, linkingRunner, ocrRunner)
+		if err != nil {
+			slog.Error("local fallback initialization failed")
+			return false
+		}
 		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, semanticEnabled)
 		interpretationScheduler.Preflight, err = makePreflight(ctx, pool, retained, inferenceConfig, rollout)
 		if err != nil {
 			slog.Error("preflight configuration invalid")
 			return false
 		}
-		handlers[ocr.Kind] = interpretationScheduler.OCRHandler(ocrRunner.Handler())
-		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(classificationRunner.Handler())
-		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(extractionRunner.Handler())
+		handlers[ocr.Kind] = interpretationScheduler.OCRHandler(handlers[ocr.Kind])
+		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(handlers[classification.Kind])
+		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(handlers[extraction.Kind])
 		if semanticEnabled {
 			handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
 		}

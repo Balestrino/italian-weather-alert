@@ -10,8 +10,23 @@ import (
 // OCR presentation normalization. It returns the exact source substring, not a
 // repaired model assertion. Byte mapping also survives Unicode case-width changes.
 func CanonicalLiteral(source, quote string) (string, bool) {
+	return canonicalLiteral(source, quote, false)
+}
+
+const LocalLiteralVersion = "local-contiguous-double-quotes-v1"
+
+// CanonicalLocalLiteral also accepts typographic double-quote presentation,
+// while returning the exact contiguous source substring with original offsets.
+func CanonicalLocalLiteral(source, quote string) (string, bool) {
+	return canonicalLiteral(source, quote, true)
+}
+
+func canonicalLiteral(source, quote string, doubleQuotes bool) (string, bool) {
 	view := NormalizeOCR(source)
 	needle := strings.ToLower(NormalizeOCR(quote).Text)
+	if doubleQuotes {
+		needle = strings.NewReplacer("“", "\"", "”", "\"").Replace(needle)
+	}
 	if needle == "" {
 		return "", false
 	}
@@ -19,6 +34,9 @@ func CanonicalLiteral(source, quote string) (string, bool) {
 	var starts, ends []int
 	for offset, r := range view.Text {
 		lower := string(unicode.ToLower(r))
+		if doubleQuotes && (r == '“' || r == '”') {
+			lower = "\""
+		}
 		folded.WriteString(lower)
 		for range []byte(lower) {
 			starts = append(starts, offset)

@@ -49,15 +49,13 @@ func GateScope(endpoint, alias string) (string, error) {
 	return "provider-" + hex.EncodeToString(h[:16]), nil
 }
 
-type localReuseKey struct{}
-
 // LocalReuseOnly prevents paid fallback when materializing an equivalent version.
 func LocalReuseOnly(ctx context.Context) context.Context {
-	return context.WithValue(ctx, localReuseKey{}, true)
+	return processing.WithProviderFreeReuse(ctx)
 }
 
 func (g Gate) before(ctx context.Context, model string, input any) (processing.GatePermit, processing.Rejection, error) {
-	if only, _ := ctx.Value(localReuseKey{}).(bool); only {
+	if processing.ProviderFreeReuseOnly(ctx) {
 		return processing.GatePermit{}, processing.Rejection{}, &CallError{Code: "equivalent_reuse_unavailable"}
 	}
 	a, ok := ctx.Value(attemptKey{}).(*callAttempt)

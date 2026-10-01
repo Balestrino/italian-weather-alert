@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
 )
 
@@ -36,10 +37,13 @@ func RegisterCatalog(ctx context.Context, store catalogStore, adapter, model str
 	}
 	promptID := "linking-prompt-updates-it-v4"
 	configID := stableID("linking-config", base.ModelVersionID, promptID, "baseline-evidence-ambiguity-guard-non-thinking-v6")
+	if adapter == "local-openai-chat" {
+		configID = stableID("linking-config", configID, inference.LocalChatPolicyVersion)
+	}
 	if err = store.RegisterPrompt(ctx, processing.PromptVersion{ID: promptID, Name: "toscana-update-linking", Stage: "linking", Revision: "v4", Body: PromptBody, CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
 	}
-	if err = store.RegisterConfiguration(ctx, processing.ConfigurationVersion{ID: configID, Name: "baseline-evidence-linking", Stage: "linking", Revision: "v6", ModelVersionID: &base.ModelVersionID, PromptVersionID: &promptID, LogicVersion: "baseline-evidence-ambiguity-guard-non-thinking-v6", Settings: json.RawMessage(`{"retrieval":"same_municipality_place_postgresql_fts","max_candidates":20,"semantic":false,"max_completion_tokens":4096,"unique_items_validated_locally":true,"qwen_enable_thinking":false,"unresolved_relation":"must_be_null","missing_place_multiple_compatible_candidates":"deterministic_ambiguous_relation"}`), CreatedAt: createdAt}); err != nil {
+	if err = store.RegisterConfiguration(ctx, processing.ConfigurationVersion{ID: configID, Name: inference.LocalChatConfigurationName(adapter, "baseline-evidence-linking", base.ModelVersionID), Stage: "linking", Revision: "v6", ModelVersionID: &base.ModelVersionID, PromptVersionID: &promptID, LogicVersion: "baseline-evidence-ambiguity-guard-non-thinking-v6", Settings: inference.LocalChatSettings(adapter, json.RawMessage(`{"retrieval":"same_municipality_place_postgresql_fts","max_candidates":20,"semantic":false,"max_completion_tokens":4096,"unique_items_validated_locally":true,"qwen_enable_thinking":false,"unresolved_relation":"must_be_null","missing_place_multiple_compatible_candidates":"deterministic_ambiguous_relation"}`)), CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
 	}
 	return Catalog{ConfigurationVersionID: configID, PriceVersionID: base.PriceVersionID}, nil

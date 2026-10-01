@@ -8,7 +8,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | --- | ---: | ---: |
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 84 | 11 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 89 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 18 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 4 | 0 |
@@ -16,7 +16,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
 
-The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Provider entitlement restoration remains a separate open step. These checks do not complete source acceptance or production readiness.
+The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Five subsequent local fallback tasks verify opt-in Qwen chat/image tests and scoped development routing; see [local fallback operations](../docs/operations/local-llm-fallback.md). Provider entitlement restoration and dependent semantic embeddings remain separate open work. These checks do not complete source acceptance or production readiness.
 
 Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/operations/environment-verification.md).
 

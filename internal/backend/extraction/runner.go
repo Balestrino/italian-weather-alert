@@ -218,6 +218,9 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	for _, window := range windows {
 		window.legacyLiteral = r.legacyOutput
 		request, requestErr := WindowRequest(r.Model, window)
+		if r.Adapter.Name() == "local-openai-chat" {
+			request, requestErr = LocalWindowRequest(r.Model, window)
+		}
 		if requestErr != nil {
 			base.Segments = segmentResults
 			usage, _ := extractionUsage(usageTotal.finish(), nil)

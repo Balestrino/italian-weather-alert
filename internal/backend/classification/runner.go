@@ -214,6 +214,9 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	segmentResults := make([]SegmentResult, 0, len(segments))
 	for _, segment := range segments {
 		request, requestErr := SegmentRequest(r.Model, segment)
+		if r.Adapter.Name() == "local-openai-chat" && !r.legacyOutput {
+			request, requestErr = LocalSegmentRequest(r.Model, segment)
+		}
 		if requestErr != nil {
 			return r.fail(ctx, attempt, now(), "classification_request_invalid", false, usageTotal.finish())
 		}
@@ -241,6 +244,9 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 			usageTotal.add(response.Usage)
 		}
 		decision, parseErr := ParseDecision(response.Content, segment.Content())
+		if r.Adapter.Name() == "local-openai-chat" && !r.legacyOutput {
+			decision, parseErr = ParseLocalDecision(response.Content, segment.Content())
+		}
 		if r.legacyOutput {
 			decision, parseErr = ParseLegacyDecision(response.Content, segment.Content())
 		}

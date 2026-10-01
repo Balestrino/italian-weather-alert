@@ -35,6 +35,8 @@ type Request struct {
 	MaxTokens           int                  `json:"max_tokens,omitempty"`
 	SkipSpecialTokens   *bool                `json:"skip_special_tokens,omitempty"`
 	ChatTemplateKwargs  *ChatTemplateOptions `json:"chat_template_kwargs,omitempty"`
+	Temperature         *float64             `json:"temperature,omitempty"`
+	Seed                *int64               `json:"seed,omitempty"`
 }
 
 // ChatTemplateOptions is explicit and optional: omission preserves the provider's

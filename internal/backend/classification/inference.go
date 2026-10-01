@@ -60,7 +60,24 @@ type segmentMessage struct {
 	Text        string `json:"text"`
 }
 
+func LocalSegmentRequest(model string, segment Segment) (inference.Request, error) {
+	request, err := SegmentRequest(model, segment)
+	if err != nil {
+		return inference.Request{}, err
+	}
+	request.Messages[0].Content, _ = json.Marshal(LocalPromptBody)
+	return inference.LocalChatRequest(request), nil
+}
+
 func ParseDecision(raw string, content fullContent) (Decision, error) {
+	return parseDecision(raw, content, CanonicalLiteral)
+}
+
+func ParseLocalDecision(raw string, content Content) (Decision, error) {
+	return parseDecision(raw, content, CanonicalLocalLiteral)
+}
+
+func parseDecision(raw string, content Content, literalMatch func(string, string) (string, bool)) (Decision, error) {
 	var fields map[string]json.RawMessage
 	if json.Unmarshal([]byte(raw), &fields) != nil || len(fields) != 3 || fields["relevant"] == nil || string(fields["relevant"]) == "null" || fields["reason_code"] == nil || fields["evidence_quote"] == nil {
 		return Decision{}, ErrInvalid
@@ -72,7 +89,7 @@ func ParseDecision(raw string, content fullContent) (Decision, error) {
 		return Decision{}, ErrInvalid
 	}
 	validReason := decision.ReasonCode == "regional_warning" || decision.ReasonCode == "local_weather_measure" || decision.ReasonCode == "weather_operational_update" || decision.ReasonCode == "not_relevant"
-	quote, literal := CanonicalLiteral(content.Text, decision.EvidenceQuote)
+	quote, literal := literalMatch(content.Text, decision.EvidenceQuote)
 	if !validReason || quote == "" || decision.Relevant != (decision.ReasonCode != "not_relevant") || !literal {
 		return Decision{}, ErrInvalid
 	}

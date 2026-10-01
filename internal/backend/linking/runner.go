@@ -125,6 +125,9 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, p Payload) (jobs.Result,
 	if r.DisableThinking {
 		request.ChatTemplateKwargs = &inference.ChatTemplateOptions{EnableThinking: false}
 	}
+	if r.Adapter.Name() == "local-openai-chat" {
+		request = inference.LocalChatRequest(request)
+	}
 	response, err := r.Adapter.Complete(ctx, request)
 	if deferred, deferErr := inference.FinishDeferral(ctx, r.Processing, attempt, err); deferred {
 		return jobs.Result{}, deferErr
