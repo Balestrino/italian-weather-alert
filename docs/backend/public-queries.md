@@ -52,7 +52,7 @@ are task 6.3.
 Run from the repository root:
 
 ```sh
-go test -tags=integration ./internal/publicquery -run TestFiveSharedPublicQueryGroups -v
+go test -tags=integration ./internal/backend/publicquery -run TestFiveSharedPublicQueryGroups -v
 go test -race ./...
 go vet ./...
 docker build -t iwa-app:task-6.1 .

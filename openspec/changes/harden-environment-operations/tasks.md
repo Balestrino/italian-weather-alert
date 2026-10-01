@@ -34,7 +34,7 @@ All items are new follow-up work from the public-checkout environment review. Ch
 - [x] 5.3 Rehearse basic setup/management from an extracted repository archive and release commands' Git-prerequisite errors; verify missing directories are created by documented steps and no command silently targets an operational installation.
 - [x] 5.4 Operator handoff completed at the user's request on 2026-10-01; execution/results are operator-owned and not independently verified here. Original verification: Reboot a disposable VM containing the activated test stack and an inactive production project; verify automatic dependency/listener recovery, retained database/object references and continued production inactivity without manual container starts.
 
-Repository verification results are recorded in [the disposable rehearsal summary](../../../docs/environment-verification.md).
+Repository verification results are recorded in [the disposable rehearsal summary](../../../docs/operations/environment-verification.md).
 
 ## 6. Current-host capacity, recovery and policy rollout
 
@@ -58,6 +58,6 @@ Repository verification results are recorded in [the disposable rehearsal summar
 
 ## Validation record — 1 October 2026
 
-Repository checks: environment/changelog regression tests, Compose example validation, disposable development/staging rehearsal, synthetic API/MCP usage and public-query integration tests, Go tests with race detection, vet, command builds, shell/Python syntax, local documentation links, and strict OpenSpec validation passed. Results are summarized in [environment verification](../../../docs/environment-verification.md). A dated changelog entry covers this work; registry publication remains pending. Before each commit, stage the work and run the changelog recorder as required by repository guidance.
+Repository checks: environment/changelog regression tests, Compose example validation, disposable development/staging rehearsal, synthetic API/MCP usage and public-query integration tests, Go tests with race detection, vet, command builds, shell/Python syntax, local documentation links, and strict OpenSpec validation passed. Results are summarized in [environment verification](../../../docs/operations/environment-verification.md). A dated changelog entry covers this work; registry publication remains pending. Before each commit, stage the work and run the changelog recorder as required by repository guidance.
 
 Progress: 22 of 28 items checked, comprising 18 verified implementation/record tasks and four explicit operator handoffs. Six operational tasks remain open: capacity completion, current-host restart-policy rollout, public image publication, routing/approval preparation, approved production activation, and rollback rehearsal. Production remains inactive.

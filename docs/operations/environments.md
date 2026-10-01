@@ -1,6 +1,6 @@
 # Development, staging and production
 
-IWA uses three Docker Compose projects from one repository directory on one host. Code publication, deployment and alert-source acceptance are separate steps; see the [coverage tracker](coverage.md).
+IWA uses three Docker Compose projects from one repository directory on one host. Code publication, deployment and alert-source acceptance are separate steps; see the [coverage tracker](../coverage.md).
 
 | Environment | Compose project | Public / admin ports | Settings / secrets | Application image |
 | --- | --- | --- | --- | --- |
@@ -35,11 +35,11 @@ The fixed volume names are `iwa_postgres_data` / `iwa_rustfs_data`, `iwa-staging
 
 ## Fresh development
 
-For an empty Docker host, follow the complete [developer setup](developer-setup.md). It initializes development, migrates the database, prepares storage and starts both listeners without an inference-provider key.
+For an empty Docker host, follow the complete [developer setup](../development/setup.md). It initializes development, migrates the database, prepares storage and starts both listeners without an inference-provider key.
 
 ## Fresh staging
 
-Use a Git checkout for a release candidate. Staging uses the [staging overlay](../deploy/compose.staging.yaml), which removes application build directives. Start from a clean identified revision and keep the checkout unchanged through validation and publication.
+Use a Git checkout for a release candidate. Staging uses the [staging overlay](../../deploy/compose.staging.yaml), which removes application build directives. Start from a clean identified revision and keep the checkout unchanged through validation and publication.
 
 ```sh
 mkdir -p .local/staging
@@ -62,7 +62,7 @@ curl --fail http://127.0.0.1:28080/health/ready
 curl --fail http://127.0.0.1:28081/admin/status
 ```
 
-No application build belongs in these staging steps. Test controlled fixtures using [release operations](../deploy/release-operations.md), then publish that candidate. Workers and inference remain off unless explicitly configured for the intended check.
+No application build belongs in these staging steps. Test controlled fixtures using [release operations](releases.md), then publish that candidate. Workers and inference remain off unless explicitly configured for the intended check.
 
 ## Prepare production without activating it
 
@@ -79,7 +79,7 @@ python3 scripts/check-deployment-config.py --environment production --runtime
 
 The example image remains a placeholder until an approved release is published. Configuration, status, logs and stop/teardown commands remain available with that placeholder. Production image operations require `ghcr.io/...@sha256:` followed by 64 hexadecimal characters, and application builds are rejected. Digest syntax alone does not prove publication or operator approval.
 
-The `production` profile selects the five core services; `production-worker` and `application-backup` are separate. Profiles control selection: explicitly targeting a service can activate its profile. They do not replace deployment approval. Use the complete [production deployment and rollback procedure](../deploy/release-operations.md) after host readiness passes. Keep the application backup worker disabled while off-host PBS protects the whole VM.
+The `production` profile selects the five core services; `production-worker` and `application-backup` are separate. Profiles control selection: explicitly targeting a service can activate its profile. They do not replace deployment approval. Use the complete [production deployment and rollback procedure](releases.md) after host readiness passes. Keep the application backup worker disabled while off-host PBS protects the whole VM.
 
 ## Routine management
 

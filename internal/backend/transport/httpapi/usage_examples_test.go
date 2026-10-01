@@ -30,7 +30,7 @@ type publishedUsageExamples struct {
 }
 
 func TestPublishedUsageExamplesAgainstLocalService(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("..", "..", "..", "..", "deploy", "public-usage-examples.json"))
+	raw, err := os.ReadFile(filepath.Join("..", "..", "..", "..", "docs", "backend", "public-usage-examples.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

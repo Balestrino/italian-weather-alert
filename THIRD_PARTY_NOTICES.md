@@ -4,7 +4,7 @@ These notices apply to the files listed below and to the derived municipality an
 
 ## ISTAT: municipality registry
 
-Files: `docs/nazionale/registri/comuni-italia.csv` and its identical embedded copy `internal/domain/territorial_municipalities.csv`; municipality names and ISTAT codes in `docs/coverage.md`.
+Files: `docs/nazionale/registri/comuni-italia.csv` and its identical embedded copy `internal/backend/domain/territorial_municipalities.csv`; municipality names and ISTAT codes in `docs/coverage.md`.
 
 Source and attribution: Istituto nazionale di statistica (ISTAT), [Codici statistici delle unità amministrative territoriali](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/), captured 15 September 2026. [ISTAT's open-data terms](https://www.istat.it/dati/open-data/) permit redistribution with source attribution under Creative Commons Attribution 4.0. IWA selected and normalized registry fields and joined them with Garda Informatica CAP associations. This derived table is not an official ISTAT publication, and ISTAT does not endorse IWA.
 

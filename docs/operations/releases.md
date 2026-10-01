@@ -1,6 +1,6 @@
 # Release images and production recovery
 
-This is the public procedure for preparing and checking an IWA release. The production Compose project is configured on the same VM as development and staging but has not been started; PBS backup and public source readiness remain open. Keep actual hostnames, credentials, backup records and approval evidence in private operational records. The [environment guide](../docs/environments.md) describes all three projects.
+This is the public procedure for preparing and checking an IWA release. The production Compose project is configured on the same VM as development and staging but has not been started; PBS backup and public source readiness remain open. Keep actual hostnames, credentials, backup records and approval evidence in private operational records. The [environment guide](environments.md) describes all three projects.
 
 ## Image identity and manual approval
 
@@ -10,7 +10,7 @@ Use one clean Git revision in the shared checkout. Run CI-equivalent tests and t
 scripts/release-image.sh build
 ```
 
-The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Follow the exact [staging initialization commands](../docs/environments.md#fresh-staging), which reuse that candidate for migrations, storage initialization and listener startup with rebuilding disabled. Keep the worker off unless the change requires a controlled source or inference check.
+The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Follow the exact [staging initialization commands](environments.md#fresh-staging), which reuse that candidate for migrations, storage initialization and listener startup with rebuilding disabled. Keep the worker off unless the change requires a controlled source or inference check.
 
 Every release check includes:
 
@@ -19,13 +19,13 @@ Every release check includes:
 3. Representative JSON API and MCP queries against known staging fixtures, truthful coverage/updating state, and absence of administration on the public listener. Check the administrative listener only from its restricted path.
 4. Review of logs, failed jobs, source status and any change-specific source or inference regression. A code pass does not accept or publicly enable a source.
 
-The ordinary [Compose smoke check](../scripts/smoke-compose.py) changes no services. Its `staging --allow-interruption` option stops/restarts staging RustFS and belongs only on a throwaway stack or a planned staging interruption; production interruption is rejected.
+The ordinary [Compose smoke check](../../scripts/smoke-compose.py) changes no services. Its `staging --allow-interruption` option stops/restarts staging RustFS and belongs only on a throwaway stack or a planned staging interruption; production interruption is rejected.
 
 After the staging checks, authenticate to GHCR using private credentials and run `scripts/release-image.sh publish`. Publication first compares the configured and running staging application image IDs/revision labels with the clean-revision candidate and refuses a mismatch before pushing. It then pushes the tested local image and prints a `ghcr.io/...@sha256:...` reference. The first GHCR package is private by default; an operator must explicitly make the image public before using anonymous production pulls. Record the Git revision, staging results, published digest, prior production digest and operator approval together. A public image contains application code, never deployment secrets. Keep at least the previous compatible digest available for rollback.
 
 ## Prepared production project and resource limits
 
-The prepared project uses ignored `.local/production.env` and `.local/production/secrets` in the shared checkout. [The environment wrapper](../scripts/compose-env.sh) fixes the `iwa-production` project name and adds [compose.production.yaml](compose.production.yaml), which removes local build directives. The example reserves loopback ports `38080` and `38081`; the proxy and private operator route have not been connected to them. The image remains a placeholder until an approved digest replaces it. `config` and `ps --all` are safe preparation checks; neither starts containers.
+The prepared project uses ignored `.local/production.env` and `.local/production/secrets` in the shared checkout. [The environment wrapper](../../scripts/compose-env.sh) fixes the `iwa-production` project name and adds [compose.production.yaml](../../deploy/compose.production.yaml), which removes local build directives. The example reserves loopback ports `38080` and `38081`; the proxy and private operator route have not been connected to them. The image remains a placeholder until an approved digest replaces it. `config` and `ps --all` are safe preparation checks; neither starts containers.
 
 Every production service has a profile, so an unqualified `up` selects no service after valid image selection. An explicitly named service can activate its own profile; profiles do not constitute deployment approval. The `production` profile contains the listeners, PostgreSQL, RustFS and Crawl4AI. The `production-worker` profile is separate, and the `application-backup` profile is not used while PBS protects the VM. The initial per-container ceilings are:
 
@@ -44,11 +44,11 @@ The five core services can reach **3.5 GiB** in aggregate; the worker adds **0.7
 Use only synthetic or authorized fixtures. Keep staging workers off, leave provider keys absent, and keep notifications disabled during fixture validation. The repository already provides a reproducible synthetic transport corpus and an isolated PostgreSQL fixture covering all five query groups:
 
 ```sh
-go test ./internal/server -run TestPublishedUsageExamplesAgainstLocalService -v
-go test -tags=integration ./internal/publicquery -run TestFiveSharedPublicQueryGroups -v
+go test ./internal/backend/transport/httpapi ./internal/backoffice -run TestPublishedUsageExamplesAgainstLocalService -v
+go test -tags=integration ./internal/backend/publicquery -run TestFiveSharedPublicQueryGroups -v
 ```
 
-These tests create their own fixture service/database; they do not populate or modify the running staging database. They test the examples in [public-usage-examples.json](public-usage-examples.json), including retained versions, municipal measures, regional facts, coverage and public/admin separation. Record their result alongside the exact candidate's runtime checks. On fresh staging, additionally verify empty coverage/search are truthful and discover the expected MCP tool surface:
+These tests create their own fixture service/database; they do not populate or modify the running staging database. They test the examples in [public-usage-examples.json](../backend/public-usage-examples.json), including retained versions, municipal measures, regional facts, coverage and public/admin separation. Record their result alongside the exact candidate's runtime checks. On fresh staging, additionally verify empty coverage/search are truthful and discover the expected MCP tool surface:
 
 ```sh
 curl --fail http://127.0.0.1:28080/v1/sources/coverage
@@ -56,7 +56,7 @@ curl --fail 'http://127.0.0.1:28080/v1/search?kind=document'
 curl --fail -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' -H 'MCP-Protocol-Version: 2026-07-28' --data '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' http://127.0.0.1:28080/mcp
 ```
 
-For release checks requiring populated staging, prepare a consistent private synthetic database/object fixture through the documented administration and retention interfaces. Record its known records, version IDs, object hashes, expected query results and limitations. Transfer database and objects together; keep collection/inference/notifications disabled. Run the [five API/MCP examples](public-usage.md) against the selected staging ports, replacing automated fixture IDs/times with those in the reviewed fixture. Do not label automated fixture acceptance as acceptance of a real alert source. An empty staging query alone is insufficient evidence for a data-processing release.
+For release checks requiring populated staging, prepare a consistent private synthetic database/object fixture through the documented administration and retention interfaces. Record its known records, version IDs, object hashes, expected query results and limitations. Transfer database and objects together; keep collection/inference/notifications disabled. Run the [five API/MCP examples](../backend/public-usage.md) against the selected staging ports, replacing automated fixture IDs/times with those in the reviewed fixture. Do not label automated fixture acceptance as acceptance of a real alert source. An empty staging query alone is insufficient evidence for a data-processing release.
 
 ## Production deployment
 
@@ -116,6 +116,6 @@ The agreed targets are **no more than six hours of lost data** and **one hour fr
 
 Use Proxmox snapshot mode with the running guest agent's filesystem freeze/thaw where supported, then prove recoverability rather than assuming a successful snapshot is application consistent. Before public activation and after material storage changes, restore a PBS backup to an isolated VM without production network identity or outbound collection, provider calls or notification delivery. Time from simulated outage detection until the restored public API/MCP is healthy and representative PostgreSQL records resolve to the correct RustFS originals and versions. Check that historical source-check times remain historical and incomplete jobs recover safely. Record backup age, restore time, data checks and any gap privately. A one-hour target is not achieved until the timed drill proves it.
 
-The public [OpenSpec readiness tasks](../openspec/changes/define-toscana-alert-service/tasks.md) keep PBS configuration, isolated restore and production deployment verification open until performed and evidenced. The committed examples are checked by `python3 scripts/check-deployment-config.py`; before deployment, inspect `scripts/compose-env.sh production --profile production config --format json` and confirm the project name, limits, ports and absence of application `build` settings.
+The public [OpenSpec readiness tasks](../../openspec/changes/define-toscana-alert-service/tasks.md) keep PBS configuration, isolated restore and production deployment verification open until performed and evidenced. The committed examples are checked by `python3 scripts/check-deployment-config.py`; before deployment, inspect `scripts/compose-env.sh production --profile production config --format json` and confirm the project name, limits, ports and absence of application `build` settings.
 
 Platform references: [GHCR image access and digest pulls](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry), [Proxmox VE backup and restore modes](https://github.com/proxmox/pve-docs/blob/master/vzdump.adoc), and [PBS pruning and verification](https://pbs.proxmox.com/docs/maintenance.html).

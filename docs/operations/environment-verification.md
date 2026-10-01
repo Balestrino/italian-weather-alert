@@ -31,7 +31,7 @@ groups passed. These use test-owned fixtures and do not establish acceptance or
 public availability of any alert source.
 
 To repeat the isolated rehearsal, follow the prerequisites in
-[developer setup](developer-setup.md), then run:
+[developer setup](../development/setup.md), then run:
 
 ```sh
 python3 -m unittest scripts/test_environment_operations.py
@@ -47,5 +47,5 @@ concurrent production capacity, public GHCR availability, external routing or
 production deployment/rollback. The user took ownership of backup/restore and
 VM checks; their results were not independently verified here. The current-host
 restart-policy rollout and remaining release gates stay open in the
-[implementation checklist](../openspec/changes/harden-environment-operations/tasks.md).
+[implementation checklist](../../openspec/changes/harden-environment-operations/tasks.md).
 Private operational measurements and evidence remain outside the repository.

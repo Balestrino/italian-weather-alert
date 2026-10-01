@@ -61,7 +61,7 @@ or deterministic IP affinity before claiming one cross-replica allowance.
 The initial numbers were set after the reproducible transport-bound benchmark:
 
 ```sh
-go test ./internal/server -run '^$' \
+go test ./internal/backend/transport/httpapi ./internal/backoffice -run '^$' \
   -bench '^BenchmarkPublicCoverageHTTP$' -benchtime=3s -benchmem -count=3
 ```
 
@@ -82,7 +82,7 @@ data before increasing them.
 ## Verification
 
 ```sh
-go test ./internal/config ./internal/server
+go test ./internal/backend/config ./internal/backend/transport/httpapi ./internal/backoffice
 go test -race ./...
 go vet ./...
 docker compose config --quiet

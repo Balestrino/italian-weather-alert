@@ -33,9 +33,9 @@ go build ./cmd/...
 go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 ```
 
-The [developer setup guide](docs/developer-setup.md) explains installation, local configuration, and stack checks. Use synthetic fixtures for ordinary tests. Include real source material only when its provenance and reuse terms are recorded. Describe what changed, how you checked it, and any known gaps in your pull request.
+The [developer setup guide](docs/development/setup.md) explains installation, local configuration, and stack checks. Use synthetic fixtures for ordinary tests. Include real source material only when its provenance and reuse terms are recorded. Describe what changed, how you checked it, and any known gaps in your pull request.
 
-Changes intended for a deployed release are checked on the isolated staging stack described in [Environments](docs/environments.md). Production uses only a manually approved image digest after the [release checks](deploy/release-operations.md); a passing pull request or staging test does not activate an alert source.
+Changes intended for a deployed release are checked on the isolated staging stack described in [Environments](docs/operations/environments.md). Production uses only a manually approved image digest after the [release checks](docs/operations/releases.md); a passing pull request or staging test does not activate an alert source.
 
 ## What happens to a source report
 

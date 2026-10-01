@@ -65,8 +65,8 @@ values or stored with a view.
 
 ```sh
 python3 scripts/init-secrets.py
-go test ./internal/server ./internal/publicview ./internal/config
-go test -tags=integration ./internal/publicquery -run TestFiveSharedPublicQueryGroups -v
+go test ./internal/backend/transport/httpapi ./internal/backoffice ./internal/backend/publicview ./internal/backend/config
+go test -tags=integration ./internal/backend/publicquery -run TestFiveSharedPublicQueryGroups -v
 go test -race ./...
 go vet ./...
 docker compose config --quiet

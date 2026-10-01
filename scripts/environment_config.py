@@ -73,7 +73,7 @@ class Environment:
         self.project = PROJECTS[name]
         self.env_file = self.root / (f"deploy/{name}.env.example" if example else f".local/{name}.env")
         if not self.env_file.is_file():
-            raise EnvironmentError(f"Missing {self.env_file.relative_to(self.root)}; follow docs/environments.md to prepare this environment.")
+            raise EnvironmentError(f"Missing {self.env_file.relative_to(self.root)}; follow docs/operations/environments.md to prepare this environment.")
         self.process_environment = clean_environment()
 
     def command(self, *args: str) -> list[str]:

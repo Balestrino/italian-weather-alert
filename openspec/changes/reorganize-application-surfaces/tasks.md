@@ -12,5 +12,23 @@
 
 ## 3. Documentation and final verification
 
-- [ ] 3.1 Reorganize current guides, add architecture/component documentation and update contributor links and OpenSpec index; verify local Markdown links and current path references.
-- [ ] 3.2 Run race, vet, build, synthetic database integration and deployment checks, record actual results and a dated changelog entry; verify final diff and checklist against the public checkout.
+- [x] 3.1 Reorganize current guides, add architecture/component documentation and update contributor links and OpenSpec index; verify local Markdown links and current path references.
+- [x] 3.2 Run race, vet, build, synthetic database integration and deployment checks, record actual results and a dated changelog entry; verify final diff and checklist against the public checkout.
+
+## Validation record — 1 October 2026
+
+The public checkout passed `go test -race ./...`, `go vet ./...`, command builds,
+the complete synthetic `-tags=integration -p 2` suite, environment/changelog
+regression tests and deployment-template validation. The CI coverage command
+including `api/public` measured 68.8% statement coverage (66% required).
+`govulncheck@v1.8.0` reported no reachable vulnerabilities. The Docker image built
+with all three packaged binaries. Standalone frontend Compose configuration was
+checked for loopback publication and absence of credentials, mounts and private
+data-network access. The authoritative JSON contracts are byte-for-byte unchanged;
+local Markdown links and production package boundaries passed their checks.
+
+The public status page was checked with a synthetic HTTP backend in Chromium at
+390px, 768px and 1440px, at 200% zoom, with keyboard navigation and JavaScript
+disabled. Private administrative browser acceptance remained optional and was
+not rerun; its assets were moved unchanged. These results do not certify source
+acceptance, public routing, deployment or operational release gates.

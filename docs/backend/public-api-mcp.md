@@ -43,7 +43,7 @@ and name header validation, and JSON-RPC handling. The service additionally
 rejects other protocol versions, limits request bodies, propagates disconnect
 cancellation, and applies Go cross-origin protection. The five descriptors and
 their complete input/output JSON Schemas are embedded directly from the
-reviewed `docs/prerequisiti-mvp/mcp-tools.json` artifact.
+reviewed `api/public/mcp-tools.json` artifact.
 
 Only the public role registers these routes and tools. The administrative role
 does not register `/v1` or `/mcp`; the public query interface has no collection,
@@ -65,7 +65,7 @@ disabled by default and reauthorized at each delivery. Task 6.6 publishes
 Run from the repository root:
 
 ```sh
-go test ./internal/server -run 'TestPublic' -v
+go test ./internal/backend/transport/httpapi ./internal/backoffice -run 'TestPublic' -v
 go test -race ./...
 go vet ./...
 docker build -t iwa-app:task-6.2 .

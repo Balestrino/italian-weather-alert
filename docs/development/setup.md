@@ -1,6 +1,6 @@
 # Developer setup
 
-This procedure runs development (`iwa`) with PostgreSQL, RustFS, Crawl4AI and the public/admin HTTP listeners. It works from a Git clone or an extracted ZIP; no agent tool is required. Read [environment prerequisites and existing-installation guidance](environments.md) first. If this Docker host already has an `iwa` project or volumes, preserve its credentials/settings instead of following the fresh-copy steps.
+This procedure runs development (`iwa`) with PostgreSQL, RustFS, Crawl4AI and the public/admin HTTP listeners. It works from a Git clone or an extracted ZIP; no agent tool is required. Read [environment prerequisites and existing-installation guidance](../operations/environments.md) first. If this Docker host already has an `iwa` project or volumes, preserve its credentials/settings instead of following the fresh-copy steps.
 
 ## 1. Prepare a fresh development project
 
@@ -38,7 +38,9 @@ curl --fail http://127.0.0.1:8081/health/ready
 curl --fail http://127.0.0.1:8081/admin/status
 ```
 
-Open [the administration UI](http://127.0.0.1:8081/admin/). The public JSON API is `http://127.0.0.1:8080/v1/` and MCP is `http://127.0.0.1:8080/mcp`. Substitute configured ports in URLs. A new database has no accepted sources, so empty public results are expected. The [coverage tracker](coverage.md) does not import runtime sources automatically.
+Open [the administration UI](http://127.0.0.1:8081/admin/). The public JSON API is `http://127.0.0.1:8080/v1/` and MCP is `http://127.0.0.1:8080/mcp`. Substitute configured ports in URLs. A new database has no accepted sources, so empty public results are expected. The [coverage tracker](../coverage.md) does not import runtime sources automatically.
+
+The [public status frontend](../frontend/README.md) can run separately with `go run ./cmd/iwa-frontend`, on loopback port 8082 by default. Its optional standalone Compose project is separate from this core environment setup.
 
 ## 4. Configure source work and optional collection
 
@@ -64,7 +66,7 @@ go build ./cmd/...
 go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
 ```
 
-Before changing a capability, read [OpenSpec plans and progress](../openspec/README.md). [Agent tools](agent-tools.md) are optional contributor tools. Integration coverage instructions are in [CONTRIBUTING.md](../CONTRIBUTING.md). For an opt-in fresh-snapshot Compose rehearsal using unique temporary projects and generated credentials, run `python3 scripts/rehearse-environments.py --run` on a host with spare capacity. It builds an image, starts disposable services, exercises a disposable RustFS outage and removes only its own containers/volumes/image afterward. It does not prove a VM reboot or production readiness.
+Before changing a capability, read [OpenSpec plans and progress](../../openspec/README.md). [Agent tools](agent-tools.md) are optional contributor tools. Integration coverage instructions are in [CONTRIBUTING.md](../../CONTRIBUTING.md). For an opt-in fresh-snapshot Compose rehearsal using unique temporary projects and generated credentials, run `python3 scripts/rehearse-environments.py --run` on a host with spare capacity. It builds an image, starts disposable services, exercises a disposable RustFS outage and removes only its own containers/volumes/image afterward. It does not prove a VM reboot or production readiness.
 
 An ordinary restart does not rebuild your code. To deploy changed development code deliberately, first rerun applicable tests, then:
 
@@ -74,7 +76,7 @@ scripts/compose-env.sh development run --rm --no-deps --pull never admin migrate
 scripts/compose-env.sh development up -d --no-build --pull never --wait --wait-timeout 180 public admin
 ```
 
-Update any already activated worker separately with the same selected image and its reviewed configuration. Keep a compatible prior image/configuration for rollback and preserve data volumes and additive migrations. For releases, use the separate [staging/production procedure](../deploy/release-operations.md).
+Update any already activated worker separately with the same selected image and its reviewed configuration. Keep a compatible prior image/configuration for rollback and preserve data volumes and additive migrations. For releases, use the separate [staging/production procedure](../operations/releases.md).
 
 ```sh
 scripts/compose-env.sh development logs --tail=100 public admin postgres rustfs crawl4ai
@@ -83,4 +85,4 @@ scripts/compose-env.sh development start --wait --wait-timeout 180 postgres rust
 scripts/compose-env.sh development down
 ```
 
-`stop`/`start` operate on existing containers. `down` retains PostgreSQL/RustFS volumes and private files. A readiness response of 503 means a dependency is unavailable; inspect the selected project's status and logs. Do not use `down -v` as routine recovery. Ordinary smoke checks change no services; [planned fault injection](environments.md#planned-failure-checks) requires an explicit interruption option.
+`stop`/`start` operate on existing containers. `down` retains PostgreSQL/RustFS volumes and private files. A readiness response of 503 means a dependency is unavailable; inspect the selected project's status and logs. Do not use `down -v` as routine recovery. Ordinary smoke checks change no services; [planned fault injection](../operations/environments.md#planned-failure-checks) requires an explicit interruption option.

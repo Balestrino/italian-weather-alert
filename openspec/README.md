@@ -6,7 +6,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 
 | Change | Done | Open |
 | --- | ---: | ---: |
-| [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 4 | 2 |
+| [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 77 | 10 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
@@ -16,8 +16,10 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
 
-Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/environment-verification.md).
+Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/operations/environment-verification.md).
 
 Open tasks include environment capacity/policy rollout and production release gates, the Toscana observational trial and public readiness gates, GHCR image publication, off-host backup and restore verification, the evening report rollout, and parts of the provider efficiency rollout. See each `tasks.md` for the precise checklist.
 
-For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The repository includes [OpenSpec agent workflows](../docs/agent-tools.md); an agent or CLI is not required to inspect the plans.
+For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The repository includes [OpenSpec agent workflows](../docs/development/agent-tools.md); an agent or CLI is not required to inspect the plans.
+
+The application-separation change reorganizes implementation and guide locations. Historical snapshot prose can retain earlier source paths; use the [architecture mapping](../docs/architecture/README.md) to locate their current equivalents. Snapshot checks do not certify the current checkout.

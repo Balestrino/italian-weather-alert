@@ -71,8 +71,8 @@ never substitutes the official URL.
 Run from the repository root:
 
 ```sh
-go test ./internal/server -run TestPublishedUsageExamplesAgainstLocalService -v
-go test -tags=integration ./internal/publicquery -run TestFiveSharedPublicQueryGroups -v
+go test ./internal/backend/transport/httpapi ./internal/backoffice -run TestPublishedUsageExamplesAgainstLocalService -v
+go test -tags=integration ./internal/backend/publicquery -run TestFiveSharedPublicQueryGroups -v
 ```
 
 The first command starts a local in-process HTTP service, connects with the
