@@ -18,7 +18,7 @@ Use one clean Git revision in the shared checkout. Run CI-equivalent tests and t
 scripts/release-image.sh build
 ```
 
-The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Follow the exact [staging initialization commands](environments.md#fresh-staging), which reuse that candidate for migrations, storage initialization and listener startup with rebuilding disabled. Keep the worker off unless the change requires a controlled source or inference check.
+The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Follow the exact [staging initialization commands](environments.md#fresh-staging), which reuse that candidate for migrations, storage initialization and listener startup with rebuilding disabled. Keep the worker off unless the change requires a controlled source or inference check. Development/staging default startup excludes processing and backup; a test uses `processing-worker` explicitly and ends with `stop worker` plus `ps --all worker`. See [background selection and activation](environments.md#background-service-selection).
 
 Every release check includes:
 
@@ -87,12 +87,22 @@ curl --fail http://127.0.0.1:38081/health/ready
 
 The private admin listener must remain reachable only through the reviewed SSH/tailnet path. Check external HTTPS API/MCP separately, including trusted client-address forwarding, absence of admin/configuration routes, truthful coverage/source ages and known document/evidence references. Production retains its own state; no data copy or source activation occurs as part of image promotion.
 
-Only after provider/source settings are reviewed and collection is deliberately authorized, enable the optional worker:
+Only after provider/source settings are reviewed and collection is deliberately authorized, enable the optional worker. Use [region → municipality → source activation](environments.md#territorial-and-source-activation) through CLI or admin first, with the production environment selected explicitly. Keep the current collector until the handover is scheduled; at that handover stop its development/staging worker and verify it is stopped before starting production. The continuous collector then runs only in production; this policy does not deduplicate intentionally parallel checks.
 
 ```sh
 scripts/compose-env.sh production --profile production --profile production-worker up -d --no-build --pull never worker
 scripts/compose-env.sh production --profile production --profile production-worker logs --tail=100 worker
 ```
+
+For example, inspect the production territorial/source choices without starting processing:
+
+```sh
+scripts/compose-env.sh production --profile production run --rm --no-deps --pull never admin region-status 09
+scripts/compose-env.sh production --profile production run --rm --no-deps --pull never admin municipality-status 09 050004
+scripts/compose-env.sh production --profile production run --rm --no-deps --pull never admin source-status <source-id>
+```
+
+Replace the source placeholder before execution. Source/publication flags, territorial gates and worker selection are independent. Profiles do not stop a previously running worker or prevent its `unless-stopped` recovery after a host restart. Explicit service targets can activate profiles; default exclusion alone is not a runtime stop.
 
 Its provider key belongs in `.local/production/secrets/regolo_api_key` or the private configured path and must be readable by application UID 65532. Do not select `application-backup` while whole-VM PBS protection is in use.
 
@@ -108,7 +118,7 @@ scripts/compose-env.sh production --profile production up -d --no-build --pull n
 python3 scripts/smoke-compose.py production
 ```
 
-Roll back an activated worker separately with both profiles, and verify known evidence references, source ages and backup monitoring. Preserve additive migrations, database/object volumes and acquired evidence. Never use `down -v` or reverse migrations as an image rollback. An incompatible/corrupt data state requires stopping writers and restoring PostgreSQL plus RustFS together; explicitly decide how to handle post-backup data.
+Roll back an activated worker separately with both profiles, and verify known evidence references, source ages and backup monitoring. Preserve additive migrations, database/object volumes and acquired evidence. The municipal state migration preserves existing configured-source eligibility without overriding explicit choices; copied data therefore still require disabled territories and stopped nonproduction workers. Once municipal disablement is used, do not run an older worker image that ignores that gate: keep processing stopped until a compatible gate-enforcing image is selected. Rolling back profiles requires inspecting resolved selection again, since old defaults may select workers. Never use `down -v` or reverse migrations as an image rollback. An incompatible/corrupt data state requires stopping writers and restoring PostgreSQL plus RustFS together; explicitly decide how to handle post-backup data.
 
 ## Roll out dependency restart policies
 

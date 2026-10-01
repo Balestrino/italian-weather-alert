@@ -44,14 +44,27 @@ The [public status frontend](../frontend/README.md) can run separately with `go 
 
 ## 4. Configure source work and optional collection
 
+Start at `/admin/regions`: enable the region, then open **Configura regione → Comuni** and enable the intended municipality. Use the advanced regional setup to adopt a complete official municipality register and select supported profiles before region activation. New municipalities default to disabled; disabling a region preserves their choices. Regional bulletins do not require a municipality flag.
+
 Administration at `/admin/sources` supports authority/channel records, source drafts, acquisition previews and separate collection/publication controls. Use synthetic or authorized fixtures. Record official referrals, product/territory scope, access/reuse conditions and representative examples; preview before collection activation. A preview is not source acceptance or public enablement. Geography data in `docs/` are research inputs; runtime dataset registration and selection are explicit operations.
 
 Only start `worker` when a controlled source and the intended provider are configured. Put the real provider key in `.local/development/secrets/regolo_api_key`, or set `IWA_REGOLO_API_KEY_PATH` in `.local/development.env` to another private readable file. The file must contain one nonempty line and be readable by application UID 65532, through its mode or a deliberate ACL. Keep it inside an owner-private directory; never put the key in `.env` or a command argument.
 
 ```sh
-scripts/compose-env.sh development up -d --no-build --pull never worker
+scripts/compose-env.sh development --profile processing-worker up -d --no-build --pull never worker
 scripts/compose-env.sh development logs --tail=100 worker
 ```
+
+Finish every controlled development run explicitly:
+
+```sh
+scripts/compose-env.sh development stop worker
+scripts/compose-env.sh development ps --all worker
+```
+
+A plain development `up` selects the five core services and excludes `worker` and `backup`. Selecting `processing-worker` or naming `worker` explicitly activates processing; `application-backup` selects backup independently. Profiles do not stop an already running container. The existing `unless-stopped` policy can restart an activated worker after a host restart until explicitly stopped. These projects do not deduplicate source/LLM/OCR work across environments.
+
+CLI and admin save the same region, municipality and source choices. See [environment-scoped activation commands](../operations/environments.md#territorial-and-source-activation) for status, enablement and suspension. Source enablement alone does not start a worker; an acquisition preview is a separate bounded operation that can fetch originals even with the worker stopped. Publication remains a separate acceptance decision.
 
 Collection/provider requests can incur charges. Notifications, semantic linking, public retained-copy access and application backups start disabled. The optional `backup` service needs its own reviewed configuration; the whole-VM production strategy uses off-host PBS instead.
 
@@ -78,7 +91,7 @@ scripts/compose-env.sh development run --rm --no-deps --pull never admin migrate
 scripts/compose-env.sh development up -d --no-build --pull never --wait --wait-timeout 180 public admin
 ```
 
-Update any already activated worker separately with the same selected image and its reviewed configuration. Keep a compatible prior image/configuration for rollback and preserve data volumes and additive migrations. For releases, use the separate [staging/production procedure](../operations/releases.md).
+Update any already activated worker separately with the same selected image and its reviewed configuration. Keep a compatible prior image/configuration for rollback and preserve data volumes and additive migrations. Once municipal disablement is used, the processing image must enforce that gate; keep workers stopped if rolling back to an older image that ignores it. For releases, use the separate [staging/production procedure](../operations/releases.md).
 
 ```sh
 scripts/compose-env.sh development logs --tail=100 public admin postgres rustfs crawl4ai

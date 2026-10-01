@@ -14,7 +14,7 @@ All projects share CPU, RAM and disk. Their named volumes, networks and credenti
 
 ## Prerequisites
 
-Use Bash, Python 3.9 or newer, Docker Engine with its Compose plugin, and curl. The environment commands and overlays were tested with Docker Compose **v5.5.1**; verify an older plugin can parse the `!reset` overlays using the template check below before proceeding. Git is required for release images; basic setup and management also work from an extracted ZIP. Go 1.27.1 is needed only for native builds and Go tests. Docker pulls/builds need network access and several gigabytes of disk, especially for Crawl4AI.
+Use Bash, Python 3.9 or newer, Docker Engine with its Compose plugin, and curl. The environment commands and overlays were tested with Docker Compose **v5.5.1**; verify an older plugin can parse the `!reset` and `!override` overlays using the template check below before proceeding. Git is required for release images; basic setup and management also work from an extracted ZIP. Go 1.27.1 is needed only for native builds and Go tests. Docker pulls/builds need network access and several gigabytes of disk, especially for Crawl4AI.
 
 Run commands from the repository root unless a command uses an absolute script path. The wrapper itself also works from another working directory.
 
@@ -81,6 +81,74 @@ The example image remains a placeholder until an approved release is published. 
 
 The `production` profile selects the five core services; `production-worker` and `application-backup` are separate. Profiles control selection: explicitly targeting a service can activate its profile. They do not replace deployment approval. Use the complete [production deployment and rollback procedure](releases.md) after host readiness passes. Keep the application backup worker disabled while off-host PBS protects the whole VM.
 
+## Background service selection
+
+A default development/staging `up` selects only public, admin, postgres, rustfs and crawl4ai. Processing is opt-in with `processing-worker`; backup is separately opt-in with `application-backup`. Production's default selects nothing, `production` selects those five core services, and its worker uses only `production-worker`. The development/staging profile cannot select the production worker.
+
+After initializing the intended environment, use a bounded, source-scoped check when needed:
+
+```sh
+scripts/compose-env.sh staging --profile processing-worker up -d --no-build --pull never worker
+scripts/compose-env.sh staging logs --tail=100 worker
+scripts/compose-env.sh staging stop worker
+scripts/compose-env.sh staging ps --all worker
+```
+
+Backup has its own selection, without selecting processing:
+
+```sh
+scripts/compose-env.sh staging --profile application-backup config --services
+```
+
+An explicit service target such as `scripts/compose-env.sh staging up -d --no-build --pull never worker` also activates a profiled worker; omitting the profile is not protection when naming that target. Profiles govern Compose selection, not runtime admission or cross-environment deduplication. They do not stop existing workers: `restart: unless-stopped` can recover a previously activated worker after a Docker/host restart. End a test with `stop worker` and confirm its state using `ps --all worker`. The processing worker also handles configured notifications; stopping it stops those loops too.
+
+## Territorial and source activation
+
+The selected environment owns its registry and flags. Automatic local-source processing requires **region enabled → municipality enabled → source collection enabled → worker active**. A regional source requires its region and supported profile, not a municipality flag. None of these choices grants public publication. A saved source flag does not demonstrate worker liveness.
+
+In the admin panel, use `/admin/regions` to enable/disable a region. Open **Configura regione → Comuni** to enable/disable individual municipalities, including those without sources. Regional setup supplies the complete adopted register and supported processing profiles. Configure a municipality's sources in its configuration tab; acquire a deliberate preview, then enable collection using the existing source form. Source suspension and publication remain separate controls. Native forms require an operator identity and expected revision; after a conflict reload before retrying. The municipality list shows saved state and territorial blocking reason, retaining filters/pagination after actions. History records the operator and revision.
+
+The equivalent CLI commands run on the admin service against an already migrated environment. The following examples explicitly target development; substitute actual region/ISTAT/source identifiers and the revisions returned by status, rather than assuming the example revision is current. Source enablement uses the intended configuration revision; suspension uses its active revision. Territorial mutations increment their own revision. Each status/action returns JSON; rejected arguments, missing prerequisites or stale revisions return nonzero with a stable, private-detail-free error code.
+
+```sh
+scripts/compose-env.sh development run --rm --no-deps --pull never admin region-status 09
+scripts/compose-env.sh development run --rm --no-deps --pull never admin region-enable 09 <region-revision> <operator>
+scripts/compose-env.sh development run --rm --no-deps --pull never admin region-disable 09 <region-revision> <operator>
+scripts/compose-env.sh development run --rm --no-deps --pull never admin municipality-status 09 050004
+scripts/compose-env.sh development run --rm --no-deps --pull never admin municipality-enable 09 050004 <municipality-revision> <operator>
+scripts/compose-env.sh development run --rm --no-deps --pull never admin municipality-disable 09 050004 <municipality-revision> <operator>
+scripts/compose-env.sh development run --rm --no-deps --pull never admin source-status <source-id>
+scripts/compose-env.sh development run --rm --no-deps --pull never admin source-enable-collection <source-id> <configuration-revision> <operator>
+scripts/compose-env.sh development run --rm --no-deps --pull never admin source-suspend-collection <source-id> <active-revision> <operator>
+```
+
+Angle-bracket values are documentation placeholders; replace them before executing. These commands save or inspect configuration without starting the worker, previewing sources, calling LLM/OCR or activating publication. They reuse the same audited domain/registry operations as the panel. Source activation still requires preview evidence, collection permission and compatible territorial configuration. A saved child/source choice can be changed while the parent is disabled; execution remains blocked until all gates permit it. To acquire a manual preview, enable its territory first and use the separate preview action.
+
+Use the explicit environment on every command. For initialized staging or approved production, status examples are:
+
+```sh
+scripts/compose-env.sh staging run --rm --no-deps --pull never admin municipality-status 09 050004
+scripts/compose-env.sh production --profile production run --rm --no-deps --pull never admin source-status <source-id>
+```
+
+Disabling a parent gates new acquisition and processing, including queued and manual work. Already admitted work may finish. It preserves child/source flags and historical results; re-enabling restores normal eligibility without enqueueing a catch-up batch. A municipality flag gates its local sources, not shared regional bulletin collection or retained regional warnings. New register identities start disabled; unchanged identities preserve choices across register replacement, and retired identities remain readable in history.
+
+## Adoption and collector handover
+
+Repository changes do not modify live containers. Inspect each existing collector before any rollout:
+
+```sh
+scripts/compose-env.sh development ps --all worker backup
+scripts/compose-env.sh staging ps --all worker backup
+scripts/compose-env.sh production ps --all worker backup
+```
+
+Keep the current collector running until a production handover is explicitly scheduled and the [release prerequisites](releases.md) pass. The eventual continuous collector belongs only in production; development/staging processing is for controlled checks that end with an explicit stop. At the scheduled handover, stop the former collector and confirm it is stopped before activating the reviewed production worker under the release procedure. This change provides no host-wide lease: intentionally activating multiple environments still duplicates resource use.
+
+The additive municipal migration preserves prior eligibility for existing municipalities with configured local sources, attributing that backfill to migration. It does not change source/public flags, regional choices, immutable geography or existing migration checksums. Existing explicit municipality choices are never overwritten on a repeated migration. For a new database/register, municipalities default to disabled.
+
+Keep additive state/events on rollback. A prior image that lacks the municipality execution gate is incompatible with active processing after operators have disabled municipalities: keep workers stopped until a compatible image is selected. Restoring old Compose profiles can also default-enable optional services; inspect resolved selection before startup. An image/configuration rollback does not automatically restart a deliberately stopped worker and never requires a reverse migration or deleting volumes.
+
 ## Routine management
 
 Always select the environment explicitly. For example, these commands target staging:
@@ -119,4 +187,4 @@ The check verifies runtime project/port/mount identity before stopping anything,
 
 Generate separate credentials for fresh projects. New files use mode `0644` inside a host directory with mode `0700`, independent of umask, so the container users can read their bind-mounted secrets. Existing credentials and custom permissions are preserved. A private provider key must be readable by its container UID (65532 for the application); repair its mode/ACL deliberately rather than regenerating it. Runtime checks test mounted-file readability without printing values.
 
-Never point development and staging to the same database or RustFS storage. If staging needs a private representative copy, transfer PostgreSQL and RustFS together from a consistent point, and disable collection, inference and notifications before using it. Code promotion does not copy data or activate sources. Keep private files, operational evidence and unpublished captures outside commits.
+Never point development and staging to the same database or RustFS storage. If staging needs a private representative copy, transfer PostgreSQL and RustFS together from a consistent point, and keep both background services stopped, provider keys absent and notifications disabled before using it. The compatibility migration deliberately preserves configured local-source eligibility, so it is not a copied-data safeguard. Disable copied regions and review municipality/source choices through the panel or environment-scoped CLI before any controlled worker activation. Code promotion does not copy data or activate sources. Keep private files, operational evidence and unpublished captures outside commits.
