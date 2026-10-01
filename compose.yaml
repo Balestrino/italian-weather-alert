@@ -172,18 +172,18 @@ volumes:
   rustfs_data: {}
 secrets:
   postgres_password:
-    file: ./.secrets/postgres_password
+    file: ${IWA_SECRETS_DIR:-./.secrets}/postgres_password
   rustfs_access_key:
-    file: ./.secrets/rustfs_access_key
+    file: ${IWA_SECRETS_DIR:-./.secrets}/rustfs_access_key
   rustfs_secret_key:
-    file: ./.secrets/rustfs_secret_key
+    file: ${IWA_SECRETS_DIR:-./.secrets}/rustfs_secret_key
   crawl_token:
-    file: ./.secrets/crawl_token
+    file: ${IWA_SECRETS_DIR:-./.secrets}/crawl_token
   regolo_api_key:
-    file: ${IWA_REGOLO_API_KEY_PATH:-./.secrets/regolo_api_key}
+    file: ${IWA_REGOLO_API_KEY_PATH:-${IWA_SECRETS_DIR:-./.secrets}/regolo_api_key}
   public_cursor_key:
-    file: ./.secrets/public_cursor_key
+    file: ${IWA_SECRETS_DIR:-./.secrets}/public_cursor_key
   notifications_config:
-    file: ${IWA_NOTIFICATIONS_CONFIG_PATH:-./.secrets/notifications_config.json}
+    file: ${IWA_NOTIFICATIONS_CONFIG_PATH:-${IWA_SECRETS_DIR:-./.secrets}/notifications_config.json}
   backups_config:
-    file: ${IWA_BACKUPS_CONFIG_PATH:-./.secrets/backups_config.json}
+    file: ${IWA_BACKUPS_CONFIG_PATH:-${IWA_SECRETS_DIR:-./.secrets}/backups_config.json}

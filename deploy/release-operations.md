@@ -4,13 +4,13 @@ This is the public procedure for preparing and checking an IWA release. It descr
 
 ## Image identity and manual approval
 
-Use the isolated staging checkout at one clean Git revision. Run CI-equivalent tests and the checks relevant to the change. Build once with:
+Use one clean Git revision in the shared checkout. Run CI-equivalent tests and the checks relevant to the change. Do not change the checkout between build, staging validation and publish. Build once with:
 
 ```sh
 scripts/release-image.sh build
 ```
 
-The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.env` to that exact tag. Start dependencies, migrate and initialize storage as described in the [developer setup guide](../docs/developer-setup.md), then bring up the public and admin listeners with the tested image. Keep the worker off unless the change requires a controlled source or inference check.
+The helper prints `ghcr.io/balestrino/italian-weather-alert:<full-commit-sha>`. Set `IWA_APP_IMAGE` in staging's ignored `.local/staging.env` to that exact tag. Use `scripts/compose-env.sh staging` to start dependencies, migrate and initialize storage as described in the [developer setup guide](../docs/developer-setup.md), then bring up the public and admin listeners with the tested image. Keep the worker off unless the change requires a controlled source or inference check.
 
 Every release check includes:
 

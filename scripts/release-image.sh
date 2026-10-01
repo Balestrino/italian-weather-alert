@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: scripts/release-image.sh build|publish
 
-Run from a clean staging checkout. Set IWA_RELEASE_IMAGE_REPOSITORY to override
+Run from a clean revision in the shared checkout. Set IWA_RELEASE_IMAGE_REPOSITORY to override
 ghcr.io/balestrino/italian-weather-alert. Build first, test that exact image in
 staging, then publish it. The operator approves the printed registry digest.
 EOF

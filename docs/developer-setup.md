@@ -2,7 +2,7 @@
 
 This guide brings up an isolated local IWA stack for development. It uses the Compose services in this repository: PostgreSQL, RustFS, Crawl4AI, the read-only public API/MCP listener, and the private administration listener. The worker is a separate step because it needs a real inference-provider credential.
 
-For the current VM's separate development and staging installations, and the planned production VM, see [Environments](environments.md). Release images, approvals and recovery checks are documented in [Release operations](../deploy/release-operations.md).
+For the current VM's separate development and staging Compose projects in one checkout, and the planned production VM, see [Environments](environments.md). Release images, approvals and recovery checks are documented in [Release operations](../deploy/release-operations.md).
 
 Commands below assume a POSIX shell on a machine with Docker Engine and the Docker Compose plugin. Run them from the repository root. Python 3 and `curl` are used by the setup and verification commands; Go 1.27.1 is needed for native builds and tests. Allow several gigabytes of free disk space for the container images, especially Crawl4AI.
 
@@ -10,7 +10,7 @@ Before changing an existing capability, read the [OpenSpec plans and progress](.
 
 ## 1. Choose an isolated local project
 
-Use a separate checkout if the machine already hosts an IWA installation. In the shell used for all commands in this guide, set a distinct Compose project, image tag, and host ports:
+For a disposable local project, set a distinct Compose project, image tag, and host ports in the shell used for all commands. For the existing development and staging projects, use the explicit wrapper in [Environments](environments.md) instead.
 
 ```sh
 export COMPOSE_PROJECT_NAME=iwa-dev

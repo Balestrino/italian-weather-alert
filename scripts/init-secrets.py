@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """Generate local service secrets once, without printing or replacing them."""
+import argparse
 import os
 from pathlib import Path
 import secrets
 
-root = Path(__file__).resolve().parents[1] / '.secrets'
-root.mkdir(mode=0o700, exist_ok=True)
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--directory', type=Path, default=Path('.secrets'))
+args = parser.parse_args()
+repository = Path(__file__).resolve().parents[1]
+root = args.directory if args.directory.is_absolute() else repository / args.directory
+root.mkdir(mode=0o700, parents=True, exist_ok=True)
 root.chmod(0o700)
 for name in ('postgres_password', 'rustfs_access_key', 'rustfs_secret_key', 'crawl_token', 'public_cursor_key'):
     try:
