@@ -80,6 +80,22 @@ Generated transport-only Drupal Views DOM identifiers in HTML comments or class 
 ### Requirement: Necessary attachments and ordinances
 The service SHALL acquire linked attachments and ordinances when needed to establish a measure, territory or validity. If an attachment cannot be accessed or interpreted, it SHALL expose the available official document or link and identify the fields that cannot be determined. It SHALL NOT substitute bulletin validity or page expiry for a duration specified only in the ordinance.
 
+An operator MAY configure municipal attachment discovery within an explicitly named document-content class. A missing configured content container SHALL fail the check visibly rather than silently omit attachments; generic links outside that container and navigation/footer links SHALL NOT become required attachments. Explicitly registered dependencies SHALL remain required according to their declarations. Configurations without this option SHALL retain their existing discovery behavior.
+
+External attachments MAY be acquired under an explicit scope in the source revision carrying exact HTTPS origin, canonical directory prefix, official referral and separate collection/retention policy evidence. The scope SHALL NOT authorize broader channel discovery or other sources. Initial resource URLs and every redirect SHALL remain within the permitted resource scope and the resource's initial origin; unconfigured external resources SHALL retain visible forbidden references without download. An enabled PDF-validation option SHALL reject non-PDF, truncated or structurally unreadable responses rather than retain them as valid attachments. Preview and programmed collection SHALL apply the same configured attachment discovery, permission and validation checks. A successful programmed check SHALL follow verified object persistence; failures SHALL preserve originals and missing references, existing bounded backoff and source retry instructions, without asserting future availability.
+
+#### Scenario: An authorized external ordinance and a generic footer PDF
+- **WHEN** a municipal revision selects its document-content container and declares a reviewed external attachment scope
+- **THEN** the necessary linked ordinance is downloaded and validated within that scope while the generic footer PDF is excluded; the declaration does not grant another source the same access
+
+#### Scenario: An external download leaves its declared scope
+- **WHEN** the linked URL or a redirect leaves the exact authorized origin or directory prefix
+- **THEN** the collector refuses that request, preserves an explicit missing-resource failure and keeps the check incomplete
+
+#### Scenario: A purported PDF contains an error page or is truncated
+- **WHEN** PDF validation is configured and an attachment response is HTML or a structurally invalid PDF
+- **THEN** both preview and scheduled collection fail visibly, preserve the parent original and mark the attachment invalid without claiming a complete acquisition
+
 #### Scenario: A notice refers to an unreadable ordinance for duration
 - **WHEN** the notice announces closures but their duration is only in an unreadable attachment
 - **THEN** the notice and attachment link remain available and the closure duration is explicitly undetermined

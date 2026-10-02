@@ -69,6 +69,9 @@ func (s *Store) Stage(ctx context.Context, input Acquisition) error {
 		if r.Missing == "" && (!c.Policy.CollectionPermitted || !c.Policy.RetentionPermitted || c.Policy.Evidence == nil) {
 			return ErrPolicy
 		}
+		if r.Missing == "" && r.Role == "attachment" && r.SourceID == a.SourceID && c.Attachments != nil && !c.Attachments.Allows(a.URL, r.URL) {
+			return ErrPolicy
+		}
 	}
 	var documentID int64
 	if err = tx.QueryRow(ctx, `INSERT INTO retained_documents(source_id,official_url) VALUES ($1,$2) ON CONFLICT(source_id,official_url) DO UPDATE SET official_url=EXCLUDED.official_url RETURNING id`, a.SourceID, a.URL).Scan(&documentID); err != nil {

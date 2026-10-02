@@ -25,6 +25,18 @@ type DirectHTTP struct {
 }
 
 func (d *DirectHTTP) Crawl(ctx context.Context, target string) (Page, error) {
+	return d.crawl(ctx, target, nil)
+}
+
+// CrawlBounded checks both the initial URL and every redirect before a request.
+func (d *DirectHTTP) CrawlBounded(ctx context.Context, target string, allowed func(string) bool) (Page, error) {
+	if allowed == nil || !allowed(target) {
+		return Page{}, ErrInvalidConfiguration
+	}
+	return d.crawl(ctx, target, allowed)
+}
+
+func (d *DirectHTTP) crawl(ctx context.Context, target string, allowed func(string) bool) (Page, error) {
 	original, err := url.Parse(target)
 	if err != nil || original.Host == "" || (original.Scheme != "http" && original.Scheme != "https") || original.User != nil || original.Fragment != "" {
 		return Page{}, ErrInvalidConfiguration
@@ -41,7 +53,7 @@ func (d *DirectHTTP) Crawl(ctx context.Context, target string) (Page, error) {
 	client := *baseClient
 	configuredRedirect := client.CheckRedirect
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if !sameHTTPOrigin(original, req.URL) {
+		if !sameHTTPOrigin(original, req.URL) || allowed != nil && !allowed(req.URL.String()) {
 			return errResourceRedirectOutsideOrigin
 		}
 		if configuredRedirect != nil {

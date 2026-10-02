@@ -5,9 +5,33 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
+
+func TestDirectHTTPRejectsOutOfScopeRedirectBeforeRequest(t *testing.T) {
+	outsideCalls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/allowed/start.pdf" {
+			http.Redirect(w, r, "/private/other.pdf", http.StatusFound)
+		} else {
+			outsideCalls++
+			_, _ = w.Write([]byte("outside"))
+		}
+	}))
+	defer server.Close()
+	allowed := func(raw string) bool { return strings.HasPrefix(raw, server.URL+"/allowed/") }
+	client := &DirectHTTP{Client: server.Client()}
+	_, err := client.CrawlBounded(context.Background(), server.URL+"/allowed/start.pdf", allowed)
+	if err == nil || outsideCalls != 0 {
+		t.Fatalf("redirect escaped scope: calls=%d err=%v", outsideCalls, err)
+	}
+	_, err = client.CrawlBounded(context.Background(), server.URL+"/private/other.pdf", allowed)
+	if err == nil || outsideCalls != 0 {
+		t.Fatal("initial URL escaped scope")
+	}
+}
 
 func TestDirectHTTPRetainsExactBytesAndMediaType(t *testing.T) {
 	want := []byte{0x25, 0x50, 0x44, 0x46, 0x00, 0xff, 0x10}

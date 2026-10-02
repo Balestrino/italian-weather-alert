@@ -167,3 +167,14 @@ Documentation verification checked local paths/anchors, five territorial identit
 - [x] 16.5 Re-evaluate the Livorno access probe with an ordinary browser click and the checkout's `DirectHTTP` on the node and development Crawl4AI network; validate the downloaded PDF, preserve evidence privately and revise the earlier access conclusion without claiming collector integration or future availability.
 
 These tasks record a completed diagnostic recheck, including unresolved acquisition failures. They do not certify that every enabled municipality collects successfully, resolve the attachment-selection/access problems, verify semantic interpretation, complete trial/acceptance or change the coverage snapshot. Public findings are in [Cascina](../../../docs/territori/09-toscana/comuni/050008-cascina.md), [Livorno](../../../docs/territori/09-toscana/comuni/049009-livorno.md) and the [territorial index](../../../docs/territori/README.md); detailed operational outcomes remain private.
+
+## 17. Scoped Livorno external attachments — 2 October 2026
+
+- [x] 17.1 Add revision-scoped attachment discovery and reviewed external-resource permissions with exact HTTPS origin/path boundaries, preserving legacy defaults and explicit dependencies.
+- [x] 17.2 Enforce resource and redirect bounds, validate configured PDFs, preserve missing-reference failures and apply the same checks to preview and scheduled acquisition before verified retention.
+- [x] 17.3 Verify allowed/forbidden resource boundaries, footer exclusion, missing containers, invalid PDFs, preview parity and unchanged legacy behavior with redistributable fixtures and the application PDF parser.
+- [x] 17.4 Apply the scoped Livorno revision on development after a successful preview, preserve rollback/evidence and verify a fresh complete worker check plus retained attachments without changing other source configurations or public activation.
+- [x] 17.5 Update current territorial/platform guidance, dated discovery history and operational verification references; keep captures/configurations private and record the change in the changelog.
+
+
+Repository tests, scoped vet checks, the real PDF parser in the application image and an isolated PostgreSQL failure/recovery test passed. A scoped development revision was activated after a successful preview; a fresh ordinary worker receipt and retained PDF reads verified the configured acquisition, with other source states and municipal activation flags preserved. Detailed receipts, settings, hashes, captures and rollback snapshots remain private. These checks do not certify future availability, interpretation, source acceptance, complete municipal coverage or production readiness. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).

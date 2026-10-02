@@ -4,6 +4,8 @@ Official Toscana warnings and municipal measures are distributed across regional
 
 ## What Changes
 
+- Support reviewed external municipal attachments through revision-scoped origins and paths, optional document-content filtering and PDF validation, with matching preview/collector checks; verify the Livorno development scope separately from public acceptance.
+
 - Maintain indexed territorial source guides with current operational knowledge, dated discoveries, scoped platform notes and separate private evidence; keep source acceptance and runtime activation independent of documentation.
 - Cover Toscana's seven categories: minor-network hydrogeological/hydraulic risk, main-network hydraulic risk, strong thunderstorms, wind, coastal waves, snow and ice. Include regional vigilance, criticality/alert and monitoring as distinct products.
 - Provide regional applicability by municipality and versioned official alert-zone mappings, including municipalities spanning multiple zones.

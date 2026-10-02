@@ -27,12 +27,13 @@ type retentionStore interface {
 }
 
 type Engine struct {
-	Registry  registryStore
-	Retained  retentionStore
-	Crawler   Crawler
-	Resources Crawler
-	Tracking  revisionTracker
-	Now       func() time.Time
+	Registry    registryStore
+	Retained    retentionStore
+	Crawler     Crawler
+	Resources   Crawler
+	Tracking    revisionTracker
+	Now         func() time.Time
+	validatePDF func(context.Context, Page) error
 }
 
 type RetainedPage struct {
@@ -207,7 +208,7 @@ func (e *Engine) acquire(ctx context.Context, sourceID string, revision int, cfg
 	}
 	report := Preview{SourceID: sourceID, Configuration: revision, ObservedAt: now().UTC()}
 	state := acquisitionState{contentRecognized: true}
-	discovered := map[string]bool{}
+	discovered := map[string]*time.Time{}
 	for _, section := range cfg.Sections {
 		part, found, err := e.traverseSection(ctx, sourceID, revision, cfg, section, &state)
 		if err != nil {
@@ -215,7 +216,9 @@ func (e *Engine) acquire(ctx context.Context, sourceID string, revision int, cfg
 		}
 		report.Sections = append(report.Sections, part)
 		for _, item := range found {
-			discovered[item.URL] = true
+			if previous, exists := discovered[item.URL]; !exists || previous == nil {
+				discovered[item.URL] = item.PublicationDate
+			}
 			if len(discovered) > cfg.Discovery.MaxDocuments {
 				state.errorCode = "document_limit_reached"
 				return report, state, fmt.Errorf("%w: document limit reached", ErrInvalidConfiguration)
@@ -233,9 +236,16 @@ func (e *Engine) acquire(ctx context.Context, sourceID string, revision int, cfg
 		if err != nil {
 			return report, state, fmt.Errorf("crawl discovered document: %w", err)
 		}
-		retained, err := e.retain(ctx, sourceID, revision, item, page.HTML)
+		var retained RetainedPage
+		if cfg.Attachments == nil {
+			retained, err = e.retain(ctx, sourceID, revision, item, page.HTML)
+		} else {
+			retained, err = e.retainDocument(ctx, sourceID, revision, PlannedDocument{URL: item, PublicationDate: discovered[item]}, page, report.ObservedAt, &state, cfg.Attachments, false)
+		}
 		if err != nil {
-			state.errorCode = "retention_failed"
+			if state.errorCode == "" {
+				state.errorCode = "retention_failed"
+			}
 			return report, state, fmt.Errorf("retain discovered document: %w", err)
 		}
 		report.Documents = append(report.Documents, retained)
@@ -305,7 +315,7 @@ func (e *Engine) scheduledAcquire(ctx context.Context, sourceID string, revision
 			unavailableErr = ErrCrawlUnavailable
 			continue
 		}
-		retained, err := e.retainPlanned(ctx, sourceID, revision, target, observedAt, &state)
+		retained, err := e.retainPlanned(ctx, sourceID, revision, target, observedAt, &state, cfg.Attachments)
 		if retained.VersionID > 0 {
 			retained.Workload = "ordinary"
 			if plan.Bootstrap {
@@ -346,25 +356,40 @@ func (e *Engine) scheduledAcquire(ctx context.Context, sourceID string, revision
 	return report, state, nil
 }
 
-func (e *Engine) retainPlanned(ctx context.Context, source string, revision int, target PlannedDocument, checkedAt time.Time, state *acquisitionState) (RetainedPage, error) {
+func (e *Engine) retainPlanned(ctx context.Context, source string, revision int, target PlannedDocument, checkedAt time.Time, state *acquisitionState, policy *registry.AttachmentPolicy) (RetainedPage, error) {
 	page, err := e.Crawler.Crawl(ctx, target.URL)
 	observeCrawl(state, page, err)
 	if err != nil {
 		return RetainedPage{}, fmt.Errorf("crawl tracked document: %w", err)
 	}
+	return e.retainDocument(ctx, source, revision, target, page, checkedAt, state, policy, true)
+}
+
+func (e *Engine) retainDocument(ctx context.Context, source string, revision int, target PlannedDocument, page Page, checkedAt time.Time, state *acquisitionState, policy *registry.AttachmentPolicy, track bool) (RetainedPage, error) {
 	mediaType := page.MediaType
 	if mediaType == "" {
 		mediaType = "text/html; charset=utf-8"
 	}
 	resources := []documents.Resource{{URL: target.URL, Role: "original", Required: true, SourceID: source, Configuration: revision, MediaType: mediaType, Bytes: page.HTML}}
 	requiredAttachmentMissing := false
+	requiredInvalidPDF := false
 	// Discover document-linked PDFs on every check so newly added attachments
 	// participate in the version hash even when the parent URL is unchanged.
 	seenResources := map[string]bool{target.URL: true}
 	for _, dependency := range target.Resources {
 		seenResources[dependency.URL] = true
 	}
-	for _, attachment := range linkedPDFs(target.URL, page.HTML) {
+	contentClass := ""
+	if policy != nil {
+		contentClass = policy.ContentClass
+	}
+	links, err := documentPDFLinks(target.URL, page.HTML, contentClass)
+	if err != nil {
+		state.errorCode = "attachment_content_unrecognized"
+		state.contentRecognized = false
+		return RetainedPage{}, err
+	}
+	for _, attachment := range links {
 		if !seenResources[attachment] {
 			target.Resources = append(target.Resources, PlannedResource{URL: attachment, Required: true})
 			seenResources[attachment] = true
@@ -375,9 +400,7 @@ func (e *Engine) retainPlanned(ctx context.Context, source string, revision int,
 		return RetainedPage{}, ErrInvalidConfiguration
 	}
 	for _, dependency := range target.Resources {
-		parentURL, parentErr := url.Parse(target.URL)
-		resourceURL, resourceErr := url.Parse(dependency.URL)
-		if parentErr != nil || resourceErr != nil || parentURL.Scheme != resourceURL.Scheme || !strings.EqualFold(parentURL.Host, resourceURL.Host) || resourceURL.User != nil {
+		if !policy.Allows(target.URL, dependency.URL) {
 			resources = append(resources, documents.Resource{URL: dependency.URL, Role: "attachment", Required: dependency.Required, SourceID: source, Configuration: revision, Missing: "forbidden"})
 			requiredAttachmentMissing = requiredAttachmentMissing || dependency.Required
 			continue
@@ -386,7 +409,22 @@ func (e *Engine) retainPlanned(ctx context.Context, source string, revision int,
 		if fetcher == nil {
 			fetcher = e.Crawler
 		}
-		resourcePage, crawlErr := fetcher.Crawl(ctx, dependency.URL)
+		var resourcePage Page
+		var crawlErr error
+		parentURL, _ := url.Parse(target.URL)
+		resourceURL, _ := url.Parse(dependency.URL)
+		if !sameHTTPOrigin(parentURL, resourceURL) {
+			bounded, ok := fetcher.(interface {
+				CrawlBounded(context.Context, string, func(string) bool) (Page, error)
+			})
+			if !ok {
+				crawlErr = ErrInvalidConfiguration
+			} else {
+				resourcePage, crawlErr = bounded.CrawlBounded(ctx, dependency.URL, func(raw string) bool { return policy.Allows(target.URL, raw) })
+			}
+		} else {
+			resourcePage, crawlErr = fetcher.Crawl(ctx, dependency.URL)
+		}
 		if crawlErr != nil {
 			if dependency.Required {
 				observeCrawl(state, resourcePage, crawlErr)
@@ -394,6 +432,18 @@ func (e *Engine) retainPlanned(ctx context.Context, source string, revision int,
 			}
 			resources = append(resources, documents.Resource{URL: dependency.URL, Role: "attachment", Required: dependency.Required, SourceID: source, Configuration: revision, Missing: "unavailable"})
 			continue
+		}
+		if policy != nil && policy.ValidatePDF {
+			validate := e.validatePDF
+			if validate == nil {
+				validate = validateAttachmentPDF
+			}
+			if validate(ctx, resourcePage) != nil {
+				resources = append(resources, documents.Resource{URL: dependency.URL, Role: "attachment", Required: dependency.Required, SourceID: source, Configuration: revision, Missing: "unavailable"})
+				requiredAttachmentMissing = requiredAttachmentMissing || dependency.Required
+				requiredInvalidPDF = requiredInvalidPDF || dependency.Required
+				continue
+			}
 		}
 		observeCrawl(state, resourcePage, nil)
 		resourceType := resourcePage.MediaType
@@ -408,9 +458,10 @@ func (e *Engine) retainPlanned(ctx context.Context, source string, revision int,
 	}
 	metadataJSON, _ := json.Marshal(metadata)
 	hash := sha256.New()
-	_, _ = hash.Write([]byte(target.URL))
+	_, _ = hash.Write([]byte(target.URL + "\x00"))
+	_, _ = hash.Write(metadataJSON)
 	for _, resource := range resources {
-		_, _ = hash.Write([]byte("\x00" + resource.URL + "\x00"))
+		_, _ = hash.Write([]byte("\x00" + resource.URL + "\x00" + resource.Missing + "\x00"))
 		_, _ = hash.Write(resource.Bytes)
 	}
 	id := "check-" + source + "-" + fmt.Sprint(revision) + "-" + hex.EncodeToString(hash.Sum(nil))
@@ -419,14 +470,20 @@ func (e *Engine) retainPlanned(ctx context.Context, source string, revision int,
 		state.errorCode = "retention_failed"
 		return RetainedPage{}, err
 	}
-	changed, err := e.Tracking.RecordVersion(ctx, source, target.URL, version.ID, checkedAt)
-	if err != nil {
-		state.errorCode = "tracking_failed"
-		return RetainedPage{}, err
+	changed := false
+	if track {
+		changed, err = e.Tracking.RecordVersion(ctx, source, target.URL, version.ID, checkedAt)
+		if err != nil {
+			state.errorCode = "tracking_failed"
+			return RetainedPage{}, err
+		}
 	}
 	retained := RetainedPage{InferenceResources: version.Resources, URL: target.URL, VersionID: version.ID, Hash: version.Hash, Changed: changed}
 	if requiredAttachmentMissing {
 		state.errorCode = "required_attachment_unavailable"
+		if requiredInvalidPDF {
+			state.errorCode = "invalid_attachment_pdf"
+		}
 		return retained, ErrRequiredAttachment
 	}
 	return retained, nil
@@ -436,19 +493,40 @@ func (e *Engine) retainPlanned(ctx context.Context, source string, revision int,
 // external pages are not newly discovered collection channels. Out-of-origin
 // PDF links are returned for a visible missing reference, never fetched.
 func linkedPDFs(parent string, body []byte) []string {
+	links, _ := documentPDFLinks(parent, body, "")
+	return links
+}
+
+func documentPDFLinks(parent string, body []byte, contentClass string) ([]string, error) {
 	base, err := url.Parse(parent)
 	if err != nil {
-		return nil
+		return nil, ErrInvalidConfiguration
 	}
 	root, err := html.Parse(strings.NewReader(string(body)))
 	if err != nil {
-		return nil
+		return nil, ErrUnrecognizedContent
 	}
 	seen := map[string]bool{}
+	contentFound := contentClass == ""
 	var result []string
 	walkElements(root, func(node *html.Node) {
+		if contentClass != "" && hasClass(node, contentClass) {
+			contentFound = true
+		}
 		if node.Data != "a" {
 			return
+		}
+		if contentClass != "" {
+			within := false
+			for ancestor := node.Parent; ancestor != nil; ancestor = ancestor.Parent {
+				if ancestor.Data == "footer" || ancestor.Data == "nav" || ancestor.Data == "header" {
+					return
+				}
+				within = within || hasClass(ancestor, contentClass)
+			}
+			if !within {
+				return
+			}
 		}
 		for _, attribute := range node.Attr {
 			if attribute.Key != "href" {
@@ -471,7 +549,10 @@ func linkedPDFs(parent string, body []byte) []string {
 		}
 	})
 	slices.Sort(result)
-	return result
+	if !contentFound {
+		return nil, ErrUnrecognizedContent
+	}
+	return result, nil
 }
 
 func (e *Engine) traverseSection(ctx context.Context, sourceID string, revision int, cfg registry.Configuration, section string, state *acquisitionState) (SectionPreview, []DiscoveredDocument, error) {
@@ -557,6 +638,9 @@ func validateDiscovery(cfg registry.Configuration) error {
 }
 
 func validateAcquisitionConfiguration(cfg registry.Configuration) error {
+	if !cfg.Attachments.Valid() || cfg.Attachments != nil && cfg.RegionalProduct != nil {
+		return ErrInvalidConfiguration
+	}
 	if cfg.RegionalProduct != nil {
 		if cfg.AccessMethod != "crawl4ai-html-pdf" {
 			return ErrInvalidConfiguration

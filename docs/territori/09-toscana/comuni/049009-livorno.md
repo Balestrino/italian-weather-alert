@@ -16,7 +16,7 @@ Comune di Livorno, provincia di Livorno, ISTAT `049009`. Fonte IWA: `livorno-mun
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria per le notizie esaminate | [Categoria Protezione Civile](https://www.comune.livorno.it/it/news-category/133640); verificare paginazione e perimetro nell'ambiente |
-| Risorse Municipium | Allegati collegati dal Comune | `livorno-api.cloud.municipiumapp.it`; riconoscimento, accesso e riuso da valutare per il perimetro richiesto |
+| Risorse Municipium | Allegati collegati dal Comune | `livorno-api.cloud.municipiumapp.it`, solo `/s3/3612/allegati/`; regola esplicita per fonte/revisione, senza ammissione di altri host |
 | Altri portali comunali | Ricerca separata | Un collegamento nell'interfaccia non ne include automaticamente tutti gli atti nella raccolta |
 
 La [notizia comunale esaminata](https://www.comune.livorno.it/it/news/133640/allerta-arancio-per-forti-temporali-con-rischio-idrogeologico-e-idraulico-del-reticolo-minore) collega l'ordinanza n. 303 del 20 agosto 2026 nella sezione Allegati e una guida alla navigazione nel footer. I due PDF sono su domini Municipium distinti da quello della pagina. Consultazione documentale: 2026-10-02; il contenuto può cambiare.
@@ -25,31 +25,32 @@ La [notizia comunale esaminata](https://www.comune.livorno.it/it/news/133640/all
 
 Distinguere gli allegati della notizia dai documenti generici del sito. Verificare ogni dominio esterno rispetto al riferimento ufficiale e ai vincoli di raccolta/riuso. Una risorsa `forbidden` può essere esclusa dal collector prima di qualsiasi richiesta HTTP: non prova un 403 o un file rimosso.
 
-Nel comportamento attuale, [retainPlanned e linkedPDFs](../../../../internal/backend/acquisition/preview.go) raccolgono i link PDF dall'intera pagina, li rendono obbligatori e rifiutano quelli con schema o host diverso dal documento. Il testo principale può essere conservato mentre il controllo rimane incompleto con `required_attachment_unavailable`.
+Il [collector](../../../../internal/backend/acquisition/preview.go) supporta ora una policy `attachments` per fonte/revisione: `content_class` limita la discovery dei PDF alla parte pertinente del documento, `external` ammette origini HTTPS e prefissi di percorso verificati e `validate_pdf` richiede un PDF valido. Le fonti senza questa policy mantengono la scansione generale e il rifiuto degli allegati esterni. Un allegato necessario non recuperato mantiene il controllo incompleto e il riferimento conservato.
 
-Il ricontrollo del 2026-10-02 ha rivalutato LIV-001 e LIV-002 mediante pagina ufficiale, codice e un nuovo giro programmato; dettagli in LIV-003. Il rifiuto di un allegato necessario interrompe il giro prima dei documenti successivi: distinguere target scoperti e originali conservati.
-
-LIV-004 individua come perimetro proposto il solo host HTTPS `livorno-api.cloud.municipiumapp.it` e `/s3/3612/allegati/`, per gli allegati pertinenti collegati dalle notizie comunali. LIV-005 verifica il download dell'ordinanza con browser ordinario e `DirectHTTP`, correggendo il limite della prima prova con un altro client. La causa della differenza fra client rimane indeterminata; perimetro del collector, persistenza e selezione degli allegati restano da implementare e verificare. Le [note legali comunali](https://www.comune.livorno.it/it/legal_notices) dichiarano CC BY 4.0 salvo eccezioni e contenuti di terzi; il riferimento esterno non concede da solo diritti su ogni risorsa di un host.
+Il ricontrollo del 2026-10-02 ha rivalutato LIV-001 e LIV-002 mediante pagina ufficiale, codice e un nuovo giro programmato. In quella fase nessuna correzione era stata introdotta; LIV-006 registra la successiva implementazione e verifica. Nell'acquisizione programmata l'errore ferma il giro prima dei documenti successivi: distinguere target scoperti e originali conservati; esiti per ambiente nel registro privato. Vedere LIV-003.
 
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
 | --- | --- | --- | --- |
-| LIV-001 | PDF della pagina esaminata | PDF esterni registrati come `forbidden`, senza download | Comportamento applicato dal collector; modifica proposta |
-| LIV-002 | Discovery degli allegati | La scansione dell'intera pagina può includere il PDF generico del footer | Comportamento applicato; selezione degli allegati pertinenti proposta |
+| LIV-001 | PDF della pagina esaminata | Allegati esterni ammessi solo nel perimetro HTTPS/percorso revisionato; altri riferimenti restano `forbidden` | Correzione implementata e verificata sul perimetro; LIV-006 |
+| LIV-002 | Discovery degli allegati | Selezione entro `article-content`, con esclusione di footer, navigazione e intestazioni | Correzione implementata e verificata sul perimetro; LIV-006 |
 
 L'eventuale ammissione di risorse Municipium deve essere esplicita e limitata alla fonte e ai percorsi verificati. La nota di piattaforma non costituisce una autorizzazione generale.
 
+La rivalutazione LIV-004 ha identificato come perimetro tecnico il solo host HTTPS `livorno-api.cloud.municipiumapp.it`, percorso `/s3/3612/allegati/`, per gli allegati pertinenti collegati dalle notizie comunali. Il riferimento della pagina esaminata compare dentro `article-content`; la guida generica è nel footer. `cloud-ita.municipiumapp.it` non richiede un'abilitazione per raccogliere quell'ordinanza. Sono da verificare separatamente l'effettivo accesso al file e le condizioni di ciascun documento; il collector dispone ora di una policy esplicita per autorizzare questo perimetro, con referral e riuso separati.
+
 ## Problemi aperti
 
-| ID | Problema | Intervento proposto | Criterio di chiusura |
-| --- | --- | --- | --- |
-| LIV-001 | L'ordinanza collegata è su un host esterno escluso dal collector | Verificare il perimetro di accesso/riuso e supportare le risorse autorizzate | Test di confine e acquisizione completa della fonte verificata |
-| LIV-002 | Il PDF del footer viene trattato come allegato obbligatorio | Distinguere gli allegati della notizia dai collegamenti generici | Fixture con ordinanza e footer, poi confronto con la pagina reale |
+LIV-001 e LIV-002 hanno una correzione nel checkout con test di confine, confronto del filtro con la pagina reale e verifica della conservazione; vedere LIV-006. Restano da verificare continuità dei download, eventuali nuovi host o eccezioni dei documenti e copertura oltre la prima pagina configurata. Trial, interpretazione e accettazione restano separati.
 
-Modifica, issue e verifiche della correzione: non disponibili. I retry non cambiano questi vincoli. Trial e accettazione restano separati.
+LIV-005 ha corretto il limite di accesso registrato in LIV-004: la prima prova HTTP non dimostrava indisponibilità per tutti i client. Il file esatto è stato acquisito con un normale browser e con `DirectHTTP`, e validato come PDF leggibile; dettagli dei trasporti ed esiti nell'archivio privato. Le [note legali comunali](https://www.comune.livorno.it/it/legal_notices) dichiarano CC BY 4.0 salvo eccezioni e contenuti di terzi; la clausola sui collegamenti esterni non concede da sola i diritti su ogni risorsa di un host.
+
+Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente interessato, conservare il risultato e validare il PDF, oltre allo stato HTTP. Un esito del browser o di un altro client non sostituisce la verifica di `DirectHTTP`. Prima di considerare completo un giro verificare anche persistenza, riferimenti e tutti gli allegati necessari. Gestire i fallimenti temporanei con retry limitati e cadenze della fonte; un rifiuto persistente richiede diagnosi o un canale ufficiale alternativo verificato.
 
 ## Registro delle scoperte
+
+Le voci LIV-001–LIV-005 descrivono gli stati osservati nelle rispettive fasi del 2026-10-02; LIV-006 aggiorna il comportamento corrente dopo la correzione.
 
 ### LIV-001 — Ordinanza pubblicata su risorse Municipium
 
@@ -102,3 +103,15 @@ Modifica, issue e verifiche della correzione: non disponibili. I retry non cambi
 - **Conseguenza:** supera il limite di verifica dell'accessibilità in LIV-004 per questo file e questi tentativi; restano aperti LIV-001 e LIV-002, la persistenza attraverso il collector e l'accesso futuro. Il successo non certifica tutti gli allegati dello stesso host.
 - **Prossima verifica:** integrare il perimetro autorizzato e il filtro dei link pertinenti, verificare gli originali conservati in un nuovo controllo completo e osservare la continuità del recupero.
 - **Collegamenti:** LIV-004; probe privato senza modifica al codice applicativo, issue e integrazione non disponibili.
+
+
+### LIV-006 — Allegati revisionati e filtro del contenuto verificati
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, fixture sintetiche, parser PDF dell'immagine applicativa, PostgreSQL isolato e verifica operativa privata.
+- **Ambito:** fonte `livorno-municipal`, prima pagina della categoria configurata e allegati PDF pertinenti entro `article-content`; origine HTTPS `livorno-api.cloud.municipiumapp.it` e solo `/s3/3612/allegati/`. Ambiente e revisione attivati sono documentati nel registro privato.
+- **Conoscenza:** confermato per questo perimetro. **Intervento:** implementato e verificato; continuità, interpretazione e accettazione rimangono separate.
+- **Osservazione:** la policy della revisione autorizza gli allegati esterni verificati, esclude la guida del footer e richiede tipo/struttura PDF e parsing Poppler. Preview e percorso programmato condividono i controlli e i metadati di pubblicazione. Le risorse mancanti impediscono la completezza; il percorso esterno e i redirect sono limitati prima della richiesta.
+- **Evidenza:** [policy e confini](../../../../internal/backend/registry/attachments.go), [collector](../../../../internal/backend/acquisition/preview.go), [fixture del perimetro](../../../../internal/backend/acquisition/scoped_attachments_test.go), [persistenza e recupero](../../../../internal/backend/acquisition/scoped_attachments_integration_test.go), [procedura di verifica](../../../operations/municipal-attachments.md). Configurazione attiva, ricevute, originali e verifiche di rilettura conservati privatamente.
+- **Conseguenza:** chiude i criteri di correzione di LIV-001 e LIV-002 sul perimetro verificato; gli altri comuni e i domini generici non ereditano la regola. Un download riuscito non garantisce l'accessibilità futura o la copertura di altri canali.
+- **Prossima verifica:** osservare la continuità del recupero; rivalutare nuovi host, percorsi, eccezioni dei documenti o cambiamenti dell'HTML. Paginazione completa, altri portali, trial e accettazione restano da verificare.
+- **Collegamenti:** LIV-001–LIV-005; [specifica](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md) e task 17; issue non disponibile.

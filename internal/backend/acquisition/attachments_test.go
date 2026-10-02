@@ -15,7 +15,7 @@ func TestPlannedCheckDiscoversPDFsAndRetainsUnavailableExternalReference(t *test
 	retained := &fakeRetention{}
 	engine := Engine{Crawler: crawler, Resources: resources, Retained: retained, Tracking: &fakeTracker{}}
 	state := acquisitionState{}
-	page, err := engine.retainPlanned(context.Background(), "source", 1, PlannedDocument{URL: parent}, time.Now(), &state)
+	page, err := engine.retainPlanned(context.Background(), "source", 1, PlannedDocument{URL: parent}, time.Now(), &state, nil)
 	if err != ErrRequiredAttachment || page.VersionID == 0 || state.errorCode != "required_attachment_unavailable" {
 		t.Fatalf("external required PDF silently omitted: %#v %v", state, err)
 	}
@@ -38,12 +38,12 @@ func TestLinkedPDFChangeCreatesNewParentVersion(t *testing.T) {
 	crawler := &fixtureCrawler{pages: map[string]Page{parent: {URL: parent, StatusCode: 200, MediaType: "text/html", HTML: []byte(`<a href="/order.pdf">Ordinanza</a>`)}}}
 	resources := &fixtureCrawler{pages: map[string]Page{pdf: {URL: pdf, StatusCode: 200, MediaType: "application/pdf", HTML: []byte("version one")}}}
 	engine := Engine{Crawler: crawler, Resources: resources, Retained: &stableRetention{}, Tracking: &fakeTracker{}}
-	first, err := engine.retainPlanned(context.Background(), "source", 1, PlannedDocument{URL: parent}, time.Now(), &acquisitionState{})
+	first, err := engine.retainPlanned(context.Background(), "source", 1, PlannedDocument{URL: parent}, time.Now(), &acquisitionState{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	resources.pages[pdf] = Page{URL: pdf, StatusCode: 200, MediaType: "application/pdf", HTML: []byte("version two")}
-	second, err := engine.retainPlanned(context.Background(), "source", 1, PlannedDocument{URL: parent}, time.Now(), &acquisitionState{})
+	second, err := engine.retainPlanned(context.Background(), "source", 1, PlannedDocument{URL: parent}, time.Now(), &acquisitionState{}, nil)
 	if err != nil || first.VersionID == second.VersionID || !second.Changed {
 		t.Fatalf("changed attachment lost: %#v %#v %v", first, second, err)
 	}
