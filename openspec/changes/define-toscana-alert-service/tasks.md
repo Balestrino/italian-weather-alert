@@ -301,3 +301,14 @@ and the HTTP/runtime-boundary smoke passed. Provider holds remained separate.
 This trial establishes concurrent processing, not semantic source acceptance or
 long-term capacity; detailed logs, receipts, settings and rollback archive remain
 private. The repository default remains one replica.
+
+- [x] 22.7 Add two corrected development worker replicas on operator request for a total of six; preserve the existing four identities and settings, verify startup and processing/restart observations against current server slots, and document return to four workers with private evidence retained.
+
+The six-worker expansion preserved all four existing container identities and
+matched their corrected image/settings. Each of the six replicas performed queue
+attempts during verification, with zero restarts and no observed pre-claim
+deadlocks. The local server initially returned HTTP 503 and subsequently exposed
+six slots; the first sixty-second slot window observed no active model slots.
+This verifies six active queue workers, not six simultaneous model executions.
+The nondisruptive HTTP/runtime-boundary smoke passed. Provider retry/circuit
+controls remained active; settings, logs and observations remain private.

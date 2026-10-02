@@ -159,8 +159,24 @@ were active in 34 of 41 samples over eighty seconds. HTTP 200 receipts and store
 validated classifications from all four workers confirmed actual processing.
 Two quotation validation failures remained rejected. No further pre-claim
 deadlocks or worker restarts occurred in the observation window, and the HTTP
-smoke passed. Four corrected replicas remain active; long-term capacity and
+smoke passed. Four corrected replicas were active for that observation; long-term capacity and
 semantic source acceptance require separate observation.
+
+The next operator-requested expansion uses six replicas of the corrected image,
+preserving the existing four containers and inference settings. Select
+`--scale worker=6` on subsequent worker `up` commands to keep six workers, or
+`--scale worker=4` to return to the previously verified count. The same queue
+maintenance lock and scale-down recovery apply. Server slot count and processing
+availability still require independent observation; starting six workers does
+not itself establish six simultaneous model executions.
+
+Verification found six running workers performing queue attempts, with no
+restarts or observed pre-claim deadlocks and a passing HTTP/runtime-boundary
+smoke. The server initially returned HTTP 503, then exposed six slots. No active
+model slots were observed in the first sixty-second sample window, so this
+expansion verifies worker activation and queue progress rather than six
+simultaneous model calls. Six corrected replicas remain active; detailed runtime
+evidence and settings are private.
 
 ## Deploy and roll back
 

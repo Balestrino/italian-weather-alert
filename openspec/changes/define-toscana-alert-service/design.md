@@ -260,6 +260,13 @@ parallel work after maintenance and lock release after failure/cancelled waiting
 Deploy the corrected image to all four replicas so they share the lock protocol;
 an older worker does not coordinate on this lock.
 
+The next operator request expands the corrected development worker to six
+replicas. Add the two replicas without recreating the existing four or changing
+their image/settings. Verify current server capacity, running queue loops and
+restart/deadlock observations; preserve private rollback evidence and document
+`--scale worker=4` as the return to the previous count. The existing lock protocol
+and source/provider controls apply to all six replicas.
+
 ## Territorial source knowledge guides
 
 Maintain a human-readable knowledge base under `docs/territori/`, with region directories keyed by two-digit codes and municipality files keyed by six-digit ISTAT identity. Create files when research begins. Each guide puts current source maps, operational rules and open problems before its dated discovery register. A shared template records stable finding IDs, scope, evidence dates, knowledge status and intervention status independently. Subsequent entries reference superseded findings without deleting them.

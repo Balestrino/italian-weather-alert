@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Expand development to six corrected worker replicas, verify preserved existing containers and queue progress, and document server concurrency limits and return to four workers.
 - 2026-10-02 [Fixed] Prevent concurrent inference workers from deadlocking during queue maintenance; test cancellation and lock release, deploy four development replicas and verify parallel processing.
 - 2026-10-02 [Changed] Run and verify two concurrent development fallback requests using existing worker replicas; document scope, private rollback evidence and return to one worker.
 - 2026-10-02 [Changed] Record retained-source replay and bounded development local-processing results, accounting and rollout limits.
