@@ -375,6 +375,9 @@ func TestDisabledRegionGatesClaimsAndManualExecution(t *testing.T) {
 		if _, err = s.SetRegionEnabled(ctx, region, 2, true, "test"); err != nil {
 			t.Fatal(err)
 		}
+		if _, err = s.SetMunicipalityEnabled(ctx, region, istat, 0, true, "test"); err != nil {
+			t.Fatal(err)
+		}
 	}
 	reg := registry.New(p)
 	if err := reg.CreateAuthority(ctx, registry.Authority{ID: "a", Name: "a", OfficialURL: "https://example.test"}); err != nil {

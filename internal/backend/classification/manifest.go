@@ -43,9 +43,30 @@ var municipalViewClass = regexp.MustCompile(`<div class="js-view-dom-id-[0-9a-f]
 
 const MunicipalHTMLPolicy = "municipal-html-v2"
 
-// CanonicalHTML removes only two exact, reviewed generated Drupal identifiers.
+const CascinaHTMLPolicy = "cascina-html-v1"
+
+var cascinaCSRFMeta = regexp.MustCompile(`<meta name="csrf-token" content="[A-Za-z0-9]{40}">`)
+var cascinaCSRFInput = regexp.MustCompile(`<input type="hidden" name="_token" value="[A-Za-z0-9]{40}">`)
+
+// HTMLPolicy identifies only source-specific, reviewed presentation noise.
+func HTMLPolicy(source string) string {
+	switch source {
+	case "calcinaia-municipal":
+		return MunicipalHTMLPolicy
+	case "cascina-municipal":
+		return CascinaHTMLPolicy
+	default:
+		return ""
+	}
+}
+
+// CanonicalHTML removes exact reviewed transport fields for the named source.
 // Text, dates, links, other attributes and card order remain byte-significant.
 func CanonicalHTML(source string, body []byte) []byte {
+	if source == "cascina-municipal" {
+		body = cascinaCSRFMeta.ReplaceAll(body, []byte(`<meta name="csrf-token" content="">`))
+		return cascinaCSRFInput.ReplaceAll(body, []byte(`<input type="hidden" name="_token" value="">`))
+	}
 	if source != "calcinaia-municipal" {
 		return body
 	}
@@ -56,7 +77,7 @@ func CanonicalHTML(source string, body []byte) []byte {
 func manifestHash(body []byte) string { sum := sha256.Sum256(body); return hex.EncodeToString(sum[:]) }
 
 // BuildManifest preserves all text, metadata and graphical inputs. It removes
-// only the exact municipal generated comment proven irrelevant by paired evidence.
+// only exact source-specific transport fields proven irrelevant by paired evidence.
 // Missing or unverifiable graphical provenance is represented but never reusable.
 func BuildManifest(ctx context.Context, retained documentStore, extracted ocrStore, version documents.Version, content Content, configuration string) (InputManifest, error) {
 	manifest := InputManifest{IssuerID: version.IssuerID, Version: ManifestVersion, Configuration: configuration, DocumentID: version.DocumentID, Complete: content.Complete, Sections: append([]ContentSection(nil), content.Sections...), Reusable: content.Complete && len(content.Sections) > 0}
@@ -133,8 +154,11 @@ func BuildManifest(ctx context.Context, retained documentStore, extracted ocrSto
 			if err != nil {
 				return manifest, err
 			}
-			if (media == "text/html" || media == "application/xhtml+xml") && manifest.SourceID == "calcinaia-municipal" {
+			if (media == "text/html" || media == "application/xhtml+xml") && HTMLPolicy(manifest.SourceID) != "" {
 				body = CanonicalHTML(manifest.SourceID, body)
+				if manifest.SourceID == "cascina-municipal" {
+					item.Policy += ":" + CascinaHTMLPolicy
+				}
 			}
 			item.Identity = manifestHash(body)
 		}

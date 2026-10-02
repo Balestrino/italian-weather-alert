@@ -23,6 +23,12 @@ import (
 )
 
 func TestPreflightContiguousGroups(t *testing.T) {
+	for _, source := range []string{"calcinaia-municipal", "cascina-municipal"} {
+		t.Run(source, func(t *testing.T) { testPreflightContiguousGroups(t, source) })
+	}
+}
+
+func testPreflightContiguousGroups(t *testing.T, source string) {
 	ctx := context.Background()
 	pool := interpretationTestDB(t)
 	for _, m := range []func(context.Context, *pgxpool.Pool) error{registry.Migrate, documents.Migrate, jobs.Migrate, processing.Migrate, ocr.Migrate, classification.Migrate, extraction.Migrate, Migrate} {
@@ -31,7 +37,6 @@ func TestPreflightContiguousGroups(t *testing.T) {
 		}
 	}
 	reg := registry.New(pool)
-	source := "calcinaia-municipal"
 	if e := reg.CreateAuthority(ctx, registry.Authority{ID: "a", Name: "a", OfficialURL: "https://example.org"}); e != nil {
 		t.Fatal(e)
 	}
@@ -48,6 +53,9 @@ func TestPreflightContiguousGroups(t *testing.T) {
 	retain := func(id, marker, text, mediaType string) documents.Version {
 		t.Helper()
 		b := []byte(`<div class="js-view-dom-id-` + strings.Repeat(marker, 64) + `">` + text + `</div>`)
+		if source == "cascina-municipal" {
+			b = []byte(`<meta name="csrf-token" content="` + strings.Repeat(marker, 40) + `"><main>` + text + `</main><input type="hidden" name="_token" value="` + strings.Repeat(marker, 40) + `">`)
+		}
 		v, e := retained.Retain(ctx, documents.Acquisition{ID: id, SourceID: source, Configuration: 1, URL: "https://example.org/notice", Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{{URL: "https://example.org/notice", SourceID: source, Configuration: 1, Role: "original", Required: true, MediaType: mediaType, Bytes: b}}})
 		if e != nil {
 			t.Fatal(e)
@@ -55,8 +63,10 @@ func TestPreflightContiguousGroups(t *testing.T) {
 		return v
 	}
 	a := retain("a", "a", "Warning A", "text/html")
-	if collapsed := retain("b-marker", "b", "Warning A", "text/html"); collapsed.ID != a.ID {
-		t.Fatal("generated identifier created a version")
+	if source == "calcinaia-municipal" {
+		if collapsed := retain("b-marker", "b", "Warning A", "text/html"); collapsed.ID != a.ID {
+			t.Fatal("generated identifier created a version")
+		}
 	}
 	// Content-Type variations retain distinct versions, but preflight treats
 	// their equivalent HTML evidence as one contiguous interpretation group.

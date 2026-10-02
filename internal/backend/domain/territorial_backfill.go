@@ -97,6 +97,9 @@ func (s *Store) BackfillToscana(ctx context.Context) error {
 			return err
 		}
 	}
+	if _, err = tx.Exec(ctx, municipalityLifecycleBackfillSQL); err != nil {
+		return err
+	}
 	var revision int
 	var enabled bool
 	if err = tx.QueryRow(ctx, `SELECT revision,enabled FROM territorial_regions WHERE code='09' FOR UPDATE`).Scan(&revision, &enabled); err != nil {

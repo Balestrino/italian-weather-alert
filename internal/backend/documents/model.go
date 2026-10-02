@@ -23,7 +23,8 @@ var (
 
 // Resource declares every necessary dependency, including inaccessible ones.
 // SourceID/Configuration identify the policy that permits retaining its bytes;
-// external attachments must use their own verified source configuration.
+// External attachments require their own verified source configuration or an
+// explicit attachment scope with referral and reuse evidence in this revision.
 type Resource struct {
 	URL           string `json:"url"`
 	Role          string `json:"role"` // original, attachment, or resource

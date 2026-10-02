@@ -34,3 +34,10 @@ These checkboxes reflect the private project task list on 30 September 2026. A c
 
 - [x] 5.1 Extend the existing dashboard browser harness for region → municipality → configuration → history and second-region setup in isolated fixtures; verify 390px/768px/1440px, keyboard, 200% zoom, JavaScript disabled and error states, and retain screenshots plus observed acceptance results.
 - [x] 5.2 Run `go test ./...`, `go vet ./...`, affected PostgreSQL integration suites and strict OpenSpec validation; document actual results plus an isolated migration/rollback rehearsal and an operator guide for regional setup, disablement, processing compatibility and the unchanged public perimeter. Do not use real source activation or paid inference for acceptance.
+
+## 6. Regional entry ordering (2 October 2026)
+
+- [x] 6.1 Count enabled municipalities in the current regional register and display enabled/total counts; order both regional entry routes and state filters by region enablement, enabled municipality count descending, then name/code; preserve unavailable labels.
+- [x] 6.2 Verify rendered ordering and filters with synthetic fixtures, current membership and partial failures with isolated PostgreSQL, then refresh the development backoffice and verify the integrated browser.
+
+Validation: `go test ./internal/backoffice ./internal/backend/operations`, `go vet ./internal/backoffice ./internal/backend/operations` and `go test -tags=integration ./internal/backoffice -run '^TestTerritorialMunicipalityReaders$' -count=1` passed. The development admin was rebuilt and refreshed; the integrated browser verified the 20-row ordering and enabled/total column via tailnet. The public service and collector retained their container and image identities.

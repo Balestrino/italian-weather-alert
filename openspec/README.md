@@ -8,15 +8,22 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | --- | ---: | ---: |
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 89 | 11 |
+| [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 107 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
-| [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 18 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 6 | 0 |
+| [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
+| [Automatic changelog](changes/automate-changelog/proposal.md) | 11 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
 
 The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Five subsequent local fallback tasks verify opt-in Qwen chat/image tests and scoped development routing; see [local fallback operations](../docs/operations/local-llm-fallback.md). Provider entitlement restoration and dependent semantic embeddings remain separate open work. These checks do not complete source acceptance or production readiness.
+
+Three subsequent documentation tasks add [territorial source guides](../docs/territori/README.md), a shared template, scoped platform notes and contributor upkeep instructions. Public findings and private operational evidence remain separate; document verification does not resolve the recorded acquisition problems or change the coverage snapshot.
+
+Five subsequent municipal recheck tasks preserve diagnostic evidence and scoped download observations. Five further attachment tasks add revision-scoped external PDF permissions, content filtering and preview/collector validation, with isolated persistence tests and a verified development Livorno rollout. See [municipal attachment operations](../docs/operations/municipal-attachments.md). Five further Cascina tasks verify listing dates, its separately reviewed PDF scope, CSRF interpretation equivalence and retirement of only reviewed stale unattempted work in development. Isolated tests verify validated reuse without a second call; ordinary checks verify unchanged-version retention. These checks do not complete source acceptance or establish future availability.
+
+Explicit background selection and hierarchical controls have synthetic repository verification for CLI/admin parity, municipal migration and processing admission, plus native-form browser checks. See [background processing verification](../docs/operations/background-processing-verification.md). The current live collector was preserved; production handover remains a separate release operation.
 
 Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/operations/environment-verification.md).
 

@@ -51,6 +51,11 @@ func main() {
 	}
 }
 func run() bool {
+	control, controlRequested, controlErr := parseControlCommand(os.Args[1:])
+	if controlErr != nil {
+		slog.Error("control command failed", "code", controlErrorCode(controlErr))
+		return false
+	}
 	reportCommand := len(os.Args) == 2 && (os.Args[1] == "report-preview" || os.Args[1] == "report-status")
 	projectCommand := len(os.Args) == 3 && os.Args[1] == "project-regional-version"
 	zonesCommand := len(os.Args) == 4 && os.Args[1] == "adopt-toscana-zones"
@@ -61,7 +66,7 @@ func run() bool {
 	previewCommand := len(os.Args) == 4 && os.Args[1] == "preview"
 	backupResultCommand := len(os.Args) == 6 && os.Args[1] == "backup-result"
 	retentionPolicyCommand := len(os.Args) == 3 && os.Args[1] == "retention-policy"
-	if (!reportCommand && !projectCommand && !zonesCommand && !preflightCommand && !pendingArchiveCommand && !archiveCommand && !seedCommand && !previewCommand && !retentionPolicyCommand && !backupResultCommand && len(os.Args) > 2) || (len(os.Args) == 2 && !reportCommand && os.Args[1] != "check" && os.Args[1] != "inference-catalog-check" && os.Args[1] != "migrate" && os.Args[1] != "storage-init" && os.Args[1] != "storage-recover" && os.Args[1] != "retention-cleanup" && os.Args[1] != "worker" && os.Args[1] != "backup-worker") {
+	if (!controlRequested && !reportCommand && !projectCommand && !zonesCommand && !preflightCommand && !pendingArchiveCommand && !archiveCommand && !seedCommand && !previewCommand && !retentionPolicyCommand && !backupResultCommand && len(os.Args) > 2) || (len(os.Args) == 2 && !controlRequested && !reportCommand && os.Args[1] != "check" && os.Args[1] != "inference-catalog-check" && os.Args[1] != "migrate" && os.Args[1] != "storage-init" && os.Args[1] != "storage-recover" && os.Args[1] != "retention-cleanup" && os.Args[1] != "worker" && os.Args[1] != "backup-worker") {
 		slog.Error("unknown command")
 		return false
 	}
@@ -98,6 +103,13 @@ func run() bool {
 		return false
 	}
 	defer pool.Close()
+	if controlRequested {
+		if err := executeControl(ctx, pool, c.Role, control, os.Stdout); err != nil {
+			slog.Error("control command failed", "code", controlErrorCode(err))
+			return false
+		}
+		return true
+	}
 	if reportCommand {
 		if c.Role != "admin" {
 			slog.Error("report commands require the admin role")

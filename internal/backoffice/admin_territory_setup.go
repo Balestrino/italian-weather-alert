@@ -176,7 +176,7 @@ func adminTerritorySetupRoutes(mux *http.ServeMux, a AdminRuntime) {
 		http.Redirect(w, r, "/admin/regions/"+region.Code+"/setup", http.StatusSeeOther)
 	})
 	mux.HandleFunc("POST /admin/regions/{region}/enabled", func(w http.ResponseWriter, r *http.Request) {
-		if err := territoryForm(w, r, "actor", "expected_revision", "enabled"); err != nil {
+		if err := territoryForm(w, r, "actor", "expected_revision", "enabled", "return_to"); err != nil {
 			territoryFailure(w, r, err)
 			return
 		}
@@ -191,11 +191,47 @@ func adminTerritorySetupRoutes(mux *http.ServeMux, a AdminRuntime) {
 			territoryFailure(w, r, domain.ErrInvalid)
 			return
 		}
-		if _, err = a.TerritoryConfig.SetRegionEnabled(r.Context(), region.Code, revision, raw == "true", r.PostForm.Get("actor")); err != nil {
+		back, err := territoryControlReturn(r.PostForm.Get("return_to"), region.Code, "configuration")
+		if err != nil {
 			territoryFailure(w, r, err)
 			return
 		}
-		http.Redirect(w, r, "/admin/regions/"+region.Code+"?tab=configuration", http.StatusSeeOther)
+		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+		defer cancel()
+		if _, err = a.TerritoryConfig.SetRegionEnabled(ctx, region.Code, revision, raw == "true", r.PostForm.Get("actor")); err != nil {
+			territoryFailure(w, r, err)
+			return
+		}
+		http.Redirect(w, r, back, http.StatusSeeOther)
+	})
+	mux.HandleFunc("POST /admin/regions/{region}/municipalities/{istat}/enabled", func(w http.ResponseWriter, r *http.Request) {
+		if err := territoryForm(w, r, "actor", "expected_revision", "enabled", "return_to"); err != nil {
+			territoryFailure(w, r, err)
+			return
+		}
+		region, err := setupRegion(r, a)
+		if err != nil {
+			territoryFailure(w, r, err)
+			return
+		}
+		revision, err := territoryRevision(r.PostForm.Get("expected_revision"))
+		raw := r.PostForm.Get("enabled")
+		if err != nil || (raw != "true" && raw != "false") {
+			territoryFailure(w, r, domain.ErrInvalid)
+			return
+		}
+		back, err := territoryControlReturn(r.PostForm.Get("return_to"), region.Code, "municipalities")
+		if err != nil {
+			territoryFailure(w, r, err)
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+		defer cancel()
+		if _, err = a.TerritoryConfig.SetMunicipalityEnabled(ctx, region.Code, r.PathValue("istat"), revision, raw == "true", r.PostForm.Get("actor")); err != nil {
+			territoryFailure(w, r, err)
+			return
+		}
+		http.Redirect(w, r, back, http.StatusSeeOther)
 	})
 	adminTerritoryNewSourceRoutes(mux, a)
 }
@@ -288,4 +324,46 @@ func adminTerritoryNewSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
 	}
 	mux.HandleFunc("GET /admin/regions/{region}/sources/new", handler)
 	mux.HandleFunc("POST /admin/regions/{region}/sources/new", handler)
+}
+
+// Restrict native-form returns to the same territorial workspace. Validate before mutation.
+func territoryControlReturn(raw, region, fallbackTab string) (string, error) {
+	if raw == "" {
+		return "/admin/regions/" + region + "?tab=" + fallbackTab, nil
+	}
+	u, err := url.Parse(raw)
+	if err != nil || u.IsAbs() || u.Host != "" || u.Fragment != "" || u.RawPath != "" || len(raw) > 4096 {
+		return "", domain.ErrInvalid
+	}
+	q, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		return "", domain.ErrInvalid
+	}
+	for k, v := range q {
+		if len(v) != 1 {
+			return "", domain.ErrInvalid
+		}
+		if u.Path == "/admin/regions" {
+			if k != "state" || !slices.Contains([]string{"all", "enabled", "disabled"}, v[0]) {
+				return "", domain.ErrInvalid
+			}
+		} else {
+			if u.Path != "/admin/regions/"+region || !slices.Contains([]string{"tab", "search", "province", "coverage", "after"}, k) {
+				return "", domain.ErrInvalid
+			}
+		}
+	}
+	if u.Path == "/admin/regions" {
+		return u.String(), nil
+	}
+	if u.Path != "/admin/regions/"+region || !slices.Contains([]string{"configuration", "municipalities"}, q.Get("tab")) {
+		return "", domain.ErrInvalid
+	}
+	if q.Get("tab") == "configuration" && len(q) != 1 {
+		return "", domain.ErrInvalid
+	}
+	if len(q.Get("search")) > 200 || len(q.Get("province")) > 100 || len(q.Get("after")) > 2048 || !slices.Contains([]string{"", "none", "configured", "collecting"}, q.Get("coverage")) {
+		return "", domain.ErrInvalid
+	}
+	return u.String(), nil
 }

@@ -48,14 +48,10 @@ func interpretationTestDB(t *testing.T) *pgxpool.Pool {
 		}
 		return strings.TrimSpace(string(out))
 	}
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	binding := listener.Addr().String() + ":5432"
-	_ = listener.Close()
-	run("run", "--pull=never", "--detach", "--name", name, "--publish", binding, "--mount", "type=bind,src="+passwordFile+",dst=/run/secrets/password,readonly", "--env", "POSTGRES_PASSWORD_FILE=/run/secrets/password", "--env", "POSTGRES_USER=iwa", "--env", "POSTGRES_DB=iwa", "postgres:16-alpine")
 	t.Cleanup(func() { _ = exec.Command("docker", "rm", "-fv", name).Run() })
+	// Docker owns published-port allocation; an OS-selected free port can
+	// already belong to another container's forwarding rule.
+	run("run", "--pull=never", "--detach", "--name", name, "--publish", "127.0.0.1::5432", "--mount", "type=bind,src="+passwordFile+",dst=/run/secrets/password,readonly", "--env", "POSTGRES_PASSWORD_FILE=/run/secrets/password", "--env", "POSTGRES_USER=iwa", "--env", "POSTGRES_DB=iwa", "postgres:16-alpine")
 	address := run("port", name, "5432/tcp")
 	host, port, err := net.SplitHostPort(address)
 	if err != nil {

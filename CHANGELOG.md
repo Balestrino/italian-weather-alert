@@ -4,6 +4,32 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+## 0.1.2 - 2026-10-02
+
+- 2026-10-02 [Fixed] Let Docker allocate loopback ports for interpretation integration databases and clean up failed starts, avoiding published-port collisions in Coverage.
+- 2026-10-02 [Changed] Prepare the 0.1.2 municipal corrections patch, align OpenAPI/MCP metadata and release notes, and retain the development-to-main software promotion gates.
+- 2026-10-02 [Fixed] Correct Cascina listing dates and scoped PDF selection, add reviewed CSRF interpretation reuse, verify development collection and retire only stale unattempted COC work while preserving originals and provider controls.
+- 2026-10-02 [Changed] Prioritize enabled regions and current enabled municipality counts in the backoffice regional table; show enabled/total counts and verify synthetic ordering, isolated database reads and the development browser.
+- 2026-10-02 [Changed] Configure tailnet-only HTTPS access to the development status frontend and verify frontend and backoffice access in the integrated browser.
+- 2026-10-02 [Changed] Add reviewed source-scoped external PDF attachments, content filtering and preview/collector validation; verify failure persistence and activate the verified Livorno development revision with rollback evidence.
+
+- 2026-10-02 [Changed] Verify Livorno's ordinance download with the application HTTP client and a normal browser; refine the earlier access finding and document validation limits.
+- 2026-10-02 [Changed] Review Livorno's external attachment boundary and distinguish collector authorization from file accessibility; retain the access probe privately.
+- 2026-10-02 [Changed] Recheck municipal acquisition and retained originals; update territorial guidance for footer PDF failures, add Pontedera and keep operational evidence private.
+- 2026-10-02 [Added] Add territorial source guides, a shared discovery template and Municipium notes; link the main README, documentation index and coverage inventory, and require contributor upkeep with private evidence kept separate.
+- 2026-10-02 [Changed] Enable development collection for the existing Cascina, Livorno and Pisa candidates through audited source controls.
+
+## 0.1.1 - 2026-10-01
+
+- 2026-10-01 [Changed] Bump the software patch version to 0.1.1, align OpenAPI/MCP metadata, and prepare versioned changelog history and patch release notes.
+- 2026-10-01 [Changed] Apply the additive municipal migration and update development admin; verify live controls and readiness while preserving the existing collector and record partial image alignment.
+- 2026-10-01 [Changed] Document explicit worker selection, environment-scoped territorial and source controls, compatible rollback and separately scheduled collector handover; record synthetic verification.
+- 2026-10-01 [Added] Provide audited CLI and admin activation controls for regions, municipalities and source collection, with native forms and territorial blocking status.
+- 2026-10-01 [Added] Add audited municipality enablement and hierarchical acquisition/inference gates while preserving existing collection eligibility
+- 2026-10-01 [Changed] Make collection and backup workers opt-in in development and staging; verify isolated production profile selection
+- 2026-10-01 [Planned] Extend the processing plan with hierarchical region/municipality/source controls in CLI and admin, independent of worker startup and public publication
+- 2026-10-01 [Planned] Plan explicit development and staging background worker activation with production profile isolation and controlled shared-host processing
+
 ## 0.1.0 - 2026-10-01
 
 - 2026-10-01 [Added] Prepare the first software release with versioned history, pilot release notes and development-to-main promotion guidance.

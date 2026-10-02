@@ -64,6 +64,10 @@ Read retained bulletins, processing statuses and consolidated facts in private s
 
 Count all matches with the same predicates as lists; use deterministic keyset pagination (name/ISTAT for municipalities, event time/kind/stable ID for history). Avoid one query per municipality. Scope source/document/job links and validated local return paths to the same territory. Partial reader failures show unavailable sections rather than zero or empty successful results.
 
+### Regional entry ordering
+
+The region entry sorts rows server-side by region enablement first, then saved enabled municipality counts in the current adopted register descending, with name/code ties. A single aggregate query reads total and enabled counts without per-region queries; current membership excludes retired municipalities. Counts preserve saved choices under disabled parents and stay independent of source/worker state. Both entry routes and state filters share the ordering and enabled/total column. Unknown counts remain explicit and sort after known counts in the same enablement group.
+
 ### History composition
 
 Compose typed history entries from territorial events, registry versions/events, retained versions and processing/job outcomes, without copying them into a competing audit database. Expose filters for dates, source and event kind. Show recorded time, actor when present, revision/version, outcome, and evidence links. Keep valid time and observation time distinct; display retention limitations and old associations. Disabled territories remain fully inspectable.

@@ -87,6 +87,7 @@ type Discovery struct {
 type Configuration struct {
 	ProcessingProfile    string                   `json:"processing_profile,omitempty"`
 	InferenceEligibility *InferenceEligibility    `json:"inference_eligibility,omitempty"`
+	Attachments          *AttachmentPolicy        `json:"attachments,omitempty"`
 	Unresolved           []string                 `json:"unresolved"`
 	URL                  string                   `json:"url"`
 	Sections             []string                 `json:"sections"`
@@ -169,6 +170,9 @@ func (c *Configuration) defaults() {
 	}
 }
 func (c Configuration) valid() bool {
+	if !c.Attachments.Valid() || c.Attachments != nil && (c.AccessMethod != "crawl4ai" || c.RegionalProduct != nil) {
+		return false
+	}
 	if !c.InferenceEligibility.valid(c.URL) {
 		return false
 	}

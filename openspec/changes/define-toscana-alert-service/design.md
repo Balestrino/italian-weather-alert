@@ -1,5 +1,31 @@
 ## Context
 
+### Cascina corrections — 2 October 2026
+
+Use the source-revision layout `2 Jan 2006` for the observed unpadded Italian
+listing days; test one/two-digit days and date-based tracker selection. Keep
+unknown dates eligible and explicit-reference/ongoing-measure exceptions intact.
+Discover PDF attachments inside the observed `page-content` container, preserving
+explicit dependencies. Review the official municipal decree/notice referral and
+reuse conditions for the exact Cascina API origin and `/s3/1520/allegati/`
+attachment directory; grant linked municipal PDFs only, with bounded redirects
+and real PDF validation. Generic S3 footer resources and other external
+origins remain excluded; acquisition of non-PDF dependencies is separate work.
+
+Paired retained Cascina HTML differs only in generated 40-character CSRF values
+in an exact meta tag and hidden input. Normalize only those reviewed tag forms
+for `cascina-municipal` with one versioned policy shared by preflight and manifests.
+Preserve original bytes, operative text, dates, links and required attachments.
+Incomplete inputs remain distinct; source opt-in and compatible validated results
+are still required for reuse. Test warm reuse without a provider call.
+
+Preserve private database/image/configuration rollback evidence before development
+activation. Apply the source revision after preview, verify fresh complete checks
+and corrected tracker dates, and add Cascina to the existing preflight/OCR/result
+reuse lists. Retire only the explicitly reviewed stale unattempted COC jobs and
+versions through a guarded audited operation, keeping originals and histories.
+Provider holds, local fallback scope, acceptance and production remain separate.
+
 See [proposal.md](proposal.md) for scope and motivation. The workspace contains a substantial implementation and tests alongside the research and planning artifacts. This revision captures the agreed target behavior and deployment design; completed code tasks do not by themselves certify live source acceptance or operational readiness.
 
 Research context (the detailed investigation records are retained separately):
@@ -201,3 +227,19 @@ The evaluated local fallback covers text classification, extraction and linking,
 The evaluated local policy uses greedy decoding (temperature 0, seed 42) with thinking disabled, recorded in immutable stage settings and configuration identities. Local classification additionally records its reason-code mapping prompt. Source selection requires the evaluated classification/extraction output contracts. Vision is separately opt-in: a passing synthetic OCR test and enabled image input are prerequisites. Equivalent-copy materialization first tries a compatible primary cache, then an eligible local cache on a specific reuse miss, with both transports prohibited regardless of gate state. Semantic embeddings retain their own provider and can still delay linking.
 
 Local classification tolerates typographic double-quote presentation through a separately versioned contiguous matcher that returns the original source substring and preserves Unicode byte offsets. Remote and legacy parsing remain unchanged; invented words and disjoint quotations remain rejected. Local extraction records a concise prompt with explicit civil-protection opening rules, validated on long notices as well as isolated operative sentences. Catalog names/revisions isolate concurrent remote and local configurations, including distinct text/image model capabilities; immutable earlier local versions remain auditable.
+
+## Territorial source knowledge guides
+
+Maintain a human-readable knowledge base under `docs/territori/`, with region directories keyed by two-digit codes and municipality files keyed by six-digit ISTAT identity. Create files when research begins. Each guide puts current source maps, operational rules and open problems before its dated discovery register. A shared template records stable finding IDs, scope, evidence dates, knowledge status and intervention status independently. Subsequent entries reference superseded findings without deleting them.
+
+Keep shared platform notes under `docs/fonti/piattaforme/` and link them from the municipality that supplied the evidence. Platform observations do not transfer permissions or collection exceptions to other territories. Seed Toscana and its four investigated municipalities with public references, code behavior and explicit verification limits; the Livorno attachment/footer findings describe proposed collector work, not an implemented fix.
+
+The public coverage tracker remains the acceptance/status reference with its existing snapshot preserved. Environment-specific configurations, detailed outcomes and unpublished captures remain under ignored `.local/operations/territori/`; public guides contain only redistributable summaries and links. The local archive requires separate private retention/backup. Contributor guidance requires consulting and updating the relevant guide during source work. Documentation validation checks paths/anchors, territorial identities, finding IDs and evidence boundaries, without launching collection or inference.
+
+## Scoped municipal attachments — 2 October 2026
+
+An optional `attachments` contract belongs to the immutable source revision. `content_class` selects the document content for linked PDF discovery; a missing container fails visibly and footer/navigation links are excluded. Existing configurations preserve their previous discovery, and explicit registered dependencies are not silently removed. Each `external` scope declares an exact HTTPS `origin`, canonical directory `path_prefix`, official `referral` evidence and its own collection/retention `policy`. These permissions cover linked attachments only and do not enable another source or a new channel. Livorno's reviewed case uses its municipal resource host and directory; actual operational settings remain private.
+
+Preview and scheduled collection share document/attachment retention. `DirectHTTP.CrawlBounded` validates the initial URL and each redirect before sending the request, retains the existing prohibition on leaving the file's initial origin, and constrains paths using the source contract. Opt-in `validate_pdf` checks response type, PDF framing and the Poppler parser already shipped in the application image. HTML error pages and truncated/unreadable PDFs become visible missing references; persistence remains content-addressed and verified by the document store. Scanned PDFs do not require extractable text for acquisition. Missing-resource reasons and publication metadata participate in acquisition identities to keep diagnostic changes replayable and prevent collisions between previews and later dated collection. Invalid PDFs use the existing unavailable-reference vocabulary and the distinct scheduled error `invalid_attachment_pdf`, avoiding a storage-schema change.
+
+Use a reviewed candidate revision and successful preview before changing active collection. Preserve original evidence and prior revision/image for rollback, then verify a fresh normal worker check and stored attachment bytes. Existing backoff, source retry instructions, provider controls and public-enablement gates remain separate. A development recovery does not establish acceptance or future remote availability.

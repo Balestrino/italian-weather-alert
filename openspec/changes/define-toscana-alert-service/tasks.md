@@ -149,3 +149,52 @@ The [environment hardening change](../harden-environment-operations/tasks.md) an
 - [x] 14.5 Document local model setup, runtime configuration, rollback and the explicit OCR/embedding capability boundaries without claiming acceptance of untested stages.
 
 The local fallback was verified with repository checks, isolated PostgreSQL tests, real local Qwen text/image tests and a bounded development canary. Reviewed local quote presentation and civil-protection extraction corrections retain strict contiguous evidence and independent immutable versions. Development acquisition completed a fresh municipal check, OCR and representative text interpretation succeeded, and ordinary processing resumed with the credential-wide remote hold preserved. Semantic embedding work remains separately blocked by remote entitlement; task 13.8, source acceptance and production readiness remain open. Private captures, deployment settings, dumps and call ledgers are excluded from the public repository. See [local fallback operations](../../../docs/operations/local-llm-fallback.md).
+
+## 15. Territorial source knowledge guides — 2 October 2026
+
+- [x] 15.1 Add indexed regional/municipal Markdown guides, a shared template and scoped platform notes, with current guidance, open problems and dated discoveries that distinguish knowledge from intervention status.
+- [x] 15.2 Seed Toscana, Calcinaia, Cascina, Livorno, Pisa and Municipium with publicly supportable findings and explicit verification limits; retain environment-specific observations privately and preserve the coverage tracker's dated status assessments.
+- [x] 15.3 Link guides from the main README, documentation index and coverage tracker, add contributor upkeep instructions and align proposal/design/specification; verify local links and anchors, ISTAT identities, discovery IDs, checklist counts, private-evidence exclusion and whitespace without activating sources or changing acquisition behavior.
+
+Documentation verification checked local paths/anchors, five territorial identities against the adopted ISTAT register, nine unique discovery IDs and required discovery fields, unchanged coverage identity/status columns and private archive exclusion/permissions. The new requirement and its three scenarios were checked structurally; the OpenSpec CLI was unavailable, so no CLI validation is claimed. These checks do not resolve source acquisition problems or establish acceptance. See the [territorial guide index](../../../docs/territori/README.md).
+
+## 16. Municipal acquisition recheck — 2 October 2026
+
+- [x] 16.1 Inspect development territorial/source gates, retain the baseline privately and run a fresh normal collector check for each active municipal source without enabling inactive sources or changing publication.
+- [x] 16.2 Compare fresh check receipts with checked targets, retained version completeness and original objects; retain precise outcomes and missing-resource diagnostics in the private territorial archive, separating discovery from acquisition and acquisition from interpretation.
+- [x] 16.3 Update municipal guides and the dated discovery register, add the missing Pontedera guide, scope Municipium findings to the observed Cascina/Livorno pages and verify links, discovery fields, private evidence exclusion and changelog.
+- [x] 16.4 Review Livorno's official attachment referral, legal notices, HTML link context and current collector boundaries; probe the exact ordinance URL, preserve its unsuccessful HTTP response privately and document a proposed source-scoped external-resource boundary without claiming activation or successful acquisition.
+- [x] 16.5 Re-evaluate the Livorno access probe with an ordinary browser click and the checkout's `DirectHTTP` on the node and development Crawl4AI network; validate the downloaded PDF, preserve evidence privately and revise the earlier access conclusion without claiming collector integration or future availability.
+
+These tasks record a completed diagnostic recheck, including unresolved acquisition failures. They do not certify that every enabled municipality collects successfully, resolve the attachment-selection/access problems, verify semantic interpretation, complete trial/acceptance or change the coverage snapshot. Public findings are in [Cascina](../../../docs/territori/09-toscana/comuni/050008-cascina.md), [Livorno](../../../docs/territori/09-toscana/comuni/049009-livorno.md) and the [territorial index](../../../docs/territori/README.md); detailed operational outcomes remain private.
+
+## 17. Scoped Livorno external attachments — 2 October 2026
+
+- [x] 17.1 Add revision-scoped attachment discovery and reviewed external-resource permissions with exact HTTPS origin/path boundaries, preserving legacy defaults and explicit dependencies.
+- [x] 17.2 Enforce resource and redirect bounds, validate configured PDFs, preserve missing-reference failures and apply the same checks to preview and scheduled acquisition before verified retention.
+- [x] 17.3 Verify allowed/forbidden resource boundaries, footer exclusion, missing containers, invalid PDFs, preview parity and unchanged legacy behavior with redistributable fixtures and the application PDF parser.
+- [x] 17.4 Apply the scoped Livorno revision on development after a successful preview, preserve rollback/evidence and verify a fresh complete worker check plus retained attachments without changing other source configurations or public activation.
+- [x] 17.5 Update current territorial/platform guidance, dated discovery history and operational verification references; keep captures/configurations private and record the change in the changelog.
+
+Repository tests, scoped vet checks, the real PDF parser in the application image and an isolated PostgreSQL failure/recovery test passed. A scoped development revision was activated after a successful preview; a fresh ordinary worker receipt and retained PDF reads verified the configured acquisition, with other source states and municipal activation flags preserved. Detailed receipts, settings, hashes, captures and rollback snapshots remain private. These checks do not certify future availability, interpretation, source acceptance, complete municipal coverage or production readiness. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).
+
+## 18. Cascina dates, attachments and interpretation reuse — 2 October 2026
+
+- [x] 18.1 Verify the one-digit official date, document container and paired retained HTML; preserve private development rollback evidence and confirm exact CSRF-only differences before defining normalization.
+- [x] 18.2 Add a Cascina-only versioned HTML policy shared by preflight and interpretation manifests; test CSRF equivalence, source boundaries, operative text/date/link changes and incomplete resources, retaining raw evidence.
+- [x] 18.3 Validate one/two-digit listing dates and the page-content attachment boundary with synthetic fixtures; verify persistent date-based planning and zero-call warm interpretation reuse on disposable PostgreSQL.
+- [x] 18.4 Review official referral/reuse for Cascina-only API PDFs and apply the development revision after preview, enable existing reuse switches, verify fresh complete collection and corrected tracker dates, and retire only reviewed stale unattempted COC work while preserving originals, provider holds and fallback scope.
+- [x] 18.5 Update territorial/platform guidance and dated discoveries, document operational verification/rollback, run relevant checks and record the change without claiming source acceptance or production deployment.
+
+Repository tests, scoped vet and isolated PostgreSQL date/preflight/attachment
+checks passed, including Cascina result reuse without a second model call. The
+source revision passed preview and two ordinary development checks; stored dates
+and parser reads verified the configured acquisition. The second check retained
+unchanged versions, while the isolated test verified CSRF equivalence and warm
+validated reuse. Only reviewed stale unattempted COC work was archived; originals
+remain available. Admin and worker use the correction image; HTTP/runtime
+boundary smoke passed. Full release image alignment remains partial because
+public and backup retain earlier images. Provider quota hold, fallback scope,
+source acceptance and production readiness remain separate. The OpenSpec CLI
+was unavailable; no CLI validation is claimed. Detailed evidence and rollback
+are private. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).

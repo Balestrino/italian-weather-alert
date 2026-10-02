@@ -17,7 +17,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from environment_config import (APPLICATIONS, CORE, Environment, EnvironmentError,
                                 inspect_boundaries, verify_staging_release)
-from deployment_checks import check_runtime, templates
+from deployment_checks import check_runtime, templates, validate_background_selection
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('smoke_compose', ROOT / 'scripts/smoke-compose.py')
@@ -232,6 +232,12 @@ class RuntimeTests(unittest.TestCase):
             with self.assertRaises(EnvironmentError):
                 inspect_boundaries(self.environment, config, containers)
 
+    def test_inactive_optional_workers_do_not_require_keys(self):
+        for role in ('worker', 'backup'):
+            self.config['services'][role] = {'secrets': [{'source': 'unused-key'}]}
+            self.containers.append({'Config': {'Labels': {'com.docker.compose.project': 'iwa-staging', 'com.docker.compose.service': role}}, 'State': {'Running': False}})
+        self.assertEqual(inspect_boundaries(self.environment, self.config, self.containers), set(CORE))
+
     def test_smoke_default_is_read_only_and_unused_provider_key_is_optional(self):
         self.environment.config = lambda **kwargs: self.config
         self.environment.containers = lambda: self.containers
@@ -282,6 +288,30 @@ class RuntimeTests(unittest.TestCase):
             candidate['Config']['Labels']['org.opencontainers.image.revision'] = 'old'
             with self.assertRaises(EnvironmentError):
                 verify_staging_release('ghcr.io/example/iwa:revision', 'revision')
+
+
+class BackgroundSelectionTests(unittest.TestCase):
+    def test_resolved_profiles_and_explicit_targets(self):
+        if shutil.which('docker') is None:
+            self.skipTest('Docker Compose is needed for template parsing')
+        for name in ('development', 'staging', 'production'):
+            environment = Environment(name, example=True)
+            config = environment.config(all_services=True)
+            validate_background_selection(environment, config)
+            for service in ('worker', 'backup'):
+                options = ('--profile', 'production') if name == 'production' else ()
+                selected = json.loads(environment.capture(*options, 'config', '--format', 'json', service))['services']
+                self.assertIn(service, selected)
+                self.assertNotIn('backup' if service == 'worker' else 'worker', selected)
+            for service in ('worker', 'backup'):
+                broken = copy.deepcopy(config)
+                broken['services'][service].pop('profiles')
+                with self.assertRaisesRegex(EnvironmentError, name + ' ' + service):
+                    validate_background_selection(environment, broken)
+            if name == 'production':
+                config['services']['worker']['profiles'].append('processing-worker')
+                with self.assertRaisesRegex(EnvironmentError, 'production worker'):
+                    validate_background_selection(environment, config)
 
 
 if __name__ == '__main__':

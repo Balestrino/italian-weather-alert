@@ -77,8 +77,32 @@ Generated transport-only Drupal Views DOM identifiers in HTML comments or class 
 - **WHEN** separate retained versions contain the same substantive HTML evidence under a reviewed interpretation policy
 - **THEN** contiguous preflight grouping and classification reuse avoid duplicate provider calls while retaining each version's provenance
 
+#### Scenario: A reviewed Cascina page changes only its CSRF values
+- **WHEN** complete consecutive retained Cascina inputs differ only in the exact reviewed CSRF meta and hidden-input values under the same processing policy
+- **THEN** source-scoped preflight and validated result reuse avoid new provider calls while retaining originals; changed dates, text, links, attachments or incomplete evidence remain distinct
+
+#### Scenario: A municipal listing uses a single-digit day
+- **WHEN** a source publishes `8 ottobre 2024` with the evaluated `2 Jan 2006` layout and Italian month normalization
+- **THEN** discovery persists the official date and excludes old targets from the recent window except for existing explicit-reference or ongoing/unresolved-measure exceptions
+
 ### Requirement: Necessary attachments and ordinances
 The service SHALL acquire linked attachments and ordinances when needed to establish a measure, territory or validity. If an attachment cannot be accessed or interpreted, it SHALL expose the available official document or link and identify the fields that cannot be determined. It SHALL NOT substitute bulletin validity or page expiry for a duration specified only in the ordinance.
+
+An operator MAY configure municipal attachment discovery within an explicitly named document-content class. A missing configured content container SHALL fail the check visibly rather than silently omit attachments; generic links outside that container and navigation/footer links SHALL NOT become required attachments. Explicitly registered dependencies SHALL remain required according to their declarations. Configurations without this option SHALL retain their existing discovery behavior.
+
+External attachments MAY be acquired under an explicit scope in the source revision carrying exact HTTPS origin, canonical directory prefix, official referral and separate collection/retention policy evidence. The scope SHALL NOT authorize broader channel discovery or other sources. Initial resource URLs and every redirect SHALL remain within the permitted resource scope and the resource's initial origin; unconfigured external resources SHALL retain visible forbidden references without download. An enabled PDF-validation option SHALL reject non-PDF, truncated or structurally unreadable responses rather than retain them as valid attachments. Preview and programmed collection SHALL apply the same configured attachment discovery, permission and validation checks. A successful programmed check SHALL follow verified object persistence; failures SHALL preserve originals and missing references, existing bounded backoff and source retry instructions, without asserting future availability.
+
+#### Scenario: An authorized external ordinance and a generic footer PDF
+- **WHEN** a municipal revision selects its document-content container and declares a reviewed external attachment scope
+- **THEN** the necessary linked ordinance is downloaded and validated within that scope while the generic footer PDF is excluded; the declaration does not grant another source the same access
+
+#### Scenario: An external download leaves its declared scope
+- **WHEN** the linked URL or a redirect leaves the exact authorized origin or directory prefix
+- **THEN** the collector refuses that request, preserves an explicit missing-resource failure and keeps the check incomplete
+
+#### Scenario: A purported PDF contains an error page or is truncated
+- **WHEN** PDF validation is configured and an attachment response is HTML or a structurally invalid PDF
+- **THEN** both preview and scheduled collection fail visibly, preserve the parent original and mark the attachment invalid without claiming a complete acquisition
 
 #### Scenario: A notice refers to an unreadable ordinance for duration
 - **WHEN** the notice announces closures but their duration is only in an unreadable attachment
@@ -131,6 +155,28 @@ The internal monitoring system SHALL retain diagnostic evidence for availability
 #### Scenario: A parser improvement is assessed
 - **WHEN** a revised interpretation process is evaluated against a retained ambiguous case
 - **THEN** the internal result records whether the issue is resolved without a manual edit of the public notice
+
+### Requirement: Territorial source knowledge guides
+The repository SHALL maintain a Markdown guide for each investigated region and municipality, indexed under `docs/territori/` and identified by region code and municipal ISTAT code where applicable. Guides SHALL contain identity and scope, source maps, current operational guidance, scoped rules and exceptions, open problems and a dated discovery register. Each discovery SHALL carry a stable identifier, source/product scope, observation and evidence, knowledge status, intervention status, last verification and a next check or closure criterion. Hypotheses, confirmed observations and superseded conclusions SHALL remain distinguishable from proposed, applied and verified interventions. Subsequent discoveries SHALL preserve and reference earlier entries while updating the current guidance. Shared platform characteristics SHALL be referenced separately and SHALL NOT establish permissions or exceptions for other territories.
+
+Public guides SHALL contain only redistributable summaries and references. Unpublished operational evidence, credentials, captures and machine-specific settings SHALL NOT enter repository changes; private observations SHALL remain in the ignored operational archive with scoped evidence references. Guides SHALL link the coverage tracker without changing its dated acceptance assessments or activating collection/publication. Contributors SHALL consult and update relevant guides during source investigations and changes. New guides SHALL be created when research begins rather than implying investigated coverage for every registered territory.
+
+#### Scenario: An external attachment and a footer PDF are discovered
+- **WHEN** a municipal page links an ordinance on an external platform and an unrelated PDF in its footer
+- **THEN** its guide records the observed links and current collector behavior separately from proposed corrections, links scoped platform notes and identifies the evidence needed to close each problem without granting cross-domain collection
+
+#### Scenario: A later discovery contradicts current guidance
+- **WHEN** a source change or new evidence invalidates a documented rule
+- **THEN** a new dated entry references the original discovery, preserves its history and revises current guidance and open problems without treating the old conclusion as current
+
+#### Scenario: Only private operational evidence establishes a failure
+- **WHEN** source diagnosis depends on logs or retained responses not cleared for redistribution
+- **THEN** details remain in the private archive, public guidance identifies its verification limits and neither guide nor successful document validation establishes source acceptance or public availability
+
+#### Scenario: An operator rechecks enabled municipal acquisition
+- **WHEN** the operator requests a new acquisition check for enabled municipalities
+- **THEN** verification distinguishes territorial enablement from source collection, checks fresh programmed outcomes and retained originals for active sources, and records inactive sources separately without activating them
+- **AND** scoped findings update the territorial guides while environment-specific configurations, check receipts and captures remain private; a successful check does not establish interpretation correctness or municipality-wide coverage
 
 ### Requirement: Operator-configured source lifecycle
 Operators SHALL manage sources and sections through internal administration with persisted configuration history. A new source SHALL begin in draft, support an acquisition preview, and require explicit collection activation after that preview. New collection SHALL initially be internal; public enablement SHALL require separate operator action after source acceptance. Routine publication after enablement SHALL be automatic without individual-notice approval. Autonomous discovery of new source channels SHALL NOT be required.

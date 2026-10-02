@@ -101,8 +101,16 @@ func TestTerritorialMunicipalityReaders(t *testing.T) {
 		t.Fatal(overview, err)
 	}
 	for _, r := range overview.Regions {
-		if r.Code == "09" && (r.Municipalities == nil || *r.Municipalities != 125 || r.Sources == nil || *r.Sources != 1) {
+		if r.Code == "09" && (r.Municipalities == nil || *r.Municipalities != 125 || r.EnabledMunicipalities == nil || *r.EnabledMunicipalities != 0 || r.Sources == nil || *r.Sources != 1) {
 			t.Fatal(r)
+		}
+		if r.Code == "01" && (r.Municipalities != nil || r.EnabledMunicipalities != nil) {
+			t.Fatal("unadopted register counted as zero", r)
+		}
+	}
+	for _, member := range []struct{ region, istat string }{{"09", "909000"}, {"09", "909124"}, {"03", "903000"}} {
+		if _, err := domain.New(p).SetMunicipalityEnabled(ctx, member.region, member.istat, 0, true, "test"); err != nil {
+			t.Fatal(err)
 		}
 	}
 	// The query count is independent of the requested page size.
@@ -134,8 +142,30 @@ func TestTerritorialMunicipalityReaders(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, r := range overview.Regions {
-		if r.Code == "09" && (r.Municipalities == nil || *r.Municipalities != 125 || r.Sources != nil) {
+		if r.Code == "09" && (r.Municipalities == nil || *r.Municipalities != 125 || r.EnabledMunicipalities == nil || *r.EnabledMunicipalities != 2 || r.Sources != nil) {
 			t.Fatal("partial failure hidden", r)
+		}
+		if r.Code == "03" && (r.Enabled || r.EnabledMunicipalities == nil || *r.EnabledMunicipalities != 1) {
+			t.Fatal("saved municipality flag lost in disabled region", r)
+		}
+	}
+	// Retired municipalities keep their saved flag but must not contribute to current counts.
+	body := "istat,comune,codice_regione,sigla\n909000,Comune 000,09,PR\n"
+	meta := domain.MunicipalityImport{Region: "09", OfficialURL: "https://example.test/official", Version: "replacement", VerifiedAt: time.Now(), ExpectedCount: 1, Complete: true, CompletenessEvidence: "Complete synthetic replacement"}
+	preview, err := domain.PreviewMunicipalities([]byte(body), meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = domain.New(p).AdoptMunicipalities(ctx, []byte(body), meta, preview.SHA256, 1, "test"); err != nil {
+		t.Fatal(err)
+	}
+	overview, err = s.TerritorialOverview(ctx, time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, r := range overview.Regions {
+		if r.Code == "09" && (r.Municipalities == nil || *r.Municipalities != 1 || r.EnabledMunicipalities == nil || *r.EnabledMunicipalities != 1) {
+			t.Fatal("retired municipality counted", r)
 		}
 	}
 }

@@ -46,6 +46,8 @@ The first source rollout is in **Tuscany**. The internal pilot covers the three 
 
 The [national coverage tracker](docs/coverage.md) lists all 20 regions and their municipalities, with ISTAT codes and CAPs. It is a planning and verification inventory, not a live alert map. Tuscany is the first source pilot; the tracker records the status of its regional and municipal channels.
 
+The [territorial source guides](docs/territori/README.md) collect current guidance, scoped rules and exceptions, open problems, and dated discoveries for investigated regions and municipalities. Contributors use the [shared template](docs/territori/MODELLO.md) to create new guides and update them during source work. Shared platform notes are linked from the relevant guides; private operational evidence is kept separately.
+
 ## For citizens
 
 When public access opens, you will be able to connect an MCP-compatible assistant to IWA and ask, for example:
@@ -86,11 +88,12 @@ The code and the information it produces are provided on a best-effort, **“as 
 ## Documentation and reuse
 
 - [Documentation index](docs/README.md) and [national coverage tracker](docs/coverage.md)
+- [Regional and municipal source guides](docs/territori/README.md) and [discovery template](docs/territori/MODELLO.md)
 - [OpenSpec plans and progress](openspec/README.md)
 - [Agent workflows and optional tools](docs/development/agent-tools.md)
 - [Developer setup](docs/development/setup.md), [public API/MCP examples](docs/backend/public-usage.md), and [API/MCP contract](docs/backend/public-api-mcp.md)
 - [Development, staging and production](docs/operations/environments.md) and [release operations](docs/operations/releases.md)
-- [Changelog](CHANGELOG.md) and [v0.1.0 release notes](docs/releases/v0.1.0.md)
+- [Changelog](CHANGELOG.md) and [v0.1.2 release notes](docs/releases/v0.1.2.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 Original IWA code is licensed under [GPL-3.0-only](LICENSE). Selected third-party data and retained source files have separate terms recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The public repository contains only reviewed source snapshots; the broader internal research evidence is kept separately.

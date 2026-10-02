@@ -1,6 +1,7 @@
 package classification
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"strings"
@@ -9,6 +10,51 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
 )
+
+func TestCascinaCSRFPolicyAndManifest(t *testing.T) {
+	const source = "cascina-municipal"
+	const url = "https://municipal.example/it/news/42/avviso"
+	one := `<meta name="csrf-token" content="` + strings.Repeat("a", 40) + `"><main><a href="/ordinanza">Chiusura 8 ottobre, ore 18:00</a></main><form id="ricerca"><input type="hidden" name="_token" value="` + strings.Repeat("a", 40) + `"></form>`
+	two := strings.ReplaceAll(one, strings.Repeat("a", 40), strings.Repeat("b", 40))
+	build := func(html, namedSource string, complete bool) InputManifest {
+		t.Helper()
+		body := []byte(html)
+		docs := &fakeDocuments{bodies: map[string][]byte{url: body}}
+		v := documents.Version{ID: 1, DocumentID: 1, Metadata: json.RawMessage(`{}`), Complete: complete, Resources: []documents.Reference{{URL: url, SourceID: namedSource, Role: "original", Required: true, MediaType: "text/html", Hash: manifestHash(body)}}}
+		content, err := GatherContent(context.Background(), docs, fakeOCR{}, v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		m, err := BuildManifest(context.Background(), docs, fakeOCR{}, v, content, "cfg")
+		if err != nil {
+			t.Fatal(err)
+		}
+		return m
+	}
+	a, b := build(one, source, true), build(two, source, true)
+	if a.Hash != b.Hash || !a.Reusable || !strings.HasSuffix(a.Resources[0].Policy, ":"+CascinaHTMLPolicy) {
+		t.Fatal("CSRF-only change not reusable under the versioned policy")
+	}
+	if bytes.Equal([]byte(one), CanonicalHTML(source, []byte(one))) {
+		t.Fatal("fixture not normalized")
+	}
+	for _, s := range []string{"unknown", "livorno-municipal", "calcinaia-municipal"} {
+		if build(one, s, true).Hash == build(two, s, true).Hash {
+			t.Fatalf("normalization escaped Cascina: %s", s)
+		}
+	}
+	for _, changed := range []string{strings.Replace(two, "18:00", "19:00", 1), strings.Replace(two, "8 ottobre", "9 ottobre", 1), strings.Replace(two, "Chiusura", "Revoca", 1), strings.Replace(two, "/ordinanza", "/revoca", 1), strings.Replace(two, `type="hidden"`, `type="text"`, 1)} {
+		if build(changed, source, true).Hash == a.Hash {
+			t.Fatal("meaningful change normalized away")
+		}
+	}
+	if m := build(two, source, false); m.Reusable || m.Hash == a.Hash {
+		t.Fatal("incomplete content reused")
+	}
+	if !bytes.Equal(CanonicalHTML(source, []byte(one)), CanonicalHTML(source, CanonicalHTML(source, []byte(one)))) {
+		t.Fatal("normalization not idempotent")
+	}
+}
 
 func TestManifestInvalidatesMeaningfulChangesAndIncompleteGraphics(t *testing.T) {
 	ctx := context.Background()

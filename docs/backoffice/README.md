@@ -7,7 +7,11 @@ backend.
 
 The default local address is `http://127.0.0.1:8081/admin/`. The interface starts
 with regions and municipalities; Operazioni and Sistema provide cross-territory
-tools. Existing URLs and JSON/form clients remain compatible. Core navigation,
+tools. The regional table places enabled regions first, then sorts each group by
+enabled municipalities in the current register (descending), with alphabetical
+ties. It shows enabled/total municipality counts; saved municipality flags remain
+visible when a region is disabled, and unavailable counts sort after known ones.
+Existing URLs and JSON/form clients remain compatible. Core navigation,
 filters and actions work without JavaScript.
 
 Use the [developer setup](../development/setup.md) for initialization and the

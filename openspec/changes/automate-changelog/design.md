@@ -12,6 +12,12 @@ The initial changelog records the current fix and this mechanism. Entries descri
 
 Software releases move the existing dated bullets into a version/date section and retain exactly one empty Unreleased section for the next changes. Release preparation adds its own dated bullet, so reorganizing history still satisfies per-commit enforcement. The recorder continues to write only under Unreleased; versioned sections are preserved. Reviewed pilot notes are committed with the release preparation. Promotion retains history through a `dev` to `main` merge; tag and GitHub publication target the merged revision after its workflows pass. Container publication and production approval remain separate operational work.
 
+The 0.1.2 preparation groups the municipal corrections after the earlier 0.1.1
+preparation, keeping its dated history and notes unchanged. OpenAPI and MCP
+metadata identify 0.1.2; release notes describe the source-specific opt-in,
+upgrade requirements and pilot limits. Promotion can include multiple prepared
+versions since the last published baseline without claiming that each was tagged.
+
 ## Validation
 
 Use temporary synthetic Git repositories to verify automatic insertion, idempotence, blocked unstaged changelog edits, and CI detection of a bypassed hook. Run the repository's Go and static checks after integration.

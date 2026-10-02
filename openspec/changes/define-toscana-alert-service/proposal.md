@@ -4,6 +4,10 @@ Official Toscana warnings and municipal measures are distributed across regional
 
 ## What Changes
 
+- Correct the reviewed Cascina date layout and footer attachment selection with separately reviewed Cascina API PDFs, and add source-scoped interpretation normalization for proven CSRF-only HTML changes; verify bounded development collection and retire only the reviewed stale pending COC versions without replaying history or reopening provider holds.
+- Support reviewed external municipal attachments through revision-scoped origins and paths, optional document-content filtering and PDF validation, with matching preview/collector checks; verify the Livorno development scope separately from public acceptance.
+
+- Maintain indexed territorial source guides with current operational knowledge, dated discoveries, scoped platform notes and separate private evidence; keep source acceptance and runtime activation independent of documentation.
 - Cover Toscana's seven categories: minor-network hydrogeological/hydraulic risk, main-network hydraulic risk, strong thunderstorms, wind, coastal waves, snow and ice. Include regional vigilance, criticality/alert and monitoring as distinct products.
 - Provide regional applicability by municipality and versioned official alert-zone mappings, including municipalities spanning multiple zones.
 - Deliver the first operational MVP for Toscana regional products and Calcinaia local communications. For Calcinaia, use the municipal website as the primary publication source, Cittadino Informato as a secondary discovery/coverage diagnostic and the albo only to retrieve acts referenced by municipal notices; secondary-channel gaps do not become primary-source facts or completeness claims. Retain Livorno, Pisa, Pontedera and Cascina as subsequent local rollout targets. Use operator-configured sources and sections; external channels require scoped official referrals. Recognized provenance does not substitute for technical source acceptance.

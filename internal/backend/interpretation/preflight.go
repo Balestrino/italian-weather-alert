@@ -112,9 +112,9 @@ func (p *Preflight) Build(ctx context.Context, v documents.Version) (PreflightMa
 					item.Pages = append(item.Pages, preflightHash(page.Bytes))
 				}
 			default:
-				if (item.Media == "text/html" || item.Media == "application/xhtml+xml") && m.Source == "calcinaia-municipal" {
+				if (item.Media == "text/html" || item.Media == "application/xhtml+xml") && classification.HTMLPolicy(m.Source) != "" {
 					body = classification.CanonicalHTML(m.Source, body)
-					item.Policy += ":" + classification.MunicipalHTMLPolicy
+					item.Policy += ":" + classification.HTMLPolicy(m.Source)
 				}
 				item.Identity = preflightHash(body)
 			}
