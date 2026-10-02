@@ -276,3 +276,28 @@ requested trial; no new image, schema, source policy or acceptance status was
 introduced. Slot occupancy establishes concurrency, not a throughput improvement.
 Private settings, database archive, samples and receipts remain ignored. See
 [local fallback operations](../../../docs/operations/local-llm-fallback.md).
+
+- [x] 22.4 Activate two additional development worker replicas on operator request; verify four running workers with matching image/settings and preserved existing identities, record the current server slot count and document return to two replicas.
+
+The subsequent operator request brought development to four running replicas
+with matching images/settings and preserved first/second worker identities.
+The server then reported one slot; this verifies worker activation rather than
+four simultaneous model executions. Pre-claim database deadlocks later exhausted
+recovery and restarted workers, requiring the fix below. The HTTP/runtime-boundary smoke passed;
+private runtime evidence is retained and return to two replicas is documented.
+
+- [x] 22.5 Serialize pre-claim inference queue maintenance across replicas with a transaction advisory lock released before job/model execution; verify four competing callbacks, callback failure and cancelled-waiter release on disposable PostgreSQL with race checks, command checks and vet.
+- [x] 22.6 Deploy the corrected image to all four development replicas; verify parallel calls, stored results, provider holds, HTTP smoke and no further pre-claim deadlocks/restarts during the observation window, preserving private logs, database archive and rollback settings.
+
+The corrected image passed focused processing integration/race checks, command
+and processing tests, vet and the application image build. All four development
+workers were recreated with that image and preserved inference settings. Over
+an eighty-second slot observation, four slots were active in 34 of 41 samples;
+receipts confirmed HTTP 200 responses with matching model provenance. Twenty-nine
+validated classifications were stored across all four workers. Two quotation
+validation failures remained rejected by the existing strict parser. No new
+pre-claim deadlocks or worker restarts occurred after the fix during observation,
+and the HTTP/runtime-boundary smoke passed. Provider holds remained separate.
+This trial establishes concurrent processing, not semantic source acceptance or
+long-term capacity; detailed logs, receipts, settings and rollback archive remain
+private. The repository default remains one replica.

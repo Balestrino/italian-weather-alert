@@ -139,6 +139,29 @@ details. Existing admin/configured-image divergence still prevents a full releas
 image-alignment claim, and this observation does not establish a speedup or source
 acceptance.
 
+The operator subsequently requested two additional replicas, bringing the active
+development worker count to four with the same image and settings. The two
+existing replicas were preserved. At this expansion the server reported one slot;
+four worker processes do not establish four simultaneous model executions, and
+requests may wait on the server. Use `--scale worker=4` on worker `up` commands to
+retain this selection, or `--scale worker=2` to return to the previous trial count.
+The scale-down recovery behavior above also applies to that reduction. Continued
+observation exposed pre-claim database deadlocks that exhausted recovery and
+restarted workers. The corrected worker image serializes bulk queue maintenance
+with a database advisory lock, released before claiming jobs or calling models.
+All replicas must run this fix; older images do not participate in the lock.
+Rollback to an earlier image requires first reducing concurrency to a previously
+verified count. The server later reported four slots; server capacity should be
+checked again during each trial rather than inferred from the worker count.
+
+After rollout of the tested correction to all four workers, four server slots
+were active in 34 of 41 samples over eighty seconds. HTTP 200 receipts and stored
+validated classifications from all four workers confirmed actual processing.
+Two quotation validation failures remained rejected. No further pre-claim
+deadlocks or worker restarts occurred in the observation window, and the HTTP
+smoke passed. Four corrected replicas remain active; long-term capacity and
+semantic source acceptance require separate observation.
+
 ## Deploy and roll back
 
 Run the ordinary Go checks and the processing integration tests on disposable

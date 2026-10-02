@@ -242,6 +242,24 @@ receipts, validated results and worker stability; slot occupancy alone does not
 establish a throughput improvement. Keep operational evidence private, leave the
 repository default at one replica and document explicit scale-down recovery.
 
+The subsequent operator request expands development to four replicas using the
+same image/settings without recreating the first two. Check current server slots
+again: worker count and simultaneous server executions are independent. When the
+server exposes fewer slots, requests may queue there. Record this capacity limit
+and the explicit return to two workers alongside runtime verification.
+
+Four-worker observation reproduced deadlocks in the pre-claim bulk queue updates,
+exhausting worker recovery and causing process restarts. Wrap the complete
+recovery/equivalence/provider-hold maintenance callback in a PostgreSQL
+transaction advisory lock (`730072`). The transaction reserves one pool
+connection; callback queries use the remaining pool connections. Hold the lock
+only for queue maintenance and release it before claims or provider calls.
+Commit on success; bounded independent-context rollback releases ownership after
+errors or cancellation. Integration checks exercise four competing callbacks,
+parallel work after maintenance and lock release after failure/cancelled waiting.
+Deploy the corrected image to all four replicas so they share the lock protocol;
+an older worker does not coordinate on this lock.
+
 ## Territorial source knowledge guides
 
 Maintain a human-readable knowledge base under `docs/territori/`, with region directories keyed by two-digit codes and municipality files keyed by six-digit ISTAT identity. Create files when research begins. Each guide puts current source maps, operational rules and open problems before its dated discovery register. A shared template records stable finding IDs, scope, evidence dates, knowledge status and intervention status independently. Subsequent entries reference superseded findings without deleting them.

@@ -721,19 +721,21 @@ func run() bool {
 		inferenceWorker := &jobs.Worker{Store: queue, Queue: inference.Queue, ID: "inference-" + workerID, Lease: 20 * time.Minute, PollInterval: 500 * time.Millisecond, Handlers: handlers}
 		var nextEquivalentRelease time.Time
 		inferenceWorker.BeforeClaim = func(c context.Context, at time.Time) error {
-			if err := gateStore.DeferRecoveryJobs(c, at); err != nil {
-				return err
-			}
-			if !at.Before(nextEquivalentRelease) {
-				if err := interpretationScheduler.ReleaseEquivalent(c, at); err != nil {
+			return gateStore.MaintainQueue(c, func(c context.Context) error {
+				if err := gateStore.DeferRecoveryJobs(c, at); err != nil {
 					return err
 				}
-				nextEquivalentRelease = at.Add(30 * time.Second)
-			}
-			if err := interpretationScheduler.DeferEquivalent(c, at); err != nil {
-				return err
-			}
-			return gateStore.DeferHeldJobs(c, gateBindings, at)
+				if !at.Before(nextEquivalentRelease) {
+					if err := interpretationScheduler.ReleaseEquivalent(c, at); err != nil {
+						return err
+					}
+					nextEquivalentRelease = at.Add(30 * time.Second)
+				}
+				if err := interpretationScheduler.DeferEquivalent(c, at); err != nil {
+					return err
+				}
+				return gateStore.DeferHeldJobs(c, gateBindings, at)
+			})
 		}
 		checkEngine := &acquisition.Engine{Registry: registry.New(pool), Retained: retained, Crawler: &acquisition.Crawl4AI{BaseURL: c.CrawlURL, Token: c.CrawlToken, Client: &http.Client{Timeout: 90 * time.Second}}, Resources: &acquisition.DirectHTTP{Client: &http.Client{Timeout: 90 * time.Second}}, Tracking: acquisition.NewTrackingStore(pool)}
 		checkWorker := &acquisition.CheckWorker{Store: acquisition.NewScheduleStore(pool), Engine: checkEngine, ID: "acquisition-" + workerID, Lease: 20 * time.Minute, PollInterval: time.Second, Schedule: func(scheduleCtx context.Context, page acquisition.RetainedPage, at time.Time) error {

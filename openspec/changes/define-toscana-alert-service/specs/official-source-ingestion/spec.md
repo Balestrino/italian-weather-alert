@@ -344,6 +344,14 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 - **THEN** distinct admitted inference jobs may make concurrent requests with exclusive durable claims, separate call receipts and unchanged model, retry and source controls
 - **AND** operators verify actual overlapping requests and validated results, preserve rollback evidence and document returning to one replica; scaling also applies to primary-provider jobs and other worker loops, without changing the default replica count or limiting unrelated clients
 
+#### Scenario: Additional workers exceed the local server slot count
+- **WHEN** the operator requests additional development worker replicas and the server exposes fewer slots than the worker count
+- **THEN** replicas retain the same image/settings and exclusive queue claims, existing replicas remain running, and verification distinguishes running workers from concurrent model executions and documents returning to the previous count
+
+#### Scenario: Concurrent workers maintain the inference queue
+- **WHEN** several workers apply recovery, equivalent-copy and provider-hold deferrals before claiming inference jobs
+- **THEN** maintenance is serialized within the database and errors or cancellation release ownership; job claiming and model execution remain parallel after maintenance returns
+
 #### Scenario: A local model has limited capabilities
 - **WHEN** a local model supports text but does not have evaluated vision or compatible embedding support
 - **THEN** only evaluated text stages use that fallback, OCR/embedding keep their own controls and unresolved dependencies remain visible
