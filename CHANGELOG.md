@@ -4,6 +4,10 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+## 0.1.2 - 2026-10-02
+
+- 2026-10-02 [Fixed] Let Docker allocate loopback ports for interpretation integration databases and clean up failed starts, avoiding published-port collisions in Coverage.
+- 2026-10-02 [Changed] Prepare the 0.1.2 municipal corrections patch, align OpenAPI/MCP metadata and release notes, and retain the development-to-main software promotion gates.
 - 2026-10-02 [Fixed] Correct Cascina listing dates and scoped PDF selection, add reviewed CSRF interpretation reuse, verify development collection and retire only stale unattempted COC work while preserving originals and provider controls.
 - 2026-10-02 [Changed] Prioritize enabled regions and current enabled municipality counts in the backoffice regional table; show enabled/total counts and verify synthetic ordering, isolated database reads and the development browser.
 - 2026-10-02 [Changed] Configure tailnet-only HTTPS access to the development status frontend and verify frontend and backoffice access in the integrated browser.

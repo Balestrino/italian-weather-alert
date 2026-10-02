@@ -21,3 +21,11 @@ Validation on 1 October 2026: all six changelog regression tests passed. A dispo
 - [x] 4.2 Verify version alignment, preserved dated history, changelog regressions/enforcement, public transport tests, local release-note links and strict OpenSpec validation; reconcile the progress index without creating a publication tag or claiming production activation.
 
 Patch validation on 1 October 2026: OpenAPI/MCP metadata both identify 0.1.1, historical 0.1.0 entries and notes were preserved, all six changelog regressions and public transport tests passed, 45 local documentation links resolved, and strict change validation plus whitespace checks passed. Go race tests, vet and command builds also passed. Tagging and publication remain separate release operations.
+
+## 5. Municipal corrections patch preparation — 2 October 2026
+
+- [x] 5.1 Bump OpenAPI/MCP metadata to 0.1.2, group the dated municipal corrections under the patch heading, preserve historical 0.1.0/0.1.1 entries and notes, and update current release references with concise upgrade and pilot limits.
+- [x] 5.2 Verify metadata alignment, unchanged historical entries/notes, changelog regressions/enforcement, public transport tests and local links; update the progress index and prepare promotion through the existing CI/Coverage/Security software-release workflow without implying image publication or production activation.
+- [x] 5.3 Repair the interpretation integration fixture's observed published-port collision by letting Docker allocate its loopback port, registering cleanup before startup and verifying the affected PostgreSQL suite without weakening coverage gates.
+
+Preparation validation on 2 October 2026: OpenAPI/MCP metadata identify 0.1.2; historical entries and release notes are unchanged. All six changelog regressions, public transport tests, the full isolated interpretation integration suite, tagged vet, local-link and whitespace checks passed. Docker now allocates the integration fixture loopback port after an observed Coverage startup collision. The OpenSpec CLI was unavailable; no CLI validation is claimed. Promotion, tagging and GitHub publication remain gated on the exact revision workflows; container publication and production activation remain separate.
