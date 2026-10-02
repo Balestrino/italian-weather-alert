@@ -15,6 +15,7 @@ import (
 type RegionSummary struct {
 	domain.Region
 	Municipalities              *int64
+	EnabledMunicipalities       *int64
 	Sources, Collecting, Issues *int64
 	LastResult                  *time.Time
 	ObservedAt                  time.Time
@@ -36,22 +37,24 @@ func (s *Store) TerritorialOverview(ctx context.Context, at time.Time) (Territor
 		result.Regions = append(result.Regions, RegionSummary{Region: r, ObservedAt: at})
 	}
 	// All-region aggregates are independent: a missing operational subsection must not hide geography.
-	rows, err := s.pool.Query(ctx, `SELECT r.code,count(m.istat) FROM territorial_regions r JOIN territorial_region_versions v ON v.region_code=r.code AND v.revision=r.revision LEFT JOIN territorial_municipalities m ON m.region_code=r.code AND m.dataset_id=v.configuration->>'municipality_dataset' WHERE COALESCE(v.configuration->>'municipality_dataset','')<>'' GROUP BY r.code`)
+	rows, err := s.pool.Query(ctx, `SELECT r.code,count(m.istat),count(m.istat) FILTER(WHERE st.enabled) FROM territorial_regions r JOIN territorial_region_versions v ON v.region_code=r.code AND v.revision=r.revision LEFT JOIN territorial_municipalities m ON m.region_code=r.code AND m.dataset_id=v.configuration->>'municipality_dataset' LEFT JOIN territorial_municipality_state st ON st.region_code=m.region_code AND st.istat=m.istat WHERE COALESCE(v.configuration->>'municipality_dataset','')<>'' GROUP BY r.code`)
 	if err == nil {
 		for rows.Next() {
 			var code string
-			var n int64
-			if e := rows.Scan(&code, &n); e != nil {
+			var n, enabled int64
+			if e := rows.Scan(&code, &n, &enabled); e != nil {
 				rows.Close()
 				return result, e
 			}
 			result.Regions[byCode[code]].Municipalities = &n
+			result.Regions[byCode[code]].EnabledMunicipalities = &enabled
 		}
 		err = rows.Err()
 		rows.Close()
 		if err != nil {
 			for i := range result.Regions {
 				result.Regions[i].Municipalities = nil
+				result.Regions[i].EnabledMunicipalities = nil
 			}
 		}
 	}

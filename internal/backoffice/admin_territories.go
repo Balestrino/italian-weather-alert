@@ -1,6 +1,7 @@
 package backoffice
 
 import (
+	"cmp"
 	"context"
 	"encoding/base64"
 	"errors"
@@ -100,6 +101,32 @@ func adminTerritoryRoutes(mux *http.ServeMux, a AdminRuntime) {
 					page.Overview.Regions = append(page.Overview.Regions, region)
 				}
 			}
+		}
+		if !page.Unavailable {
+			page.Overview.Regions = slices.Clone(page.Overview.Regions)
+			slices.SortFunc(page.Overview.Regions, func(a, b operations.RegionSummary) int {
+				if a.Enabled != b.Enabled {
+					if a.Enabled {
+						return -1
+					}
+					return 1
+				}
+				if (a.EnabledMunicipalities == nil) != (b.EnabledMunicipalities == nil) {
+					if a.EnabledMunicipalities == nil {
+						return 1
+					}
+					return -1
+				}
+				if a.EnabledMunicipalities != nil && b.EnabledMunicipalities != nil {
+					if order := cmp.Compare(*b.EnabledMunicipalities, *a.EnabledMunicipalities); order != 0 {
+						return order
+					}
+				}
+				if order := cmp.Compare(a.Name, b.Name); order != 0 {
+					return order
+				}
+				return cmp.Compare(a.Code, b.Code)
+			})
 		}
 		renderUI(w, territoryTemplates, "regions", page)
 	}

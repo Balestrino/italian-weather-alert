@@ -7,11 +7,16 @@ Organizzare il pannello amministrativo attorno a regioni e comuni, rendendo imme
 ## ADDED Requirements
 
 ### Requirement: Territory first administrative entry
-The administrative entry SHALL present regions with enablement state, configuration readiness, municipality coverage, latest result time and operational issues. Enabled regions SHALL be immediately identifiable; unconfigured and disabled regions SHALL remain discoverable for onboarding. Primary navigation SHALL separate Regioni, Operazioni and Sistema. Technical destinations SHALL remain reachable without dominating the territorial overview. Summaries SHALL cover the full stated scope, include observation time and distinguish unavailable data from zero.
+The administrative entry SHALL present regions with enablement state, configuration readiness, municipality coverage, latest result time and operational issues. Rows SHALL place enabled regions first, then order each enablement group by the number of enabled municipalities in the current adopted register descending, with ties ordered by region name and code ascending. Municipality enablement counts SHALL reflect saved municipality flags, independently of source collection and the parent region flag; retired municipalities SHALL be excluded. Unknown counts SHALL sort after known counts within the same enablement group and SHALL remain labeled unavailable. Both `/admin/` and `/admin/regions`, including state filters, SHALL use this order and display enabled and total municipality counts. Enabled regions SHALL be immediately identifiable; unconfigured and disabled regions SHALL remain discoverable for onboarding. Primary navigation SHALL separate Regioni, Operazioni and Sistema. Technical destinations SHALL remain reachable without dominating the territorial overview. Summaries SHALL cover the full stated scope, include observation time and distinguish unavailable data from zero.
 
 #### Scenario: Open the dashboard
 - **WHEN** an operator opens the administrative entry
 - **THEN** they can identify enabled regions, inspect configuration and results, and start setup of another region from the same page
+
+#### Scenario: Prioritize enabled territories
+- **WHEN** an operator opens either regional entry route or filters regions by state
+- **THEN** enabled regions appear first and each state group is ordered by enabled municipalities descending, with alphabetical ties and unknown counts last
+- **AND** counts include only current register members, including enabled municipalities without sources, and preserve saved flags when their region is disabled
 
 #### Scenario: Summary dependency unavailable
 - **WHEN** one regional summary cannot be read
