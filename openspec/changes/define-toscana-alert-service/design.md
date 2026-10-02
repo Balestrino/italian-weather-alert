@@ -228,6 +228,20 @@ The evaluated local policy uses greedy decoding (temperature 0, seed 42) with th
 
 Local classification tolerates typographic double-quote presentation through a separately versioned contiguous matcher that returns the original source substring and preserves Unicode byte offsets. Remote and legacy parsing remain unchanged; invented words and disjoint quotations remain rejected. Local extraction records a concise prompt with explicit civil-protection opening rules, validated on long notices as well as isolated operative sentences. Catalog names/revisions isolate concurrent remote and local configurations, including distinct text/image model capabilities; immutable earlier local versions remain auditable.
 
+### Development fallback concurrency trial — 2 October 2026
+
+Use two replicas of the existing worker to exercise a local server's two slots.
+Each replica runs one inference job at a time; PostgreSQL claims coordinate jobs
+and scheduled source checks, while notification delivery uses durable locks.
+Verify the resolved image/settings against the current worker, retain a database
+archive and add the replica with `--no-recreate --no-deps --no-build --pull never`.
+This uses the existing runtime rather than introducing another inference policy.
+The count also applies to primary-provider work after recovery and scales the
+other worker loops. It does not cap unrelated server clients. Observe overlapping
+receipts, validated results and worker stability; slot occupancy alone does not
+establish a throughput improvement. Keep operational evidence private, leave the
+repository default at one replica and document explicit scale-down recovery.
+
 ## Territorial source knowledge guides
 
 Maintain a human-readable knowledge base under `docs/territori/`, with region directories keyed by two-digit codes and municipality files keyed by six-digit ISTAT identity. Create files when research begins. Each guide puts current source maps, operational rules and open problems before its dated discovery register. A shared template records stable finding IDs, scope, evidence dates, knowledge status and intervention status independently. Subsequent entries reference superseded findings without deleting them.

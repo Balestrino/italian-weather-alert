@@ -90,6 +90,55 @@ model when its required retrieval inputs are available; a held embedding provide
 can still delay new semantic linking. Do not interpret local text/OCR success as
 completion of those dependencies or public source acceptance.
 
+## Try two concurrent requests in development
+
+Each worker processes one inference job at a time. When the local server reports
+two available slots in `/props`, two replicas can use those slots through the
+existing PostgreSQL queue. Before scaling, verify that the resolved development
+worker image and environment match the running worker and preserve a database
+archive plus private rollback settings. Add the second replica without rebuilding,
+recreating the first worker or starting dependencies:
+
+```sh
+scripts/compose-env.sh development --profile processing-worker up -d \
+  --no-deps --no-recreate --no-build --pull never --scale worker=2 worker
+scripts/compose-env.sh development ps --all worker
+```
+
+This permits up to two ordinary inference jobs concurrently, including primary
+provider jobs after recovery. It is a worker count, not a server-wide limiter for
+other clients. Each replica also runs document, acquisition and configured
+notification loops; durable queue/source claims and notification locks coordinate
+the replicas. Source schedules, admission controls, retries and model settings
+retain their existing configuration. No historical replay is requested.
+
+Verify simultaneous processing through `/slots` when the server exposes it, then
+inspect overlapping call receipts from distinct queue jobs, returned models,
+validated processing results, errors and worker restarts. Keep captures private.
+Do not infer a throughput improvement from slot occupancy alone.
+
+Repeat `--scale worker=2` on subsequent worker `up` commands while this trial is
+wanted. The repository default remains one replica. To return to one worker:
+
+```sh
+scripts/compose-env.sh development --profile processing-worker up -d \
+  --no-deps --no-recreate --no-build --pull never --scale worker=1 worker
+```
+
+Scaling down stops the excess replica; interrupted inference retains its call
+receipt and follows ordinary lease/retry recovery. Originals and histories remain
+available.
+
+The initial 2 October 2026 development trial observed both slots occupied in 59 of 61
+samples over two minutes. Overlapping HTTP 200 receipts from distinct jobs and
+complete stored OCR pages from both workers verified actual parallel processing
+with matching returned model provenance. Both workers had zero restarts and the
+HTTP/runtime-boundary smoke passed; all pre-existing containers were preserved.
+Two replicas were active for that observation. Private samples and receipts retain the
+details. Existing admin/configured-image divergence still prevents a full release
+image-alignment claim, and this observation does not establish a speedup or source
+acceptance.
+
 ## Deploy and roll back
 
 Run the ordinary Go checks and the processing integration tests on disposable

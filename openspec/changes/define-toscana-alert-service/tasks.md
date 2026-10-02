@@ -258,3 +258,21 @@ vigilance correction has positive and conservative-fallback regressions. Current
 source policies and ordinary routing remain intact; continuing rollout and
 semantic downstream acceptance remain separate. Detailed captures, configurations,
 receipts, trial programs and snapshot are private.
+
+## 22. Development fallback concurrency trials — 2 October 2026
+
+- [x] 22.1 Verify two local server slots and matching resolved/running worker settings; preserve a verified database archive and private rollback evidence, then add a second development worker without recreating the original or changing its image.
+- [x] 22.2 Verify overlapping local requests from distinct queue jobs, returned model provenance, validated results and worker stability while preserving provider holds and source controls.
+- [x] 22.3 Document replica scope, trial results and return to one worker; update the specification, checklist counts and changelog without changing the default replica count or claiming a throughput improvement from occupancy.
+
+The development trial verified two-slot occupancy in 59 of 61 samples over two
+minutes, overlapping HTTP 200 receipts from distinct worker/job identities and
+complete persisted OCR pages from both replicas with the requested local model.
+Both workers remained running with zero restarts, and all pre-existing container
+identities were preserved. The HTTP/runtime-boundary smoke passed. Full release
+image alignment remains unverified because the existing admin image differs from
+the environment's configured image. The two replicas remained active for the
+requested trial; no new image, schema, source policy or acceptance status was
+introduced. Slot occupancy establishes concurrency, not a throughput improvement.
+Private settings, database archive, samples and receipts remain ignored. See
+[local fallback operations](../../../docs/operations/local-llm-fallback.md).

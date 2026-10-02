@@ -339,6 +339,11 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 - **WHEN** an eligible remote job establishes an account hold or availability circuit
 - **THEN** a subsequent attempt within the existing budget may select a separate local run; successful results and schema/evidence failures do not trigger another model call
 
+#### Scenario: Two local server slots are used in development
+- **WHEN** the operator requests a two-request trial, the local server exposes two slots and two development worker replicas share the existing queue
+- **THEN** distinct admitted inference jobs may make concurrent requests with exclusive durable claims, separate call receipts and unchanged model, retry and source controls
+- **AND** operators verify actual overlapping requests and validated results, preserve rollback evidence and document returning to one replica; scaling also applies to primary-provider jobs and other worker loops, without changing the default replica count or limiting unrelated clients
+
 #### Scenario: A local model has limited capabilities
 - **WHEN** a local model supports text but does not have evaluated vision or compatible embedding support
 - **THEN** only evaluated text stages use that fallback, OCR/embedding keep their own controls and unresolved dependencies remain visible
