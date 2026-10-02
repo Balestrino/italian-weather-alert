@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Document and verify register-wide development fallback selection with existing model and independent source controls
+
 ## 0.1.2 - 2026-10-02
 
 - 2026-10-02 [Fixed] Let Docker allocate loopback ports for interpretation integration databases and clean up failed starts, avoiding published-port collisions in Coverage.

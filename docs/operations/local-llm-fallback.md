@@ -65,6 +65,18 @@ placeholder; an authenticated gateway can use `IWA_LOCAL_FALLBACK_API_KEY_FILE`
 through a private Compose override that mounts and exposes the file to the worker.
 Keep keys out of environment files and command arguments.
 
+To make fallback available to every currently registered source, enumerate the
+registry's source IDs in `IWA_LOCAL_FALLBACK_SOURCES` and include the same IDs in
+`IWA_OUTPUT_FIX_SOURCES`, preserving any existing output-fix selections. Include
+regional sources separately. The list is a configuration snapshot: newly created
+sources require an explicit update. This selection preserves source collection,
+territorial admission and publication controls; it does not activate disabled
+sources. Recreate only the selected environment's worker with its existing image
+after validating the resolved Compose configuration and preserving rollback
+settings. Verify actual local run results and model provenance for the expanded
+scope. The primary still takes preference after recovery, and embedding support
+remains separately configured.
+
 A first remote rejection preserves its failed run and schedules the local choice
 on a remaining ordinary attempt. It does not extend retry budgets. Pending jobs
 outside the source list, and jobs whose local provider is also held, remain

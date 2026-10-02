@@ -147,8 +147,21 @@ The [environment hardening change](../harden-environment-operations/tasks.md) an
 - [x] 14.3 Add opt-in live local-model classification, extraction, linking and image OCR tests with synthetic Italian notices, long-document cases and literal evidence checks; distinguish transport mocks from real model validation and report unsupported capabilities.
 - [x] 14.4 Deploy the evaluated fallback on development within the selected source scope, preserve the remote hold and prior image/settings, and verify representative local runs plus service stability.
 - [x] 14.5 Document local model setup, runtime configuration, rollback and the explicit OCR/embedding capability boundaries without claiming acceptance of untested stages.
+- [x] 14.6 Expand the explicitly configured development fallback and output-contract source lists to all registered sources, preserving rollback settings, the existing image and independent source/territorial/public controls.
+- [x] 14.7 Verify resolved worker configuration, local vision/OCR capability and actual local processing for the expanded scope, preserving remote holds and separately blocked embedding work.
+- [x] 14.8 Document register-snapshot selection, future-source updates and operational validation without publishing private settings or claiming source acceptance.
 
 The local fallback was verified with repository checks, isolated PostgreSQL tests, real local Qwen text/image tests and a bounded development canary. Reviewed local quote presentation and civil-protection extraction corrections retain strict contiguous evidence and independent immutable versions. Development acquisition completed a fresh municipal check, OCR and representative text interpretation succeeded, and ordinary processing resumed with the credential-wide remote hold preserved. Semantic embedding work remains separately blocked by remote entitlement; task 13.8, source acceptance and production readiness remain open. Private captures, deployment settings, dumps and call ledgers are excluded from the public repository. See [local fallback operations](../../../docs/operations/local-llm-fallback.md).
+
+The subsequent source-list expansion in tasks 14.6–14.8 was verified on
+2 October 2026 with fallback configuration/routing tests, a live synthetic
+vision/OCR check and complete development OCR results from the local runner.
+Resolved and running worker settings matched; the worker retained its existing
+image, other service identities and source controls were preserved, and the
+development HTTP/runtime smoke passed. Rollback settings, database archive and
+detailed receipts remain private. This operational selection does not restore
+remote entitlement or supply embedding support; newly registered sources require
+an explicit list update.
 
 ## 15. Territorial source knowledge guides — 2 October 2026
 

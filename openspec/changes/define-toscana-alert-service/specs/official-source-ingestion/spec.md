@@ -331,6 +331,10 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 - **WHEN** the remote and configured local providers are blocked
 - **THEN** queued jobs wait before claiming, preserving attempt budgets and failure evidence
 
+#### Scenario: Fallback is selected for every registered source
+- **WHEN** the operator explicitly lists all currently registered source IDs in the fallback and evaluated output-contract selections
+- **THEN** admitted jobs from those sources may use the configured fallback while the primary is blocked, disabled sources remain disabled, source publication remains independent, and newly registered sources require an explicit configuration update
+
 #### Scenario: A provider failure first establishes a hold
 - **WHEN** an eligible remote job establishes an account hold or availability circuit
 - **THEN** a subsequent attempt within the existing budget may select a separate local run; successful results and schema/evidence failures do not trigger another model call
