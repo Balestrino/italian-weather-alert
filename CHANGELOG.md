@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Enable development collection for the existing Cascina, Livorno and Pisa candidates through audited source controls.
+
 ## 0.1.1 - 2026-10-01
 
 - 2026-10-01 [Changed] Bump the software patch version to 0.1.1, align OpenAPI/MCP metadata, and prepare versioned changelog history and patch release notes.
