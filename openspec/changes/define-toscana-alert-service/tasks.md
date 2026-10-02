@@ -312,3 +312,7 @@ six slots; the first sixty-second slot window observed no active model slots.
 This verifies six active queue workers, not six simultaneous model executions.
 The nondisruptive HTTP/runtime-boundary smoke passed. Provider retry/circuit
 controls remained active; settings, logs and observations remain private.
+
+## 23. Private browser access to API documentation — 2 October 2026
+
+- [x] 23.1 Open Scalar in the integrated browser through a dedicated private Tailscale Serve proxy to the development public listener; preserve existing Serve routes, verify all six endpoint references and the same-origin OpenAPI contract, and document targeted proxy removal with private rollback settings retained.

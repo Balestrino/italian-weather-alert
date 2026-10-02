@@ -7,6 +7,10 @@ Provide developers and citizens using assistants with equivalent free API and MC
 ### Requirement: Public access without registration
 The first release SHALL provide a documented read-only public JSON API and remote MCP access without payment, registration or a required API key. Both interfaces SHALL support municipality/zone discovery, warning and measure search, document details and versions, retained history, and source coverage and updating information. They SHALL expose only regional and recognized local public products; internal DPC comparisons and monitoring administration SHALL NOT appear as public warning records or public administrative operations.
 
+#### Scenario: API documentation is opened from a private remote browser
+- **WHEN** an operator requests Scalar access from a browser that cannot reach the VM's loopback public listener
+- **THEN** a dedicated private proxy may expose that public listener and its same-origin documentation/contract while preserving existing administrative routes; browser verification confirms the endpoint reference renders and records targeted proxy removal separately from public source acceptance
+
 #### Scenario: An anonymous client requests a municipality
 - **WHEN** a client submits a supported public query without credentials
 - **THEN** the service returns the permitted data subject to published usage limits without requiring registration
