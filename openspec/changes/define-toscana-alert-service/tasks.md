@@ -316,3 +316,18 @@ controls remained active; settings, logs and observations remain private.
 ## 23. Private browser access to API documentation — 2 October 2026
 
 - [x] 23.1 Open Scalar in the integrated browser through a dedicated private Tailscale Serve proxy to the development public listener; preserve existing Serve routes, verify all six endpoint references and the same-origin OpenAPI contract, and document targeted proxy removal with private rollback settings retained.
+
+## 24. Source acceptance prerequisite audit — 2 October 2026
+
+- [x] 24.1 Inspect the active CFR/Calcinaia revisions, declared policies, source regressions and existing observational campaigns; distinguish elapsed observation from reviewed original/attachment/failure/event evidence and preserve the source-scoped prerequisite inventory privately.
+- [x] 24.2 Persist truthful assessments of both existing campaigns through the administrative API, prepare the current retained-resource manifest and unresolved municipal comparisons, and verify that the audit does not grant acceptance or public enablement.
+- [x] 24.3 Verify registry acceptance/regression gates, campaign evidence requirements and shared public query groups with synthetic unit tests and disposable PostgreSQL; update territorial guidance, the coverage precheck note and changelog without claiming real-source acceptance.
+
+Both recorded campaign assessments remain `extended`. The recent campaign has
+sufficient elapsed observation and checks within its configured delay threshold,
+but reviewed originals/resources and error/event evidence are missing. Calcinaia
+also retains a failed service regression requiring a corrected rerun against the
+reviewed contract; successful software tests do not close that regression. The
+private dossier identifies these prerequisites and retained-resource identities.
+Tasks 9.3 and 10.1 remain open; no source was accepted or publicly enabled.
+Infrastructure/public readiness gates remain separate and unverified by this audit.

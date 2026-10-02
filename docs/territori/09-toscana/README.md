@@ -47,9 +47,25 @@ queste prove dall’attivazione di una policy continuativa e dall’accettazione
 
 Non derivare colori delle mappe dal testo circostante. Le pubblicazioni comunali che rilanciano un bollettino non costituiscono automaticamente una nuova allerta o una misura locale.
 
+Per diagnosticare una situazione API vuota, controllare prima `coverage.public_state`
+e `coverage_status`: controlli di acquisizione recenti e `updating.state=ok` non
+abilitano la pubblicazione. La query pubblica richiede `public_enabled` e una
+acquisizione collegata a una revisione con evento di accettazione; le viste private
+territoriali hanno un percorso distinto. `interpretation.state=not_processed`
+con la limitazione `source acceptance is pending` descrive questa barriera e non
+dimostra che nessuna elaborazione interna sia avvenuta. Separatamente, il parser
+conserva la dichiarazione di assenza di criticità con livelli per zona `unknown`
+quando i colori delle mappe non sono verificati. Vedere TOS-005.
+
 ## Problemi aperti
 
 Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel coverage tracker e nei [task del servizio Toscana](../../../openspec/changes/define-toscana-alert-service/tasks.md). Verificare sul canale operativo il monitoraggio e i casi senza evento. In presenza di `missing`, verificare il percorso che alimenta la data della pubblicazione: gli esiti per ambiente appartengono all'archivio privato.
+
+Il precollaudo di TOS-006 richiede di consultare il report della campagna oltre
+al tempo trascorso: confronti con gli originali, revisione delle risorse necessarie
+e prove di errore sono evidenze separate. Per il monitoraggio senza nuovi eventi,
+documentare anche un caso conservato di evento assente dal trial. Le verifiche
+tecniche del software non sostituiscono gli esiti attesi revisionati da una persona.
 
 ## Comuni documentati
 
@@ -106,3 +122,25 @@ Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel c
 - **Conseguenza:** il prodotto resta pertinente anche senza zone elencate; nessun nuovo livello, all-clear o misura locale è desunto. Il worker diagnostico termina e conserva i risultati; non attiva una policy generale della fonte.
 - **Prossima verifica:** estendere il confronto a eventi significativi e alle interpretazioni downstream prima di un rollout continuativo.
 - **Collegamenti:** TOS-003 e task 20–21 del servizio Toscana.
+
+### TOS-005 — Situazione pubblica vuota e livelli non determinati hanno cause distinte
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, codice, consultazione del bollettino ufficiale e controlli operativi in sola lettura.
+- **Ambito:** query di situazione pubblica per un comune toscano e proiezione del prodotto `cfr-criticality`; configurazioni ed esiti per ambiente restano privati.
+- **Conoscenza:** confermato sul codice. **Intervento:** verifica diagnostica eseguita; nessuna attivazione o correzione applicata.
+- **Osservazione:** la visibilità pubblica dipende da pubblicazione e acquisizioni accettate, mentre la freschezza dei controlli è separata. La dichiarazione testuale di assenza di criticità è conservata senza assegnare colori alle singole zone. La pagina ufficiale consultata riportava emissione del 2 ottobre 2026 alle 11:56 e validità del 2 e 3 ottobre; questa osservazione non certifica nuove capacità grafiche.
+- **Evidenza:** [filtro pubblico e query amministrative](../../../internal/backend/publicquery/administrative.go), [copertura](../../../internal/backend/publicquery/store.go), [proiezione regionale](../../../internal/backend/acquisition/regional_facts.go), [bollettino CFR](https://www.cfr.toscana.it/index.php?IDS=2&IDSS=76). Riferimento operativo privato: `SITUATION-20261002-01`.
+- **Conseguenza:** un array vuoto non è una dichiarazione di assenza di allerte; abilitare una fonte non risolve da solo i livelli grafici non determinati.
+- **Prossima verifica:** completare la verifica e accettazione del prodotto; valutare separatamente una rappresentazione esplicita dello stato non disponibile e della dichiarazione ufficiale con validità e provenienza.
+- **Collegamenti:** [specifica di accesso pubblico](../../../openspec/changes/define-toscana-alert-service/specs/public-alert-access/spec.md), [task 7.3 e 10.1](../../../openspec/changes/define-toscana-alert-service/tasks.md); CLN-004.
+
+### TOS-006 — Il tempo di osservazione non completa il collaudo delle fonti
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, report delle campagne e test su fixture sintetiche con PostgreSQL isolato.
+- **Ambito:** precollaudo dei tre prodotti CFR e del pilota Calcinaia; report, revisioni attive ed esiti operativi sono conservati privatamente.
+- **Conoscenza:** confermato sul contratto e sul codice. **Intervento:** valutazioni della campagna registrate; accettazione e abilitazione non completate.
+- **Osservazione:** le campagne distinguono durata, cadenza, originali, allegati, errori ed eventi assenti. Una campagna con durata sufficiente può restare `extended` per le revisioni mancanti. Il software può essere verificato con fixture senza certificare il comportamento delle fonti reali.
+- **Evidenza:** [report e valutazioni delle campagne](../../../internal/backend/observation/store.go), [vincoli di accettazione](../../../internal/backend/registry/store.go), [regressioni](../../../internal/backend/registry/regression.go), [requisito di qualità misurata](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). Riferimento privato: `ACCEPTANCE-PRECHECK-20261002-01`.
+- **Conseguenza:** conservare gli esiti incompleti e predisporre il dossier delle verifiche mancanti prima di presentare una fonte come accettata; un permesso di pubblicazione non è un risultato di collaudo.
+- **Prossima verifica:** completare confronti, prove di errore e casi conservati; verificare sette rischi, API/MCP e storico negli ambiti dichiarati prima della revisione finale e dell'abilitazione indipendente.
+- **Collegamenti:** CLN-005 e [task 9.3, 10.1 e 24](../../../openspec/changes/define-toscana-alert-service/tasks.md).

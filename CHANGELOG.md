@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Audit source acceptance prerequisites, persist incomplete campaign assessments, verify lifecycle/query gates and record remaining reviewed-evidence and municipal-regression requirements.
+- 2026-10-02 [Changed] Document municipality situation diagnostics, separating public source acceptance, internal facts, acquisition freshness and unverified regional map levels.
 - 2026-10-02 [Changed] Open development Scalar API documentation through a dedicated private Tailscale proxy; verify browser rendering and preserve existing routes with targeted rollback documented.
 - 2026-10-02 [Changed] Expand development to six corrected worker replicas, verify preserved existing containers and queue progress, and document server concurrency limits and return to four workers.
 - 2026-10-02 [Fixed] Prevent concurrent inference workers from deadlocking during queue maintenance; test cancellation and lock release, deploy four development replicas and verify parallel processing.

@@ -6,6 +6,15 @@ Each of the 20 regional tables starts with a **region row** summarizing regional
 
 Linked territory names open [source knowledge guides](territori/README.md) with scoped rules, exceptions and discoveries. Those guides may be revised after this inventory's snapshot; their existence or revision does not change the source-status assessments below.
 
+**Subsequent acceptance precheck — 2 October 2026:** the three CFR products and
+Calcinaia remain pending acceptance and public enablement. Campaign assessments
+and a source-scoped evidence inventory were prepared; missing reviewed comparisons,
+failure/event cases and the municipal regression must be resolved before acceptance.
+Technical tests use synthetic fixtures and do not establish real-source acceptance.
+See [TOS-006](territori/09-toscana/README.md#tos-006--il-tempo-di-osservazione-non-completa-il-collaudo-delle-fonti)
+and [CLN-005](territori/09-toscana/comuni/050004-calcinaia.md#cln-005--il-recupero-non-sostituisce-la-rivalutazione-della-regressione).
+The original dated inventory below is preserved; detailed operational evidence remains private.
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

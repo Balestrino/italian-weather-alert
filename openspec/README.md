@@ -9,7 +9,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 129 | 11 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 132 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 11 | 0 |
@@ -43,6 +43,13 @@ Environment hardening has 18 verified repository tasks and four checked operator
 The October 2 operations overview extension has synthetic PostgreSQL and browser verification for complete job states, archived scopes, exclusive document categories and historical attempt bars. The development admin rollout is recorded separately from source acceptance; provider state and last job reasons remain distinct. See [backoffice semantics and verification](../docs/backoffice/README.md).
 
 Open tasks include environment capacity/policy rollout and production release gates, the Toscana observational trial and public readiness gates, GHCR image publication, off-host backup and restore verification, the evening report rollout, and parts of the provider efficiency rollout. See each `tasks.md` for the precise checklist.
+
+Three subsequent acceptance-precheck tasks inventory source-scoped prerequisites,
+persist both existing campaign assessments and verify lifecycle/query behavior
+with synthetic fixtures and disposable PostgreSQL. Both campaigns remain extended;
+missing reviewed evidence and the municipal regression keep source acceptance and
+public enablement pending. The [coverage tracker](../docs/coverage.md) retains its
+original snapshot with a dated precheck note; detailed evidence remains private.
 
 For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The repository includes [OpenSpec agent workflows](../docs/development/agent-tools.md); an agent or CLI is not required to inspect the plans.
 
