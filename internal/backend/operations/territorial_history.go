@@ -37,6 +37,8 @@ const territorialHistorySQL = `WITH events AS(
  UNION ALL
  SELECT 'municipality-'||e.id,'configuration','',e.actor,e.recorded_at,e.revision,0,0,e.kind,jsonb_build_object('istat',e.istat,'enabled',e.enabled),e.region_code FROM territorial_municipality_events e WHERE e.region_code=$1 AND ($2='' OR e.istat=$2)
  UNION ALL
+ SELECT 'development-publication-'||e.id,'configuration','',e.actor,e.recorded_at,e.revision,0,0,CASE WHEN e.enabled THEN 'development_publication_enabled' ELSE 'development_publication_disabled' END,jsonb_build_object('istat',e.istat,'enabled',e.enabled,'environment','development'),e.region_code FROM development_publication_events e WHERE e.region_code=$1 AND ($2='' OR e.istat=$2)
+ UNION ALL
  SELECT 'config-'||c.source_id||'-'||c.revision,'configuration',c.source_id,c.actor,c.created_at,c.revision,0,0,'configuration',c.body,NULL FROM registry_configurations c
  UNION ALL
  SELECT 'source-'||e.id,'source',e.source_id,e.actor,e.created_at,e.revision,0,0,e.kind,e.evidence,NULL FROM registry_events e

@@ -287,6 +287,10 @@
             "outside_scope",
             "suspended"
           ]
+        },
+        "development_publication": {
+          "type": "boolean",
+          "description": "Manual municipality-scoped publication in development; source acceptance remains separate."
         }
       },
       "required": [
@@ -682,6 +686,10 @@
         },
         "quality": {
           "$ref": "#/$defs/Quality"
+        },
+        "development_publication": {
+          "type": "boolean",
+          "description": "Manual municipality-scoped publication in development; source acceptance remains separate."
         }
       },
       "required": [

@@ -64,5 +64,10 @@ func (s *Store) visibilitySQL() string {
 	if s.region != "" {
 		return "true"
 	}
-	return `s.public_enabled AND EXISTS (SELECT 1 FROM retained_acquisitions pa JOIN registry_events pe ON pe.source_id=pa.source_id AND pe.revision=pa.configuration AND pe.kind='acceptance' WHERE pa.document_id=v.document_id AND pa.version_id=v.id)`
+	if !s.development {
+		return strictVisibilitySQL
+	}
+	return "((" + strictVisibilitySQL + ") OR (" + s.developmentVisibilitySQL() + "))"
 }
+
+const strictVisibilitySQL = `s.public_enabled AND EXISTS (SELECT 1 FROM retained_acquisitions pa JOIN registry_events pe ON pe.source_id=pa.source_id AND pe.revision=pa.configuration AND pe.kind='acceptance' WHERE pa.document_id=v.document_id AND pa.version_id=v.id)`

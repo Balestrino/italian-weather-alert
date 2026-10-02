@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Added] Add manually selected municipality publication in development with private revision-checked controls, scoped API/MCP data, explicit limitations and revocable views; preserve staging/production acceptance gates.
+
 - 2026-10-02 [Changed] Audit source acceptance prerequisites, persist incomplete campaign assessments, verify lifecycle/query gates and record remaining reviewed-evidence and municipal-regression requirements.
 - 2026-10-02 [Changed] Document municipality situation diagnostics, separating public source acceptance, internal facts, acquisition freshness and unverified regional map levels.
 - 2026-10-02 [Changed] Open development Scalar API documentation through a dedicated private Tailscale proxy; verify browser rendering and preserve existing routes with targeted rollback documented.

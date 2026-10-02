@@ -2,9 +2,17 @@
 services:
   public:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging
   admin:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging
   worker:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging
   backup:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging

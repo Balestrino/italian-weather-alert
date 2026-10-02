@@ -8121,3 +8121,12 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+### Development municipality publication — 2026-10-02
+
+[Manual development publication](operations/development-publication.md) is a separate,
+revocable municipality choice for API/MCP consultation of municipal data and applicable
+CFR products. It does not alter the dated source acceptance assessment above or complete
+missing reviews, observational cases or regressions. Responses retain pending source
+states and identify development publication explicitly. Staging and production ignore
+these choices and retain their acceptance and release gates.

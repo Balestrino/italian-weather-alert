@@ -137,6 +137,7 @@ func adminTerritoryRoutes(mux *http.ServeMux, a AdminRuntime) {
 }
 
 type territoryPage struct {
+	DevelopmentPublication *domain.DevelopmentPublicationState
 	Municipality           *operations.TerritorialMunicipality
 	Region                 domain.Region
 	Title, Base, Tab       string
@@ -201,6 +202,14 @@ func territoryDetail(w http.ResponseWriter, r *http.Request, a AdminRuntime, ist
 		if e != nil {
 			territoryFailure(w, r, e)
 			return
+		}
+		if a.DevelopmentPublication != nil && region.Code == "09" {
+			state, e := a.DevelopmentPublication.State(ctx, region.Code, istat)
+			if e != nil {
+				territoryFailure(w, r, e)
+				return
+			}
+			page.DevelopmentPublication = &state
 		}
 		page.Municipality = &m
 		page.Title = m.Name

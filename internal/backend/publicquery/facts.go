@@ -327,7 +327,7 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
  FROM domain_regional_records r JOIN domain_regional_facts f ON f.regional_record_id=r.id
  LEFT JOIN domain_regional_projections p ON p.document_version_id=r.document_version_id AND p.logic_version=r.projection_logic
  JOIN retained_versions v ON v.id=r.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=r.source_id
-	 WHERE v.first_acquired_at<=$1 AND r.recorded_at<=registry_interpretation_cutoff(s.id,$1) AND `+s.visibilitySQL()+` AND ($2='' OR r.product=$2) AND ($3='' OR f.risk=$3) AND ($4='' OR r.source_id=$4)
+	 WHERE v.first_acquired_at<=$1 AND r.recorded_at<=registry_interpretation_cutoff(s.id,$1) AND (`+s.visibilitySQL()+`) AND (`+s.regionalDevelopmentScopeSQL(selectedMapping)+`) AND ($2='' OR r.product=$2) AND ($3='' OR f.risk=$3) AND ($4='' OR r.source_id=$4)
  AND (r.projection_logic IS NULL OR NOT EXISTS(
  SELECT 1 FROM domain_regional_projections replacement
  WHERE replacement.document_version_id=r.document_version_id AND replacement.status<>'unsupported'

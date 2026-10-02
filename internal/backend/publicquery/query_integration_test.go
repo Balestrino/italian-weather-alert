@@ -552,6 +552,182 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		}
 	})
 
+	t.Run("development-municipality-publication", func(t *testing.T) {
+		publication := domain.NewDevelopmentPublication(pool, "development")
+		state, e := publication.State(ctx, "09", "050004")
+		if e != nil || state.Enabled || state.Revision != 0 {
+			t.Fatal(state, e)
+		}
+		if e = domain.MigrateTerritories(ctx, pool); e != nil {
+			t.Fatal(e)
+		}
+		for _, mode := range []string{"production", "staging", ""} {
+			if _, e = domain.NewDevelopmentPublication(pool, mode).Set(ctx, "09", "050004", 0, true, "test"); !errors.Is(e, domain.ErrDevelopmentOnly) {
+				t.Fatal("non-development mutation allowed", mode, e)
+			}
+		}
+		configuration, e := reg.Version(ctx, "criticality-public", 1)
+		if e != nil {
+			t.Fatal(e)
+		}
+		makePending := func(id, product, territoryID string) {
+			t.Helper()
+			cfg := configuration.Configuration
+			source := registry.Source{ID: id, AuthorityID: "regione-toscana", ChannelID: "cfr", ProductID: product, Territory: territoryID}
+			if e := reg.CreateSource(ctx, source, cfg, "fixture"); e != nil {
+				t.Fatal(e)
+			}
+			if e := reg.RecordPreview(ctx, id, 1, "fixture", *cfg.Provenance); e != nil {
+				t.Fatal(e)
+			}
+			if e := reg.EnableCollection(ctx, id, 1, "fixture"); e != nil {
+				t.Fatal(e)
+			}
+		}
+		makePending("pending-criticality", "criticality", "Toscana")
+		makePending("pending-calcinaia", "municipal", "050004")
+		otherState, e := domainStore.MunicipalityState(ctx, "09", "050026")
+		if e != nil {
+			t.Fatal(e)
+		}
+		if _, e = domainStore.SetMunicipalityEnabled(ctx, "09", "050026", otherState.Revision, true, "fixture"); e != nil {
+			t.Fatal(e)
+		}
+		makePending("pending-pisa", "municipal", "050026")
+		vr := retain("pending-regional-v1", "pending-criticality", regionalURL, "synthetic bulletin", nil, metadata)
+		record := regional
+		record.ID = "pending-regional"
+		record.SourceID = "pending-criticality"
+		record.DocumentVersionID = vr.ID
+		record.Facts = []domain.RegionalFact{{Ordinal: 1, Risk: domain.RiskThunderstorms, OfficialRiskLabel: "Temporali", Zone: "A4", Level: &yellow}, {Ordinal: 2, Risk: domain.RiskThunderstorms, OfficialRiskLabel: "Temporali", Zone: "A3", Level: &yellow}}
+		if e = domainStore.PutRegional(ctx, record); e != nil {
+			t.Fatal(e)
+		}
+		vm := retain("pending-municipal-v1", "pending-calcinaia", municipalURL, "synthetic closure", nil, metadata)
+		vo := retain("pending-other-v1", "pending-pisa", "https://regione.example/notices/other", "synthetic other closure", nil, metadata)
+		local := measure
+		local.ID = "pending-local"
+		local.SourceID = "pending-calcinaia"
+		local.DocumentVersionID = vm.ID
+		if e = domainStore.PutLocalMeasure(ctx, local); e != nil {
+			t.Fatal(e)
+		}
+		if e = domainStore.RecordInterpretation(ctx, domain.InterpretationAssessment{MeasureID: local.ID, State: "supported", EvidenceDocumentVersionID: vm.ID, Reason: "synthetic passage", Limitations: []string{}, Actor: "fixture", RecordedAt: time.Now()}); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = pool.Exec(ctx, `INSERT INTO geography_zone_mappings(dataset_id,municipality_dataset_id,municipality_istat,ordinal,zone,source_name,territorial_scope,evidence_locator) VALUES('zones-v2','municipalities-v1','050026',3,'A4','Pisa','partial_municipality','synthetic shared zone'),('zones-v1','municipalities-v1','050026',3,'A4','Pisa','partial_municipality','synthetic shared zone')`); e != nil {
+			t.Fatal(e)
+		}
+
+		dev := NewForEnvironment(pool, "development")
+		scopeBefore, e := dev.PublicationScope(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		assertRegional := func(store *Store, istat string, want int) {
+			t.Helper()
+			found, e := store.Search(ctx, SearchQuery{Kind: "regional", SourceID: "pending-criticality", MunicipalityISTAT: istat})
+			if e != nil || len(found.Regional) != want {
+				t.Fatalf("regional scope %s: %#v %v", istat, found, e)
+			}
+			for _, f := range found.Regional {
+				if f.Zone != "A4" {
+					t.Fatal("unselected zone exposed", f)
+				}
+			}
+		}
+		assertRegional(dev, "", 0)
+		if _, e = publication.Set(ctx, "09", "050004", 0, true, "reviewer"); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = publication.Set(ctx, "09", "050004", 0, false, "stale"); !errors.Is(e, domain.ErrConflict) {
+			t.Fatal("missing CAS", e)
+		}
+		if _, e = publication.Set(ctx, "09", "999999", 0, true, "reviewer"); !errors.Is(e, domain.ErrTerritoryNotFound) {
+			t.Fatal("unknown municipality", e)
+		}
+		assertRegional(dev, "050004", 1)
+		assertRegional(dev, "050026", 0)
+		assertRegional(dev, "", 1)
+		for _, mode := range []string{"production", "staging", ""} {
+			assertRegional(NewForEnvironment(pool, mode), "050004", 0)
+		}
+		situation, e := dev.MunicipalitySituation(ctx, SituationQuery{MunicipalityISTAT: "050004"})
+		if e != nil || !situation.Municipality.DevelopmentPublication {
+			t.Fatal(situation, e)
+		}
+		foundLocal := false
+		for _, m := range situation.LocalMeasures {
+			if m.ID == "pending-local" {
+				foundLocal = true
+				if !strings.Contains(strings.Join(m.Quality.Interpretation.Limitations, " "), "Development publication") {
+					t.Fatal("missing warning")
+				}
+			}
+		}
+		if !foundLocal {
+			t.Fatal("municipal measure hidden")
+		}
+		coverage, e := dev.Coverage(ctx, CoverageQuery{MunicipalityISTAT: "050004", SourceID: "pending-criticality"})
+		if e != nil || len(coverage.Sources) != 1 || !coverage.Sources[0].DevelopmentPublication || coverage.Sources[0].PublicState != "pending" || coverage.Sources[0].CoverageStatus != "pending" {
+			t.Fatal("acceptance misrepresented", coverage, e)
+		}
+		if _, e = dev.Document(ctx, DocumentQuery{DocumentID: stringID(vm.DocumentID), VersionID: stringID(vm.ID)}); e != nil {
+			t.Fatal("chosen document hidden", e)
+		}
+		if _, e = dev.Document(ctx, DocumentQuery{DocumentID: stringID(vo.DocumentID), VersionID: stringID(vo.ID)}); !errors.Is(e, ErrUnknownIdentifier) {
+			t.Fatal("other document leaked", e)
+		}
+		if _, e = store.Document(ctx, DocumentQuery{DocumentID: stringID(vm.DocumentID)}); !errors.Is(e, ErrUnknownIdentifier) {
+			t.Fatal("strict document leaked", e)
+		}
+		rows, e := dev.Search(ctx, SearchQuery{Kind: "document", SourceID: "dpc-internal"})
+		if e != nil || len(rows.Documents) != 0 {
+			t.Fatal("DPC leaked", rows, e)
+		}
+		if _, e = copyAccess.Read(ctx, stringID(vm.DocumentID), stringID(vm.ID)); !errors.Is(e, publiccopy.ErrRestricted) {
+			t.Fatal("unaccepted copy exposed", e)
+		}
+		st, e := reg.State(ctx, "pending-criticality")
+		if e != nil || st.PublicEnabled {
+			t.Fatal("global publication changed", st, e)
+		}
+		var acceptances int
+		if e = pool.QueryRow(ctx, `SELECT count(*) FROM registry_events WHERE source_id='pending-criticality' AND kind='acceptance'`).Scan(&acceptances); e != nil || acceptances != 0 {
+			t.Fatal("fabricated acceptance", acceptances, e)
+		}
+
+		// An earlier query mapping can differ from today's regional configuration.
+		if _, e = pool.Exec(ctx, `INSERT INTO geography_zone_mappings(dataset_id,municipality_dataset_id,municipality_istat,ordinal,zone,source_name,territorial_scope,evidence_locator) VALUES('zones-v1','municipalities-v1','050004',4,'A2','Calcinaia','partial_municipality','synthetic historical mapping')`); e != nil {
+			t.Fatal(e)
+		}
+		historic := record
+		historic.ID = "pending-historic-zone"
+		historic.Facts = []domain.RegionalFact{{Ordinal: 1, Risk: domain.RiskThunderstorms, OfficialRiskLabel: "Temporali", Zone: "A2", Level: &yellow}}
+		if e = domainStore.PutRegional(ctx, historic); e != nil {
+			t.Fatal(e)
+		}
+		historical, e := dev.Search(ctx, SearchQuery{Kind: "regional", SourceID: "pending-criticality", MunicipalityISTAT: "050004"})
+		if e != nil || len(historical.Regional) != 2 {
+			t.Fatal("query mapping lost historical applicability", historical, e)
+		}
+		scopeEnabled, e := dev.PublicationScope(ctx)
+		if e != nil || scopeEnabled == scopeBefore {
+			t.Fatal("view scope unchanged", e)
+		}
+		if _, e = publication.Set(ctx, "09", "050004", 1, false, "reviewer"); e != nil {
+			t.Fatal(e)
+		}
+		assertRegional(dev, "050004", 0)
+		scopeRevoked, e := dev.PublicationScope(ctx)
+		if e != nil || scopeRevoked == scopeEnabled || scopeRevoked == scopeBefore {
+			t.Fatal("revocation did not invalidate saved views", e)
+		}
+		if _, e = pool.Exec(ctx, `DELETE FROM development_publication_events`); e == nil {
+			t.Fatal("audit mutable")
+		}
+	})
+
 }
 
 func stringPointer(value string) *string { return &value }

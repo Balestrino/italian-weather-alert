@@ -9,7 +9,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 132 | 11 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 136 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 11 | 0 |
@@ -54,3 +54,12 @@ original snapshot with a dated precheck note; detailed evidence remains private.
 For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The repository includes [OpenSpec agent workflows](../docs/development/agent-tools.md); an agent or CLI is not required to inspect the plans.
 
 The application-separation change reorganizes implementation and guide locations. Historical snapshot prose can retain earlier source paths; use the [architecture mapping](../docs/architecture/README.md) to locate their current equivalents. Snapshot checks do not certify the current checkout.
+
+Three subsequent implementation tasks add manually selected municipality publication
+in explicit development, with immutable private controls, scoped API/MCP visibility
+and revocable saved views. Synthetic PostgreSQL, native-form, API/MCP and resolved
+Compose checks verify same-zone isolation and strict staging/production behavior.
+See [development publication](../docs/operations/development-publication.md).
+Source acceptance remains independently pending. Task 25.4 verifies the targeted
+development public/admin rollout, native-form activation and live API/MCP equivalence;
+workers and other existing services were preserved.

@@ -104,3 +104,11 @@ examples against a local service, rejects administrative paths on the public
 listener, checks that no generated-safety field is present in the public MCP
 schemas, and uses the PostgreSQL fixture to prove a retained internal DPC
 comparison document remains absent from public search and coverage.
+
+## Development publication
+
+Explicit development installations can publish manually selected municipalities,
+including their applicable regional products, before production acceptance.
+`development_publication` on municipality/coverage records and interpretation/meta
+limitations identify this scope; pending source states remain pending. Revocation
+expires saved views and cursors on API and MCP. See [operator controls and limits](../operations/development-publication.md).

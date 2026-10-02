@@ -104,7 +104,7 @@ func run() bool {
 	}
 	defer pool.Close()
 	if controlRequested {
-		if err := executeControl(ctx, pool, c.Role, control, os.Stdout); err != nil {
+		if err := executeControlEnvironment(ctx, pool, c.Role, c.Environment, control, os.Stdout); err != nil {
 			slog.Error("control command failed", "code", controlErrorCode(err))
 			return false
 		}
@@ -867,7 +867,8 @@ func run() bool {
 		slog.Error("public copy access initialization failed")
 		return false
 	}
-	publicRuntime := httpapi.PublicRuntime{Limits: publicLimits, Views: publicview.New(pool), ViewLifetime: c.PublicViewLifetime, CursorKey: []byte(c.PublicCursorKey), Copies: copyAccess}
+	queries := publicquery.NewForEnvironment(pool, c.Environment)
+	publicRuntime := httpapi.PublicRuntime{PublicationScope: queries.PublicationScope, Limits: publicLimits, Views: publicview.New(pool), ViewLifetime: c.PublicViewLifetime, CursorKey: []byte(c.PublicCursorKey), Copies: copyAccess}
 	var adminRuntime backoffice.AdminRuntime
 	if c.Role == "admin" {
 		storage, loadErr := config.LoadStorage()
@@ -888,8 +889,11 @@ func run() bool {
 		adminScheduler := interpretation.New(pool, jobs.New(pool), inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
 		adminScheduler.Evaluations = evaluations
 		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
+		if c.Environment == "development" {
+			adminRuntime.DevelopmentPublication = domain.NewDevelopmentPublication(pool, c.Environment)
+		}
 	}
-	handler := listenerHandler(c.Role, checks, publicquery.New(pool), publicRuntime, adminRuntime)
+	handler := listenerHandler(c.Role, checks, queries, publicRuntime, adminRuntime)
 	if err := httpserver.Serve(ctx, ln, handler); err != nil {
 		slog.Error("service stopped unexpectedly")
 		return false

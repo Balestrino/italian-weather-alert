@@ -16,11 +16,13 @@ import (
 )
 
 type Store struct {
-	collectedOnly    bool
-	snapshotDatasets map[string]string
-	region           string
-	scopeTime        time.Time
-	pool             interface {
+	development       bool
+	municipalityScope string
+	collectedOnly     bool
+	snapshotDatasets  map[string]string
+	region            string
+	scopeTime         time.Time
+	pool              interface {
 		Query(context.Context, string, ...any) (pgx.Rows, error)
 		QueryRow(context.Context, string, ...any) pgx.Row
 	}
@@ -210,6 +212,12 @@ func (s *Store) municipalities(ctx context.Context, candidates []domain.Municipa
 			return nil, err
 		}
 		value := Municipality{ISTAT: candidate.ISTAT, Name: candidate.Name, MappingVersion: candidate.MappingVersionID, MappingLimitations: nonNil(candidate.MappingLimitations), LocalCoverage: coverage, Zones: []string{}}
+		if s.development {
+			err = s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM development_publication_current_municipalities WHERE istat=$1)`, candidate.ISTAT).Scan(&value.DevelopmentPublication)
+			if err != nil {
+				return nil, err
+			}
+		}
 		for _, zone := range candidate.Zones {
 			value.Zones = append(value.Zones, zone.Zone)
 		}
@@ -290,13 +298,16 @@ func (s *Store) history(ctx context.Context, knownAt time.Time, requestedFrom *t
 	err := s.pool.QueryRow(ctx, `SELECT min(v.first_acquired_at)
  FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
  JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id JOIN registry_products p ON p.id=s.product_id
-	 WHERE p.public_eligible AND `+s.visibilitySQL()+` AND v.first_acquired_at<=$1
+	 WHERE p.public_eligible AND (`+s.visibilitySQL()+`) AND v.first_acquired_at<=$1
 	   AND ($2::bigint=0 OR d.id=$2) AND ($3='' OR s.territory=$3 OR s.product_id<>'municipal')
 	   AND ($4='' OR s.id=$4) AND ($5='' OR s.product_id=$5)`, knownAt, scope.DocumentID, scope.Municipality, scope.SourceID, scope.Product).Scan(&start)
 	if err != nil {
 		return History{}, err
 	}
 	result := History{Start: utcPointer(start), Gaps: []string{}, Limitations: []string{"history reflects retained service knowledge and is not a complete pre-startup archive"}}
+	if s.development {
+		result.Limitations = append(result.Limitations, developmentPublicationWarning)
+	}
 	if requestedFrom != nil && (start == nil || requestedFrom.Before(*start)) {
 		result.Gaps = append(result.Gaps, "requested interval begins before retained service history")
 	}
@@ -321,6 +332,7 @@ func nonNil(values []string) []string {
 func stringID(value int64) string { return strconv.FormatInt(value, 10) }
 
 func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResult, error) {
+	s = s.forMunicipality(query.MunicipalityISTAT)
 	qt, err := normalizeTime(query.QueryTime)
 	if err != nil || (query.MunicipalityISTAT != "" && len(query.MunicipalityISTAT) != 6) {
 		return CoverageResult{}, ErrInvalidParameters
@@ -386,14 +398,25 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 		default:
 			value.PublicState = "pending"
 		}
+		value.DevelopmentPublication, err = s.developmentSource(ctx, value.SourceID)
+		if err != nil {
+			return CoverageResult{}, err
+		}
+		value.DevelopmentPublication = value.DevelopmentPublication && !publicEnabled
 		interpretation := Dimension{State: "not_processed", Limitations: []string{"source acceptance is pending"}, Evidence: []Evidence{}}
-		if accepted {
-			interpretation = Dimension{State: "supported", Limitations: []string{"source acceptance is recorded separately from individual facts"}, Evidence: []Evidence{}}
+		if accepted || value.DevelopmentPublication {
+			if accepted {
+				interpretation = Dimension{State: "supported", Limitations: []string{"source acceptance is recorded separately from individual facts"}, Evidence: []Evidence{}}
+			}
 			if value.Product == "criticality" || value.Product == "vigilance" || value.Product == "monitoring" {
 				var status, statement string
 				var versionID int64
 				var limits []string
-				projectionErr := s.pool.QueryRow(ctx, `SELECT p.status,p.statement,p.limitations,p.document_version_id FROM domain_regional_projections p JOIN retained_versions v ON v.id=p.document_version_id WHERE p.source_id=$1 AND p.projected_at<=registry_interpretation_cutoff($1,$2) AND v.first_acquired_at<=$2 ORDER BY v.first_acquired_at DESC,v.id DESC,p.projected_at DESC LIMIT 1`, value.SourceID, qt.KnownAt).Scan(&status, &statement, &limits, &versionID)
+				projectionVisibility := "true"
+				if !accepted {
+					projectionVisibility = s.visibilitySQL()
+				}
+				projectionErr := s.pool.QueryRow(ctx, `SELECT p.status,p.statement,p.limitations,p.document_version_id FROM domain_regional_projections p JOIN retained_versions v ON v.id=p.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=p.source_id WHERE (`+projectionVisibility+`) AND p.source_id=$1 AND p.projected_at<=registry_interpretation_cutoff($1,$2) AND v.first_acquired_at<=$2 ORDER BY v.first_acquired_at DESC,v.id DESC,p.projected_at DESC LIMIT 1`, value.SourceID, qt.KnownAt).Scan(&status, &statement, &limits, &versionID)
 				if projectionErr == nil {
 					interpretation.State = "partial"
 					if status == "unsupported" {
@@ -436,6 +459,13 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 
 func (s *Store) quality(ctx context.Context, sourceID string, qt QueryTime, interpretation Dimension) (Quality, error) {
 	result := Quality{Interpretation: interpretation}
+	dev, devErr := s.developmentSource(ctx, sourceID)
+	if devErr != nil {
+		return Quality{}, devErr
+	}
+	if dev {
+		result.Interpretation.Limitations = append(result.Interpretation.Limitations, developmentPublicationWarning)
+	}
 	var suspended bool
 	if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM registry_interpretation_suspensions WHERE source_id=$1 AND (resumed_at IS NULL OR (suspended_at<=$2 AND resumed_at>$2)))`, sourceID, qt.KnownAt).Scan(&suspended); err != nil {
 		return Quality{}, err

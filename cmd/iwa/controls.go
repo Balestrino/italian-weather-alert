@@ -33,11 +33,11 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 	switch c.Name {
 	case "source-status", "region-status":
 		count = 2
-	case "municipality-status":
+	case "municipality-status", "municipality-development-publication-status":
 		count = 3
 	case "source-enable-collection", "source-suspend-collection", "region-enable", "region-disable":
 		count = 4
-	case "municipality-enable", "municipality-disable":
+	case "municipality-enable", "municipality-disable", "municipality-development-publication-enable", "municipality-development-publication-disable":
 		count = 5
 	default:
 		return c, false, nil
@@ -88,6 +88,9 @@ func controlDigits(s string, n int) bool {
 
 // No worker, crawler, provider or container client is constructed by controls.
 func executeControl(ctx context.Context, pool *pgxpool.Pool, role string, c controlCommand, out io.Writer) error {
+	return executeControlEnvironment(ctx, pool, role, "production", c, out)
+}
+func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, environment string, c controlCommand, out io.Writer) error {
 	if role != "admin" {
 		return errControlRole
 	}
@@ -97,6 +100,14 @@ func executeControl(ctx context.Context, pool *pgxpool.Pool, role string, c cont
 	var result any
 	var err error
 	switch c.Name {
+	case "municipality-development-publication-enable", "municipality-development-publication-disable", "municipality-development-publication-status":
+		publication := domain.NewDevelopmentPublication(pool, environment)
+		if !strings.HasSuffix(c.Name, "-status") {
+			_, err = publication.Set(ctx, c.Region, c.ISTAT, c.Revision, strings.HasSuffix(c.Name, "-enable"), c.Actor)
+		}
+		if err == nil {
+			result, err = publication.State(ctx, c.Region, c.ISTAT)
+		}
 	case "source-enable-collection", "source-suspend-collection", "source-status":
 		if c.Name == "source-enable-collection" {
 			err = reg.EnableCollection(ctx, c.Source, c.Revision, c.Actor)
@@ -136,6 +147,8 @@ func executeControl(ctx context.Context, pool *pgxpool.Pool, role string, c cont
 
 func controlErrorCode(err error) string {
 	switch {
+	case errors.Is(err, domain.ErrDevelopmentOnly):
+		return "development_environment_required"
 	case errors.Is(err, errControlArguments), errors.Is(err, registry.ErrInvalid), errors.Is(err, domain.ErrInvalid):
 		return "invalid_arguments"
 	case errors.Is(err, errControlRole):

@@ -17,7 +17,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from environment_config import (APPLICATIONS, CORE, Environment, EnvironmentError,
                                 inspect_boundaries, verify_staging_release)
-from deployment_checks import check_runtime, templates, validate_background_selection
+from deployment_checks import check_runtime, templates, validate_background_selection, validate_config
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('smoke_compose', ROOT / 'scripts/smoke-compose.py')
@@ -298,6 +298,14 @@ class BackgroundSelectionTests(unittest.TestCase):
             environment = Environment(name, example=True)
             config = environment.config(all_services=True)
             validate_background_selection(environment, config)
+            validate_config(environment, config)
+            for role in APPLICATIONS:
+                self.assertEqual(config['services'][role]['environment']['IWA_ENVIRONMENT'], name)
+                broken = copy.deepcopy(config)
+                broken['services'][role]['environment']['IWA_ENVIRONMENT'] = 'development' if name != 'development' else 'production'
+                with self.assertRaisesRegex(EnvironmentError, 'runtime environment'):
+                    validate_config(environment, broken)
+
             for service in ('worker', 'backup'):
                 options = ('--profile', 'production') if name == 'production' else ()
                 selected = json.loads(environment.capture(*options, 'config', '--format', 'json', service))['services']

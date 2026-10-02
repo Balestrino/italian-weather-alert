@@ -30,11 +30,12 @@ type PublicViewStore interface {
 }
 
 type PublicRuntime struct {
-	Limits       PublicLimits
-	Views        PublicViewStore
-	ViewLifetime time.Duration
-	CursorKey    []byte
-	Copies       PublicCopyAccess
+	PublicationScope func(context.Context) (string, error)
+	Limits           PublicLimits
+	Views            PublicViewStore
+	ViewLifetime     time.Duration
+	CursorKey        []byte
+	Copies           PublicCopyAccess
 }
 
 type PublicCopyAccess interface {
@@ -132,6 +133,13 @@ func (s *publicService) createView(ctx context.Context, operation string, raw js
 	if err != nil {
 		return s.failure(servedAt, err, nil)
 	}
+	scope := ""
+	if s.publicationScope != nil {
+		scope, err = s.publicationScope(ctx)
+		if err != nil {
+			return s.failure(servedAt, err, nil)
+		}
+	}
 	full, status := s.invokeUnviewed(ctx, operation, sanitized)
 	if status != http.StatusOK || full.Meta == nil {
 		return full, status
@@ -140,7 +148,7 @@ func (s *publicService) createView(ctx context.Context, operation string, raw js
 	if err != nil {
 		return s.failure(servedAt, err, nil)
 	}
-	history := publicquery.History{Start: full.Meta.HistoryStart, Gaps: full.Meta.HistoryGaps, Limitations: full.Meta.Limitations}
+	history := publicquery.History{PublicationScope: scope, Start: full.Meta.HistoryStart, Gaps: full.Meta.HistoryGaps, Limitations: full.Meta.Limitations}
 	historyJSON, err := json.Marshal(history)
 	if err != nil {
 		return s.failure(servedAt, err, nil)
@@ -157,6 +165,15 @@ func (s *publicService) createView(ctx context.Context, operation string, raw js
 }
 
 func (s *publicService) page(ctx context.Context, view publicview.View, data any, history publicquery.History, positions map[string]int, pageSize int, servedAt time.Time) (publicResponse, int) {
+	if s.publicationScope != nil {
+		scope, err := s.publicationScope(ctx)
+		if err != nil {
+			return s.failure(servedAt, err, nil)
+		}
+		if scope != history.PublicationScope {
+			return s.failure(servedAt, errCursorExpired, nil)
+		}
+	}
 	page, next, more, err := paginateData(data, positions, pageSize)
 	if err != nil {
 		return s.failure(servedAt, err, nil)

@@ -98,3 +98,22 @@ Administrative pages and operations SHALL be accessible only through a local int
 #### Scenario: An anonymous caller attempts a source activation
 - **WHEN** the caller uses public API or MCP access
 - **THEN** no administrative activation operation is available
+
+### Requirement: Manual municipality publication in development
+An explicitly configured development runtime SHALL allow private operators to enable or revoke publication for individual current supported Toscana municipalities, with an expected revision and an immutable actor/time audit. The setting SHALL be disabled by default and independent of collection, source acceptance and global source publication. It SHALL expose retained municipal data and applicable CFR products through equivalent API/MCP queries without requiring production acceptance reviews, observational completion or release readiness. Only active source configurations with recorded provenance, permitted publication and no unresolved policy conditions SHALL qualify. Versions SHALL have an acquisition under that active configuration. Unsupported products, DPC comparisons and local sources of unselected municipalities SHALL remain excluded. Unscoped regional fact searches SHALL include only zones applicable to selected municipalities; selecting one municipality SHALL NOT enable other municipalities sharing its zone. Shared official regional bulletin metadata MAY describe the complete bulletin.
+
+Responses SHALL identify development publication on municipality and source coverage records and disclose the manual override in interpretation/history limitations. Source acceptance and coverage states SHALL remain truthful, including pending acceptance and uncertain map levels. Retained-copy access SHALL continue to require its independent existing authorization. Revoking a selection or changing its relevant publication configuration SHALL invalidate saved development views and cursors. Development views SHALL NOT be served by strict runtimes.
+
+`IWA_ENVIRONMENT` SHALL accept only development, staging or production and default to production. Compose environments SHALL pin their corresponding runtime value. Staging and production SHALL neither expose these controls nor honor saved development choices, including when a development database is deliberately copied. Existing source acceptance, release and explicit production publication gates SHALL continue to apply.
+
+#### Scenario: Only Calcinaia is enabled in development
+- **WHEN** an operator enables publication for ISTAT 050004
+- **THEN** its retained municipal data and applicable regional facts become available with development limitations; another municipality sharing A4 remains unselected and source acceptance remains pending
+
+#### Scenario: Publication is revoked after the first page
+- **WHEN** the operator revokes the municipal setting
+- **THEN** new queries follow the revoked selection and API/MCP access to an earlier saved view explicitly expires
+
+#### Scenario: A development database is used in production
+- **WHEN** development publication choices exist in the database and the runtime is staging, production or unspecified
+- **THEN** those choices grant no public visibility and manual activation commands are unavailable

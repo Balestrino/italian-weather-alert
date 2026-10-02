@@ -331,3 +331,22 @@ reviewed contract; successful software tests do not close that regression. The
 private dossier identifies these prerequisites and retained-resource identities.
 Tasks 9.3 and 10.1 remain open; no source was accepted or publicly enabled.
 Infrastructure/public readiness gates remain separate and unverified by this audit.
+
+## 25. Manual municipality publication in development — 2 October 2026
+
+- [x] 25.1 Add default-off municipality publication state, immutable actor/time events and revision-checked private admin/CLI controls available only in explicit development; pin all Compose runtime environments and preserve collection/source acceptance flags.
+- [x] 25.2 Share development visibility across API/MCP municipal data, applicable CFR facts, document metadata and history; constrain selected municipalities/zones and active policy-permitted acquisitions, disclose development limitations and preserve independent copy restrictions.
+- [x] 25.3 Verify strict staging/production behavior, same-zone isolation, historical mapping applicability, revocation and saved-view expiry, native-form protections, audit persistence and default/invalid environment handling with synthetic tests and disposable PostgreSQL; update documentation and coverage boundaries.
+- [x] 25.4 Deploy the reversible development public/admin change, enable Calcinaia explicitly and verify selected/unselected API behavior and administrative state with private rollback evidence; report uncertain regional levels and missing municipal facts without claiming source acceptance.
+
+Development public/admin were rebuilt, migrated and deployed; the browser's native
+form explicitly enabled Calcinaia. API/MCP agree on its saved view and the original
+HTTPS endpoint returns applicable CFR facts with development limitations. A second
+municipality sharing A4 remains unselected, and unscoped regional facts stay in A4.
+Source collection/public flags and acceptance counts are unchanged; existing workers
+and other services were preserved. Unknown regional levels and absent interpreted
+municipal measures remain explicit. The nondisruptive boundary/secret/HTTP smoke passed.
+This targeted deployment does not certify uniform application-image rollout: the full
+runtime image checker reports preserved older backup/worker images. Private database,
+listener settings, response comparisons and rollback details are retained. Source
+acceptance tasks 9.3 and 10.1 and production release gates remain open.

@@ -4,24 +4,32 @@
 services:
   public:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: production
     profiles: [production]
     cpus: 0.5
     mem_limit: 256m
     pids_limit: 128
   admin:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: production
     profiles: [production]
     cpus: 0.5
     mem_limit: 256m
     pids_limit: 128
   worker:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: production
     profiles: !override [production-worker]
     cpus: 1.5
     mem_limit: 768m
     pids_limit: 256
   backup:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: production
     profiles: [application-backup]
     cpus: 0.5
     mem_limit: 512m

@@ -37,6 +37,12 @@ o estrazione riuscita non dimostra che un provvedimento sia consolidato nel
 dominio. CLN-004 e [TOS-005](../README.md#tos-005--situazione-pubblica-vuota-e-livelli-non-determinati-hanno-cause-distinte)
 descrivono questi criteri, senza cambiare l'accettazione della fonte.
 
+La [pubblicazione manuale in development](../../../operations/development-publication.md) consente di scegliere singoli
+comuni per la consultazione API/MCP, includendo i prodotti regionali applicabili.
+La scelta è revocabile e distinta dalla raccolta e dall’accettazione delle fonti.
+Gli stati pendenti e i livelli non verificati restano espliciti; staging e produzione
+mantengono i requisiti della specifica. Vedere CLN-006.
+
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
@@ -108,3 +114,13 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Conseguenza:** non marcare una regressione superata sulla base del solo deployment o della classificazione riuscita; non inserire un'accettazione con attestazioni prive di evidenza.
 - **Prossima verifica:** recuperare o ricostruire il corpus con esiti attesi revisionati, completare la rivalutazione e i confronti del trial, poi verificare l'accettazione e l'abilitazione separate.
 - **Collegamenti:** CLN-003, CLN-004, TOS-006 e [task 9.3, 10.1 e 24](../../../../openspec/changes/define-toscana-alert-service/tasks.md).
+
+### CLN-006 — Scelta comunale di pubblicazione per development
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, fixture, PostgreSQL isolato, controllo nativo nel browser e confronto API/MCP in development; dettagli operativi conservati separatamente.
+- **Ambito:** Pubblicazione manuale di Calcinaia in development.
+- **Conoscenza:** comportamento implementato; non certifica accettazione reale. **Intervento:** controlli separati per ambiente e comune.
+- **Osservazione:** un operatore può pubblicare dati comunali conservati e fatti regionali applicabili senza completare le verifiche di produzione. La scelta non si estende agli altri comuni della stessa zona, non cambia l’accettazione né autorizza copie pubbliche. Revoca e cambio di ambito fanno scadere le viste API/MCP conservate.
+- **Evidenza:** [controlli operativi](../../../operations/development-publication.md) e [specifica pubblica](../../../../openspec/changes/define-toscana-alert-service/specs/public-alert-access/spec.md#requirement-manual-municipality-publication-in-development).
+- **Conseguenza:** in development dati consultabili possono accompagnare `public_state=pending` e `development_publication=true`; nessuna misura locale o colore regionale viene dedotto per colmare dati mancanti.
+- **Prossima verifica:** usare i controlli separati per la consultazione di sviluppo; completare le revisioni e le rivalutazioni registrate prima della pubblicazione verificata in produzione.

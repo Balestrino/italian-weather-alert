@@ -36,13 +36,14 @@ type PublicQueries interface {
 }
 
 type publicService struct {
-	queries      PublicQueries
-	now          func() time.Time
-	maxPageSize  int
-	views        PublicViewStore
-	viewLifetime time.Duration
-	cursorKey    []byte
-	copies       PublicCopyAccess
+	publicationScope func(context.Context) (string, error)
+	queries          PublicQueries
+	now              func() time.Time
+	maxPageSize      int
+	views            PublicViewStore
+	viewLifetime     time.Duration
+	cursorKey        []byte
+	copies           PublicCopyAccess
 }
 
 type publicMeta struct {
@@ -376,7 +377,7 @@ func publicRoutes(mux *http.ServeMux, queries PublicQueries, now func() time.Tim
 	if runtime.Views != nil && (runtime.ViewLifetime <= 0 || len(runtime.CursorKey) < 32) {
 		panic("invalid public view configuration")
 	}
-	service := &publicService{queries: queries, now: now, maxPageSize: limits.MaxPageSize, views: runtime.Views, viewLifetime: runtime.ViewLifetime, cursorKey: append([]byte(nil), runtime.CursorKey...), copies: runtime.Copies}
+	service := &publicService{publicationScope: runtime.PublicationScope, queries: queries, now: now, maxPageSize: limits.MaxPageSize, views: runtime.Views, viewLifetime: runtime.ViewLifetime, cursorKey: append([]byte(nil), runtime.CursorKey...), copies: runtime.Copies}
 	budget := newSlidingBudget(limits, now)
 	mux.Handle("GET /v1/municipalities", budget.middleware(service.httpHandler("discover_municipalities", nil)))
 	mux.Handle("GET /v1/municipalities/{municipality_istat}/situation", budget.middleware(service.httpHandler("get_municipality_situation", map[string]string{"municipality_istat": "municipality_istat"})))

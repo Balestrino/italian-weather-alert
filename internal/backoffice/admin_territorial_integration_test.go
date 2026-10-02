@@ -563,3 +563,66 @@ func TestTerritoryDashboardBrowser(t *testing.T) {
 		t.Fatalf("navigation/setup enqueued work: %d %v", count, err)
 	}
 }
+
+func TestDevelopmentPublicationWorkspaceControls(t *testing.T) {
+	ctx := context.Background()
+	p := territorialAdminDB(t)
+	adoptTestMunicipalities(t, p, "09", 2)
+	publication := domain.NewDevelopmentPublication(p, "development")
+	runtime := AdminRuntime{Territories: operations.New(p), TerritoryConfig: domain.New(p), DevelopmentPublication: publication}
+	h := HandlerWithAdministration(nil, runtime)
+	base := "http://127.0.0.1/admin/regions/09/municipalities/909000"
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", base+"?tab=configuration", nil))
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "Abilita pubblicazione in development") {
+		t.Fatal(w.Code, w.Body)
+	}
+	post := func(origin, revision, enabled string) int {
+		t.Helper()
+		form := url.Values{"actor": {"operator"}, "expected_revision": {revision}, "enabled": {enabled}}
+		r := httptest.NewRequest("POST", base+"/development-publication", strings.NewReader(form.Encode()))
+		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		r.Header.Set("Origin", origin)
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		return w.Code
+	}
+	if code := post("https://foreign.example", "0", "true"); code != 403 {
+		t.Fatal("CSRF accepted", code)
+	}
+	if code := post("http://127.0.0.1", "0", "true"); code != 303 {
+		t.Fatal("enable", code)
+	}
+	if code := post("http://127.0.0.1", "0", "false"); code != 409 {
+		t.Fatal("stale write", code)
+	}
+	if code := post("http://127.0.0.1", "1", "false"); code != 303 {
+		t.Fatal("revoke", code)
+	}
+	history, e := operations.New(p).TerritorialHistory(ctx, "09", "909000", operations.TerritorialHistoryFilter{Kind: "configuration"}, time.Now())
+	if e != nil {
+		t.Fatal(e)
+	}
+	count := 0
+	for _, event := range history.Entries {
+		if strings.HasPrefix(event.Outcome, "development_publication_") {
+			count++
+			if event.Actor != "operator" {
+				t.Fatal(event)
+			}
+		}
+	}
+	if count != 2 {
+		t.Fatal("missing publication audit", history)
+	}
+	runtime.DevelopmentPublication = nil
+	h = HandlerWithAdministration(nil, runtime)
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", base+"?tab=configuration", nil))
+	if w.Code != 200 || strings.Contains(w.Body.String(), "/development-publication") {
+		t.Fatal("strict form", w.Code, w.Body)
+	}
+	if code := post("http://127.0.0.1", "2", "true"); code != 404 {
+		t.Fatal("strict route", code)
+	}
+}

@@ -24,6 +24,7 @@ x-app: &app
     start_period: 60s
 
 x-env: &env
+  IWA_ENVIRONMENT: development
   IWA_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
   IWA_CRAWL_TOKEN_FILE: /run/secrets/crawl_token
 

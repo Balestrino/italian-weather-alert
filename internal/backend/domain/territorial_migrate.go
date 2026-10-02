@@ -61,5 +61,8 @@ func MigrateTerritories(ctx context.Context, pool *pgxpool.Pool) error {
 	if err := migrateTerritorialGateHardening(ctx, pool); err != nil {
 		return err
 	}
-	return migrateMunicipalityLifecycle(ctx, pool)
+	if err := migrateMunicipalityLifecycle(ctx, pool); err != nil {
+		return err
+	}
+	return migrateDevelopmentPublication(ctx, pool)
 }

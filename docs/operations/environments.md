@@ -10,6 +10,8 @@ IWA uses three Docker Compose projects from one repository directory on one host
 
 These are example ports; select free loopback ports in each private environment file. Only public/admin HTTP listeners publish host ports, bound to `127.0.0.1`. Databases, object storage, crawlers and workers have no host ports. A new installation has no accepted sources or live collection. Production preparation selects no services and creates no containers.
 
+The runtime `IWA_ENVIRONMENT` is pinned to the selected Compose environment; its software default is strict production. Development alone supports [manual municipality publication](development-publication.md) before source acceptance. Staging/production ignore these selections and retain the specified gates.
+
 All projects share CPU, RAM and disk. Their named volumes, networks and credentials are separate, but a host outage affects every environment. Review capacity and off-host recovery before production activation.
 
 ## Prerequisites
