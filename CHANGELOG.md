@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Configure tailnet-only HTTPS access to the development status frontend and verify frontend and backoffice access in the integrated browser.
 - 2026-10-02 [Changed] Add reviewed source-scoped external PDF attachments, content filtering and preview/collector validation; verify failure persistence and activate the verified Livorno development revision with rollback evidence.
 
 - 2026-10-02 [Changed] Verify Livorno's ordinance download with the application HTTP client and a normal browser; refine the earlier access finding and document validation limits.
