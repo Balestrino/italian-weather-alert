@@ -31,9 +31,10 @@ può riconoscere la pertinenza di un formato regionale già revisionato, usando
 il parser rigoroso delle tabelle o lo stato esplicito senza evento. Richiede una
 policy `local_processing` del prodotto; non interpreta nuove mappe, non inventa
 livelli e non rende completa una risorsa mancante. Le policy regionali non possono
-dichiarare PDF grafici come documenti di solo testo. Verifiche con fixture del
-2026-10-02 non certificano il formato live; nessuna policy delle fonti operative
-è stata attivata da questa modifica.
+dichiarare PDF grafici come documenti di solo testo. Le verifiche del 2026-10-02 comprendono fixture, replay di originali conservati
+e un trial development limitato. La vigilanza con tabella riconosciuta ma senza
+zone elencate resta pertinente, senza dedurre un all-clear. TOS-004 distingue
+queste prove dall’attivazione di una policy continuativa e dall’accettazione.
 
 ## Regole ed eccezioni
 
@@ -41,7 +42,8 @@ dichiarare PDF grafici come documenti di solo testo. Verifiche con fixture del
 | --- | --- | --- | --- |
 | TOS-001 | Tre prodotti CFR | Accettazione e risorse necessarie sono distinte per prodotto; il monitoraggio non emette livelli desunti dalla narrativa | Applicato nel parser; accettazione reale separata |
 | TOS-002 | Stato del controllo | Completezza della raccolta e pubblicazione attesa sono dimensioni separate | Applicato nello store dei controlli |
-| TOS-003 | Formati CFR con policy locale esplicita | Pertinenza positiva da formato rigorosamente riconosciuto; risorse complete ed evidenza letterale obbligatorie, fallback sui casi non riconosciuti | Implementato e verificato con fixture; attivazione e accettazione separate |
+| TOS-003 | Formati CFR con policy locale esplicita | Pertinenza positiva da formato rigorosamente riconosciuto; risorse complete ed evidenza letterale obbligatorie, fallback sui casi non riconosciuti | Implementato; TOS-004 aggiunge replay e trial limitato |
+| TOS-004 | Originali CFR conservati e trial development | Tabella di vigilanza senza zone pertinente solo dopo parsing rigoroso e titolo letterale; nessun all-clear desunto | Replay e classificazioni persistite verificati; rollout continuativo separato |
 
 Non derivare colori delle mappe dal testo circostante. Le pubblicazioni comunali che rilanciano un bollettino non costituiscono automaticamente una nuova allerta o una misura locale.
 
@@ -92,3 +94,15 @@ Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel c
 - **Evidenza:** [classificatore strutturato](../../../internal/backend/classification/structured.go), [verifica persistente sintetica](../../../internal/backend/interpretation/local_processing_integration_test.go), [specifica di acquisizione](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md).
 - **Conseguenza:** si riducono le chiamate sui formati revisionati senza dedurre colori dalle mappe; policy e risultati hanno identità separate. Non si dichiara un risparmio misurato o accettazione della fonte.
 - **Prossima verifica:** confrontare formati e risorse del singolo prodotto con originali, revisionare la policy e misurare il canary prima dell'attivazione.
+
+
+### TOS-004 — Replay regionale e trial limitato con evidenza reale
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, originali conservati, fixture, PostgreSQL e trial development limitato; nessun nuovo fetch certificato dalla prova.
+- **Ambito:** quindici versioni conservate dei tre prodotti CFR nel replay; una versione per prodotto nel trial di classificazione persistente.
+- **Conoscenza:** confermato sul campione. **Intervento:** verifica applicata e correzione della vigilanza implementata; policy continuative e accettazione separate.
+- **Osservazione:** le quindici versioni complete producono pertinenza locale; tredici hanno confronto storico concordante. La prima prova rileva fallback non necessario quando la tabella di vigilanza riconosciuta non elenca zone. La correzione richiede parsing rigoroso di fenomeni/date e titolo del bollettino come evidenza letterale. Le tre classificazioni del trial sono persistite senza chiamate al modello.
+- **Evidenza:** [classificatore e confini](../../../internal/backend/classification/structured.go), [regressioni sintetiche](../../../internal/backend/classification/local_processing_test.go), [risultati e limiti del trial](../../operations/local-processing.md). Selezione e originali restano nel registro privato.
+- **Conseguenza:** il prodotto resta pertinente anche senza zone elencate; nessun nuovo livello, all-clear o misura locale è desunto. Il worker diagnostico termina e conserva i risultati; non attiva una policy generale della fonte.
+- **Prossima verifica:** estendere il confronto a eventi significativi e alle interpretazioni downstream prima di un rollout continuativo.
+- **Collegamenti:** TOS-003 e task 20–21 del servizio Toscana.

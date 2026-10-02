@@ -295,3 +295,28 @@ checksums remain valid. Article selectors apply to original HTML notices; HTML
 attachments retain their full text. Native and model page writes preserve their
 selected path across retries rather than mixing extraction methods in one run.
 See [local processing operations](../../../docs/operations/local-processing.md).
+
+
+## Bounded local-processing verification — 2 October 2026
+
+A read-only retained-development replay compares candidate selectors with full
+page text, checks title/article/metadata and attachment preservation, exercises
+missing/ambiguous selector fallback, and probes unique municipal PDFs with real
+Poppler. It separates technical native-text eligibility from approval of a
+text-only directory. A validated vigilance table remains relevant when its six
+phenomena have no listed zones: use the literal regional bulletin title only
+after strict table/date recognition, without inferring an all-clear.
+
+For the explicitly requested development trial, use eight fixed versions and a
+separate queue with one attempt per job and at most twenty calls to the existing
+local model. Trial document readers attach reviewed candidate policies only to
+those versions and exact reviewed PDF hashes. Processing stores, manifests,
+queue claims and call receipts are real; policy identity separates results from
+ordinary reuse. Four municipal baseline/candidate pairs use the same model;
+regional classification and reviewed native PDFs exercise zero-call paths.
+Preserve a private database snapshot and input/output evidence. Existing source
+policies and normal worker routing remain intact; no automatic downstream
+extraction, embedding, linking or publication is requested by this diagnostic
+worker. The worker exits after the fixed queue, with results retained for admin
+inspection. This bounded trial is separate from a continuing source rollout or
+semantic extraction acceptance.

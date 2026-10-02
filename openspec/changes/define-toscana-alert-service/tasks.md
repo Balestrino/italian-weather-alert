@@ -232,3 +232,29 @@ territorial guidance are documented in [local processing operations](../../../do
 Source policies remain opt-in and no live settings, provider accounts, acceptance
 status or production deployment were changed. Native text requires reviewed
 text-only scopes; meaningful vector graphics remain outside those scopes.
+
+## 20. Bounded local-processing replay — 2 October 2026
+
+- [x] 20.1 Replay candidate article and regional policies against a bounded sample of retained development documents using read-only database access; check complete article evidence, fallback and historical relevance agreement without provider calls.
+- [x] 20.2 Probe unique retained municipal PDFs with the current native extractor and real Poppler; distinguish technically eligible files from scopes approved for activation.
+- [x] 20.3 Keep detailed evidence private and update territorial discovery registers, operations guidance, specification and changelog with the observed results and remaining rollout boundaries.
+
+## 21. Bounded development trial — 2 October 2026
+
+- [x] 21.1 Prepare an eight-version, separate-queue trial using the checked-out implementation, reviewed candidate policies and existing local model gates; preserve a database snapshot and cap calls at twenty.
+- [x] 21.2 Persist baseline/candidate classifications and four reviewed native PDF resources in development through real queue claims and processing stores; keep results available for dashboard inspection without automatic downstream publication or broad policy activation.
+- [x] 21.3 Verify persisted evidence, usage, model-call limits, dashboard access and worker termination; record results and remaining quality/rollout limits in the territorial registers and operations guidance.
+
+The fifty-version read-only replay passed content/fallback checks, with 51.8%
+less municipal HTML input, fifteen local regional decisions, and six of fifteen
+unique PDFs accepted for native text (eleven pages). The completed development
+trial persisted sixteen successful jobs on eight fixed versions: four municipal
+baseline/candidate pairs agreed, their input tokens fell 36.8%, three regional
+classifications and four native PDF resources (seven pages) made no model calls.
+Sixteen local calls stayed below the twenty-call cap; usage/cost provenance and
+browser visibility were verified, and the separate worker exited. Focused race,
+vet, strict OpenSpec and disposable PostgreSQL checks passed. The empty-zone
+vigilance correction has positive and conservative-fallback regressions. Current
+source policies and ordinary routing remain intact; continuing rollout and
+semantic downstream acceptance remain separate. Detailed captures, configurations,
+receipts, trial programs and snapshot are private.

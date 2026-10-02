@@ -387,3 +387,8 @@ historical reprocessing or changes to source/public activation.
 - **WHEN** the strict regional parser recognizes all six phenomenon rows and both dates, no explicit zone facts are listed, the regional bulletin title is literal original-page evidence, and required content is complete
 - **THEN** local classification establishes only the bulletin's regional relevance without a model call
 - **AND** no all-clear, alert color or local measure is inferred; a title without the recognized table or complete evidence retains normal fallback
+
+#### Scenario: A local-processing development trial is explicitly bounded
+- **WHEN** an operator requests a trial on fixed retained versions before broader activation
+- **THEN** a separate worker queue may persist evaluated candidate results with immutable processing and evidence identities, a fixed model-call cap and existing provider gates
+- **AND** candidate policies apply only to the selected trial inputs, model calls and zero-call paths remain distinguishable, the trial worker exits, and current source policies, ordinary worker routing and public activation remain unchanged

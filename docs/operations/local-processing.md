@@ -142,3 +142,63 @@ go test -tags=integration ./internal/backend/ocr ./internal/backend/interpretati
 Run `TestPDFTextUsesRealPoppler` in the application image if Poppler is absent on
 the host. These fixture checks do not establish live omission rates, source
 acceptance, deployment or monetary savings; measure those after scoped activation.
+
+
+## Retained-source replay — 2 October 2026
+
+The bounded development replay used 50 retained versions: 35 municipal notices
+from Cascina/Livorno and 15 regional bulletins from the three CFR products. The
+candidate municipal selector `main#main-content` retained the article title,
+complete `article-content`, checked metadata and all collected attachment text.
+Across these municipal originals, normalized HTML input fell from 188,933 to
+90,979 bytes (51.8%). This is input reduction, not a measured token or monetary
+saving. Missing and ambiguous selector probes retained full-page fallback.
+
+All 15 complete regional inputs produced positive local relevance; the 13 with
+historical classified results agreed on relevance. The two other cases lacked
+that historical comparison. The first replay exposed unnecessary fallback on
+vigilance tables with no listed zones; the narrow recognized-table/title case
+was corrected and regression-tested before the passing replay. No alert colors
+or municipal measures were inferred.
+
+Of 15 unique retained municipal PDFs, six passed native extraction (11 pages).
+The nine others contained raster images and kept whole-resource OCR fallback.
+The reader currently rejects even small embedded logos. Eight selected municipal
+versions had incomplete interpretation evidence and remained incomplete. These
+checks made no provider calls and used read-only database access. Original
+captures, exact case selections, outputs and reproducible probe programs remain
+in the private operational archive. Observations concern retained snapshots,
+not a fresh source crawl, continuous availability or source acceptance.
+
+## Fixed development trial
+
+An explicitly selected trial uses a separate queue on eight fixed retained
+versions, with one attempt per job and a cap of twenty calls to the existing
+local model. Candidate policies are attached only inside that trial reader;
+current source configurations and ordinary worker routing are preserved. Real
+queue claims, immutable configurations, input manifests, processing results and
+call receipts make the evaluated results visible in the existing backoffice.
+Four municipal baseline/candidate pairs use the same model. Three regional
+classifications and four individually reviewed native PDF resources exercise
+local zero-call paths. The trial worker exits after the selected queue; no
+automatic downstream interpretation or publication is scheduled.
+
+For inspection, open **Operazioni → Job** and filter the trial queue, then
+inspect **Consumi** and the documents for the selected sources. Detailed case
+IDs, queue name, model responses, snapshot and rollback evidence belong to the
+private register. Completion of this bounded trial does not enable a continuing
+local-processing source policy; a broader trial must review directory scopes,
+model quality and downstream extraction separately.
+
+The completed development trial persisted sixteen successful jobs with no failures:
+eight candidate classifications, four baseline classifications and four native
+PDF resources (seven pages). The three regional classifications and all four
+PDF resources made no model calls; other classification work made sixteen local
+model calls in total, below the twenty-call cap. All four baseline/candidate
+municipal pairs agreed on relevance. Their reported input tokens fell from
+6,767 to 4,277 (36.8%); this small sample is not an omission-rate evaluation.
+Local model attempts reported usage with unknown cost rather than inventing a
+remote price. Native/structured attempts recorded usage and cost as not
+applicable. Real database receipts and the private browser view confirmed all
+sixteen jobs completed, and the temporary worker exited. Ordinary acquisition
+and source configurations were preserved.

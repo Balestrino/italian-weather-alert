@@ -9,7 +9,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 115 | 11 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 121 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 11 | 0 |
@@ -28,7 +28,13 @@ text-only PDF native extraction and positive-only regional-format classification
 Synthetic tests, disposable PostgreSQL and real Poppler checks verify fallbacks,
 page provenance, zero-call accounting and policy-separated reuse. See
 [local processing operations](../docs/operations/local-processing.md). No live
-source policy was activated; acceptance and measured savings remain separate.
+source policy was activated by those implementation tasks. Six subsequent
+verification tasks add a fifty-version read-only replay and an eight-version
+development trial. All sixteen trial jobs succeeded; four municipal comparisons
+agreed with 36.8% fewer reported input tokens, while regional classifications
+and reviewed native PDFs made no model calls. Trial results are retained for
+backoffice inspection, and the separate worker exited. Continuing policies,
+semantic downstream quality and acceptance remain separate.
 
 Explicit background selection and hierarchical controls have synthetic repository verification for CLI/admin parity, municipal migration and processing admission, plus native-form browser checks. See [background processing verification](../docs/operations/background-processing-verification.md). The current live collector was preserved; production handover remains a separate release operation.
 

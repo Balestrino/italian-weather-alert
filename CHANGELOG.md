@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Record retained-source replay and bounded development local-processing results, accounting and rollout limits.
 - 2026-10-02 [Changed] Reduce model dependence with reviewed article-body selection, native PDF text and deterministic regional relevance, preserving evidence and conservative fallbacks
 - 2026-10-02 [Changed] Clarify operations with complete job states, archive and reason drilldowns, document backlog categories and accessible historical attempt bars; verify database, browser and development admin rollout.
 - 2026-10-02 [Changed] Document and verify register-wide development fallback selection with existing model and independent source controls
