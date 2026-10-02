@@ -77,4 +77,21 @@ func TestPreflightMeaningfulChanges(t *testing.T) {
 	if a == b {
 		t.Fatal("unreviewed normalization")
 	}
+	one = `<meta name="csrf-token" content="` + strings.Repeat("a", 40) + `"><main>Chiusura 8 ottobre ore 18:00</main><input type="hidden" name="_token" value="` + strings.Repeat("a", 40) + `">`
+	two = strings.ReplaceAll(one, strings.Repeat("a", 40), strings.Repeat("b", 40))
+	a, _ = build("cascina-municipal", one, "unchanged", `{}`, false)
+	b, _ = build("cascina-municipal", two, "unchanged", `{}`, false)
+	if a != b {
+		t.Fatal("Cascina CSRF changes not equivalent")
+	}
+	for _, changed := range []string{strings.Replace(two, "18:00", "19:00", 1), strings.Replace(two, "8 ottobre", "9 ottobre", 1), strings.Replace(two, "Chiusura", "Revoca", 1)} {
+		b, _ = build("cascina-municipal", changed, "unchanged", `{}`, false)
+		if a == b {
+			t.Fatal("Cascina meaningful change lost")
+		}
+	}
+	b, complete := build("cascina-municipal", two, "unchanged", `{}`, true)
+	if complete || a == b {
+		t.Fatal("Cascina missing resource concealed")
+	}
 }

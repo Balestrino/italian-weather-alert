@@ -3,7 +3,8 @@
 The crawl-based municipal collector supports an optional `attachments` policy in
 each immutable source configuration. Use it only after reviewing the official
 referral, document context and applicable reuse conditions. The
-[Livorno guide](../territori/09-toscana/comuni/049009-livorno.md) records the source
+[Livorno guide](../territori/09-toscana/comuni/049009-livorno.md) and
+[Cascina guide](../territori/09-toscana/comuni/050008-cascina.md) record separate source
 research; [Municipium notes](../fonti/piattaforme/municipium.md) describe the
 observed platform cases without granting permissions to other municipalities.
 
@@ -105,3 +106,45 @@ go test -tags=integration ./internal/backend/acquisition -run TestScopedAttachme
 
 Run `TestPDFValidationUsesRealParser` in the application image when Poppler is not
 installed on the host. Passing fixture tests does not certify live source coverage.
+
+## Cascina date repair and interpretation reuse
+
+The separately reviewed Cascina revision uses `2 Jan 2006` with Italian month
+normalization, `page-content` for news and attachment sections, and its own exact
+API origin/tenant directory grant. One/two-digit date fixtures and persistent
+tracking tests verify that a repaired old date leaves the recent acquisition
+window; unknown dates and explicit-reference/ongoing/unresolved exceptions remain
+eligible. No unavailable-target exclusion is needed for a reachable historical
+page correctly dated outside the window.
+
+`cascina-html-v1` removes only the 40-character alphanumeric values in the exact
+reviewed CSRF meta/hidden-input forms from interpretation fingerprints. Retained
+bytes remain unchanged. Enable Cascina explicitly in `IWA_PREFLIGHT_SOURCES`,
+`IWA_OCR_REUSE_SOURCES` and `IWA_INTERPRETATION_REUSE_SOURCES` only after checking
+the policy. Keep provider holds and local fallback scope independent. The isolated
+preflight test verifies contiguous grouping, incomplete evidence, real changes,
+archive/configuration boundaries and validated reuse without a second model call.
+
+For a reviewed historical backlog, stop the worker and record exact version/job
+IDs and the corrected official date privately. A scoped transaction must assert
+the active revision, date, absent protection/references, unchanged version set,
+no claimed check, no runs and no attempted/running jobs. Archive only those jobs
+and interpretation versions with an actor and snapshot cutoff; preserve originals,
+trigger identities, results and accounting. Global archive commands would affect
+unrelated work and are inappropriate for this targeted repair. Resume the worker
+and confirm the historical version is absent from the default pending admin view.
+Archival records a decision to retire work, not a successful interpretation.
+
+Development verification included a successful scoped preview, two complete
+ordinary checks, corrected stored dates and real parser reads of retained PDFs.
+The second check reused unchanged retained versions; no provider calls were made
+for Cascina during these checks. That observation demonstrates unchanged-content
+handling; the isolated test supplies the separate validated-result reuse evidence.
+Fresh non-equivalent work can still await a held provider. Capture receipts,
+rollback images/settings and the scoped archival operation privately. Restoring a
+source configuration/image does not undo archives; any future historical
+reprocessing is a separately selected action preserving prior history.
+
+```sh
+go test -tags=integration ./internal/backend/acquisition ./internal/backend/interpretation -run 'Test(RevisionTrackingBootstrapAndRecurringSelection|PreflightContiguousGroups|ScopedAttachmentsPersistFailureAndRecover)$' -v
+```

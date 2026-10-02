@@ -18,7 +18,7 @@ Per ogni comune verificare separatamente riferimento ufficiale, emittente/pubbli
 
 La scansione generica può includere PDF di navigazione che non documentano la notizia; il vincolo sul dominio può escludere un vero allegato ufficialmente collegato. Vedere `LIV-001` e `LIV-002` per il caso concreto, i criteri di chiusura e la distinzione fra comportamento presente e correzione proposta. La correzione del collector è successiva alle guide iniziali: LIV-006 e MUN-003 documentano il comportamento opt-in implementato.
 
-CAS-002 documenta lo stesso rischio di selezione del footer su Cascina. Nel percorso programmato l'errore dell'allegato ferma anche l'acquisizione dei documenti successivi: controllare originali conservati e completezza, oltre al numero dei target scoperti.
+CAS-002 documenta la diagnosi precedente dello stesso rischio di selezione del footer su Cascina; CAS-004 e MUN-004 registrano la successiva correzione separata. Nel percorso programmato l'errore dell'allegato ferma anche l'acquisizione dei documenti successivi: controllare originali conservati e completezza, oltre al numero dei target scoperti.
 
 LIV-004 precisa il perimetro esterno proposto per Livorno e distingue il filtro locale del collector dall'accessibilità del file. Il collector ora offre una regola esplicita per fonte/revisione; l'ammissione tecnica non garantisce che il download sia consentito dal server. Il collegamento nel footer a `cloud-ita.municipiumapp.it` non giustifica l'abilitazione di quel dominio come fonte di allegati pertinenti.
 
@@ -56,5 +56,15 @@ MUN-001 e MUN-002 registrano il comportamento osservato prima della correzione o
 - **Conoscenza:** confermato. **Intervento:** implementato e verificato sul perimetro Livorno; risultati dettagliati per ambiente restano privati.
 - **Osservazione:** ogni revisione può limitare la discovery dei PDF al contenitore del documento e autorizzare origini/percorso con referral e riuso espliciti. I PDF del footer sono esclusi dal filtro; i riferimenti necessari non recuperati restano visibili e impediscono un controllo completo.
 - **Evidenza:** [LIV-006](../../territori/09-toscana/comuni/049009-livorno.md), [policy](../../../internal/backend/registry/attachments.go), [fixture](../../../internal/backend/acquisition/scoped_attachments_test.go) e [procedura](../../operations/municipal-attachments.md).
-- **Conseguenza:** aggiorna l'intervento proposto in MUN-001 per Livorno; MUN-002 mantiene i suoi problemi sul perimetro di Cascina privo della policy. La capacità non autorizza automaticamente domini Municipium o host S3 di altri enti.
+- **Conseguenza:** aggiorna l'intervento proposto in MUN-001 per Livorno; MUN-002 descriveva il perimetro di Cascina allora privo della policy; MUN-004 documenta la successiva verifica indipendente. La capacità non autorizza automaticamente domini Municipium o host S3 di altri enti.
 - **Prossima verifica:** raccogliere evidenze e configurare separatamente ogni ulteriore fonte; osservare continuità del download e cambiamenti nella struttura del sito.
+
+### MUN-004 — Cascina richiede contenitore e tenant verificati separatamente
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, pagine ufficiali di Cascina, trasporto applicativo, parser PDF e fixture.
+- **Ambito:** pagine configurate di `cascina-municipal`, classe `page-content` e soli PDF municipali collegati su `cascina-api.cloud.municipiumapp.it` nella directory `/s3/1520/allegati/`.
+- **Conoscenza:** confermato per i casi esaminati. **Intervento:** revisione separata implementata e verificata in sviluppo; esiti e configurazioni dettagliati privati.
+- **Osservazione:** contenuto e sezioni degli allegati usano `page-content`, diversamente da `article-content` di Livorno. Il referral Sogefarm collega atti municipali nel tenant API Cascina; le note legali e le eccezioni sono state riesaminate. Il PDF generico del footer appartiene a un'origine S3 diversa, non autorizzata. Il normale client applicativo scarica i due PDF esaminati e Poppler li legge; una precedente prova con altro client era fallita.
+- **Evidenza:** [CAS-004, referral e condizioni](../../territori/09-toscana/comuni/050008-cascina.md), [policy](../../../internal/backend/registry/attachments.go), [fixture](../../../internal/backend/acquisition/scoped_attachments_test.go), [verifica operativa](../../operations/municipal-attachments.md).
+- **Conseguenza:** supera per il perimetro revisionato l'intervento proposto in MUN-002; non trasferisce il permesso di Livorno, né autorizza tutti gli host Municipium. Non verifica formati diversi dai PDF o tutti i documenti del tenant.
+- **Prossima verifica:** osservare struttura, download, condizioni ed eccezioni documentali; verificare indipendentemente ogni ulteriore comune o directory.

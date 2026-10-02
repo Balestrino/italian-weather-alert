@@ -77,6 +77,14 @@ Generated transport-only Drupal Views DOM identifiers in HTML comments or class 
 - **WHEN** separate retained versions contain the same substantive HTML evidence under a reviewed interpretation policy
 - **THEN** contiguous preflight grouping and classification reuse avoid duplicate provider calls while retaining each version's provenance
 
+#### Scenario: A reviewed Cascina page changes only its CSRF values
+- **WHEN** complete consecutive retained Cascina inputs differ only in the exact reviewed CSRF meta and hidden-input values under the same processing policy
+- **THEN** source-scoped preflight and validated result reuse avoid new provider calls while retaining originals; changed dates, text, links, attachments or incomplete evidence remain distinct
+
+#### Scenario: A municipal listing uses a single-digit day
+- **WHEN** a source publishes `8 ottobre 2024` with the evaluated `2 Jan 2006` layout and Italian month normalization
+- **THEN** discovery persists the official date and excludes old targets from the recent window except for existing explicit-reference or ongoing/unresolved-measure exceptions
+
 ### Requirement: Necessary attachments and ordinances
 The service SHALL acquire linked attachments and ordinances when needed to establish a measure, territory or validity. If an attachment cannot be accessed or interpreted, it SHALL expose the available official document or link and identify the fields that cannot be determined. It SHALL NOT substitute bulletin validity or page expiry for a duration specified only in the ordinance.
 

@@ -1,5 +1,31 @@
 ## Context
 
+### Cascina corrections — 2 October 2026
+
+Use the source-revision layout `2 Jan 2006` for the observed unpadded Italian
+listing days; test one/two-digit days and date-based tracker selection. Keep
+unknown dates eligible and explicit-reference/ongoing-measure exceptions intact.
+Discover PDF attachments inside the observed `page-content` container, preserving
+explicit dependencies. Review the official municipal decree/notice referral and
+reuse conditions for the exact Cascina API origin and `/s3/1520/allegati/`
+attachment directory; grant linked municipal PDFs only, with bounded redirects
+and real PDF validation. Generic S3 footer resources and other external
+origins remain excluded; acquisition of non-PDF dependencies is separate work.
+
+Paired retained Cascina HTML differs only in generated 40-character CSRF values
+in an exact meta tag and hidden input. Normalize only those reviewed tag forms
+for `cascina-municipal` with one versioned policy shared by preflight and manifests.
+Preserve original bytes, operative text, dates, links and required attachments.
+Incomplete inputs remain distinct; source opt-in and compatible validated results
+are still required for reuse. Test warm reuse without a provider call.
+
+Preserve private database/image/configuration rollback evidence before development
+activation. Apply the source revision after preview, verify fresh complete checks
+and corrected tracker dates, and add Cascina to the existing preflight/OCR/result
+reuse lists. Retire only the explicitly reviewed stale unattempted COC jobs and
+versions through a guarded audited operation, keeping originals and histories.
+Provider holds, local fallback scope, acceptance and production remain separate.
+
 See [proposal.md](proposal.md) for scope and motivation. The workspace contains a substantial implementation and tests alongside the research and planning artifacts. This revision captures the agreed target behavior and deployment design; completed code tasks do not by themselves certify live source acceptance or operational readiness.
 
 Research context (the detailed investigation records are retained separately):

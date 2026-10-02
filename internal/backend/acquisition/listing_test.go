@@ -1,11 +1,38 @@
 package acquisition
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 )
+
+func TestCascinaListingUnpaddedDays(t *testing.T) {
+	cfg := registry.Configuration{Discovery: registry.Discovery{DocumentPathPrefixes: []string{"/it/news/"}, ListingItemClass: "card-body", ListingDateClass: "h5", ListingDateLayout: "2 Jan 2006", ListingDateLocale: "it"}}
+	for _, tc := range []struct {
+		day  string
+		want int
+	}{{"8", 8}, {"08", 8}, {"18", 18}, {"32", 0}} {
+		t.Run(tc.day, func(t *testing.T) {
+			body := []byte(fmt.Sprintf(`<div class="card-body"><a href="/it/news?type=3">Avvisi</a><span class="h5 card-pretitle">%s ottobre 2024</span><a href="/it/news/42/avviso"><h1 class="h5">Avviso</h1></a></div>`, tc.day))
+			items := discoverDocuments("https://municipal.example/it/news-category/42", body, cfg, []Link{{URL: "https://municipal.example/it/news/42/avviso"}})
+			if len(items) != 1 {
+				t.Fatalf("discovery: %#v", items)
+			}
+			if tc.want == 0 {
+				if items[0].PublicationDate != nil {
+					t.Fatal("invalid date accepted")
+				}
+				return
+			}
+			want := time.Date(2024, 10, tc.want, 0, 0, 0, 0, time.UTC)
+			if items[0].PublicationDate == nil || !items[0].PublicationDate.Equal(want) {
+				t.Fatalf("date: %#v", items[0])
+			}
+		})
+	}
+}
 
 func TestCalcinaiaListingDateExtraction(t *testing.T) {
 	body := []byte(`<div class="card-body"><span class="data">20 Ago 2026</span><a href="/novita/avviso-di-criticita">Avviso</a></div>`)

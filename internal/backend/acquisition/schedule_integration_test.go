@@ -451,6 +451,25 @@ func TestRevisionTrackingBootstrapAndRecurringSelection(t *testing.T) {
 	if !changed {
 		t.Fatal("new version not detected")
 	}
+	// A reviewed unpadded layout repairs a previously undated old target, while
+	// recent and ongoing targets retain their existing selection behavior.
+	cfg := registry.Configuration{Discovery: registry.Discovery{DocumentPathPrefixes: []string{"/"}, ListingItemClass: "card-body", ListingDateClass: "h5", ListingDateLayout: "2 Jan 2006", ListingDateLocale: "it"}}
+	body := []byte(`<div class="card-body"><span class="h5">8 ottobre 2024</span><a href="/unknown-date">Old notice</a></div>`)
+	corrected := discoverDocuments("https://source.example/list", body, cfg, []Link{{URL: documents[3].URL}})
+	if len(corrected) != 1 || corrected[0].PublicationDate == nil {
+		t.Fatal("unpadded date not discovered")
+	}
+	if _, err := tracker.Remember(ctx, "track-s", 1, corrected, now.Add(20*time.Minute)); err != nil {
+		t.Fatal(err)
+	}
+	repaired, err := tracker.Plan(ctx, "track-s", 1, now.Add(21*time.Minute), 30)
+	if err != nil || repaired.Bootstrap || plannedURLs(repaired) != documents[1].URL+","+documents[0].URL {
+		t.Fatalf("old repaired target still planned: %#v %v", repaired, err)
+	}
+	var persisted time.Time
+	if err := pool.QueryRow(ctx, "SELECT source_publication_date FROM acquisition_targets WHERE source_id='track-s' AND url=$1", documents[3].URL).Scan(&persisted); err != nil || !persisted.Equal(*corrected[0].PublicationDate) {
+		t.Fatalf("corrected date not persisted: %v %v", persisted, err)
+	}
 }
 
 func plannedURLs(plan RevisionPlan) string {

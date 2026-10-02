@@ -4,6 +4,7 @@ Official Toscana warnings and municipal measures are distributed across regional
 
 ## What Changes
 
+- Correct the reviewed Cascina date layout and footer attachment selection with separately reviewed Cascina API PDFs, and add source-scoped interpretation normalization for proven CSRF-only HTML changes; verify bounded development collection and retire only the reviewed stale pending COC versions without replaying history or reopening provider holds.
 - Support reviewed external municipal attachments through revision-scoped origins and paths, optional document-content filtering and PDF validation, with matching preview/collector checks; verify the Livorno development scope separately from public acceptance.
 
 - Maintain indexed territorial source guides with current operational knowledge, dated discoveries, scoped platform notes and separate private evidence; keep source acceptance and runtime activation independent of documentation.

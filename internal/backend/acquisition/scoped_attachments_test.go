@@ -130,3 +130,44 @@ func TestScopedDiscoveryPreservesExplicitDependencies(t *testing.T) {
 		t.Fatalf("explicit required dependency hidden: %v %#v", err, retained.items)
 	}
 }
+
+func TestCascinaContentExcludesFooterWithoutExternalGrants(t *testing.T) {
+	const parent = "https://municipal.example/it/news/42/avviso"
+	policy := &registry.AttachmentPolicy{ContentClass: "page-content", ValidatePDF: true}
+	for _, body := range []string{
+		`<div class="page-content paragraph"><p>Attivazione del COC</p></div><footer><a href="https://assets.example/piano.pdf">Piano di miglioramento</a></footer>`,
+		`<div class="page-content paragraph"><p>Attivazione del COC</p><footer><a href="https://assets.example/piano.pdf">Piano di miglioramento</a></footer></div>`,
+	} {
+		crawler := &fixtureCrawler{pages: map[string]Page{parent: {StatusCode: 200, HTML: []byte(body)}}}
+		retained := &fakeRetention{}
+		engine := Engine{Crawler: crawler, Retained: retained, Tracking: &fakeTracker{}}
+		page, err := engine.retainPlanned(context.Background(), "cascina-municipal", 3, PlannedDocument{URL: parent}, time.Now(), &acquisitionState{}, policy)
+		if err != nil || page.VersionID == 0 || len(retained.items) != 1 || len(retained.items[0].Resources) != 1 || len(crawler.calls) != 1 {
+			t.Fatalf("footer interfered with acquisition: %v %#v", err, retained.items)
+		}
+	}
+	if policy.Allows(parent, "https://assets.example/ordinanza.pdf") {
+		t.Fatal("external host granted")
+	}
+}
+
+func TestCascinaContentKeepsReviewedPDFAndExcludesFooter(t *testing.T) {
+	const parent = "https://municipal.example/it/news/42/avviso"
+	const attachment = "https://assets.example/s3/42/allegati/ordinanza.pdf"
+	const footer = "https://footer.example/s3/42/allegati/piano.pdf"
+	policy := scopedFixture()
+	policy.ContentClass = "page-content"
+	crawler := &fixtureCrawler{pages: map[string]Page{parent: {URL: parent, StatusCode: 200, HTML: []byte(`<div class="page-content"><p>Avviso comunale</p></div><div class="page-content"><a href="` + attachment + `">Allegato</a></div><footer><a href="` + footer + `">Piano</a></footer>`)}}}
+	resources := &boundedFixture{fixtureCrawler{pages: map[string]Page{attachment: {URL: attachment, StatusCode: 200, MediaType: "application/pdf", HTML: syntheticPDF()}}}}
+	retained := &fakeRetention{}
+	engine := Engine{Crawler: crawler, Resources: resources, Retained: retained, Tracking: &fakeTracker{}, validatePDF: func(context.Context, Page) error { return nil }}
+	_, err := engine.retainPlanned(context.Background(), "cascina-municipal", 4, PlannedDocument{URL: parent}, time.Now(), &acquisitionState{}, policy)
+	if err != nil || len(resources.calls) != 1 || resources.calls[0] != attachment || len(retained.items) != 1 || len(retained.items[0].Resources) != 2 {
+		t.Fatalf("reviewed attachment omitted or footer included: %v %#v", err, retained.items)
+	}
+	for _, forbidden := range []string{footer, "https://assets.example/s3/43/allegati/ordinanza.pdf", "https://other.example/s3/42/allegati/ordinanza.pdf"} {
+		if policy.Allows(parent, forbidden) {
+			t.Fatalf("unreviewed attachment allowed: %s", forbidden)
+		}
+	}
+}

@@ -176,5 +176,25 @@ These tasks record a completed diagnostic recheck, including unresolved acquisit
 - [x] 17.4 Apply the scoped Livorno revision on development after a successful preview, preserve rollback/evidence and verify a fresh complete worker check plus retained attachments without changing other source configurations or public activation.
 - [x] 17.5 Update current territorial/platform guidance, dated discovery history and operational verification references; keep captures/configurations private and record the change in the changelog.
 
-
 Repository tests, scoped vet checks, the real PDF parser in the application image and an isolated PostgreSQL failure/recovery test passed. A scoped development revision was activated after a successful preview; a fresh ordinary worker receipt and retained PDF reads verified the configured acquisition, with other source states and municipal activation flags preserved. Detailed receipts, settings, hashes, captures and rollback snapshots remain private. These checks do not certify future availability, interpretation, source acceptance, complete municipal coverage or production readiness. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).
+
+## 18. Cascina dates, attachments and interpretation reuse — 2 October 2026
+
+- [x] 18.1 Verify the one-digit official date, document container and paired retained HTML; preserve private development rollback evidence and confirm exact CSRF-only differences before defining normalization.
+- [x] 18.2 Add a Cascina-only versioned HTML policy shared by preflight and interpretation manifests; test CSRF equivalence, source boundaries, operative text/date/link changes and incomplete resources, retaining raw evidence.
+- [x] 18.3 Validate one/two-digit listing dates and the page-content attachment boundary with synthetic fixtures; verify persistent date-based planning and zero-call warm interpretation reuse on disposable PostgreSQL.
+- [x] 18.4 Review official referral/reuse for Cascina-only API PDFs and apply the development revision after preview, enable existing reuse switches, verify fresh complete collection and corrected tracker dates, and retire only reviewed stale unattempted COC work while preserving originals, provider holds and fallback scope.
+- [x] 18.5 Update territorial/platform guidance and dated discoveries, document operational verification/rollback, run relevant checks and record the change without claiming source acceptance or production deployment.
+
+Repository tests, scoped vet and isolated PostgreSQL date/preflight/attachment
+checks passed, including Cascina result reuse without a second model call. The
+source revision passed preview and two ordinary development checks; stored dates
+and parser reads verified the configured acquisition. The second check retained
+unchanged versions, while the isolated test verified CSRF equivalence and warm
+validated reuse. Only reviewed stale unattempted COC work was archived; originals
+remain available. Admin and worker use the correction image; HTTP/runtime
+boundary smoke passed. Full release image alignment remains partial because
+public and backup retain earlier images. Provider quota hold, fallback scope,
+source acceptance and production readiness remain separate. The OpenSpec CLI
+was unavailable; no CLI validation is claimed. Detailed evidence and rollback
+are private. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).
