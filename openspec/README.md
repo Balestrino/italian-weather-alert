@@ -9,7 +9,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 89 | 11 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 92 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 16 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 18 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 8 | 0 |
@@ -18,6 +18,8 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
 
 The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Five subsequent local fallback tasks verify opt-in Qwen chat/image tests and scoped development routing; see [local fallback operations](../docs/operations/local-llm-fallback.md). Provider entitlement restoration and dependent semantic embeddings remain separate open work. These checks do not complete source acceptance or production readiness.
+
+Three subsequent documentation tasks add [territorial source guides](../docs/territori/README.md), a shared template, scoped platform notes and contributor upkeep instructions. Public findings and private operational evidence remain separate; document verification does not resolve the recorded acquisition problems or change the coverage snapshot.
 
 Explicit background selection and hierarchical controls have synthetic repository verification for CLI/admin parity, municipal migration and processing admission, plus native-form browser checks. See [background processing verification](../docs/operations/background-processing-verification.md). The current live collector was preserved; production handover remains a separate release operation.
 

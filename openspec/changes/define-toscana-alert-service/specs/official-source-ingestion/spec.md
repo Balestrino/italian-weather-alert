@@ -132,6 +132,23 @@ The internal monitoring system SHALL retain diagnostic evidence for availability
 - **WHEN** a revised interpretation process is evaluated against a retained ambiguous case
 - **THEN** the internal result records whether the issue is resolved without a manual edit of the public notice
 
+### Requirement: Territorial source knowledge guides
+The repository SHALL maintain a Markdown guide for each investigated region and municipality, indexed under `docs/territori/` and identified by region code and municipal ISTAT code where applicable. Guides SHALL contain identity and scope, source maps, current operational guidance, scoped rules and exceptions, open problems and a dated discovery register. Each discovery SHALL carry a stable identifier, source/product scope, observation and evidence, knowledge status, intervention status, last verification and a next check or closure criterion. Hypotheses, confirmed observations and superseded conclusions SHALL remain distinguishable from proposed, applied and verified interventions. Subsequent discoveries SHALL preserve and reference earlier entries while updating the current guidance. Shared platform characteristics SHALL be referenced separately and SHALL NOT establish permissions or exceptions for other territories.
+
+Public guides SHALL contain only redistributable summaries and references. Unpublished operational evidence, credentials, captures and machine-specific settings SHALL NOT enter repository changes; private observations SHALL remain in the ignored operational archive with scoped evidence references. Guides SHALL link the coverage tracker without changing its dated acceptance assessments or activating collection/publication. Contributors SHALL consult and update relevant guides during source investigations and changes. New guides SHALL be created when research begins rather than implying investigated coverage for every registered territory.
+
+#### Scenario: An external attachment and a footer PDF are discovered
+- **WHEN** a municipal page links an ordinance on an external platform and an unrelated PDF in its footer
+- **THEN** its guide records the observed links and current collector behavior separately from proposed corrections, links scoped platform notes and identifies the evidence needed to close each problem without granting cross-domain collection
+
+#### Scenario: A later discovery contradicts current guidance
+- **WHEN** a source change or new evidence invalidates a documented rule
+- **THEN** a new dated entry references the original discovery, preserves its history and revises current guidance and open problems without treating the old conclusion as current
+
+#### Scenario: Only private operational evidence establishes a failure
+- **WHEN** source diagnosis depends on logs or retained responses not cleared for redistribution
+- **THEN** details remain in the private archive, public guidance identifies its verification limits and neither guide nor successful document validation establishes source acceptance or public availability
+
 ### Requirement: Operator-configured source lifecycle
 Operators SHALL manage sources and sections through internal administration with persisted configuration history. A new source SHALL begin in draft, support an acquisition preview, and require explicit collection activation after that preview. New collection SHALL initially be internal; public enablement SHALL require separate operator action after source acceptance. Routine publication after enablement SHALL be automatic without individual-notice approval. Autonomous discovery of new source channels SHALL NOT be required.
 

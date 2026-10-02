@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Added] Add territorial source guides, a shared discovery template and Municipium notes; link the main README, documentation index and coverage inventory, and require contributor upkeep with private evidence kept separate.
 - 2026-10-02 [Changed] Enable development collection for the existing Cascina, Livorno and Pisa candidates through audited source controls.
 
 ## 0.1.1 - 2026-10-01

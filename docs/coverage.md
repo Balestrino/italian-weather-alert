@@ -4,6 +4,8 @@
 
 Each of the 20 regional tables starts with a **region row** summarizing regional-source implementation and checks. The remaining rows list every municipality in that region alphabetically. In the municipality rows, *implementation* means onboarding that municipality’s source, not the existence of a generic API or of an ISTAT registry entry. *Checks* means source research, preview, trial and acceptance; it does not describe postal validation. “Not checked” never means “no alerts.” In municipality rows, **—** means no source integration or source check is recorded in this inventory; it does not mean that the municipality has issued no alerts.
 
+Linked territory names open [source knowledge guides](territori/README.md) with scoped rules, exceptions and discoveries. Those guides may be revised after this inventory's snapshot; their existence or revision does not change the source-status assessments below.
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification
@@ -6781,7 +6783,7 @@ The CAP column lists every municipality-level postcode in the retained Garda Inf
 
 | Territory | ISTAT code | CAP | Implementation | Source checks |
 | --- | --- | --- | --- | --- |
-| **Toscana — region** | 09 | — | Regional sources in internal pilot; public off | Observation and formal acceptance pending |
+| **[Toscana — region](territori/09-toscana/README.md)** | 09 | — | Regional sources in internal pilot; public off | Observation and formal acceptance pending |
 | Abbadia San Salvatore | 052001 | 53021 | — | — |
 | Abetone Cutigliano | 047023 | 51024 | — | — |
 | Agliana | 047002 | 51031 | — | — |
@@ -6808,7 +6810,7 @@ The CAP column lists every municipality-level postcode in the retained Garda Inf
 | Buonconvento | 052003 | 53022 | — | — |
 | Buti | 050002 | 56032 | — | — |
 | Calci | 050003 | 56011 | — | — |
-| Calcinaia | 050004 | 56012 | Internal pilot; public off | Trial and acceptance pending |
+| [Calcinaia](territori/09-toscana/comuni/050004-calcinaia.md) | 050004 | 56012 | Internal pilot; public off | Trial and acceptance pending |
 | Calenzano | 048005 | 50041 | — | — |
 | Camaiore | 046005 | 55041 | — | — |
 | Campagnatico | 053002 | 58042 | — | — |
@@ -6830,7 +6832,7 @@ The CAP column lists every municipality-level postcode in the retained Garda Inf
 | Carrara | 045003 | 54033 | — | — |
 | Casale Marittimo | 050006 | 56040 | — | — |
 | Casciana Terme Lari | 050040 | 56035 | — | Associated service identified; municipal source not verified |
-| Cascina | 050008 | 56021 | Candidate configured; public off | Preview passed; trial and acceptance pending |
+| [Cascina](territori/09-toscana/comuni/050008-cascina.md) | 050008 | 56021 | Candidate configured; public off | Preview passed; trial and acceptance pending |
 | Casola in Lunigiana | 045004 | 54014 | — | — |
 | Casole d'Elsa | 052004 | 53031 | — | — |
 | Castagneto Carducci | 049006 | 57022 | — | — |
@@ -6903,7 +6905,7 @@ The CAP column lists every municipality-level postcode in the retained Garda Inf
 | Lastra a Signa | 048024 | 50055 | — | — |
 | Laterina Pergine Valdarno | 051042 | 52019 | — | — |
 | Licciana Nardi | 045009 | 54016 | — | — |
-| Livorno | 049009 | 57121, 57122, 57123, 57124, 57125, 57126, 57127, 57128 | Candidate configured; public off | Preview unresolved; trial and acceptance pending |
+| [Livorno](territori/09-toscana/comuni/049009-livorno.md) | 049009 | 57121, 57122, 57123, 57124, 57125, 57126, 57127, 57128 | Candidate configured; public off | Preview unresolved; trial and acceptance pending |
 | Londa | 048025 | 50060 | — | — |
 | Loro Ciuffenna | 051020 | 52024 | — | — |
 | Lucca | 046017 | 55100 | — | — |
@@ -6965,7 +6967,7 @@ The CAP column lists every municipality-level postcode in the retained Garda Inf
 | Pieve Fosciana | 046025 | 55036 | — | — |
 | Pieve Santo Stefano | 051030 | 52036 | — | — |
 | Piombino | 049012 | 57025 | — | — |
-| Pisa | 050026 | 56121, 56122, 56123, 56124, 56125, 56126, 56127, 56128 | Candidate configured; public off | Preview passed; trial and acceptance pending |
+| [Pisa](territori/09-toscana/comuni/050026-pisa.md) | 050026 | 56121, 56122, 56123, 56124, 56125, 56126, 56127, 56128 | Candidate configured; public off | Preview passed; trial and acceptance pending |
 | Pistoia | 047014 | 51100 | — | — |
 | Pitigliano | 053019 | 58017 | — | — |
 | Podenzana | 045013 | 54010 | — | — |

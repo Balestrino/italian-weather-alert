@@ -3,6 +3,7 @@
 Italian Weather Alert is an independent, best-effort project to make Italian regional weather and hydrogeological alerts and related municipal notices easier to find. It is not an official alert source. Check the issuing authorities for current warnings and instructions.
 
 - [Coverage tracker](coverage.md): all regions and municipalities, with documented implementation and source-check status. It is not a live alert map.
+- [Territorial source guides](territori/README.md): current collection guidance, scoped exceptions, open problems and dated discoveries for investigated regions and municipalities, with shared platform notes.
 - [Architecture](architecture/README.md): component responsibilities, dependency boundaries and the old-to-new layout mapping.
 - [Backend](backend/README.md): data processing, public API/MCP and contracts.
 - [Backoffice](backoffice/README.md): private territorial administration and operator actions.
