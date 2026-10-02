@@ -4,6 +4,9 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Changed] Verify Livorno's ordinance download with the application HTTP client and a normal browser; refine the earlier access finding and document validation limits.
+- 2026-10-02 [Changed] Review Livorno's external attachment boundary and distinguish collector authorization from file accessibility; retain the access probe privately.
+- 2026-10-02 [Changed] Recheck municipal acquisition and retained originals; update territorial guidance for footer PDF failures, add Pontedera and keep operational evidence private.
 - 2026-10-02 [Added] Add territorial source guides, a shared discovery template and Municipium notes; link the main README, documentation index and coverage inventory, and require contributor upkeep with private evidence kept separate.
 - 2026-10-02 [Changed] Enable development collection for the existing Cascina, Livorno and Pisa candidates through audited source controls.
 

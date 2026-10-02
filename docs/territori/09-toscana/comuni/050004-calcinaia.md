@@ -27,6 +27,8 @@ Confrontare le sezioni configurate e la paginazione: un elenco generale non dimo
 
 Per documenti 404/410 usare la [procedura di recupero](../../../operations/acquisition-recovery.md): assenza dagli elenchi completamente traversati, riferimenti e misure ancora aperte vanno verificati prima di una esclusione. Conservare lo storico; un'assenza non prova revoca né equivalenza a un altro URL.
 
+Nel ricontrollo del 2026-10-02 è stato seguito il percorso programmato del collector, confrontando esito del controllo, target verificati e presenza degli oggetti originali conservati. La verifica è limitata alle sezioni e alla finestra della configurazione effettiva; risultati e configurazione per ambiente sono nell'archivio privato. Vedere CLN-003.
+
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
@@ -61,3 +63,13 @@ Trial e accettazione restano quelli del coverage tracker. Le lacune dei canali s
 - **Evidenza:** [recupero dell'acquisizione](../../../operations/acquisition-recovery.md).
 - **Conseguenza:** conservare gli errori e valutare presenza negli elenchi, riferimenti e misure prima della disposizione.
 - **Prossima verifica:** nuova acquisizione completa dopo la decisione; dettagli operativi nel registro privato.
+
+### CLN-003 — Verificare gli originali oltre all'esito del controllo
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, codice e ricontrollo operativo privato.
+- **Ambito:** `calcinaia-municipal`, raccolta programmata delle sezioni configurate; dettagli dell'ambiente e della revisione nel registro privato.
+- **Conoscenza:** confermato come criterio diagnostico. **Intervento:** verifica eseguita, nessuna correzione applicata.
+- **Osservazione:** conteggio degli elenchi, target scoperti e documenti acquisiti descrivono fasi diverse; la presenza degli originali va controllata nelle versioni e negli oggetti conservati.
+- **Evidenza:** [collector](../../../../internal/backend/acquisition/preview.go), [store documenti](../../../../internal/backend/documents/store.go) e [procedura di recupero](../../../operations/acquisition-recovery.md); esiti dettagliati privati.
+- **Conseguenza:** un ricontrollo riguarda il perimetro effettivo e non completa l'accettazione o la copertura dei canali secondari di CLN-001.
+- **Prossima verifica:** proseguire l'osservazione delle sezioni e confrontare pubblicazioni note e allegati necessari nel trial.

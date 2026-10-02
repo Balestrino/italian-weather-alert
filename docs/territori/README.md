@@ -8,7 +8,7 @@ Il [coverage tracker](../coverage.md) resta il riferimento pubblico per stato e 
 
 | Regione | Codice | Scheda | Comuni documentati |
 | --- | --- | --- | --- |
-| Toscana | `09` | [Guida regionale](09-toscana/README.md) | [Calcinaia](09-toscana/comuni/050004-calcinaia.md), [Cascina](09-toscana/comuni/050008-cascina.md), [Livorno](09-toscana/comuni/049009-livorno.md), [Pisa](09-toscana/comuni/050026-pisa.md) |
+| Toscana | `09` | [Guida regionale](09-toscana/README.md) | [Calcinaia](09-toscana/comuni/050004-calcinaia.md), [Cascina](09-toscana/comuni/050008-cascina.md), [Livorno](09-toscana/comuni/049009-livorno.md), [Pisa](09-toscana/comuni/050026-pisa.md), [Pontedera](09-toscana/comuni/050029-pontedera.md) |
 
 L'indice contiene i territori già investigati. L'assenza di una scheda significa che qui non abbiamo ancora raccolto conoscenze, non che manchino pubblicazioni ufficiali. L'elenco nazionale completo rimane nel coverage tracker.
 

@@ -149,6 +149,11 @@ Public guides SHALL contain only redistributable summaries and references. Unpub
 - **WHEN** source diagnosis depends on logs or retained responses not cleared for redistribution
 - **THEN** details remain in the private archive, public guidance identifies its verification limits and neither guide nor successful document validation establishes source acceptance or public availability
 
+#### Scenario: An operator rechecks enabled municipal acquisition
+- **WHEN** the operator requests a new acquisition check for enabled municipalities
+- **THEN** verification distinguishes territorial enablement from source collection, checks fresh programmed outcomes and retained originals for active sources, and records inactive sources separately without activating them
+- **AND** scoped findings update the territorial guides while environment-specific configurations, check receipts and captures remain private; a successful check does not establish interpretation correctness or municipality-wide coverage
+
 ### Requirement: Operator-configured source lifecycle
 Operators SHALL manage sources and sections through internal administration with persisted configuration history. A new source SHALL begin in draft, support an acquisition preview, and require explicit collection activation after that preview. New collection SHALL initially be internal; public enablement SHALL require separate operator action after source acceptance. Routine publication after enablement SHALL be automatic without individual-notice approval. Autonomous discovery of new source channels SHALL NOT be required.
 

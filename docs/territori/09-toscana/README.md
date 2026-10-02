@@ -47,6 +47,7 @@ Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel c
 | Cascina | `050008` | [Guida comunale](comuni/050008-cascina.md) |
 | Livorno | `049009` | [Guida comunale](comuni/049009-livorno.md) |
 | Pisa | `050026` | [Guida comunale](comuni/050026-pisa.md) |
+| Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
 
