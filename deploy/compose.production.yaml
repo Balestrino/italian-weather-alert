@@ -4,6 +4,7 @@
 services:
   public:
     build: !reset null
+    ports: !override ["127.0.0.1:${IWA_PUBLIC_PORT:-38080}:8080"]
     environment:
       IWA_ENVIRONMENT: production
     profiles: [production]

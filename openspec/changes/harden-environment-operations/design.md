@@ -18,6 +18,10 @@ There are no durable main specs yet. The new capability supplements the imported
 
 ## Decisions
 
+### Development API binding — 2 October 2026
+
+The operator requested development API access on all host IPv4 interfaces. The base public port maps `0.0.0.0`, while staging/production replace the entire ports list using `!override` to retain one loopback binding. Native public development startup uses the same default; explicit `IWA_LISTEN` remains available. Administrative ports and internal service exposure retain their existing boundaries. Configuration/runtime checks derive the permitted address from the environment and listener role, compare the actual Docker binding and use loopback for readiness requests. Apply the host mapping by recreating only development public with its existing image; no migration or dependency restart is required.
+
 ### 1. Recover existing stacks with Docker restart policies
 
 Add `restart: unless-stopped` to PostgreSQL, RustFS and Crawl4AI in the base file. Production inherits this after activation; profiles continue to leave a never-started production project inactive. Use Docker's existing policy rather than introduce a second systemd supervisor. This preserves the operator's intentional stops and keeps management uniform across environments.

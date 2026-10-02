@@ -61,3 +61,19 @@ Repository verification results are recorded in [the disposable rehearsal summar
 Repository checks: environment/changelog regression tests, Compose example validation, disposable development/staging rehearsal, synthetic API/MCP usage and public-query integration tests, Go tests with race detection, vet, command builds, shell/Python syntax, local documentation links, and strict OpenSpec validation passed. Results are summarized in [environment verification](../../../docs/operations/environment-verification.md). A dated changelog entry covers this work; registry publication remains pending. Before each commit, stage the work and run the changelog recorder as required by repository guidance.
 
 Progress: 22 of 28 items checked, comprising 18 verified implementation/record tasks and four explicit operator handoffs. Six operational tasks remain open: capacity completion, current-host restart-policy rollout, public image publication, routing/approval preparation, approved production activation, and rollback rehearsal. Production remains inactive.
+
+## 9. Development public listener binding — 2 October 2026
+
+- [x] 9.1 Publish development API/MCP/documentation on `0.0.0.0`, align native development public defaults, replace the port list with loopback in staging/production, and verify resolved overlays, runtime mismatch rejection and continued private administration with focused tests.
+- [x] 9.2 Apply the requested development binding to only the public service using its existing image, verify actual binding and local/non-loopback HTTP access, preserve all other container identities and record configuration, checks and rollback privately; update operational guidance and changelog without claiming production readiness.
+
+The 2 October follow-up passed 20 environment regression tests, resolved Compose
+template checks and focused Go configuration tests. Only development public was
+recreated with its unchanged image; every other container identity was preserved.
+The actual host binding is `0.0.0.0:8080`. Readiness, docs, OpenAPI and municipality
+situation requests passed through loopback, LAN and tailnet IPv4 addresses; the Go
+MCP SDK confirmed matching API data and saved-view versions on all three origins.
+The existing HTTPS proxy and nondisruptive development smoke passed. Configuration,
+container snapshots, responses and rollback evidence remain private. These requests
+used the host's own interfaces and do not attest another machine's firewall path.
+Progress is now 24 of 30 items checked; the same six operational tasks remain open.

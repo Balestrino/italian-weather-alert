@@ -211,6 +211,19 @@ func TestEnvironmentDefaultsStrict(t *testing.T) {
 		if err != nil || c.Environment != mode {
 			t.Fatal(mode, err)
 		}
+		expected := "127.0.0.1:8080"
+		if mode == "development" {
+			expected = "0.0.0.0:8080"
+		}
+		if c.Listen != expected {
+			t.Fatalf("%s public listener: got %q want %q", mode, c.Listen, expected)
+		}
+		t.Setenv("IWA_ROLE", "admin")
+		c, err = Load()
+		if err != nil || c.Listen != "127.0.0.1:8081" {
+			t.Fatalf("%s admin listener: %q %v", mode, c.Listen, err)
+		}
+		t.Setenv("IWA_ROLE", "public")
 	}
 	t.Setenv("IWA_ENVIRONMENT", "dev")
 	if _, err = Load(); err == nil {

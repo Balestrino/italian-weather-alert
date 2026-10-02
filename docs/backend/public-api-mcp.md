@@ -13,6 +13,11 @@ The page loads Scalar 1.72.0 from jsDelivr, so interactive rendering requires
 browser access to that CDN. The JSON specifications are served locally. These
 documentation routes are available only on the public listener.
 
+In development the public host port binds to `0.0.0.0`, so another machine can
+open `http://<host-address>:8080/docs` and use the same origin for JSON API and
+MCP. Substitute `IWA_PUBLIC_PORT` if configured. Staging/production public ports
+and every administrative host port remain on loopback.
+
 For a browser on another machine, the VM's loopback address is not the browser's
 localhost. An operator-selected Tailscale Serve HTTPS port can proxy the public
 listener privately, preserving existing admin/frontend routes. For example:

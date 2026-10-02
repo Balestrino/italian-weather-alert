@@ -7,7 +7,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | Change | Done | Open |
 | --- | ---: | ---: |
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
-| [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 22 | 6 |
+| [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 136 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
@@ -39,6 +39,13 @@ semantic downstream quality and acceptance remain separate.
 Explicit background selection and hierarchical controls have synthetic repository verification for CLI/admin parity, municipal migration and processing admission, plus native-form browser checks. See [background processing verification](../docs/operations/background-processing-verification.md). The current live collector was preserved; production handover remains a separate release operation.
 
 Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/operations/environment-verification.md).
+
+Two subsequent development API-binding tasks publish the public listener on
+`0.0.0.0`, preserve loopback administration and release-environment ports, and
+verify the targeted existing-image rollout with unchanged other containers.
+Focused configuration/environment tests, template checks, local-interface HTTP
+and API/MCP comparisons passed; remote-machine firewall reachability and
+production readiness remain separate from these checks.
 
 The October 2 operations overview extension has synthetic PostgreSQL and browser verification for complete job states, archived scopes, exclusive document categories and historical attempt bars. The development admin rollout is recorded separately from source acceptance; provider state and last job reasons remain distinct. See [backoffice semantics and verification](../docs/backoffice/README.md).
 

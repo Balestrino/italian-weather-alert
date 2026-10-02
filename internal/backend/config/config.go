@@ -36,7 +36,11 @@ func Load() (Config, error) {
 	if c.Role != "public" && c.Role != "admin" && c.Role != "worker" {
 		return Config{}, errors.New("invalid service role")
 	}
-	c.Listen = env("IWA_LISTEN", "127.0.0.1:8080")
+	defaultListen := "127.0.0.1:8080"
+	if c.Environment == "development" && c.Role == "public" {
+		defaultListen = "0.0.0.0:8080"
+	}
+	c.Listen = env("IWA_LISTEN", defaultListen)
 	if c.Role == "admin" {
 		c.Listen = env("IWA_LISTEN", "127.0.0.1:8081")
 		c.AdminTailscaleOrigin = os.Getenv("IWA_ADMIN_TAILSCALE_ORIGIN")

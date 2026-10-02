@@ -106,10 +106,16 @@ def docker_json(*args: str):
         raise EnvironmentError("Docker inspection failed (private output withheld).") from error
 
 
+def listener_host_ip(environment: str, name: str) -> str:
+    return "0.0.0.0" if environment == "development" and name == "public" else "127.0.0.1"
+
+
 def listener_origin(config: dict, name: str) -> str:
     ports = config["services"][name].get("ports", [])
-    if len(ports) != 1 or ports[0].get("host_ip") != "127.0.0.1":
-        raise EnvironmentError(f"{name} must publish one loopback listener.")
+    environment = config["services"][name].get("environment", {}).get("IWA_ENVIRONMENT", "production")
+    expected = listener_host_ip(environment, name)
+    if len(ports) != 1 or ports[0].get("host_ip") != expected:
+        raise EnvironmentError(f"{name} must publish one listener bound to {expected}.")
     return f"http://127.0.0.1:{ports[0]['published']}"
 
 
@@ -130,8 +136,10 @@ def inspect_boundaries(environment: Environment, config: dict, containers: list[
         ports = container["NetworkSettings"].get("Ports") or {}
         published = [entry for entries in ports.values() if entries for entry in entries]
         if name in ("public", "admin"):
+            listener_origin(config, name)
             expected = str(config["services"][name]["ports"][0]["published"])
-            if len(published) != 1 or published[0]["HostIp"] != "127.0.0.1" or published[0]["HostPort"] != expected:
+            expected_ip = listener_host_ip(environment.name, name)
+            if len(published) != 1 or published[0]["HostIp"] != expected_ip or published[0]["HostPort"] != expected:
                 raise EnvironmentError(f"Unexpected actual listener binding for {name}.")
         elif bindings or published:
             raise EnvironmentError(f"Internal service {name} publishes a host port.")
