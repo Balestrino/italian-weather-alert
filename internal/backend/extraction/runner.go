@@ -44,6 +44,7 @@ type resultStore interface {
 }
 
 type Runner struct {
+	LocalConfigurationVersion   string
 	OutputFixSources            map[string]bool
 	CheckpointSources           map[string]bool
 	LegacyConfigurationVersion  string
@@ -129,6 +130,13 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 		configuredRunner.Checkpoints = nil
 	}
 	r = &configuredRunner
+	if version.LocalProcessingIdentity() != "" {
+		if r.LocalConfigurationVersion == "" {
+			return jobs.Result{}, failure("extraction_configuration_invalid", false)
+		}
+		r.ConfigurationVersion = r.LocalConfigurationVersion
+		r.legacyOutput = false
+	}
 	content, err := classification.GatherContent(ctx, r.Documents, r.OCR, version)
 	if err != nil {
 		return jobs.Result{}, failure("extraction_content_unavailable", true)

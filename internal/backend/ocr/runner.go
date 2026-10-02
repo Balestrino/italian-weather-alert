@@ -34,6 +34,8 @@ type resultStore interface {
 }
 
 type Runner struct {
+	TextExtractor                   TextExtractor
+	LocalConfigurationVersion       string
 	ReuseSources                    map[string]bool
 	Artifacts                       *Store
 	ProviderScope, RendererIdentity string
@@ -118,9 +120,19 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	if reference == nil {
 		return jobs.Result{}, failure("retained_resource_unknown", false)
 	}
+	native := r.TextExtractor != nil && reference.LocalProcessing.TextPDF(reference.URL) && strings.EqualFold(strings.TrimSpace(strings.Split(reference.MediaType, ";")[0]), "application/pdf")
+	if native {
+		if r.LocalConfigurationVersion == "" {
+			return jobs.Result{}, failure("ocr_configuration_invalid", false)
+		}
+		r.ConfigurationVersion = r.LocalConfigurationVersion
+	}
 	policyKey := ""
 	if reference.Inference != nil && !strings.HasSuffix(reference.Inference.Policy, ":default") {
 		policyKey = ":" + shortHash(reference.Inference.Policy)
+	}
+	if policy := reference.LocalProcessing.Identity(); policy != "" {
+		policyKey += ":" + shortHash(policy)
 	}
 	subjectValue := map[string]any{"resource_url": payload.ResourceURL, "resource_sha256": reference.Hash}
 	if policyKey != "" {
@@ -166,6 +178,47 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 			return jobs.Result{}, failure("ocr_result_unavailable", true)
 		}
 		return result(missing)
+	}
+	modelPagesStarted := false
+	if native {
+		if prior, found, lookupErr := r.Results.Page(ctx, run.ID, 1); lookupErr != nil {
+			return r.failAttempt(ctx, attempt, now(), "ocr_result_unavailable", true)
+		} else if found && prior.ReturnedModel != PDFTextVersion {
+			modelPagesStarted = true
+		}
+	}
+	if native && !modelPagesStarted {
+		body, readErr := r.Documents.Read(ctx, version.ID, reference.URL)
+		if readErr != nil {
+			return r.failAttempt(ctx, attempt, now(), "retained_resource_unavailable", true)
+		}
+		pages, textErr := r.TextExtractor.Extract(ctx, body)
+		if textErr == nil && completeTextPages(pages) {
+			for _, page := range pages {
+				local := PageResult{RunID: run.ID, DocumentVersionID: version.ID, PageNumber: page.Number, ResourceURL: reference.URL, Status: "complete", MediaType: "application/pdf", InputSHA256: digest([]byte(fmt.Sprintf("%s:%d:%s", reference.Hash, page.Number, PDFTextVersion))), OutputSHA256: digest([]byte(page.Text)), ExtractedText: page.Text, ProviderResponseID: "local:" + PDFTextVersion, ReturnedModel: PDFTextVersion, CreatedAt: now().UTC()}
+				if err = r.Results.PutPage(ctx, local); err != nil {
+					return jobs.Result{}, failure("ocr_result_unavailable", true)
+				}
+			}
+			complete := ResourceResult{RunID: run.ID, DocumentVersionID: version.ID, ResourceURL: reference.URL, Status: "complete", PageCount: len(pages), CreatedAt: now().UTC()}
+			if err = r.finish(ctx, attempt, now(), "succeeded", processing.Usage{Status: "not_applicable"}, nil, ""); err != nil {
+				return jobs.Result{}, failure("ocr_attempt_unavailable", true)
+			}
+			if err = r.Results.PutResource(ctx, complete); err != nil {
+				return jobs.Result{}, failure("ocr_result_unavailable", true)
+			}
+			return result(complete)
+		}
+		if ctx.Err() != nil {
+			return r.failAttempt(ctx, attempt, now(), "native_text_interrupted", true)
+		}
+		// An interrupted local write cannot be silently combined with model pages.
+		// Retry the same extractor rather than changing evidence midway through a run.
+		if prior, found, lookupErr := r.Results.Page(ctx, run.ID, 1); lookupErr != nil {
+			return r.failAttempt(ctx, attempt, now(), "ocr_result_unavailable", true)
+		} else if found && prior.ReturnedModel == PDFTextVersion {
+			return r.failAttempt(ctx, attempt, now(), "native_text_retry_unavailable", true)
+		}
 	}
 	var identities []renderedIdentity
 	var pages []PageImage

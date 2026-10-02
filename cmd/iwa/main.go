@@ -586,7 +586,12 @@ func run() bool {
 			slog.Error("OCR catalog registration failed")
 			return false
 		}
-		ocrRunner := &ocr.Runner{ReuseSources: rollout.OCRSources, Documents: retained, Processing: processing.New(pool), Results: ocr.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: ocrAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: ocrAdapter, Ledger: gateStore}}, Renderer: ocr.PopplerRenderer{DPI: 144}, Model: ocrConfig.Model, ConfigurationVersion: ocrCatalog.ConfigurationVersionID, PriceVersion: ocrCatalog.PriceVersionID}
+		ocrRunnerLocalConfiguration, err := processing.New(pool).RegisterLocalProcessing(ctx, ocrCatalog.ConfigurationVersionID, time.Now())
+		if err != nil {
+			slog.Error("local processing configuration registration failed")
+			return false
+		}
+		ocrRunner := &ocr.Runner{LocalConfigurationVersion: ocrRunnerLocalConfiguration, TextExtractor: ocr.PopplerText{}, ReuseSources: rollout.OCRSources, Documents: retained, Processing: processing.New(pool), Results: ocr.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: ocrAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: ocrAdapter, Ledger: gateStore}}, Renderer: ocr.PopplerRenderer{DPI: 144}, Model: ocrConfig.Model, ConfigurationVersion: ocrCatalog.ConfigurationVersionID, PriceVersion: ocrCatalog.PriceVersionID}
 		if reuseOCR {
 			rendererID := os.Getenv("IWA_OCR_RENDERER_ID")
 			if rendererID == "" {
@@ -625,7 +630,12 @@ func run() bool {
 			return false
 		}
 		reuseSources := rollout.InterpretationSources
-		classificationRunner := &classification.Runner{OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyClassification.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Processing: processing.New(pool), Results: classification.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: classificationCatalog.ConfigurationVersionID, PriceVersion: classificationCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
+		classificationRunnerLocalConfiguration, err := processing.New(pool).RegisterLocalProcessing(ctx, classificationCatalog.ConfigurationVersionID, time.Now())
+		if err != nil {
+			slog.Error("local processing configuration registration failed")
+			return false
+		}
+		classificationRunner := &classification.Runner{LocalConfigurationVersion: classificationRunnerLocalConfiguration, OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyClassification.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Processing: processing.New(pool), Results: classification.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: classificationCatalog.ConfigurationVersionID, PriceVersion: classificationCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
 		extractionCatalog, err := extraction.RegisterCatalog(ctx, processing.New(pool), qwenConfig.Adapter, qwenConfig.Model, time.Now())
 		if err != nil {
 			slog.Error("extraction catalog registration failed")
@@ -636,7 +646,12 @@ func run() bool {
 			slog.Error("legacy extraction catalog registration failed")
 			return false
 		}
-		extractionRunner := &extraction.Runner{OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyExtraction.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Classifications: classification.NewStore(pool), Processing: processing.New(pool), Results: extraction.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: extractionCatalog.ConfigurationVersionID, PriceVersion: extractionCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
+		extractionRunnerLocalConfiguration, err := processing.New(pool).RegisterLocalProcessing(ctx, extractionCatalog.ConfigurationVersionID, time.Now())
+		if err != nil {
+			slog.Error("local processing configuration registration failed")
+			return false
+		}
+		extractionRunner := &extraction.Runner{LocalConfigurationVersion: extractionRunnerLocalConfiguration, OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyExtraction.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Classifications: classification.NewStore(pool), Processing: processing.New(pool), Results: extraction.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: extractionCatalog.ConfigurationVersionID, PriceVersion: extractionCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
 		linkingCatalog, err := linking.RegisterCatalog(ctx, processing.New(pool), qwenConfig.Adapter, qwenConfig.Model, time.Now())
 		if err != nil {
 			slog.Error("linking catalog registration failed")

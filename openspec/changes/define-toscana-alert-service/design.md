@@ -243,3 +243,55 @@ An optional `attachments` contract belongs to the immutable source revision. `co
 Preview and scheduled collection share document/attachment retention. `DirectHTTP.CrawlBounded` validates the initial URL and each redirect before sending the request, retains the existing prohibition on leaving the file's initial origin, and constrains paths using the source contract. Opt-in `validate_pdf` checks response type, PDF framing and the Poppler parser already shipped in the application image. HTML error pages and truncated/unreadable PDFs become visible missing references; persistence remains content-addressed and verified by the document store. Scanned PDFs do not require extractable text for acquisition. Missing-resource reasons and publication metadata participate in acquisition identities to keep diagnostic changes replayable and prevent collisions between previews and later dated collection. Invalid PDFs use the existing unavailable-reference vocabulary and the distinct scheduled error `invalid_attachment_pdf`, avoiding a storage-schema change.
 
 Use a reviewed candidate revision and successful preview before changing active collection. Preserve original evidence and prior revision/image for rollback, then verify a fresh normal worker check and stored attachment bytes. Existing backoff, source retry instructions, provider controls and public-enablement gates remain separate. A development recovery does not establish acceptance or future remote availability.
+
+
+## Local processing before model inference — 2 October 2026
+
+A versioned optional `local_processing` source policy requires dated review
+evidence. It declares simple article-body selectors, text-only PDF directory
+scopes, and/or one recognized regional product format. No existing source is
+opted in by this implementation. This is an interpretation policy, not permission
+to discover or acquire resources. It follows the active reviewed source revision,
+like resource eligibility. Policy fingerprints partition run, preflight and result
+reuse identities, and separate immutable local-first processing configurations
+preserve the original model configurations as fallbacks. Policy changes do not
+replay historical work automatically.
+
+Article selectors are a bounded subset (tag, #id, .class, tag.class, tag#id).
+All configured selectors must match exactly one nonempty container; distinct
+containers are combined in document order without duplicating nested content.
+Missing, ambiguous or empty containers fall back to full-page text. Attachments
+and original bytes remain intact. A configured selector asserts the reviewed
+full article scope; fixture checks cannot certify an actual website's coverage.
+
+PDF native text is used only in explicitly reviewed text-only path scopes. Local
+Poppler commands read private temporary files under bounded contexts and output
+limits. Require readable text for every numbered page and reject any raster
+images, encrypted content, malformed output or invalid Unicode. Otherwise retain
+the existing image/OCR path for the entire resource. Vector graphics cannot be
+reliably excluded by text extraction, so mapped/graphical products must never be
+declared text-only. Persist original URL, resource hash, page number and local
+extractor identity; no provider call, token usage or remote charge is invented.
+
+For a configured regional format, reuse the existing strict HTML projection.
+Only a successfully parsed explicit fact/table or explicit monitoring no-event
+statement can establish a positive regional relevance result. Complete retained
+content and literal evidence remain mandatory. Unsupported layouts, incomplete
+resources and all unresolved or ordinary notices use normal full-content model
+classification. No keyword-based negative filter is added. Relevant notices
+continue through the existing extraction pipeline; this does not replace
+semantic interpretation of municipal measures or graphical evidence. Existing
+provider admission/holds remain in force, including pre-claim holds.
+
+Validate synthetic selectors, attachment coverage, misleading/late notices,
+text/scanned/mixed/graphical PDF fallbacks, literal regional facts, result/run
+provenance, policy-separated equivalence and durable persistence on disposable
+PostgreSQL. Source-specific review/activation and live quality observation remain
+separate from this repository implementation.
+
+Native PDF page inputs require additive migration `066_ocr_native_text`, expanding
+only the page-result media constraint. Prior images, records and migration
+checksums remain valid. Article selectors apply to original HTML notices; HTML
+attachments retain their full text. Native and model page writes preserve their
+selected path across retries rather than mixing extraction methods in one run.
+See [local processing operations](../../../docs/operations/local-processing.md).

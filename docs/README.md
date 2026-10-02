@@ -13,6 +13,7 @@ Italian Weather Alert is an independent, best-effort project to make Italian reg
 - [Environment verification](operations/environment-verification.md): disposable rehearsal results and operational checks still outstanding.
 - [Release operations](operations/releases.md): image approval, deployment checks and PBS recovery targets.
 - [Reviewed municipal PDF attachments](operations/municipal-attachments.md): source/revision boundaries, content filtering, PDF validation, preview and verified retention.
+- [Local processing before model inference](operations/local-processing.md): reviewed article-body selectors, text-only PDF extraction, regional relevance rules, conservative fallbacks and accounting.
 - [Acquisition recovery](operations/acquisition-recovery.md): stale municipal URLs, temporary interpretation limits and bounded development validation.
 - [Optional local Qwen fallback](operations/local-llm-fallback.md): real model tests, scoped routing, OCR capability checks and rollback.
 - [OpenSpec plans and progress](../openspec/README.md): change proposals, capability specifications, and dated task checklists.

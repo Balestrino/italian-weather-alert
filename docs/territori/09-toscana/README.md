@@ -26,12 +26,22 @@ Verificare separatamente pagina, risorse grafiche e versione stampabile richiest
 
 Consultare lo [stato dei controlli](../../../internal/backend/acquisition/schedule.go) per distinguere raggiungibilità, completezza, ritardo e pubblicazione attesa. `publication_state=missing` significa che la pubblicazione attesa non è stata osservata secondo la configurazione; non dimostra da solo che il CFR non abbia pubblicato. Controllare cadenza configurata, data osservata e parsing prima di attribuire il problema alla fonte.
 
+La capacità opzionale [elaborazione locale](../../operations/local-processing.md)
+può riconoscere la pertinenza di un formato regionale già revisionato, usando
+il parser rigoroso delle tabelle o lo stato esplicito senza evento. Richiede una
+policy `local_processing` del prodotto; non interpreta nuove mappe, non inventa
+livelli e non rende completa una risorsa mancante. Le policy regionali non possono
+dichiarare PDF grafici come documenti di solo testo. Verifiche con fixture del
+2026-10-02 non certificano il formato live; nessuna policy delle fonti operative
+è stata attivata da questa modifica.
+
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
 | --- | --- | --- | --- |
 | TOS-001 | Tre prodotti CFR | Accettazione e risorse necessarie sono distinte per prodotto; il monitoraggio non emette livelli desunti dalla narrativa | Applicato nel parser; accettazione reale separata |
 | TOS-002 | Stato del controllo | Completezza della raccolta e pubblicazione attesa sono dimensioni separate | Applicato nello store dei controlli |
+| TOS-003 | Formati CFR con policy locale esplicita | Pertinenza positiva da formato rigorosamente riconosciuto; risorse complete ed evidenza letterale obbligatorie, fallback sui casi non riconosciuti | Implementato e verificato con fixture; attivazione e accettazione separate |
 
 Non derivare colori delle mappe dal testo circostante. Le pubblicazioni comunali che rilanciano un bollettino non costituiscono automaticamente una nuova allerta o una misura locale.
 
@@ -71,3 +81,14 @@ Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel c
 - **Evidenza:** [ScheduleStore e publicationStateAt](../../../internal/backend/acquisition/schedule.go).
 - **Conseguenza:** un controllo completo può coesistere con `publication_state=missing`; occorre diagnosticare le due dimensioni separatamente.
 - **Prossima verifica:** controllare configurazione ed evidenza di emissione nell'ambiente interessato; non dedurre l'assenza di un bollettino dal solo stato.
+
+
+### TOS-003 — Pertinenza regionale da formato strutturato revisionato
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, codice e fixture sintetiche.
+- **Ambito:** capacità per `cfr-vigilance`, `cfr-criticality`, `cfr-monitoring` con una policy `local_processing` esplicita; nessuna verifica web o attivazione live.
+- **Conoscenza:** confermato sul codice; equivalenza del formato live da verificare. **Intervento:** implementato e verificato in repository; rollout non eseguito.
+- **Osservazione:** il riconoscimento rigoroso di fatti espliciti o dello stato di monitoraggio senza evento permette una decisione positiva locale senza chiamata di classificazione. Formati non riconosciuti mantengono il percorso ordinario; dati incompleti restano indeterminati.
+- **Evidenza:** [classificatore strutturato](../../../internal/backend/classification/structured.go), [verifica persistente sintetica](../../../internal/backend/interpretation/local_processing_integration_test.go), [specifica di acquisizione](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md).
+- **Conseguenza:** si riducono le chiamate sui formati revisionati senza dedurre colori dalle mappe; policy e risultati hanno identità separate. Non si dichiara un risparmio misurato o accettazione della fonte.
+- **Prossima verifica:** confrontare formati e risorse del singolo prodotto con originali, revisionare la policy e misurare il canary prima dell'attivazione.

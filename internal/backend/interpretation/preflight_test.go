@@ -8,6 +8,7 @@ import (
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 )
 
 type preflightFixture struct{ bodies map[string][]byte }
@@ -93,5 +94,29 @@ func TestPreflightMeaningfulChanges(t *testing.T) {
 	b, complete := build("cascina-municipal", two, "unchanged", `{}`, true)
 	if complete || a == b {
 		t.Fatal("Cascina missing resource concealed")
+	}
+}
+
+func TestPreflightSeparatesLocalProcessingPolicies(t *testing.T) {
+	body := []byte("<main id=notice>Ordina la chiusura del ponte per rischio idraulico.</main>")
+	url := "https://municipal.example/notice"
+	v := documents.Version{ID: 1, DocumentID: 1, Complete: true, Metadata: json.RawMessage(`{}`), Resources: []documents.Reference{{URL: url, SourceID: "municipal", Role: "original", MediaType: "text/html", Hash: preflightHash(body), Required: true}}}
+	p := Preflight{Documents: preflightFixture{map[string][]byte{url: body}}, Configuration: "base", RendererIdentity: "renderer"}
+	base, err := p.Build(context.Background(), v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v.Resources[0].LocalProcessing = &registry.LocalProcessing{Version: registry.LocalProcessingVersion, HTMLBodySelectors: []string{"main"}}
+	first, err := p.Build(context.Background(), v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v.Resources[0].LocalProcessing.HTMLBodySelectors = []string{"#notice"}
+	second, err := p.Build(context.Background(), v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if base.Configuration != p.Configuration || first.Configuration == base.Configuration || second.Configuration == first.Configuration || first.Resources[0].Identity != second.Resources[0].Identity || first.Resources[0].Policy == second.Resources[0].Policy {
+		t.Fatal("policy/evidence identity boundaries")
 	}
 }

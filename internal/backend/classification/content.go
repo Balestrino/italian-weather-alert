@@ -108,6 +108,9 @@ func GatherContent(ctx context.Context, retained documentStore, extracted ocrSto
 		text := normalize(string(body))
 		if mediaType == "text/html" || mediaType == "application/xhtml+xml" {
 			text = visibleHTML(body)
+			if reference.Role == "original" && reference.LocalProcessing != nil {
+				text = articleHTML(body, reference.LocalProcessing.HTMLBodySelectors)
+			}
 		}
 		if text != "" {
 			content.Sections = append(content.Sections, ContentSection{ResourceURL: reference.URL, Role: reference.Role, Text: text})
@@ -116,7 +119,8 @@ func GatherContent(ctx context.Context, retained documentStore, extracted ocrSto
 	wire, err := json.Marshal(struct {
 		DocumentVersionID int64            `json:"document_version_id"`
 		Sections          []ContentSection `json:"sections"`
-	}{version.ID, content.Sections})
+		LocalPolicy       string           `json:"local_processing_policy,omitempty"`
+	}{version.ID, content.Sections, version.LocalProcessingIdentity()})
 	if err != nil || len(wire) > maxClassificationContentBytes {
 		return Content{}, ErrInvalid
 	}

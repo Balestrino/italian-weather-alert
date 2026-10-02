@@ -125,6 +125,9 @@ func BuildManifest(ctx context.Context, retained documentStore, extracted ocrSto
 		if ref.Inference != nil {
 			item.Policy = ref.Inference.Policy
 		}
+		if policy := ref.LocalProcessing.Identity(); policy != "" {
+			item.Policy += ":" + policy
+		}
 		if !item.Eligible {
 			manifest.Resources = append(manifest.Resources, item)
 			continue

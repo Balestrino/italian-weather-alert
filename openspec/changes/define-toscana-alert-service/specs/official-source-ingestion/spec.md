@@ -354,3 +354,36 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 #### Scenario: Image OCR has been separately evaluated
 - **WHEN** image input is enabled on the local server and its synthetic OCR test passes
 - **THEN** explicitly enabled OCR may select its own local image configuration, renderer/reuse identity and call receipts; semantic embeddings retain independent capability requirements
+
+
+### Requirement: Reviewed local processing before model inference
+The service SHALL support an optional versioned source-scoped local-processing
+policy with dated review evidence. The policy SHALL preserve full article content,
+required attachments, originals, literal evidence and page provenance. Policies
+SHALL partition processing and equivalence identities, without automatic
+historical reprocessing or changes to source/public activation.
+
+#### Scenario: Reviewed article containers match
+- **WHEN** every configured simple selector matches one nonempty article container
+- **THEN** interpretation uses their combined text in document order and retains attachment content and originals
+- **AND** missing, empty or ambiguous containers fall back to full-page text
+
+#### Scenario: A reviewed text-only PDF has complete native text
+- **WHEN** a PDF in an explicitly reviewed text-only directory has readable native text on every numbered page, no raster images and no encryption
+- **THEN** local extraction persists text with resource/page and extractor provenance without a provider call or charge
+- **AND** empty pages, scans, mixed content, images, malformed extraction or unavailable tools fall back to the original complete-resource OCR path; meaningful vector/graphical products are outside text-only scope
+
+#### Scenario: A recognized regional format establishes relevance
+- **WHEN** a reviewed regional format passes strict deterministic projection with complete content and literal evidence
+- **THEN** a positive regional relevance result is recorded locally without classification calls
+- **AND** unsupported, incomplete, ordinary or ambiguous content continues through the existing classification behavior without a keyword-based negative decision
+
+#### Scenario: Local processing policy changes
+- **WHEN** selectors, PDF scopes or structured-format policy change
+- **THEN** processing input and preflight identities differ and incompatible cached results are not reused
+- **AND** previous originals/results remain available and historical work is not automatically replayed
+
+#### Scenario: A recognized vigilance table lists no zones
+- **WHEN** the strict regional parser recognizes all six phenomenon rows and both dates, no explicit zone facts are listed, the regional bulletin title is literal original-page evidence, and required content is complete
+- **THEN** local classification establishes only the bulletin's regional relevance without a model call
+- **AND** no all-clear, alert color or local measure is inferred; a title without the recognized table or complete evidence retains normal fallback

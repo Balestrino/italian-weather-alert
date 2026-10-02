@@ -211,3 +211,24 @@ public and backup retain earlier images. Provider quota hold, fallback scope,
 source acceptance and production readiness remain separate. The OpenSpec CLI
 was unavailable; no CLI validation is claimed. Detailed evidence and rollback
 are private. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).
+
+
+## 19. Reviewed local processing before models — 2 October 2026
+
+- [x] 19.1 Add validated source-scoped local-processing policies and separate immutable configurations; include policies in retained references, processing identities and equivalence manifests while preserving legacy defaults and histories.
+- [x] 19.2 Select complete configured article containers in document order with missing/empty/ambiguous fallback, preserving attachments and evidence positions; verify misleading and late relevant content.
+- [x] 19.3 Add bounded Poppler native-text extraction for explicitly reviewed text-only PDF scopes, with whole-resource OCR fallback for incomplete, scanned, mixed, graphical, encrypted or invalid inputs; preserve page provenance and accurate zero-call accounting.
+- [x] 19.4 Add positive-only deterministic relevance for strictly recognized regional formats, with literal evidence and existing model fallback; verify unsupported/incomplete cases, compatible reuse and downstream extraction admission.
+- [x] 19.5 Verify repository regressions, disposable PostgreSQL persistence and real Poppler parsing with synthetic fixtures; update operations/territorial guidance, checklist counts and changelog without activating sources or claiming live acceptance.
+
+Verification passed the full Go race suite, vet and command builds, focused
+regressions for legacy classification/OCR and contiguous preflight reuse,
+disposable PostgreSQL tests for native text and deterministic classification,
+strict OpenSpec validation, and real Poppler tests in the application image.
+The fixtures verify complete-resource fallbacks, page provenance, zero calls and
+prices on local paths, immutable configurations, policy-separated identities,
+validated local result reuse and extraction scheduling. Local configuration and
+territorial guidance are documented in [local processing operations](../../../docs/operations/local-processing.md).
+Source policies remain opt-in and no live settings, provider accounts, acceptance
+status or production deployment were changed. Native text requires reviewed
+text-only scopes; meaningful vector graphics remain outside those scopes.

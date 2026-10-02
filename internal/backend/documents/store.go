@@ -230,6 +230,7 @@ func (s *Store) Version(ctx context.Context, id int64) (Version, error) {
 		}
 		decision := cfg.InferenceEligibility.Decide(r.URL, r.Hash, r.Role, r.Missing)
 		r.Inference = &decision
+		r.LocalProcessing = cfg.LocalProcessing
 		v.Resources = append(v.Resources, r)
 	}
 	return v, rows.Err()

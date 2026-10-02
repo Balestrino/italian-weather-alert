@@ -59,6 +59,9 @@ func (p *Preflight) Build(ctx context.Context, v documents.Version) (PreflightMa
 	if p.Configuration == "" || p.RendererIdentity == "" || v.DocumentID < 1 || p.Documents == nil {
 		return m, ErrInvalid
 	}
+	if policy := v.LocalProcessingIdentity(); policy != "" {
+		m.Configuration = preflightHash([]byte(p.Configuration + ":" + policy))
+	}
 	var metadata any
 	dec := json.NewDecoder(bytes.NewReader(v.Metadata))
 	dec.UseNumber()
@@ -80,6 +83,9 @@ func (p *Preflight) Build(ctx context.Context, v documents.Version) (PreflightMa
 		item := PreflightResource{URL: r.URL, Source: r.SourceID, Role: r.Role, Media: strings.ToLower(strings.TrimSpace(strings.Split(r.MediaType, ";")[0])), Missing: r.Missing, Required: r.Required, Eligible: r.InferenceEligible()}
 		if r.Inference != nil {
 			item.Policy = r.Inference.Policy
+		}
+		if policy := r.LocalProcessing.Identity(); policy != "" {
+			item.Policy += ":" + policy
 		}
 		if r.Missing != "" {
 			m.Complete = false
@@ -174,7 +180,7 @@ func (s *Scheduler) Prepare(ctx context.Context, p *Preflight, id int64) (Prefli
 		// A catalog rotation changes the candidate preflight configuration,
 		// but an already prepared version keeps its immutable original decision.
 		// Only a mismatch under the same configuration indicates corrupted input.
-		if cfg == p.Configuration && old.Fingerprint != d.Fingerprint {
+		if cfg == m.Configuration && old.Fingerprint != d.Fingerprint {
 			return d, ErrInvalid
 		}
 		old.VersionID = id
@@ -188,14 +194,14 @@ func (s *Scheduler) Prepare(ctx context.Context, p *Preflight, id int64) (Prefli
 		err = tx.QueryRow(ctx, `SELECT p.representative_version_id FROM interpretation_preflight p
  WHERE p.document_version_id=(SELECT max(id) FROM retained_versions WHERE document_id=$1 AND id<$2)
  AND p.complete AND p.fingerprint=$3 AND p.configuration=$4
- AND NOT EXISTS(SELECT 1 FROM interpretation_archives a WHERE a.document_version_id IN(p.document_version_id,p.representative_version_id))`, v.DocumentID, id, d.Fingerprint, p.Configuration).Scan(&prior)
+ AND NOT EXISTS(SELECT 1 FROM interpretation_archives a WHERE a.document_version_id IN(p.document_version_id,p.representative_version_id))`, v.DocumentID, id, d.Fingerprint, m.Configuration).Scan(&prior)
 		if err == nil {
 			d.RepresentativeID = prior
 		} else if !errors.Is(err, pgx.ErrNoRows) {
 			return d, err
 		}
 	}
-	_, err = tx.Exec(ctx, `INSERT INTO interpretation_preflight(document_version_id,representative_version_id,configuration,fingerprint,body,complete) VALUES($1,$2,$3,$4,$5,$6)`, id, d.RepresentativeID, p.Configuration, d.Fingerprint, wire, m.Complete)
+	_, err = tx.Exec(ctx, `INSERT INTO interpretation_preflight(document_version_id,representative_version_id,configuration,fingerprint,body,complete) VALUES($1,$2,$3,$4,$5,$6)`, id, d.RepresentativeID, m.Configuration, d.Fingerprint, wire, m.Complete)
 	if err != nil {
 		return d, err
 	}
