@@ -39,6 +39,30 @@ Operational lists SHALL use section-specific labels and primary columns, context
 - **WHEN** a record contains a long URL, error code or nested evidence
 - **THEN** the operator can reveal the complete escaped value and follow applicable evidence links without losing the record context
 
+### Requirement: Complete job state and document backlog explanation
+The operations overview SHALL show full job counts for queued, running, retry-wait, failed and succeeded states, with archived jobs separately counted, summaries by queue and kind, waiting creation age and last completion timestamps. State/queue/kind/error/archive links SHALL open matching job scopes and retain pagination filters. Archived rows SHALL expose archive time and SHALL NOT offer relaunch. Due times and expired leases SHALL be labeled as persisted queue facts rather than proof of runnable work or worker health. Last recorded reasons SHALL be distinguished from current provider gates, observed independently without exposing probe tokens.
+
+The existing incomplete-document total SHALL be explained by exclusive categories and source counts using the same archive, equivalence and discovery exclusions as the document list. Categories SHALL distinguish suspended sources, running work, retries, queued work, failures, incomplete results, versions without triggers and preliminary preparation, in that priority order. Multiple jobs for one version SHALL NOT multiply document counts. Dashboard reads SHALL NOT activate, schedule, archive or recover work.
+
+#### Scenario: OCR progresses while the incomplete-document total stays fixed
+- **WHEN** OCR jobs finish but classification or extraction is pending, failed or absent
+- **THEN** the overview shows job progress separately and explains the remaining document categories without implying all versions are queued
+
+#### Scenario: Archived failed job and reason drilldown
+- **WHEN** a failed job is archived and other jobs share a last recorded error
+- **THEN** it counts only in the archived total, the reason count excludes it, its attempts remain historical, and reason links match queue, kind, state and code
+
+### Requirement: Accessible historical processing bars
+The overview SHALL offer 24 hourly UTC buckets, 7 UTC calendar days and 30 UTC calendar days through a validated GET period filter. Historical bars SHALL count concluded persisted queue attempts by finish time, distinguish succeeded, retry, failed and abandoned outcomes, include zero buckets and attempts belonging to currently archived jobs, and exclude unfinished attempts and finishes at or beyond the observation cutoff. The current bucket SHALL be labeled partial. The page SHALL explain that attempts can repeat per job and that bars do not reconstruct document totals or historical queue backlog. Bars SHALL share a count scale and provide labels and an exact accessible table without requiring JavaScript, third-party assets or relaxed CSP.
+
+#### Scenario: Retry, relaunch and an empty bucket
+- **WHEN** the same job has several concluded attempts across time buckets and another bucket has no attempts
+- **THEN** each concluded attempt appears in its own finish-time bucket, the empty bucket remains zero, and the page identifies these values as attempts rather than unique jobs
+
+#### Scenario: History unavailable and incident data available
+- **WHEN** the detailed overview cannot be read while a basic summary or incident dependency still works
+- **THEN** detailed information is labeled unavailable and independently available summaries remain visible without exposing private failure details
+
 ### Requirement: Accounting meaning survives presentation changes
 Usage pages SHALL preserve workload/stage/model distinctions, unit labels, currency separation, price provenance and known-subtotal indicators. Unknown costs or usage SHALL NOT be rendered as zero or complete totals.
 

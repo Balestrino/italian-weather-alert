@@ -15,6 +15,9 @@ import (
 var ErrInvalid = errors.New("invalid operations filter")
 
 type Filter struct {
+	Kind      string `json:"kind,omitempty"`
+	Queue     string `json:"queue,omitempty"`
+	ErrorCode string `json:"error_code,omitempty"`
 	Issue     string `json:"issue,omitempty"`
 	State     string `json:"state,omitempty"`
 	SourceID  string `json:"source_id"`
@@ -78,6 +81,9 @@ func (s *Store) Page(ctx context.Context, section string, f Filter, at time.Time
 	if f.State != "" && (section != "jobs" || !ValidJobState(f.State)) {
 		return Report{}, ErrInvalid
 	}
+	if len(f.Kind) > 200 || len(f.Queue) > 200 || len(f.ErrorCode) > 200 || ((f.Kind != "" || f.Queue != "" || f.ErrorCode != "") && section != "jobs") {
+		return Report{}, ErrInvalid
+	}
 	if section == "sources" && (f.VersionID != 0 || f.RunID != 0) || section != "usage" && f.RunID != 0 || section != "jobs" && f.JobID != 0 {
 		return Report{}, ErrInvalid
 	}
@@ -90,9 +96,9 @@ func (s *Store) Page(ctx context.Context, section string, f Filter, at time.Time
 	result := Report{Section: section, Filter: f, ObservedAt: at.UTC()}
 	// Typed parameters are shared by every projection so unused filters cannot
 	// produce unknown-parameter errors or silently broaden document selection.
-	prefix := `WITH filter AS (SELECT $1::text source_id,$2::bigint version_id,$3::bigint run_id,$4::timestamptz observed_at,$5::bigint job_id,$6::text state) `
-	args := []any{f.SourceID, f.VersionID, f.RunID, at.UTC(), f.JobID, f.State}
-	result.Table, err = readTable(ctx, tx, prefix+query+` LIMIT 101 OFFSET $7`, append(args, (f.Page-1)*100)...)
+	prefix := `WITH filter AS (SELECT $1::text source_id,$2::bigint version_id,$3::bigint run_id,$4::timestamptz observed_at,$5::bigint job_id,$6::text state,$7::text kind,$8::text queue,$9::text error_code) `
+	args := []any{f.SourceID, f.VersionID, f.RunID, at.UTC(), f.JobID, f.State, f.Kind, f.Queue, f.ErrorCode}
+	result.Table, err = readTable(ctx, tx, prefix+query+` LIMIT 101 OFFSET $10`, append(args, (f.Page-1)*100)...)
 	if err != nil {
 		return Report{}, err
 	}
@@ -160,7 +166,7 @@ var queries = map[string]string{
  FROM registry_sources s CROSS JOIN filter f LEFT JOIN acquisition_source_status a ON a.source_id=s.id
  LEFT JOIN LATERAL (SELECT count(*) AS checks,sum((extract(epoch FROM finished_at-started_at)*1000)::bigint)::bigint AS measured_duration_ms FROM acquisition_checks WHERE source_id=s.id) checks ON true
  WHERE (f.source_id='' OR s.id=f.source_id) ORDER BY s.id`,
-	"jobs": `SELECT j.id AS job_id,j.queue,j.kind,j.state,j.attempt_count,j.max_attempts,j.attempt_budget,j.last_error_code,j.available_at,j.completed_at,
+	"jobs": `SELECT j.id AS job_id,j.queue,j.kind,j.state,j.attempt_count,j.max_attempts,j.attempt_budget,j.last_error_code,j.available_at,j.completed_at,j.archived_at,
  history.attempts,history.measured_duration_ms,
  (SELECT jsonb_agg(jsonb_build_object('after_attempt',after_attempt,'actor',actor,'created_at',created_at) ORDER BY after_attempt) FROM processing_job_relaunches WHERE job_id=j.id) AS relaunches,
  d.source_id,d.id AS document_id,v.id AS document_version_id,d.official_url
@@ -171,8 +177,8 @@ var queries = map[string]string{
  LEFT JOIN retained_documents d ON d.id=COALESCE(v.document_id,ja.document_id)
  LEFT JOIN LATERAL (SELECT jsonb_agg(jsonb_build_object('number',number,'outcome',outcome,'error_code',error_code,'started_at',started_at,'finished_at',finished_at) ORDER BY number) AS attempts,
  sum((extract(epoch FROM finished_at-started_at)*1000)::bigint)::bigint AS measured_duration_ms FROM processing_attempts WHERE job_id=j.id) history ON true
- WHERE j.archived_at IS NULL AND (f.job_id=0 OR j.id=f.job_id)
- AND (f.state='' OR j.state=f.state)
+	 WHERE ((f.state='archived' AND j.archived_at IS NOT NULL) OR (f.state<>'archived' AND j.archived_at IS NULL)) AND (f.job_id=0 OR j.id=f.job_id)
+	 AND (f.state IN ('','archived') OR j.state=f.state) AND (f.kind='' OR j.kind=f.kind) AND (f.queue='' OR j.queue=f.queue) AND (f.error_code='' OR j.last_error_code=f.error_code)
  AND (f.source_id='' OR d.source_id=f.source_id) AND (f.version_id=0 OR v.id=f.version_id)
  ORDER BY j.updated_at DESC,j.id DESC`,
 	"documents": `SELECT d.source_id,d.id AS document_id,v.id AS document_version_id,d.official_url,v.first_acquired_at,
@@ -232,7 +238,7 @@ var queries = map[string]string{
 
 func ValidJobState(state string) bool {
 	switch state {
-	case "", "queued", "running", "retry_wait", "failed", "succeeded":
+	case "", "queued", "running", "retry_wait", "failed", "succeeded", "archived":
 		return true
 	}
 	return false
@@ -260,7 +266,16 @@ func (s *Store) Overview(ctx context.Context, at time.Time) (Overview, error) {
 		return result, err
 	}
 	defer tx.Rollback(ctx)
-	prefix := `WITH filter AS (SELECT $1::text source_id,$2::bigint version_id,$3::bigint run_id,$4::timestamptz observed_at,$5::bigint job_id,$6::text state) `
+	result, err = overview(ctx, tx, at)
+	if err != nil {
+		return result, err
+	}
+	return result, tx.Commit(ctx)
+}
+
+func overview(ctx context.Context, tx pgx.Tx, at time.Time) (Overview, error) {
+	result := Overview{ObservedAt: at.UTC()}
+	prefix := `WITH filter AS (SELECT $1::text source_id,$2::bigint version_id,$3::bigint run_id,$4::timestamptz observed_at,$5::bigint job_id,$6::text state,''::text kind,''::text queue,''::text error_code) `
 	for _, item := range []struct {
 		section string
 		filter  Filter
@@ -271,5 +286,5 @@ func (s *Store) Overview(ctx context.Context, at time.Time) (Overview, error) {
 			return result, err
 		}
 	}
-	return result, tx.Commit(ctx)
+	return result, nil
 }
