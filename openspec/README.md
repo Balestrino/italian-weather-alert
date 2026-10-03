@@ -38,7 +38,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 149 | 12 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |
+| [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
@@ -149,3 +149,10 @@ Synthetic/PostgreSQL, schema, real API/MCP, pagination, historical and developme
 rollout checks preserve evidence and affected uncertainty while removing the
 document backlog from public situation rows. See [response fields](../docs/backend/public-api-mcp.md#situation-response).
 The change does not complete source acceptance or continuous platform collection.
+
+Two subsequent 0.3.0 release-preparation tasks align OpenAPI/MCP metadata, group
+the preserved dated history and document situation consumer migration, verification
+upgrades and source limits. Changelog, public transports, release-note links and
+strict specification checks pass. See [v0.3.0 notes](../docs/releases/v0.3.0.md);
+software publication uses the exact-revision workflow gates independently of
+image publication, continuous source collection or production activation.

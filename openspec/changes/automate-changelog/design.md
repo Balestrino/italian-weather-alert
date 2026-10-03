@@ -35,3 +35,13 @@ explicit five-connection pool; keep serialization, cancellation and lock-release
 assertions, the runtime locking protocol and the coverage floor intact.
 
 Use temporary synthetic Git repositories to verify automatic insertion, idempotence, blocked unstaged changelog edits, and CI detection of a bypassed hook. Run the repository's Go and static checks after integration.
+
+## Situation and verification minor release — 3 October 2026
+
+The 0.3.0 preparation groups post-0.2.0 dated history and aligns OpenAPI/MCP
+metadata. Release notes describe the intentional situation response shape change,
+consumer paths and legacy cursor restart, while retaining detailed operations.
+Explain the additive multi-source verification migration, replacement of processing
+replicas and separate retained-data replay. Preserve historical releases, pending
+source acceptance and independent collection/image/production gates. Software
+promotion follows the same dev PR, merge-commit and exact-revision workflows.

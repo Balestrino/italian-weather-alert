@@ -36,3 +36,7 @@ A software release SHALL preserve dated history under a version/date section and
 #### Scenario: A minor release is prepared and promoted
 - **WHEN** development changes are grouped for version 0.2.0 and the operator requests promotion and push
 - **THEN** OpenAPI and MCP metadata agree with the new minor version, dated history and historical notes remain intact, upgrade notes explain disabled embedding defaults and worker replacement, and promotion retains commit history with CI, Coverage and Security passing before merge and publication
+
+#### Scenario: A minor release changes a public response shape
+- **WHEN** the operator requests version 0.3.0 with the concise situation contract
+- **THEN** aligned API/MCP metadata and versioned notes describe old-to-new consumer paths, cursor transition, additive migrations and worker replacement, retain dated history and pilot limitations, and software tagging/publication target the merged main revision only after CI, Coverage and Security pass
