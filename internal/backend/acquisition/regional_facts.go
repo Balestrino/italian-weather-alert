@@ -14,6 +14,8 @@ import (
 type RegionalFact struct {
 	Risk, Label, Zone, Level, Original, Precision, Locator string
 	Date, Start, End                                       *time.Time
+	EvidenceURL                                            string
+	Page                                                   int
 }
 type RegionalProjection struct {
 	Product, Statement string

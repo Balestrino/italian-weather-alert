@@ -487,3 +487,26 @@ independently supported primary projection and source acceptance.
 The deployed situation can return no local facts despite stored successful extraction. Add a primary municipal projection at the ordinary extraction scheduling boundary, before downstream linking, and an update-link projection after linking. Both use retained results without additional model calls. Preserve atomic measure/evidence binding, literal temporal expressions, knowledge dates and source suspensions. Evaluation runs remain separate. Carry the reviewed official-provenance evidence from the active configuration into an independent append-only assessment without overriding explicit existing assessments. Public coverage summarizes ordinary interpretation of latest visible notices independently of acceptance. First pending notices must remain visible without prior measures; configured listing containers and pagination are excluded. The public subject accompanies action/place. Deployment and bounded retained-data recovery are verified separately from code tests. Graphical CFR interpretation remains an explicit follow-up and cannot be replaced by forced green values.
 
 Local worker startup must tolerate several immutable fallback revisions sharing a catalog name. Preserve legacy local registrations where compatible; when the legacy name/revision key collides, derive a separate identity and name from the exact fallback. Never rewrite an existing configuration to make startup pass. Verify both fallback associations, repeated registration and preservation of prior hashes.
+
+
+## Retained criticality vector interpretation — 3 October 2026
+
+The current Calcinaia query needs per-risk results rather than fourteen unknown
+map entries. Extract PDF text bounding boxes and vector paths with the already
+packaged Poppler utilities, without model calls or external downloads. Match
+issuance before combining HTML and PDF. Associate each risk/date heading with its
+26 labelled zone polygons, applying each path's affine transformation and a
+point-in-polygon test at the label. Recognize the official fill palette; white
+outlined polygons denote excluded main-river/coastal mask areas. A missing or
+ambiguous association stays unknown. Bound PDF size, command time, page count and
+output; unsupported vector layouts fall back to supported HTML evidence.
+
+Keep explicit HTML alert intervals when matching maps cover the same days;
+deduplicate repeated intervals and reject conflicting colors. New parser records
+use `cfr-vector-v3`, preserve older projections and become visible only at the
+actual knowledge time. Encode PDF URL/page/locator in the existing evidence
+locator and expose it through the shared public query. Limitations concerning
+unresolved labels elsewhere in the bulletin remain in source coverage, while an
+unambiguously supported zone's fact is assessed separately. This verifies the
+current Calcinaia criticality scope, not all label placements, vigilance graphics,
+municipal expiry or source acceptance.

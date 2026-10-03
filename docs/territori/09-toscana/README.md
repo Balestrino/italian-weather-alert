@@ -73,14 +73,19 @@ quando i colori delle mappe non sono verificati. Vedere TOS-005.
 
 ## Problemi aperti
 
-La diagnosi TOS-008 conferma che la proiezione `cfr-html-v2` interpreta le righe
-testuali esplicite, ma non i colori delle mappe. La dichiarazione `NESSUNA` resta
-una dichiarazione del bollettino; le combinazioni rischio/zona/data conservate con
-livello `unknown` non sono livelli verdi verificati. Accettazione e pubblicazione
-in development non completano questa capacità. `provenance.state=unresolved`
-segnala inoltre l’assenza di una valutazione al confine temporale della query.
-TOS-013 collega l’evidenza già registrata nella configurazione attiva alla storia
-della provenienza, senza retrodatare le risposte o completare l’accettazione.
+TOS-014 supera la lacuna di TOS-008 per la criticità corrente di Calcinaia:
+`cfr-vector-v3` legge i poligoni colorati del PDF conservato, li associa alle
+sigle di zona e alle intestazioni rischio/giorno, e cita le pagine. L’edizione
+PDF deve coincidere con l’emissione HTML; la sola dichiarazione `NESSUNA` non
+produce colori. Le aree escluse nei prodotti reticolo principale/mareggiate
+restano distinte dal verde. Gli intervalli espliciti della tabella prevalgono
+sulla sola precisione giornaliera della mappa.
+
+La lettura resta incompleta dove una sigla non si trova dentro un unico poligono
+supportato; lo stato della fonte conserva questi limiti, mentre i fatti sostenuti
+per altre zone hanno una valutazione propria. Restano aperte la copertura di tutti
+i posizionamenti delle sigle, la grafica della vigilanza e l’accettazione. Le
+valutazioni di provenienza di TOS-013 restano distinte da queste verifiche.
 
 Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel coverage tracker e nei [task del servizio Toscana](../../../openspec/changes/define-toscana-alert-service/tasks.md). Verificare sul canale operativo il monitoraggio e i casi senza evento. In presenza di `missing`, verificare il percorso che alimenta la data della pubblicazione: gli esiti per ambiente appartengono all'archivio privato.
 
@@ -102,6 +107,14 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-014 — Criticità della zona A4 determinata dai poligoni PDF
+
+- **Data e ultima verifica:** 2026-10-03; originali conservati, lettura diretta delle mappe, fixture sintetiche e controllo HTTPS API/MCP in development.
+- **Ambito e conoscenza:** criticità corrente per Calcinaia/A4, sette rischi per oggi/domani. Il comportamento è verificato nel perimetro indicato, senza estenderlo ai prodotti grafici non interpretati.
+- **Intervento e verifica:** lettura dei contorni/colori vettoriali con sigle e date del PDF; concordanza dell’emissione HTML/PDF, provenienza alla pagina, storico senza retrodatazione e API/MCP equivalenti. I poligoni noti producono valori determinati; colori sconosciuti, sigle ambigue, risorse mancanti o discordanti conservano l’incertezza. Gli intervalli precisi delle righe esplicite non diventano allerte dalla mezzanotte. Verifiche [software](../../../internal/backend/acquisition/regional_vector_test.go) e [procedura](../../operations/development-publication.md).
+- **Limiti e prossima verifica:** alcune sigle sono esterne o al margine dei poligoni; questi campi restano unknown, senza contaminare la valutazione dei fatti A4 sostenuti. Il campione non completa tutti i posizionamenti, la vigilanza grafica, la validità delle misure comunali o l’accettazione. Originali, risultati e rollback restano privati.
+
 
 ### TOS-013 — Provenienza configurata collegata alla qualità API
 

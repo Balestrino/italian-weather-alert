@@ -33,6 +33,13 @@ the tested scope. Municipal completeness, false-positive handling and graphical
 CFR interpretation still require successful verification; source acceptance and
 production publication remain pending. See [CLN-017](territori/09-toscana/comuni/050004-calcinaia.md#cln-017--integrazione-ordinaria-delle-misure-verificata-in-development).
 
+**Subsequent current criticality verification — 3 October 2026:** retained
+criticality PDF vector maps now determine all seven risks for Calcinaia/A4 for
+both bulletin days, with PDF/page attribution and actual HTTPS API/MCP verification.
+This resolves the current A4 unknown levels within the tested scope. Other label
+placements, vigilance graphics, municipal completeness and expiry remain separate
+work; source acceptance stays pending. See [TOS-014](territori/09-toscana/README.md#tos-014--criticità-della-zona-a4-determinata-dai-poligoni-pdf).
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

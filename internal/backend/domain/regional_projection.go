@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const RegionalProjectionLogic = "cfr-html-v2"
+const RegionalProjectionLogic = "cfr-vector-v3"
 
 type RegionalDocuments interface {
 	Version(context.Context, int64) (documents.Version, error)
@@ -31,6 +31,10 @@ type ProjectionReport struct {
 // Source suspension is locked with the write, and every result identifies the
 // exact version and parser. It never grants source acceptance/public access.
 func (s *Store) ProjectCFR(ctx context.Context, docs RegionalDocuments, id int64) (ProjectionReport, error) {
+	return s.ProjectCFRWithReader(ctx, docs, id, acquisition.PopplerVectorReader{})
+}
+
+func (s *Store) ProjectCFRWithReader(ctx context.Context, docs RegionalDocuments, id int64, reader acquisition.VectorPDFReader) (ProjectionReport, error) {
 	out := ProjectionReport{VersionID: id, Status: "not_regional", Limitations: []string{}}
 	var source, product, authority, publisher, platform string
 	err := s.pool.QueryRow(ctx, `SELECT s.id,s.product_id,s.authority_id,c.publisher_id,c.platform FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id JOIN registry_sources s ON s.id=d.source_id JOIN registry_channels c ON c.id=s.channel_id WHERE v.id=$1`, id).Scan(&source, &product, &authority, &publisher, &platform)
@@ -69,6 +73,32 @@ func (s *Store) ProjectCFR(ctx context.Context, docs RegionalDocuments, id int64
 		return out, err
 	}
 	projection, parseErr := acquisition.ProjectRegionalHTML(product, body)
+	if product == "criticality" && version.Complete {
+		for _, resource := range version.Resources {
+			if resource.SourceID == source && resource.Required && resource.Missing == "" && resource.MediaType == "application/pdf" {
+				pdf, e := docs.Read(ctx, id, resource.URL)
+				if e == nil {
+					var evidence acquisition.VectorEvidence
+					evidence, e = reader.Read(ctx, pdf)
+					if e == nil {
+						var maps acquisition.RegionalProjection
+						maps, e = acquisition.ProjectCriticalityVector(body, resource.URL, evidence)
+						if e == nil && parseErr == nil {
+							maps, e = acquisition.MergeCriticalityMaps(maps, projection)
+						}
+						if e == nil {
+							projection = maps
+							parseErr = nil
+						}
+					}
+				}
+				if e != nil {
+					projection.Limitations = append(projection.Limitations, "Retained PDF graphical interpretation failed; preceding explicit HTML evidence only.")
+				}
+				break
+			}
+		}
+	}
 	out.Status = "partial"
 	out.Statement = projection.Statement
 	out.Limitations = projection.Limitations
@@ -111,6 +141,10 @@ func (s *Store) ProjectCFR(ctx context.Context, docs RegionalDocuments, id int64
 	}
 	at := time.Now().UTC()
 	for n, f := range projection.Facts {
+		if f.EvidenceURL != "" {
+			raw, _ := json.Marshal(map[string]any{"source_url": f.EvidenceURL, "page": f.Page, "locator": f.Locator})
+			f.Locator = string(raw)
+		}
 		key := fmt.Sprintf("%s:%d:%d", RegionalProjectionLogic, id, n+1)
 		_, err = tx.Exec(ctx, `INSERT INTO domain_regional_records(id,document_version_id,source_id,product,originating_authority_id,publisher_id,platform,municipal_republication,projection_logic,evidence_locator) VALUES($1,$2,$3,$4,$5,$6,$7,false,$8,$9)`, key, id, source, product, authority, publisher, platform, RegionalProjectionLogic, f.Locator)
 		if err != nil {

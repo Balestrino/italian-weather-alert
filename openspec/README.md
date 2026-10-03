@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 145 | 12 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 146 | 12 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |
@@ -134,3 +134,11 @@ pagination and municipality isolation. Public/admin and six workers run the fix;
 worker catalog collisions preserve historical versions. Tasks 27.1–27.3 are
 verified; graphical CFR interpretation in 27.4, municipal completeness and source
 acceptance remain open. See [development operations](../docs/operations/development-publication.md).
+
+
+Task 27.5 verifies the current Calcinaia criticality response from matching retained
+PDF vector maps, with seven risks for both days, precise table validity, PDF/page
+attribution, historical preservation and actual HTTPS API/MCP equivalence. No
+regional level remains unknown for A4 in that verified response. Other unsupported
+label positions and vigilance graphics remain part of 27.4; municipal temporal
+conflicts and source acceptance are not completed by this correction.

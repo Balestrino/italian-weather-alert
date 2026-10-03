@@ -6,6 +6,7 @@ import (
 	"errors"
 	"slices"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -411,6 +412,19 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
 		evidence, evidenceErr := s.versionEvidence(ctx, item.versionID, item.locator)
 		if evidenceErr != nil {
 			return nil, evidenceErr
+		}
+		var pdfEvidence struct {
+			SourceURL string `json:"source_url"`
+			Page      int    `json:"page"`
+			Locator   string `json:"locator"`
+		}
+		if json.Unmarshal([]byte(item.locator), &pdfEvidence) == nil && pdfEvidence.SourceURL != "" && pdfEvidence.Page > 0 {
+			evidence.SourceURL = pdfEvidence.SourceURL
+			evidence.Page = &pdfEvidence.Page
+			evidence.Locator = &pdfEvidence.Locator
+			if item.value.Level != "unknown" {
+				item.limitations = slices.DeleteFunc(item.limitations, func(v string) bool { return strings.HasPrefix(v, "Unresolved map labels:") })
+			}
 		}
 		item.value.Evidence = []Evidence{evidence}
 		if item.newerUnsupported {

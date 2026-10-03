@@ -154,3 +154,22 @@ The worker SHALL support multiple immutable fallback configuration revisions wit
 - **WHEN** a newer fallback revision shares the original catalog name and its local registration encounters the legacy name/stage/revision constraint
 - **THEN** the worker obtains an independent local configuration bound to that exact fallback
 - **AND** repeated startup returns the same configuration and preserves the previous configuration and its hash
+
+
+### Requirement: Evidence-bound criticality map interpretation
+The service SHALL derive daily zone/risk levels from the retained criticality PDF's labelled filled vector polygons when its issuance matches the retained HTML and the complete seven-risk, two-day, 26-zone map set is recognized. It SHALL attribute each fact to the exact PDF URL and page. Green, yellow, orange and red SHALL follow recognized polygon fills. A white outlined polygon SHALL indicate non-applicability only for the main-river/coastal product masks; background whitespace SHALL NOT establish a level. Missing labels/polygons, overlapping shapes, unsupported colors and unsupported layouts SHALL remain unresolved. Explicit HTML alert rows SHALL retain their precise validity intervals and SHALL NOT be replaced by whole-day effective intervals.
+
+#### Scenario: Applicable and excluded risks in a complete daily map set
+- **WHEN** the retained matching PDF contains an unambiguous green polygon around the municipality's zone label for six risks and an outlined white polygon in the coastal-risk mask
+- **THEN** the service returns six green risks and coastal waves as not applicable for each represented day
+- **AND** the facts cite the retained PDF pages and their actual projection knowledge time
+
+#### Scenario: Unsupported graphics or different edition
+- **WHEN** map evidence is missing, a polygon cannot be associated with its label, a color is unsupported, or PDF and HTML issuance differ
+- **THEN** unsupported fields remain unknown or the parser retains the preceding supported explicit HTML evidence
+- **AND** a no-criticality statement alone never supplies green colors
+
+#### Scenario: Precise alert table validity and daily maps
+- **WHEN** an explicit table defines an afternoon alert interval and matching daily maps show its color
+- **THEN** the interval remains the supported validity and repeated daily copies do not duplicate it
+- **AND** a conflicting table/map color is rejected

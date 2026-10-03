@@ -59,3 +59,21 @@ several fallback revisions share a name; new local registrations are bound to th
 exact fallback. A failed initial worker rollout was reverted before this fix and
 the final workers started successfully. Backup and infrastructure were preserved.
 Exact images, controls, excluded results and rollback steps remain private.
+
+
+The subsequent 3 October criticality correction reads retained PDF vector fills,
+labelled zones and risk/date panels using packaged Poppler tools. It matches the
+PDF/HTML issuance, cites the PDF URL/page and preserves precise explicit alert
+intervals. Unknown colors, missing or ambiguous polygons and unsupported layouts
+retain uncertainty or supported HTML fallback. White outlined polygons in the
+main-river/coastal masks are distinct from green; page background is never a fact.
+The new parser keeps older projections at their original knowledge boundaries.
+
+A bounded development projection and the actual Calcinaia HTTPS API/MCP verify all
+seven A4 risks for both days as supported, without regional unknown levels in
+that response. This replaces the unresolved A4 map-level result recorded above.
+Source-wide limits for other unsupported labels and vigilance graphics remain
+separate. The current development public/admin and six workers run the correction;
+source controls, backup and infrastructure are preserved. Municipal date conflicts,
+unestablished expiry and formal source acceptance are not changed by the regional
+parser. The original dated observations above remain historical evidence.

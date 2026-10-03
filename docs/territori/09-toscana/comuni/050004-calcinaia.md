@@ -101,6 +101,13 @@ primi avvisi non interpretati, senza richiedere una misura precedente, e disting
 l’elaborazione dall’accettazione pendente. Il recupero delimitato dei risultati
 conservati non certifica l’intero corpus né corregge i falsi positivi del modello.
 
+La criticità CFR corrente per la zona A4 è ora determinata dalle mappe PDF
+conservate, con sette rischi per oggi/domani e pagine di evidenza; vedere
+[TOS-014](../README.md#tos-014--criticità-della-zona-a4-determinata-dai-poligoni-pdf).
+Questa verifica regionale non risolve automaticamente la validità delle singole
+misure comunali: un atto diverso per data/oggetto non chiarisce per inferenza il
+conflitto agosto/settembre di un’altra comunicazione.
+
 Restano da completare la correttezza semantica delle estrazioni e il merge della
 riapertura parziale di CLN-016. Date in conflitto, termini condizionali senza
 inizio stabilito e ambiti territoriali mancanti rimangono indeterminati; una
