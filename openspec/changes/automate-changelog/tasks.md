@@ -47,3 +47,15 @@ pool was too small for four lock transactions and a callback query. Two-CPU
 affinity reproduced the timeout; an explicit five-connection fixture passed three
 focused constrained-CPU runs and the complete processing integration suite with
 the race detector. Runtime configuration and the coverage floor remain unchanged.
+
+## 7. Situation and source verification minor release — 3 October 2026
+
+- [x] 7.1 Align OpenAPI/MCP metadata to 0.3.0, group post-0.2.0 dated history, preserve prior release notes and document situation compatibility, verification migration, worker replacement and pilot/source limits.
+- [x] 7.2 Verify version alignment, preserved history, release-note links, changelog regression/enforcement, public API/MCP tests and strict specification validation; prepare dev-to-main promotion and annotated tagging/GitHub publication through existing exact-revision CI/Coverage/Security gates, independently of image publication or production activation.
+
+Preparation validation for 0.3.0 on 3 October 2026: OpenAPI/MCP metadata align;
+all prior versioned history and released notes remain unchanged and all dated
+post-0.2.0 entries are preserved. Changelog regressions, public API/MCP tests,
+local release-note links, whitespace and strict OpenSpec checks pass. The prepared
+dev-to-main software promotion retains the existing exact-revision workflow
+gates. Source acceptance, images and production activation remain separate.

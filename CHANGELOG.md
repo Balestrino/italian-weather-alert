@@ -4,6 +4,9 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+## 0.3.0 - 2026-10-03
+
+- 2026-10-03 [Changed] Prepare the 0.3.0 release with aligned API/MCP metadata, situation consumer migration notes, source verification upgrades and exact-revision promotion checks.
 - 2026-10-03 [Changed] Present municipality situations as processed conclusions and separate source summaries, preserving evidence, uncertainty and API/MCP pagination.
 - 2026-10-03 [Fixed] Determine scoped criticality levels from retained PDF vector maps with page evidence, precise alert validity and historical preservation.
 - 2026-10-03 [Fixed] Connect primary municipal extractions to public facts, preserve provenance history and worker catalogs, and verify development API/MCP behavior.
