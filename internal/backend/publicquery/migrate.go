@@ -35,7 +35,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 		if err = tx.Commit(ctx); err != nil {
 			return err
 		}
-		return domain.MigrateRegionalProjection(ctx, pool)
+		return migrateProjections(ctx, pool)
 	}
 	if !errors.Is(err, pgx.ErrNoRows) {
 		return err
@@ -49,5 +49,12 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	if err = tx.Commit(ctx); err != nil {
 		return err
 	}
-	return domain.MigrateRegionalProjection(ctx, pool)
+	return migrateProjections(ctx, pool)
+}
+
+func migrateProjections(ctx context.Context, pool *pgxpool.Pool) error {
+	if err := domain.MigrateRegionalProjection(ctx, pool); err != nil {
+		return err
+	}
+	return domain.MigrateVerification(ctx, pool)
 }

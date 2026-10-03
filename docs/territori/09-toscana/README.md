@@ -53,11 +53,12 @@ mantengono i requisiti della specifica. Vedere TOS-007.
 
 Non derivare colori delle mappe dal testo circostante. Le pubblicazioni comunali che rilanciano un bollettino non costituiscono automaticamente una nuova allerta o una misura locale.
 
-Il flusso pianificato di [Cittadino Informato](../../fonti/piattaforme/cittadino-informato.md)
-aggiunge discovery per i comuni selezionati con condizioni verificate; i rilanci
+Il flusso di [Cittadino Informato](../../fonti/piattaforme/cittadino-informato.md)
+aggiunge discovery per i comuni selezionati e verifica primaria; i rilanci
 regionali si confrontano con rischio, zona, emissione e validità del prodotto CFR
 originario. Le raccolte CFR e comunali restano indipendenti e una misura locale
-non richiede un'allerta regionale. La decisione è documentata in TOS-009.
+non richiede un'allerta regionale. TOS-009 registra il piano; TOS-010 documenta
+il verificatore implementato e le prove sintetiche, senza attivazione operativa.
 
 Per diagnosticare una situazione API vuota, controllare prima `coverage.public_state`
 e `coverage_status`: controlli di acquisizione recenti e `updating.state=ok` non
@@ -98,6 +99,14 @@ tecniche del software non sostituiscono gli esiti attesi revisionati da una pers
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-010 — Confronti dei rilanci con primaria regionale verificati
+
+- **Data e ultima verifica:** 2026-10-03, codice e fixture sintetiche/PostgreSQL isolato; nessun nuovo fetch CFR.
+- **Ambito:** confronto di prodotti regionali con rilanci comunali/piattaforma per il territorio selezionato, distinto dalle misure locali.
+- **Conoscenza:** comportamento software confermato. **Intervento:** task 26.4 implementato e testato; nessuna attivazione o accettazione dei prodotti CFR.
+- **Osservazione ed evidenza:** identità di prodotto/rischio/zona/emissione/validità esplicita obbligatoria per comparare; periodi diversi e `unknown` non producono colori corroborati. Due rilanci concordi in conflitto con la primaria conservano il conflitto e il livello CFR; il monitoraggio non inventa livelli. [Verificatore](../../../internal/backend/domain/verification_store.go), [test](../../../internal/backend/domain/verification_integration_test.go) e [procedura](../../operations/cittadino-informato.md#verifica-persistente-e-ammissione--task-264).
+- **Conseguenza e prossima verifica:** implementa il confronto pianificato in TOS-009; non completa l’interpretazione grafica di TOS-008 o la correttezza semantica delle selezioni. Verificare il percorso reale della 26.2 e la valutazione 26.5 prima del trial 26.6.
 
 ### TOS-001 — Prodotti regionali con semantiche distinte
 

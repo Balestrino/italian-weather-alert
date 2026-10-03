@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-03 [Added] Implement evidence-bound multi-source verification receipts and primary-only domain admission with immutable history, deduplication and protected comparison evidence; verify synthetic PostgreSQL/query cases for task 26.4, leaving the bounded development run and activation separate.
 - 2026-10-03 [Added] Implement municipality-scoped Cittadino Informato API acquisition with versioned originals, bounded discovery, date separation and dependency/retry guards; verify synthetic persistence and bounded isolated Calcinaia checks, leaving multi-source admission pending.
 - 2026-10-03 [Planned] Replace the Cittadino Informato licensing prerequisite with tested persistent multi-source verification across Regione Toscana/CFR, municipality and platform
 - 2026-10-03 [Changed] Document the preliminary Calcinaia Cittadino Informato access and reuse review, exposed API scope and unresolved acquisition prerequisites

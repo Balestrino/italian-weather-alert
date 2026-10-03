@@ -91,6 +91,12 @@ The service SHALL separately report regional and local coverage. Regional produc
 
 Cittadino Informato candidates SHALL retain channel-specific evidence and persistent multi-source verification receipts for Regione Toscana/CFR, municipality and platform as defined in official-source-ingestion. Receipts SHALL distinguish corroboration, missing primary evidence, unavailable checks, non-comparable versions/validities, checks not applicable to the claim and actual conflicts. Corroboration SHALL be field-scoped and SHALL NOT transfer dates, validity, authority or completeness by inference. Local-only claims MAY record the CFR role as not applicable; regional claims SHALL retain the originating CFR level without requiring a municipal republication or using majority vote. A primary check failure or an unmatched candidate SHALL remain distinct from an actual comparable disagreement; uncorroborated candidates SHALL NOT create confirmed measures or replace originating regional levels.
 
+Verified primary projections SHALL preserve prior facts and immutable receipts, reuse identical facts for repeat verification, and select revised records only within the service-knowledge boundary for the same primary source and explicit act/scope. A later acquisition returning an earlier retained content hash SHALL reuse that fact while preserving the intervening history. Disappearance, unrelated acts or secondary votes SHALL NOT establish cancellation. Protected measures SHALL retain their necessary comparison evidence; fully expired evidence graphs MAY be removed through dependency-safe retention.
+
+#### Scenario: A primary publication returns to its earlier content
+- **WHEN** a verified primary revision is followed by a new acquisition of previously retained content for the same act and scope
+- **THEN** current selection follows the latest verified acquisition, reuses the earlier fact and retains the intervening facts and receipts for past knowledge queries
+
 #### Scenario: A local activation is verified without a regional alert
 - **WHEN** a platform candidate and municipal act support a local activation but no applicable regional warning is acquired
 - **THEN** the supported local measure remains separate and no regional color or absence-of-risk conclusion is inferred

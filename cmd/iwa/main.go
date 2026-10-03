@@ -57,6 +57,7 @@ func run() bool {
 		return false
 	}
 	reportCommand := len(os.Args) == 2 && (os.Args[1] == "report-preview" || os.Args[1] == "report-status")
+	verificationCommand := len(os.Args) == 3 && (os.Args[1] == "verify-candidate" || os.Args[1] == "verification-receipt") || len(os.Args) == 5 && os.Args[1] == "verification-history"
 	projectCommand := len(os.Args) == 3 && os.Args[1] == "project-regional-version"
 	zonesCommand := len(os.Args) == 4 && os.Args[1] == "adopt-toscana-zones"
 	preflightCommand := len(os.Args) == 4 && os.Args[1] == "interpretation-preflight"
@@ -66,7 +67,7 @@ func run() bool {
 	previewCommand := len(os.Args) == 4 && os.Args[1] == "preview"
 	backupResultCommand := len(os.Args) == 6 && os.Args[1] == "backup-result"
 	retentionPolicyCommand := len(os.Args) == 3 && os.Args[1] == "retention-policy"
-	if (!controlRequested && !reportCommand && !projectCommand && !zonesCommand && !preflightCommand && !pendingArchiveCommand && !archiveCommand && !seedCommand && !previewCommand && !retentionPolicyCommand && !backupResultCommand && len(os.Args) > 2) || (len(os.Args) == 2 && !controlRequested && !reportCommand && os.Args[1] != "check" && os.Args[1] != "inference-catalog-check" && os.Args[1] != "migrate" && os.Args[1] != "storage-init" && os.Args[1] != "storage-recover" && os.Args[1] != "retention-cleanup" && os.Args[1] != "worker" && os.Args[1] != "backup-worker") {
+	if (!controlRequested && !reportCommand && !verificationCommand && !projectCommand && !zonesCommand && !preflightCommand && !pendingArchiveCommand && !archiveCommand && !seedCommand && !previewCommand && !retentionPolicyCommand && !backupResultCommand && len(os.Args) > 2) || (len(os.Args) == 2 && !controlRequested && !reportCommand && os.Args[1] != "check" && os.Args[1] != "inference-catalog-check" && os.Args[1] != "migrate" && os.Args[1] != "storage-init" && os.Args[1] != "storage-recover" && os.Args[1] != "retention-cleanup" && os.Args[1] != "worker" && os.Args[1] != "backup-worker") {
 		slog.Error("unknown command")
 		return false
 	}
@@ -137,6 +138,9 @@ func run() bool {
 		return json.NewEncoder(os.Stdout).Encode(map[string]any{"mail": mail, "snapshot": snapshot}) == nil
 	}
 
+	if verificationCommand {
+		return executeVerification(ctx, pool, c, os.Args[1:], os.Stdout)
+	}
 	if projectCommand {
 		return projectRegionalVersion(ctx, pool, c)
 	}

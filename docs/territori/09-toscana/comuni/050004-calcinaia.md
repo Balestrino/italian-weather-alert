@@ -16,7 +16,7 @@ Comune di Calcinaia, provincia di Pisa, ISTAT `050004`. Fonte IWA: `calcinaia-mu
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria | [Notizie](https://www.comune.calcinaia.pi.it/tipi-di-notizia/notizie), [Avvisi](https://www.comune.calcinaia.pi.it/tipi-di-notizia/avvisi), [Comunicati](https://www.comune.calcinaia.pi.it/tipi-di-notizia/comunicati); sezioni da verificare nella configurazione |
-| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03, verifica multipla, implementazione e attivazione del nuovo flusso da verificare |
+| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03; acquisizione e verificatore implementati, percorso development e adozione operativa da verificare |
 | Albo pretorio | Atti di supporto | Cercare gli atti citati nelle notizie primarie; il riferimento al singolo atto va verificato |
 
 La mappa consolida la [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). La sezione Notizie è stata consultata il 2026-10-02; ciò non verifica tutte le altre sezioni o i canali secondari.
@@ -26,8 +26,9 @@ decisione CLN-010 come canale aggiuntivo di acquisizione/discovery con verifica
 primaria. Il nuovo piano non certifica un controllo periodico attivo. CLN-008 distingue il ruolo
 documentato dall'acquisizione configurata: verificare una fonte/sezione dedicata
 e ricevute recenti prima di dichiarare il confronto automatico operativo. La
-limitazione registrata rinvia l'acquisizione attiva alla revisione delle condizioni
-di riuso; questa scheda non ne rivaluta le condizioni correnti.
+limitazione storica CLN-008 rinviava l’acquisizione alla revisione delle condizioni
+di riuso. CLN-012 supera quel prerequisito documentale; CLN-013/CLN-014 registrano
+il codice e i collaudi successivi, con il percorso development ancora da eseguire.
 
 CLN-009 conferma il riconoscimento istituzionale del canale di Calcinaia: il
 Comune lo collega e lo raccomanda, mentre Regione e ANCI documentano il servizio.
@@ -68,7 +69,7 @@ multipla Regione/CFR–Comune–piattaforma, senza un gate di ottenimento licenz
 o documentazione della base giuridica. Mantenere controlli comunali
 indipendenti per gli avvisi assenti dalla piattaforma; confrontare con il CFR soltanto
 le affermazioni regionali comparabili, senza richiedere un'allerta regionale per ogni
-provvedimento locale. Il task 26.3 è completato; 26.2 e 26.4–26.6 restano aperti,
+provvedimento locale. I task 26.3 e 26.4 sono completati; 26.2, 26.5 e 26.6 restano aperti,
 con il coverage tracker invariato.
 
 La [revisione preliminare del canale](../../../fonti/piattaforme/cittadino-informato-review.md)
@@ -76,7 +77,8 @@ identifica l'indice REST e i limiti delle date del contenitore WordPress. Il
 trattamento dei visitatori dichiarato da ANCI Toscana non risolve i diritti sul
 flusso IWA. Il precedente criterio documentale è superato da CLN-012; occorrono
 ricevute persistenti con fonti/versioni, tempi, campi ed esiti distinti. CLN-013
-verifica le route API, i limiti e la persistenza dell’acquisizione; confronti e
+verifica le route API, i limiti e la persistenza dell’acquisizione; CLN-014 aggiunge
+ricevute e proiezione primaria con prove sintetiche. Percorso development e
 cadenza operativa restano da collaudare. Il CFR può essere
 non applicabile a una misura locale; non è richiesto un accordo unanime di tre canali.
 
@@ -95,7 +97,12 @@ estratti, la loro proiezione con evidenza/validità e gli stati di interpretazio
 richiesti dalla query; la pubblicazione manuale non esegue questo passaggio.
 `documents_requiring_attention` raccoglie soltanto avvisi collegati a misure già
 presenti: se queste mancano, l'array vuoto non esclude documenti non interpretati.
-La ricerca API dei documenti conservati è un percorso distinto.
+La ricerca API dei documenti conservati è un percorso distinto. Il task 26.4
+aggiunge un ingresso programmatico separato per la proiezione da selezioni di
+evidenza verificate, con stato di interpretazione e validità primaria. Non
+collega automaticamente tutte le righe di `extracted_measures` al dominio né
+esegue discovery delle controparti: verificare questo percorso in development
+prima di considerare superata la diagnosi operativa CLN-007.
 
 Trial e accettazione restano quelli del coverage tracker. Le lacune dei canali secondari vanno registrate separatamente dalle omissioni nel perimetro primario. Consultare il registro privato per errori e recuperi dell'ambiente; non considerarli una certificazione pubblica.
 
@@ -105,6 +112,14 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-014 — Proiezione con riscontro primario implementata
+
+- **Data e ultima verifica:** 2026-10-03, codice e fixture sintetiche/PostgreSQL isolato; nessun nuovo confronto di avvisi reali di Calcinaia.
+- **Ambito:** ingresso programmatico di verifica per il Comune selezionato, misure locali e fasi operative distinte dai rilanci regionali.
+- **Conoscenza:** comportamento software confermato nei casi provati. **Intervento:** 26.4 implementato e testato; nessun cambiamento al runtime live o all’accettazione.
+- **Osservazione ed evidenza:** i campi vengono ricavati dagli originali/versioni posseduti, inclusi atti PDF con OCR completo; ricevute dei tre ruoli e ammissione atomica da valori comunali, senza obbligo di allerta regionale. Ripetizioni riusano la misura; revisioni e ritorni conservano lo storico e la selezione per conoscenza. [Procedura](../../../operations/cittadino-informato.md#verifica-persistente-e-ammissione--task-264) e [test](../../../../internal/backend/domain/verification_integration_test.go).
+- **Conseguenza e prossima verifica:** crea il percorso di proiezione verificata richiesto dalla 26.4, separato dal worker generico diagnosticato in CLN-007. Eseguire 26.2 con originali reali in development; 26.5/26.6 verificano valutazione estesa e successiva adozione programmata. Nessuna copertura o pubblicazione dedotta dai test.
 
 ### CLN-013 — Acquisizione Cittadino Informato delimitata verificata
 

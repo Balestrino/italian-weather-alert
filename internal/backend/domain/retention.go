@@ -258,6 +258,13 @@ func (r *Retention) cleanupDatabase(ctx context.Context, evaluatedAt time.Time) 
 		`DELETE FROM retained_versions WHERE id IN(SELECT id FROM retention_candidates)`,
 		`DELETE FROM retained_documents d WHERE NOT EXISTS(SELECT 1 FROM retained_versions v WHERE v.document_id=d.id) AND NOT EXISTS(SELECT 1 FROM retained_acquisitions a WHERE a.document_id=d.id)`,
 	}
+	var verificationInstalled bool
+	if err = tx.QueryRow(ctx, "SELECT to_regclass('domain_verification_dependencies') IS NOT NULL").Scan(&verificationInstalled); err != nil {
+		return result, err
+	}
+	if verificationInstalled {
+		statements[2] = strings.Replace(statements[2], " ), needed(id) AS (", " UNION SELECT evidence_version_id,supported_version_id FROM domain_verification_dependencies\n ), needed(id) AS (", 1)
+	}
 	for index, statement := range statements {
 		if index == 1 {
 			_, err = tx.Exec(ctx, statement, evaluatedAt, months)

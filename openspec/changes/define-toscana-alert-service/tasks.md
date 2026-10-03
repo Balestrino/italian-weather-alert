@@ -356,7 +356,7 @@ acceptance tasks 9.3 and 10.1 and production release gates remain open.
 - [x] 26.1 Formalize the requested additional institutional acquisition/discovery channel for selected municipalities in proposal, design and the three specifications; preserve independent municipal/CFR collection, scoped referrals, candidate limits and separate permissions/acceptance/activation. Record platform guidance and dated findings without claiming runtime adoption. The subsequent 3 October revision replaces the original reviewed-grounds gate with technical multi-source verification; this historical planning task does not complete the revised runtime work.
 - [ ] 26.2 Deliver and verify a working multi-source acquisition-to-verification system for Regione Toscana/CFR, the selected municipality and cittadinoinformato.it. After 26.3 and 26.4, exercise a bounded development run with regional and local cases and inspect persisted receipts identifying candidate, channel roles, source/version evidence, passages, check times, compared fields and outcomes. Verify missing/unavailable/non-comparable/not-applicable/conflicting evidence behavior and diagnostic-only admission without required primary support. Completion requires working tested comparisons, not obtaining licenses, agreements or legal-basis documentation; retain bounded public access, independent primary collection and link-only platform copies.
 - [x] 26.3 Implement separate source identities and opt-in bounded acquisition for explicitly selected recognized municipality sections, with versioned originals, date meanings, dependencies, retries and visible failures; do not inherit recognition or permission across municipalities. Verified with synthetic unit/disposable PostgreSQL cases and two bounded isolated Calcinaia HTTP checks on 3 October 2026; pending verification candidates, no live source activation. See [operations](../../../docs/operations/cittadino-informato.md).
-- [ ] 26.4 Implement persistent, evidence-bound multi-source verification receipts and candidate-to-domain admission: municipal publications/referenced acts for local fields, comparable originating CFR products for regional republications; record all three channel roles and distinguish corroboration, missing primary evidence, unavailable checks, non-comparable evidence, not-applicable checks and actual conflicts; preserve changes/history, avoid duplicate measures and never use majority vote between republications.
+- [x] 26.4 Implement persistent, evidence-bound multi-source verification receipts and candidate-to-domain admission: municipal publications/referenced acts for local fields, comparable originating CFR products for regional republications; record all three channel roles and distinguish corroboration, missing primary evidence, unavailable checks, non-comparable evidence, not-applicable checks and actual conflicts; preserve changes/history, avoid duplicate measures and never use majority vote between republications.
 - [ ] 26.5 Verify synthetic and reviewed real-source cases covering primary-only/platform-only notices, date/version mismatches, unavailable checks, actual conflicts, local measures without regional alerts, unchanged/revised content, same-platform unselected municipalities and equivalent API/MCP attribution; retain link-only copies and explicit coverage limits.
 - [ ] 26.6 Run a bounded operator-selected development preview/trial for Calcinaia before separately activating scheduled acquisition; verify independent municipal/CFR checks and comparison receipts, scoped visibility and rollback, without completing source acceptance or enabling other municipalities by inference.
 
@@ -369,8 +369,9 @@ data controller, not thereby as holder of every content/database right. The
 [review dossier](../../../docs/fonti/piattaforme/cittadino-informato-review.md)
 records the original review and revised technical closure criteria. The subsequent
 user decision supersedes the licensing/documentation completion gate. Task 26.2
-remains unchecked because the implemented multi-source system and bounded run are
-still missing; there was no collector activation or external communication. This
+remains unchecked: the later 26.3/26.4 work implements acquisition and the
+programmatic verifier, but the bounded end-to-end development run is still missing;
+there was no collector activation or external communication. This
 review does not complete tasks 26.3–26.6.
 
 **26.3 implementation — 3 October 2026:** the typed opt-in API adapter, registry
@@ -379,7 +380,8 @@ originals, repeat/revised versions, date meanings, invalid/missing dependencies,
 rate limits and unavailable-detail deferral/recovery. Two bounded isolated HTTP
 checks verify Calcinaia access and unchanged-version reuse. This later work completes
 26.3 only; persistent multi-source comparisons/admission (26.4) and the complete
-26.2 development run remain open. Private source captures are excluded from Git.
+26.2 development run remain open; the later 26.4 work below adds the verifier.
+Private source captures are excluded from Git.
 
 **Revised sequence:** implement 26.3 acquisition and 26.4 persistent comparisons,
 then close 26.2 from the bounded development run and inspected receipts. Complete
@@ -388,9 +390,27 @@ scheduled trial. A local-only measure may mark CFR not applicable; a regional
 claim uses the originating CFR product without requiring municipal republication.
 No three-channel quorum or majority vote replaces field-level primary evidence.
 
-This is an authorized planning revision. It changes task 26.2's completion criterion
-to implemented multi-source verification; it does not activate platform acquisition,
-implement municipal projection or certify source acceptance.
+This records the earlier authorized planning revision. Its document changes
+replaced task 26.2's completion criterion without implementing acquisition or
+projection. The subsequent 26.3/26.4 work adds that code; source acceptance and
+operational activation remain separate.
 The historical checked bootstrap comparison in task 1.11 remains dated evidence,
 not proof of this new recurring workflow. Document consistency, scenario structure
 and local links are verified separately from runtime behavior and source acceptance.
+
+**26.4 implementation — 3 October 2026:** migration 068, the programmatic
+verifier and private admin CLI persist immutable evidence selectors, passages,
+source/version/configuration identities, comparison directions, all channel
+roles, check times and per-field outcomes. Atomic primary-only domain projection
+preserves CFR colors and supports local-only/primary-only facts without majority
+vote; direct platform store writes cannot bypass verification. Idempotence,
+concurrent receipt/measure reuse, revisions and returns to earlier content,
+existing-domain reuse with temporal/interpretation assessment, completed PDF OCR
+ownership, missing/unavailable/non-comparable/conflict cases and dependency-safe
+retention are verified with synthetic disposable PostgreSQL. Query tests verify
+current and past knowledge selection without duplicate measures. See
+[operations](../../../docs/operations/cittadino-informato.md#verifica-persistente-e-ammissione--task-264).
+This completes 26.4; the verifier consumes interpreted selectors and prior check
+results, not an automatic counterpart-discovery workflow. No new real-source
+run, live migration/activation, generic extraction-worker wiring or API/MCP
+verification-output extension is claimed. Tasks 26.2, 26.5 and 26.6 remain open.

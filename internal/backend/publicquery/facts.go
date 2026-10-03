@@ -218,6 +218,7 @@ func (s *Store) newerWarnings(ctx context.Context, id string, knownAt time.Time)
 func (s *Store) measures(ctx context.Context, municipality string, qt QueryTime) ([]Measure, error) {
 	rows, err := s.pool.Query(ctx, `SELECT m.id FROM domain_local_measures m JOIN retained_versions v ON v.id=m.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=m.source_id
 	 WHERE ($1='' OR m.municipality_istat=$1) AND v.first_acquired_at<=$2 AND m.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND `+s.visibilitySQL()+`
+	   AND domain_verification_record_current('local_measure',m.id,registry_interpretation_cutoff(s.id,$2))
 	   AND COALESCE((SELECT state FROM domain_interpretation_events i WHERE i.local_measure_id=m.id AND i.recorded_at<=registry_interpretation_cutoff(s.id,$2) ORDER BY i.recorded_at DESC,i.id DESC LIMIT 1),'not_processed') IN ('supported','partial','unreliable')
 	 ORDER BY m.id`, municipality, qt.KnownAt)
 	if err != nil {
@@ -256,7 +257,7 @@ func (s *Store) phases(ctx context.Context, municipality string, qt QueryTime) (
 	rows, err := s.pool.Query(ctx, `SELECT p.id,p.document_version_id,p.municipality_istat,a.name,p.phase,p.source_id,p.recorded_at
  FROM domain_operational_phases p JOIN retained_versions v ON v.id=p.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=p.source_id
  JOIN registry_authorities a ON a.id=p.authority_id
-	 WHERE ($1='' OR p.municipality_istat=$1) AND v.first_acquired_at<=$2 AND p.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND `+s.visibilitySQL()+` ORDER BY p.id`, municipality, qt.KnownAt)
+	 WHERE ($1='' OR p.municipality_istat=$1) AND v.first_acquired_at<=$2 AND p.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND domain_verification_record_current('operational_phase',p.id,registry_interpretation_cutoff(s.id,$2)) AND `+s.visibilitySQL()+` ORDER BY p.id`, municipality, qt.KnownAt)
 	if err != nil {
 		return nil, err
 	}
@@ -328,6 +329,7 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
  LEFT JOIN domain_regional_projections p ON p.document_version_id=r.document_version_id AND p.logic_version=r.projection_logic
  JOIN retained_versions v ON v.id=r.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=r.source_id
 	 WHERE v.first_acquired_at<=$1 AND r.recorded_at<=registry_interpretation_cutoff(s.id,$1) AND (`+s.visibilitySQL()+`) AND (`+s.regionalDevelopmentScopeSQL(selectedMapping)+`) AND ($2='' OR r.product=$2) AND ($3='' OR f.risk=$3) AND ($4='' OR r.source_id=$4)
+ AND ($5 OR domain_verification_record_current('regional_record',r.id,registry_interpretation_cutoff(s.id,$1)))
  AND (r.projection_logic IS NULL OR NOT EXISTS(
  SELECT 1 FROM domain_regional_projections replacement
  WHERE replacement.document_version_id=r.document_version_id AND replacement.status<>'unsupported'

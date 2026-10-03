@@ -44,8 +44,9 @@ rischi, paginazione delimitata, originali versionati e dipendenze PDF esplicite.
 La [procedura](../../operations/cittadino-informato.md) documenta il contratto,
 i test sintetici di persistenza e la prova HTTP isolata su Calcinaia del 2026-10-03.
 La [revisione preliminare](cittadino-informato-review.md) conserva l’inventario
-anteriore al collaudo; CIN-007 aggiorna lo stato tecnico. Confronti persistenti,
-cadenza operativa e copertura continuativa restano da verificare.
+anteriore al collaudo; CIN-007 aggiorna l’acquisizione e CIN-008 la verifica
+persistente del task 26.4, provata con fixture sintetiche. Il percorso completo in
+development, la cadenza operativa e la copertura continuativa restano da verificare.
 Feed degli avvisi e intervalli di polling non sono stati individuati nelle risorse
 consultate. Preferire un accesso API/feed verificato tecnicamente quando disponibile.
 I metadati WordPress della pagina non datano i bollettini dinamici.
@@ -72,22 +73,33 @@ CIN-006 ne supera l’uso come prerequisito del piano.
 | --- | --- | --- |
 | CIN-001 | Calcinaia | Referral verificato; altri comuni richiedono evidenze proprie |
 | CIN-002 | Condizioni | Link copyright senza documento nella homepage consultata; osservazione conservata, precedente gate superato da CIN-006 |
-| CIN-003 | Nuovo flusso IWA | Piano originario; acquisizione implementata da CIN-007, confronti e attivazione ancora aperti |
+| CIN-003 | Nuovo flusso IWA | Piano originario; acquisizione e verifica implementate da CIN-007/CIN-008, adozione operativa separata |
 | CIN-004 | Revisione originaria Calcinaia | Osservazioni conservate; criterio documentale di chiusura superato da CIN-006 |
-| CIN-005 | Accesso tecnico Calcinaia | Indice REST osservato; date del contenitore non operative, route degli avvisi e cadenza da collaudare |
+| CIN-005 | Accesso tecnico Calcinaia | Indice REST osservato; date del contenitore non operative, route collaudate da CIN-007, cadenza continuativa da verificare |
 | CIN-006 | Criterio corrente del task 26.2 | Sistema di verifica multipla implementato e verificato, con ricevute persistenti; nessun gate di ottenimento licenze/documentazione |
-| CIN-007 | Acquisizione Calcinaia | Contratto API e guardie implementati; prove sintetiche e due passaggi HTTP isolati verificati, candidati pending |
+| CIN-007 | Acquisizione Calcinaia | Contratto API e guardie implementati; prove sintetiche e due passaggi HTTP isolati verificati, candidati inizialmente pending |
+| CIN-008 | Verifica multipla | Ricevute, confronti e proiezione primaria implementati e provati con fixture; percorso reale e adozione operativa separati |
 
 ## Problemi aperti
 
 I [task 26.2–26.6](../../../openspec/changes/define-toscana-alert-service/tasks.md)
-registrano la 26.3 completata e richiedono ancora confronti persistenti, verifica del percorso in
+registrano la 26.3 e la 26.4 completate e richiedono ancora verifica del percorso in
 development, valutazione estesa e trial programmato. Il [dossier](cittadino-informato-review.md)
 conserva l’inventario tecnico e i criteri correnti. Il task 26.2 resta aperto perché
-il confronto e l’ammissione dei candidati non sono ancora implementati e verificati.
+il percorso completo con evidenze reali e ricevute in development resta da eseguire.
+La verifica implementata consuma selezioni interpretate e risultati dei controlli:
+non costituisce da sola discovery delle controparti o accettazione semantica.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-008 — Ricevute persistenti e ammissione primaria verificate
+
+- **Data e ultima verifica:** 2026-10-03, codice, fixture sintetiche e PostgreSQL isolato; nessun nuovo fetch del canale reale.
+- **Ambito:** verificatore comune ai tre ruoli Regione/CFR–Comune–piattaforma, contratto comunale selezionato; prove redistribuibili con identità sintetiche.
+- **Conoscenza:** comportamento confermato nei casi provati. **Intervento:** task 26.4 applicato al codice e verificato; nessuna migrazione o attivazione live.
+- **Osservazione ed evidenza:** passaggi da originali integri o OCR completo, ricevute immutabili, confronto per campo senza maggioranza, proiezione esclusivamente primaria, idempotenza, revisioni/ritorni e retention delle controparti. [Procedura e test](../../operations/cittadino-informato.md#verifica-persistente-e-ammissione--task-264).
+- **Conseguenza e prossima verifica:** completa l’ingresso programmatico della 26.4; non certifica semantica delle selezioni, copertura reale o orchestrazione continuativa. Eseguire il percorso development della 26.2 e la valutazione 26.5 prima del trial 26.6.
 
 ### CIN-007 — Acquisizione API delimitata e persistenza verificate
 

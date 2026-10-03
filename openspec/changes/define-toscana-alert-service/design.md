@@ -419,8 +419,32 @@ unavailable-detail backoff and validated PDF dependencies preserve visible failu
 and recoveries. Operator selection/referral supplies configuration evidence without
 a license-document prerequisite. Notices and risks remain pending verification.
 Synthetic persistence tests and a bounded isolated Calcinaia HTTP run verify this
-acquisition step; no multi-source receipt/admission implementation or scheduled
-activation is claimed. See [operations](../../../docs/operations/cittadino-informato.md).
+acquisition step; its original pending-verification state is preserved. The subsequent
+26.4 implementation below adds receipts/admission; scheduled activation remains separate. See [operations](../../../docs/operations/cittadino-informato.md).
+
+
+Task 26.4 adds an evidence-selector verification API and private admin CLI over
+retained originals/completed OCR. Values are derived from owned resources, not
+accepted as caller-supplied facts; exact local act/edition or regional
+product/risk/zone/absolute issuance/validity establishes comparability. Receipts
+are immutable and idempotent per request, record all roles and comparison
+source/version directions, and commit atomically with primary-only domain
+projection. Unsupported platform fields are never copied. A supported primary
+can be projected independently of a discordant republication or a missing
+platform notice; monitoring adds no alert color. Native domain store writes
+cannot admit a Cittadino Informato-origin fact directly.
+
+Stable primary/version facts are reused. Append-only scope/acquisition mappings
+select the current verified revision within the query's knowledge boundary,
+including a return to an earlier content hash, without removing historical
+facts. This does not infer cancellation between different acts. Local projection
+records field-supported interpretation separately from provenance/acceptance.
+Retention includes bidirectional proof dependencies while any counterpart is
+protected, then purges fully expired graphs. Synthetic PostgreSQL and public
+query tests verify these behaviors. The entry point consumes interpreted
+selectors/check results; automatic counterpart discovery, worker orchestration,
+reviewed real-source evaluation and the bounded development run remain separate
+operational/evaluation steps in 26.2, 26.5 and 26.6. No live configuration changed.
 
 ## Manual municipal development publication — 2 October 2026
 

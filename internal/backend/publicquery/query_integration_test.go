@@ -728,6 +728,54 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		}
 	})
 
+	t.Run("verification projections preserve knowledge and current deduplication", func(t *testing.T) {
+		proof := registry.Evidence{URL: "https://calcinaia.example/notices", Locator: "synthetic referral", ObservedAt: time.Now().UTC()}
+		contract := &registry.CittadinoInformatoContract{MunicipalityISTAT: "050004", MunicipalitySlug: "calcinaia", Publisher: "comune_calcinaia", Updates: true, PageSize: 1}
+		sections := []string{contract.BaseURL() + "aggiornamenti/"}
+		cfg := registry.Configuration{URL: contract.BaseURL(), Sections: sections, AccessMethod: registry.CittadinoInformatoAccess, Attribution: "synthetic", Policy: registry.Policy{Evidence: &proof, CollectionPermitted: true, RetentionPermitted: true}, CittadinoInformato: contract, Discovery: registry.Discovery{MaxPagesPerSection: 1, MaxDocuments: 5, BootstrapDays: 30}, Referral: &registry.Referral{Evidence: proof, Destination: contract.BaseURL(), Territory: "050004", ProductID: "municipal", Sections: sections, Context: "synthetic scoped referral"}}
+		if e := reg.CreateChannel(ctx, registry.Channel{ID: "verification-platform", PublisherID: "comune-calcinaia", Platform: "cittadino-informato", URL: contract.BaseURL(), External: true}); e != nil {
+			t.Fatal(e)
+		}
+		if e := reg.CreateSource(ctx, registry.Source{ID: "verification-platform", AuthorityID: "comune-calcinaia", ChannelID: "verification-platform", ProductID: "municipal", Territory: "050004"}, cfg, "fixture"); e != nil {
+			t.Fatal(e)
+		}
+		makeVerified := func(requestID, action string) domain.VerificationReceipt {
+			t.Helper()
+			body := "Ordinanza sintetica 88 | " + action + " | Ponte Sintetico | fino a nuovo ordine"
+			url := "https://calcinaia.example/notices/verified-primary"
+			version := retain(requestID, "calcinaia-public", url, body, &issuer, metadata)
+			fields := map[string]domain.EvidenceSelection{}
+			for name, value := range map[string]string{"reference": "Ordinanza sintetica 88", "kind": action, "subject": "Ponte Sintetico", "validity": "fino a nuovo ordine"} {
+				start := strings.Index(body, value)
+				fields[name] = domain.EvidenceSelection{ResourceURL: url, StartByte: start, EndByte: start + len(value), Locator: "synthetic primary " + name}
+			}
+			at := time.Now().UTC()
+			request := domain.VerificationRequest{RequestID: requestID, CandidateKey: "primary-only-act", Kind: "local_measure", MunicipalityISTAT: "050004", Candidate: domain.VerificationEvidence{SourceID: "calcinaia-public", VersionID: version.ID, Fields: fields}, Checks: []domain.VerificationCheck{{Role: "regional", State: "not_applicable", Reason: "local_only", CheckedAt: at}, {Role: "platform", State: "missing", Reason: "not_republished", CheckedAt: at, VerificationEvidence: domain.VerificationEvidence{SourceID: "verification-platform"}}}}
+			receipt, e := domainStore.VerifyMultiSource(ctx, documentStore, request, at)
+			if e != nil || !receipt.Admitted {
+				t.Fatal("primary-only projection failed", e, receipt.Outcome)
+			}
+			return receipt
+		}
+		first := makeVerified("verified-primary-first", "chiusura")
+		second := makeVerified("verified-primary-revision", "riapertura")
+		for _, receipt := range []domain.VerificationReceipt{first, second} {
+			measures, e := store.measures(ctx, "050004", QueryTime{KnownAt: receipt.VerifiedAt, EvaluationTime: receipt.VerifiedAt})
+			if e != nil {
+				t.Fatal(e)
+			}
+			var relevant []Measure
+			for _, measure := range measures {
+				if measure.ID == first.DomainRecordID || measure.ID == second.DomainRecordID {
+					relevant = append(relevant, measure)
+				}
+			}
+			if len(relevant) != 1 || relevant[0].ID != receipt.DomainRecordID {
+				t.Fatal("public current/history projection missing or duplicated", receipt.ID, relevant)
+			}
+		}
+	})
+
 }
 
 func stringPointer(value string) *string { return &value }

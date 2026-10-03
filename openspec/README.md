@@ -14,10 +14,13 @@ A subsequent bounded manual review identifies Calcinaia's exposed REST index,
 declared notice routes and the limits of WordPress page-container metadata.
 The [review dossier](../docs/fonti/piattaforme/cittadino-informato-review.md)
 preserves the initial review and revised technical closure criteria. Task 26.2
-remains open because persistent comparisons/admission and the complete verification
-run are still missing. Task 26.3 now implements scoped API acquisition, verified
+remains open because the bounded complete verification run in development is
+still missing. Task 26.3 implements scoped API acquisition, verified
 with synthetic persistence cases and two bounded isolated Calcinaia HTTP checks;
-no live collector was activated. See [operations](../docs/operations/cittadino-informato.md).
+no live collector was activated. Task 26.4 now implements immutable evidence-bound
+receipts, primary-only projection and historical/current deduplication, verified
+with synthetic disposable PostgreSQL and public-query cases. Counterpart discovery,
+reviewed real-source evaluation and scheduled adoption remain separate. See [operations](../docs/operations/cittadino-informato.md).
 
 This directory publishes IWA's change proposals, designs, capability specifications, and task checklists so contributors can see the intended behavior and work still open. Start with a change's `proposal.md`, then read its `design.md`, `specs/`, and `tasks.md`.
 
@@ -28,7 +31,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 138 | 15 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 139 | 14 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |

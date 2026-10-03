@@ -54,7 +54,7 @@ func (s *Store) PutRegional(ctx context.Context, value RegionalRecord) error {
 		return ErrInvalid
 	}
 	municipalRepublication := identity.product == "municipal" && identity.authorityID != value.OriginatingAuthorityID
-	if identity.product != value.Product && !municipalRepublication {
+	if identity.platform == "cittadino-informato" || identity.product != value.Product && !municipalRepublication {
 		return ErrInvalid
 	}
 	tag, err := tx.Exec(ctx, `INSERT INTO domain_regional_records(id,document_version_id,source_id,product,originating_authority_id,publisher_id,platform,municipal_republication)
@@ -119,7 +119,7 @@ func (s *Store) PutLocalMeasure(ctx context.Context, value LocalMeasure) error {
 	if err != nil {
 		return err
 	}
-	if identity.product != "municipal" || identity.territory != value.MunicipalityISTAT {
+	if identity.platform == "cittadino-informato" || identity.product != "municipal" || identity.territory != value.MunicipalityISTAT {
 		return ErrInvalid
 	}
 	if !matches {
@@ -152,7 +152,7 @@ func (s *Store) PutOperationalPhase(ctx context.Context, value OperationalPhase)
 	if err != nil {
 		return err
 	}
-	if identity.product != "municipal" || identity.territory != value.MunicipalityISTAT {
+	if identity.platform == "cittadino-informato" || identity.product != "municipal" || identity.territory != value.MunicipalityISTAT {
 		return ErrInvalid
 	}
 	if !matches {

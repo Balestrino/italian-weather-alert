@@ -72,6 +72,8 @@ Acquired platform publications SHALL generate evidence-bound candidates and boun
 
 The service SHALL distinguish corroborated fields, primary evidence not found, primary check unavailable, non-comparable evidence, checks not applicable to the claim and actual comparable conflicts. Each verification receipt SHALL identify the candidate, the three channel roles, consulted source/version identities and relevant passages where available, attempted-check times, field-level results and reasons for missing or inapplicable comparisons. Regional claims SHALL use the originating CFR product; local claims SHALL use municipal publications or referenced acts. A local-only measure MAY have the CFR check marked not applicable; a missing municipal republication SHALL NOT invalidate a supported originating CFR claim. The service SHALL NOT require unanimous three-channel agreement or resolve disagreements by majority vote between republications of the same original. Missing or failed primary retrieval SHALL NOT be reported as contradiction, cancellation, absence of risk or established validity. Candidates without required primary support SHALL remain diagnostic and SHALL NOT become confirmed local measures or substitute regional levels in API/MCP. Agreement SHALL NOT complete source acceptance or establish real-world completeness. New or changed evidence SHALL trigger versioned reevaluation without rewriting earlier knowledge.
 
+Verification inputs SHALL identify retained resources and literal field selections rather than supply unbound fact values. The verifier SHALL validate source/version/resource ownership, integrity, offsets and completed OCR provenance when used. Available-channel comparisons SHALL identify their direction and both evidence versions. Repeating an identical verification request SHALL reuse its receipt; new evaluations SHALL append history, and reusing a request identity with different evidence SHALL fail. Domain projection SHALL use only supported primary values and attribution; an independently supported primary MAY remain available despite a discordant secondary candidate. Verification SHALL NOT imply semantic acceptance of upstream interpretation or source acceptance.
+
 Task 26.2 SHALL remain open until a bounded development run exercises the acquisition-to-verification path and persists inspectable receipts across the three channel roles, including a regional republication and a local measure, with tested missing, unavailable, non-comparable and conflicting evidence behavior. The run SHALL verify independent primary collection and diagnostic-only admission for unsupported candidates. A planning edit or legal/technical documentation inventory alone SHALL NOT complete the task. The subsequent scheduled trial, source acceptance and public activation SHALL remain separate tasks.
 
 #### Scenario: Multi-source verification closes acquisition readiness
@@ -122,6 +124,14 @@ Task 26.2 SHALL remain open until a bounded development run exercises the acquis
 #### Scenario: Two republications disagree with the originating CFR product
 - **WHEN** platform and municipal republications agree with each other but conflict with the comparable originating CFR product
 - **THEN** the system preserves the conflict and originating level rather than selecting the republications by majority vote
+
+#### Scenario: A verification request is retried or reevaluated
+- **WHEN** the same retained evidence is verified again, or a changed primary version is evaluated
+- **THEN** identical request retries reuse their immutable receipt, new evaluations preserve earlier receipts, and supported primary facts are reused without creating duplicate measures
+
+#### Scenario: An evidence selector names a foreign or unreadable OCR page
+- **WHEN** a field selector does not belong to the retained source/version/resource or references an incomplete or absent OCR page
+- **THEN** the verifier rejects the unbound field instead of accepting a caller-supplied value or inventing a passage
 
 ### Requirement: Retained acquisition and versions
 The service SHALL retain original document bytes where permitted, source URL, acquisition time, hash, available publication/update metadata and interpretation version. It SHALL detect changes at stable URLs, preserve prior versions within retention, and avoid duplicate versions for unchanged content. An unchanged successful check SHALL NOT change publication time. Required linked resources SHALL be included or explicitly reported missing.
