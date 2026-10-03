@@ -182,7 +182,7 @@ semantica dell’interpretazione. Il task 26.5 comprende la valutazione con casi
 reali revisionati e l’attribuzione API/MCP estesa. Il normale worker di estrazione
 non viene convertito da questo comando in un orchestratore dei tre canali:
 CLN-007 resta pertinente al percorso generico; la nuova proiezione verificata ha
-un ingresso programmatico distinto. Orchestrazione continuativa e trial programmato 26.6 restano da eseguire;
+un ingresso programmatico distinto. Orchestrazione continuativa e attivazione programmata restano separate; la successiva 26.6 verifica un trial delimitato, descritto sotto;
 la prova delimitata della 26.2 è descritta sotto. Il collector continua a
 conservare il metadato iniziale `verification_state: pending`; le rivalutazioni
 sono ricevute separate, non riscritture dell’originale.
@@ -264,3 +264,48 @@ Questa prova chiude soltanto la 26.2. La valutazione estesa con esiti reali
 revisionati, l’attribuzione API/MCP delle ricevute (26.5), l’orchestrazione e il
 trial programmato (26.6), la diagnosi del worker generico CLN-007 e l’accettazione
 restano separati. Le copie della piattaforma restano link-only.
+
+
+## Valutazione e trial delimitato — task 26.5/26.6
+
+Verifica del 3 ottobre 2026. L’operatore ha delegato all’assistente la revisione
+tramite gli originali PDF. Le nuove valutazioni indicano revisore, delega, hash,
+pagine e limiti; conservano le precedenti conferme umane. Le date di pubblicazione
+dei due avvisi sui lavori non provano l’edizione dell’atto: le selezioni corrette
+le omettono e aggiungono la validità letterale presente nella piattaforma.
+Il confronto documentale trova disposizioni operative concordanti; il verificatore
+mantiene `non_comparable` quando identità/edizione non sono stabilite e `unavailable`
+per la dipendenza esterna mancante. Il PDF è conservato dalla fonte comunale.
+Il caso sui lavori stradali verifica il meccanismo di confronto, senza diventare
+una misura meteo. Le ricevute precedenti restano immutabili.
+
+Documenti, misure, fasi e prodotti regionali possono ora riportare fino a cento
+ricevute pubblicabili al confine di conoscenza richiesto. Espongono tre ruoli,
+tempi, esiti, campi confrontati, direzione e passaggi visibili. Le prove di canali
+privati sono oscurate insieme a identificativi, hash e valori; rimangono esito e
+limite del controllo. Selezione del comune e visibilità della fonte sono obbligatorie.
+Gli ID delle richieste e i selettori privati restano interni. Il limite di cento
+ricevute è dichiarato quando raggiunto, senza cambiare lo storico amministrativo.
+Il [contratto](../../api/public/contratto.schema.json), il
+[test delle query](../../internal/backend/publicquery/query_integration_test.go)
+e i [test con client MCP](../../internal/backend/transport/httpapi/public_test.go)
+verificano equivalenza, conflitti e attribuzione, storico e assenza di duplicati.
+
+Il trial 26.6 usa dati privati su un database development separato. I preview
+indipendenti conservano una pagina comunale, un prodotto CFR e la finestra della
+piattaforma dal 1° ottobre con rischi oggi/domani. Tre casi reali conservati sono
+rivalutati separatamente, dichiarando il riuso degli originali. API e client MCP
+reale restituiscono la stessa attribuzione. L’abilitazione temporanea riguarda
+Calcinaia; un altro comune non eredita visibilità. La revoca rende nuovamente
+inaccessibile il documento, disabilita i controlli del trial e conserva lo storico.
+Nessun worker programmato è collegato al database della prova. Le copie restano
+link-only; nessuna accettazione delle fonti è prodotta dal trial.
+Registro privato: `CIN-TRIAL-20261003-01`.
+
+La revisione per l’accettazione rimane distinta. La regressione conserva tutte
+le tredici aspettative originali e il riuso dichiarato dell’OCR storico; una
+suite aggiuntiva registra il fallimento corrente della riapertura parziale,
+senza cancellarlo con i tredici confronti passati. L’interpretazione grafica CFR
+e la proiezione generica CLN-007 restano aperte. Gli esiti di revisione mancanti
+non vengono sostituiti da attestazioni positive. Il
+[coverage tracker](../coverage.md) conserva lo stato pending per fonte.

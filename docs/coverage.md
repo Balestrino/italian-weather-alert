@@ -15,6 +15,16 @@ See [TOS-006](territori/09-toscana/README.md#tos-006--il-tempo-di-osservazione-n
 and [CLN-005](territori/09-toscana/comuni/050004-calcinaia.md#cln-005--il-recupero-non-sostituisce-la-rivalutazione-della-regressione).
 The original dated inventory below is preserved; detailed operational evidence remains private.
 
+**Subsequent delegated review and bounded trial — 3 October 2026:** original
+PDF/notice review was performed by the assistant on explicit operator delegation,
+with historical human confirmations preserved. Tasks 26.5/26.6 now verify evidence
+attribution through API/MCP and isolated Calcinaia visibility with rollback.
+Source acceptance remains pending: the current municipal completeness suite,
+generic municipal fact projection and regional graphical interpretation still
+require successful verification. No source acceptance or public enablement was
+inferred from the document review or development trial. See
+[the procedure](operations/cittadino-informato.md#valutazione-e-trial-delimitato--task-265266).
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

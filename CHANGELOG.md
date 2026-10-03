@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-03 [Changed] Complete tasks 26.5 and 26.6, record delegated document reviews and development rollback, and document remaining source-acceptance failures.
 - 2026-10-03 [Fixed] Preserve operative municipal directives and completed road updates, and bind attributable campaign reviews to proven reuse of retained evidence.
 - 2026-10-03 [Added] Expose scoped multi-source verification receipts through equivalent API/MCP responses with evidence visibility and knowledge-boundary checks.
 - 2026-10-03 [Changed] Complete task 26.2 with bounded development acquisition-to-verification checks, persisted real-source diagnostics and labelled synthetic controls; document scope and dependency limits.

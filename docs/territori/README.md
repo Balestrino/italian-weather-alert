@@ -49,7 +49,8 @@ distinguono riconoscimento istituzionale, verifica multipla Regione/CFR–Comune
 piattaforma e collaudo dell’acquisizione 26.3 completato in isolamento; confronti
 persistenti implementati dalla 26.4 e prova delimitata della 26.2 completata
 in development il 3 ottobre, con dati dedicati e ricevute ispezionate.
-Valutazione estesa e trial programmato restano separati. Il criterio corrente del task
+La successiva valutazione estesa 26.5 e il trial delimitato 26.6 sono verificati;
+attivazione programmata e accettazione restano separate. Il criterio corrente del task
 26.2 è un sistema implementato e verificato, senza ottenere licenze o documentazione
 giuridica; le scoperte datate conservano e segnalano il precedente gate superato.
 

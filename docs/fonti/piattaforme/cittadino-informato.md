@@ -47,8 +47,8 @@ La [revisione preliminare](cittadino-informato-review.md) conserva l’inventari
 anteriore al collaudo; CIN-007 aggiorna l’acquisizione e CIN-008 la verifica
 persistente del task 26.4, provata con fixture sintetiche. CIN-009 registra la
 prova delimitata completa della 26.2 in development, con ricevute reali e
-controlli sintetici distinti. Cadenza operativa, valutazione estesa e copertura
-continuativa restano da verificare.
+controlli sintetici distinti. CIN-010 completa la valutazione estesa e il trial delimitato; cadenza operativa
+e copertura continuativa restano da verificare.
 Feed degli avvisi e intervalli di polling non sono stati individuati nelle risorse
 consultate. Preferire un accesso API/feed verificato tecnicamente quando disponibile.
 I metadati WordPress della pagina non datano i bollettini dinamici.
@@ -86,8 +86,8 @@ CIN-006 ne supera l’uso come prerequisito del piano.
 ## Problemi aperti
 
 I [task 26.2–26.6](../../../openspec/changes/define-toscana-alert-service/tasks.md)
-registrano la 26.2, la 26.3 e la 26.4 completate; valutazione estesa e trial
-programmato restano aperti. Il [dossier](cittadino-informato-review.md)
+registrano la 26.2–26.6 completate nel perimetro dichiarato; attivazione
+programmata e accettazione restano separate (CIN-010). Il [dossier](cittadino-informato-review.md)
 conserva l’inventario tecnico e i criteri correnti. CIN-009 verifica il percorso
 completo nel solo perimetro development dichiarato: dipendenze esterne non
 consentite e dati regionali non comparabili restano diagnostici, con il primo
@@ -97,6 +97,15 @@ non costituisce da sola discovery delle controparti o accettazione semantica.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-010 — Confronti revisionati e attribuzione pubblica verificati
+
+- **Data e ultima verifica:** 2026-10-03; originali conservati, codice corrente e prova development delimitata.
+- **Conoscenza:** confermata nel perimetro delle evidenze.
+- **Osservazione:** Le nuove selezioni dei casi reali omettono le date di pubblicazione dal campo edizione e includono la validità letterale disponibile. Il documento primario resta completo; il canale piattaforma conserva la dipendenza esterna mancante e l’identità non provata. La concordanza documentale dei contenuti operativi non forza l’ammissione automatica.
+- **Intervento e verifica:** task 26.5/26.6 completati; ricevute pubbliche con tre ruoli, evidenze visibili e limiti, equivalenza API/MCP con client reale, prove sintetiche per conflitti, indisponibilità, revisioni e canali privati. Il trial development separato verifica acquisizioni indipendenti, scelta del solo comune e revoca. Registro privato `CIN-TRIAL-20261003-01`; [procedura](../../operations/cittadino-informato.md#valutazione-e-trial-delimitato--task-265266).
+- **Limiti e prossima verifica:** nessuna nuova approvazione umana inventata, copia pubblica, fonte accettata o raccolta programmata. Discovery delle controparti, orchestrazione continuativa e accettazione restano separati.
+
 
 ### CIN-009 — Percorso completo delimitato verificato in development
 

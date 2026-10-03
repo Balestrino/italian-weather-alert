@@ -116,6 +116,15 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-016 — Revisione delegata e trial con visibilità revocata
+
+- **Data e ultima verifica:** 2026-10-03; originali conservati, codice corrente e prova development delimitata.
+- **Conoscenza:** confermata nel perimetro delle evidenze.
+- **Osservazione:** Revisione documentale eseguita dall’assistente su delega esplicita dell’operatore. L’ordinanza distingue chiusure, divieti e sospensione didattica; il conflitto agosto/settembre della pagina resta irrisolto. Le date di pubblicazione non provano l’edizione dell’atto. Il confronto dei due avvisi sui lavori usa la validità letterale presente in entrambi, mantenendo distinta la dipendenza mancante del canale piattaforma.
+- **Intervento e verifica:** task 26.5/26.6 completati con ricevute corrette, API/MCP equivalenti, trial development su dati separati e rollback della visibilità Calcinaia. Le ricevute precedenti e gli storici restano conservati; gli altri comuni non sono abilitati. Registro privato `CIN-TRIAL-20261003-01`.
+- **Limiti e prossima verifica:** il caso lavori stradali è tecnico, non meteo. Il replay corrente conserva le strade liberate e il conflitto temporale, ma fallisce il merge della riapertura parziale; CLN-007 non è risolto né distribuito. Accettazione pending nel coverage tracker.
+
+
 ### CLN-015 — Acquisizione e verifica delimitate in development
 
 - **Data e ultima verifica:** 2026-10-03, controlli HTTP, originali conservati e ricevute persistenti su servizi development con dati dedicati.

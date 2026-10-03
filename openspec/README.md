@@ -7,7 +7,7 @@ with primary municipal/CFR verification and independent primary collection. Task
 license/legal-basis documentation gate with a working multi-source verification
 system: implement acquisition and persistent comparisons in 26.3/26.4, then close
 26.2 from a bounded development run, now verified with ten persisted receipts.
-Evaluation and scoped adoption remain open. The decision activates
+The later 26.5 evaluation and bounded 26.6 development trial are verified; scheduled adoption remains separate. The decision activates
 no platform collector and does not complete source acceptance. See
 [platform guidance](../docs/fonti/piattaforme/cittadino-informato.md).
 
@@ -24,9 +24,7 @@ no live collector was activated. Task 26.4 now implements immutable evidence-bou
 receipts, primary-only projection and historical/current deduplication, verified
 with synthetic disposable PostgreSQL and public-query cases. The 26.2 run verifies
 receipt readback, history/idempotence, primary-only local admission and diagnostic regional/non-comparable candidates. A wider platform
-window with an external municipal PDF remains explicitly incomplete. Counterpart
-discovery, broader reviewed real-source/API-MCP evaluation and scheduled adoption
-remain separate. See [operations](../docs/operations/cittadino-informato.md).
+window with an external municipal PDF remains explicitly incomplete. Counterpart discovery and scheduled adoption remain separate. The subsequent 26.5/26.6 work verifies reviewed real-source/API-MCP attribution and bounded scoped visibility with rollback. See [operations](../docs/operations/cittadino-informato.md).
 
 This directory publishes IWA's change proposals, designs, capability specifications, and task checklists so contributors can see the intended behavior and work still open. Start with a change's `proposal.md`, then read its `design.md`, `specs/`, and `tasks.md`.
 
@@ -37,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 140 | 13 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 142 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |
@@ -117,3 +115,12 @@ See [development publication](../docs/operations/development-publication.md).
 Source acceptance remains independently pending. Task 25.4 verifies the targeted
 development public/admin rollout, native-form activation and live API/MCP equivalence;
 workers and other existing services were preserved.
+
+The 3 October delegated document review completes the remaining review method
+requested by the operator; it is attributed to the assistant rather than recorded
+as new human approval. Tasks 26.5 and 26.6 are verified with public receipt schemas,
+synthetic PostgreSQL tests and a bounded isolated development trial using a real
+MCP client, independent acquisition and visibility revocation. Source acceptance
+remains pending: a current municipal completeness failure, live generic projection
+limits and regional graphical interpretation are explicitly retained. See
+[the current procedure](../docs/operations/cittadino-informato.md#valutazione-e-trial-delimitato--task-265266).

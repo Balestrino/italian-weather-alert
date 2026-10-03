@@ -87,7 +87,8 @@ Il precollaudo di TOS-006 richiede di consultare il report della campagna oltre
 al tempo trascorso: confronti con gli originali, revisione delle risorse necessarie
 e prove di errore sono evidenze separate. Per il monitoraggio senza nuovi eventi,
 documentare anche un caso conservato di evento assente dal trial. Le verifiche
-tecniche del software non sostituiscono gli esiti attesi revisionati da una persona.
+tecniche del software sono distinte dagli esiti attesi revisionati; TOS-012
+registra la revisione dell’assistente su delega esplicita dell’operatore.
 
 ## Comuni documentati
 
@@ -100,6 +101,15 @@ tecniche del software non sostituiscono gli esiti attesi revisionati da una pers
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-012 — Revisione degli originali CFR su delega e limiti confermati
+
+- **Data e ultima verifica:** 2026-10-03; originali conservati, codice corrente e prova development delimitata.
+- **Conoscenza:** confermata nel perimetro delle evidenze.
+- **Osservazione:** Confrontati gli originali conservati e tutte le pagine dei PDF di criticità e vigilanza, con emissioni distinte e risorse integre. La vigilanza conserva quantità di pioggia e fenomeni, non colori di allerta. Il monitoraggio conserva la dichiarazione no_event; l’esempio dell’Allegato5 resta datato marzo 2025. La lettura manuale delle mappe non modifica i livelli unknown del parser live TOS-008.
+- **Intervento e verifica:** revisione attribuita all’assistente su delega esplicita, con esiti fail/unresolved dove l’estrazione resta incompleta. Il trial 26.6 verifica controlli regionali e comunali indipendenti, attribuzione API/MCP e rollback; non accetta i prodotti CFR. Le configurazioni e i controlli live rimangono preservati.
+- **Limiti e prossima verifica:** accettazione per prodotto pending; completare interpretazione grafica, prove di errore e valutazioni previste nei task 9.3/10.1. Un originale invariato può sostenere la revisione di una nuova configurazione soltanto con acquisizione finalizzata precedente che dimostri quel riuso; i test rifiutano riuso non provato o futuro.
+
 
 ### TOS-011 — Rilancio regionale verificato come diagnostico in development
 

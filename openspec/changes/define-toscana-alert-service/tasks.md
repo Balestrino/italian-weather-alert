@@ -96,7 +96,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 
 - [x] 9.1 After 4.9–4.11, rerun the complete human-reviewed regression for discovery, OCR, full-content classification, operational-window extraction/conflict-aware merge and linking; include long and scanned ordinances, the cross-window date conflict, observed irrelevant notices and regional cases, deliver separate omission, unsupported-assertion and indeterminate-field reports, and keep failed source activation blocked until correction and successful rerun.
 - [x] 9.2 Compare baseline and semantic linking, model/prompt versions, latency and per-stage consumption on the same cases; verify a proposed processing change passes evaluation before explicit selected reprocessing and does not automatically replay all history.
-- [ ] 9.3 Start and track at least seven complete 24-hour intervals of paced observation across vigilance, criticality/alert, monitoring and Calcinaia; persist daily checks and per-scope evidence of checked sections, delays, human original/attachment comparisons and failure behavior. Use retained cases for absent events and extend for omissions, delays, missing evidence, unresolved issues or insufficient observations.
+- [ ] 9.3 Start and track at least seven complete 24-hour intervals of paced observation across vigilance, criticality/alert, monitoring and Calcinaia; persist daily checks and per-scope evidence of checked sections, delays, attributable original/attachment comparisons (human or explicitly operator-delegated assistant review) and failure behavior. Use retained cases for absent events and extend for omissions, delays, missing evidence, unresolved issues or insufficient observations.
 - [ ] 9.4 Summarize trial tokens, OCR/embedding charges, retry costs, hosting/storage and bootstrap versus steady-state consumption; verify pricing assumptions and missing metrics are explicit before proposing an operating budget.
 - [x] 9.5 Import the reviewed vigilance, criticality/alert, monitoring and Calcinaia source configurations on the dedicated VM; run and retain successful previews before separately enabling internal collection. Verify scheduled acquisition and interpretation outcomes, manual capacity/error checks and public-disabled state for all four sources. Record observed failures and deferred infrastructure honestly; do not claim seven-day trial completion or public acceptance.
 
@@ -357,8 +357,8 @@ acceptance tasks 9.3 and 10.1 and production release gates remain open.
 - [x] 26.2 Deliver and verify a working multi-source acquisition-to-verification system for Regione Toscana/CFR, the selected municipality and cittadinoinformato.it. After 26.3 and 26.4, exercise a bounded development run with regional and local cases and inspect persisted receipts identifying candidate, channel roles, source/version evidence, passages, check times, compared fields and outcomes. Verify missing/unavailable/non-comparable/not-applicable/conflicting evidence behavior and diagnostic-only admission without required primary support. Completion requires working tested comparisons, not obtaining licenses, agreements or legal-basis documentation; retain bounded public access, independent primary collection and link-only platform copies.
 - [x] 26.3 Implement separate source identities and opt-in bounded acquisition for explicitly selected recognized municipality sections, with versioned originals, date meanings, dependencies, retries and visible failures; do not inherit recognition or permission across municipalities. Verified with synthetic unit/disposable PostgreSQL cases and two bounded isolated Calcinaia HTTP checks on 3 October 2026; pending verification candidates, no live source activation. See [operations](../../../docs/operations/cittadino-informato.md).
 - [x] 26.4 Implement persistent, evidence-bound multi-source verification receipts and candidate-to-domain admission: municipal publications/referenced acts for local fields, comparable originating CFR products for regional republications; record all three channel roles and distinguish corroboration, missing primary evidence, unavailable checks, non-comparable evidence, not-applicable checks and actual conflicts; preserve changes/history, avoid duplicate measures and never use majority vote between republications.
-- [ ] 26.5 Verify synthetic and reviewed real-source cases covering primary-only/platform-only notices, date/version mismatches, unavailable checks, actual conflicts, local measures without regional alerts, unchanged/revised content, same-platform unselected municipalities and equivalent API/MCP attribution; retain link-only copies and explicit coverage limits.
-- [ ] 26.6 Run a bounded operator-selected development preview/trial for Calcinaia before separately activating scheduled acquisition; verify independent municipal/CFR checks and comparison receipts, scoped visibility and rollback, without completing source acceptance or enabling other municipalities by inference.
+- [x] 26.5 Verify synthetic and reviewed real-source cases covering primary-only/platform-only notices, date/version mismatches, unavailable checks, actual conflicts, local measures without regional alerts, unchanged/revised content, same-platform unselected municipalities and equivalent API/MCP attribution; retain link-only copies and explicit coverage limits.
+- [x] 26.6 Run a bounded operator-selected development preview/trial for Calcinaia before separately activating scheduled acquisition; verify independent municipal/CFR checks and comparison receipts, scoped visibility and rollback, without completing source acceptance or enabling other municipalities by inference.
 
 **26.2 preliminary progress — 3 October 2026 (superseded by the completed run below):** bounded manual HTTP review identified the
 Calcinaia-linked REST index, declared updates/risk routes and successful
@@ -385,8 +385,8 @@ Private source captures are excluded from Git.
 
 **Revised sequence:** implement 26.3 acquisition and 26.4 persistent comparisons,
 then close 26.2 from the bounded development run and inspected receipts. Complete
-26.5's broader synthetic/real-source evaluation before 26.6's separately activated
-scheduled trial. A local-only measure may mark CFR not applicable; a regional
+26.5's broader synthetic/real-source evaluation before 26.6's bounded development
+preview/trial; scheduled adoption remains a separate activation. A local-only measure may mark CFR not applicable; a regional
 claim uses the originating CFR product without requiring municipal republication.
 No three-channel quorum or majority vote replaces field-level primary evidence.
 
@@ -438,3 +438,45 @@ and copies link-only. Private evidence: `CIN-DEV-20261003-01`. See
 [procedure and limits](../../../docs/operations/cittadino-informato.md#prova-completa-in-development--task-262).
 This completes 26.2 only: broader reviewed evaluation/API-MCP attribution (26.5),
 scheduled adoption (26.6), generic worker wiring and source acceptance remain open.
+
+**Review delegation — 3 October 2026:** the operator asks the assistant to
+complete the remaining review by analyzing the PDFs. Historical human
+confirmations remain scoped to their original cases. New comparisons identify
+the assistant and delegation; no new human approval is inferred. This changes
+the review method, not the seven-day duration, failed-regression, per-source
+acceptance or publication criteria.
+
+
+**26.5/26.6 verification — 3 October 2026:** the operator delegated document
+review to the assistant. Original PDFs and municipal notices were compared,
+publication dates removed from the local edition selectors and the platform's
+literal validity selected. New immutable receipts preserve the earlier ones;
+local operative agreement does not override unknown identity or a missing
+platform attachment. Real and synthetic comparisons retain primary-only facts,
+non-comparable regional republications, conflicts, unavailable checks, revisions,
+unselected municipalities and private-channel redaction. Public document/fact
+responses now carry bounded evidence-aware receipts; API/MCP schemas and real
+MCP client tests agree. Synthetic disposable PostgreSQL tests cover knowledge
+boundaries and primary deduplication. This completes 26.5.
+
+The operator-selected 26.6 trial uses a separate development database, independent
+bounded municipal/CFR/platform previews and explicitly labelled re-evaluation of
+retained real cases. API and a real MCP client return equivalent attribution;
+only Calcinaia has temporary development visibility. Revocation hides the document
+again, collection controls return disabled and audit history remains. No scheduled
+collector is connected to the trial database. Source acceptance and other
+municipalities remain unenabled. Private evidence: `CIN-TRIAL-20261003-01`.
+This completes the bounded trial required by 26.6; it does not activate scheduling.
+
+**Source-review outcome — 3 October 2026:** the original thirteen municipal
+regression expectations are preserved and pass their current comparisons,
+including listing discovery and hash-matched retained OCR. A separate stronger
+completeness suite records the current partial-reopening extraction/merge failure;
+that failure is not hidden by the thirteen passes. The live generic municipal
+projection and regional graphical interpretation limitations remain unresolved.
+Delegated original/attachment reviews identify their actor and scope, with failed
+or unresolved outcomes where needed. Campaign assessments and independent source
+acceptance remain separate; tasks 9.3 and 10.1 are not completed by these reviews.
+Unchanged originals can be reviewed under a later campaign configuration only
+when a finalized matching acquisition already proves that reuse; regression tests
+reject unproven and future reuse.
