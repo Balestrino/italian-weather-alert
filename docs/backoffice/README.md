@@ -55,6 +55,12 @@ Routine actions retain observed revision/attempt checks, explicit operator
 attribution and separate collection, acceptance and publication controls.
 Presentation does not establish source acceptance.
 
+**Sistema → Embedding** provides a global switch and individual source choices,
+all disabled by default. Both levels are required; disabling the global switch
+preserves source choices and pending retry budgets. See [embedding
+controls](../operations/embedding-controls.md) for equivalent CLI operations,
+provider configuration and runtime adoption.
+
 ```sh
 go test ./internal/backoffice
 go test -tags=integration ./internal/backoffice

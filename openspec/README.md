@@ -8,7 +8,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | --- | ---: | ---: |
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
-| [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 12 | 0 |
+| [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 136 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
@@ -37,6 +37,16 @@ backoffice inspection, and the separate worker exited. Continuing policies,
 semantic downstream quality and acceptance remain separate.
 
 Explicit background selection and hierarchical controls have synthetic repository verification for CLI/admin parity, municipal migration and processing admission, plus native-form browser checks. See [background processing verification](../docs/operations/background-processing-verification.md). The current live collector was preserved; production handover remains a separate release operation.
+
+Four subsequent embedding-control tasks, verified on 2 October 2026, add disabled
+global and per-source flags, audited CLI/admin actions and live worker admission.
+Synthetic PostgreSQL checks verify scheduling, paused attempts, source-choice
+retention and lazy provider setup; native form integration and a 390px development
+page check verify the admin surface. Development adoption replaced the admin and
+all processing replicas with every flag disabled, retired only the requested
+pending embedding work and passed nondisruptive environment smoke checks.
+See [embedding operations](../docs/operations/embedding-controls.md); private
+adoption evidence does not establish provider availability or source acceptance.
 
 Environment hardening has 18 verified repository tasks and four checked operator handoffs for backup/restore and VM checks; the handoffs do not certify their results. See the [disposable verification summary](../docs/operations/environment-verification.md).
 

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/territory"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -31,6 +32,14 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 	c.Name = args[0]
 	var count int
 	switch c.Name {
+	case "source-embedding-status":
+		count = 2
+	case "source-embedding-enable", "source-embedding-disable":
+		count = 4
+	case "embedding-status":
+		count = 1
+	case "embedding-enable", "embedding-disable":
+		count = 3
 	case "source-status", "region-status":
 		count = 2
 	case "municipality-status", "municipality-development-publication-status":
@@ -51,6 +60,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		}
 	}
 	switch {
+	case strings.HasPrefix(c.Name, "embedding-"):
 	case strings.HasPrefix(c.Name, "source-"):
 		c.Source = args[1]
 	case strings.HasPrefix(c.Name, "region-"):
@@ -66,7 +76,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 	}
 	if !strings.HasSuffix(c.Name, "-status") {
 		rev, err := strconv.Atoi(args[len(args)-2])
-		if err != nil || rev < 0 || (c.Source != "" && rev == 0) {
+		if err != nil || rev < 0 || (c.Source != "" && rev == 0 && !strings.HasPrefix(c.Name, "source-embedding-")) {
 			return c, true, errControlArguments
 		}
 		c.Revision, c.Actor = rev, args[len(args)-1]
@@ -100,6 +110,22 @@ func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, en
 	var result any
 	var err error
 	switch c.Name {
+	case "source-embedding-enable", "source-embedding-disable", "source-embedding-status":
+		queue := jobs.New(pool)
+		if c.Name != "source-embedding-status" {
+			_, err = queue.SetSourceEmbeddingEnabled(ctx, c.Source, c.Revision, c.Name == "source-embedding-enable", c.Actor, time.Now())
+		}
+		if err == nil {
+			result, err = queue.SourceEmbeddingState(ctx, c.Source)
+		}
+	case "embedding-enable", "embedding-disable", "embedding-status":
+		queue := jobs.New(pool)
+		if c.Name != "embedding-status" {
+			_, err = queue.SetEmbeddingEnabled(ctx, c.Revision, c.Name == "embedding-enable", c.Actor, time.Now())
+		}
+		if err == nil {
+			result, err = queue.EmbeddingState(ctx)
+		}
 	case "municipality-development-publication-enable", "municipality-development-publication-disable", "municipality-development-publication-status":
 		publication := domain.NewDevelopmentPublication(pool, environment)
 		if !strings.HasSuffix(c.Name, "-status") {
@@ -149,13 +175,13 @@ func controlErrorCode(err error) string {
 	switch {
 	case errors.Is(err, domain.ErrDevelopmentOnly):
 		return "development_environment_required"
-	case errors.Is(err, errControlArguments), errors.Is(err, registry.ErrInvalid), errors.Is(err, domain.ErrInvalid):
+	case errors.Is(err, errControlArguments), errors.Is(err, registry.ErrInvalid), errors.Is(err, domain.ErrInvalid), errors.Is(err, jobs.ErrInvalid):
 		return "invalid_arguments"
 	case errors.Is(err, errControlRole):
 		return "admin_role_required"
 	case errors.Is(err, registry.ErrNotFound), errors.Is(err, domain.ErrTerritoryNotFound):
 		return "not_found"
-	case errors.Is(err, registry.ErrConflict), errors.Is(err, domain.ErrConflict):
+	case errors.Is(err, registry.ErrConflict), errors.Is(err, domain.ErrConflict), errors.Is(err, jobs.ErrConflict):
 		return "revision_conflict"
 	case errors.Is(err, registry.ErrPrerequisite):
 		return "preview_or_policy_required"

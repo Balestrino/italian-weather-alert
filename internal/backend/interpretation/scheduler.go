@@ -26,12 +26,13 @@ import (
 var ErrInvalid = errors.New("invalid interpretation schedule")
 
 type Scheduler struct {
-	pool        *pgxpool.Pool
-	Queue       *jobs.Store
-	Policy      inference.RetryPolicy
-	Semantic    bool
-	Preflight   *Preflight
-	Evaluations interface {
+	pool             *pgxpool.Pool
+	Queue            *jobs.Store
+	Policy           inference.RetryPolicy
+	Semantic         bool
+	EmbeddingEnabled func(context.Context, int64) (bool, error)
+	Preflight        *Preflight
+	Evaluations      interface {
 		Passed(context.Context, string) (string, error)
 	}
 }
@@ -281,9 +282,17 @@ func (s *Scheduler) AfterExtraction(ctx context.Context, r extraction.Result, wo
 		return 0, err
 	}
 	r.RunID = canonical
+	semantic := s.Semantic
+	if s.EmbeddingEnabled != nil {
+		var err error
+		semantic, err = s.EmbeddingEnabled(ctx, r.RunID)
+		if err != nil {
+			return 0, err
+		}
+	}
 	count := 0
 	for _, m := range r.Measures {
-		if s.Semantic {
+		if semantic {
 			if _, e := embedding.Enqueue(ctx, s.Queue, s.Policy, embedding.Payload{ExtractionRunID: r.RunID, MeasureOrdinal: m.Ordinal, Workload: workload}, at); e != nil {
 				return count, e
 			}

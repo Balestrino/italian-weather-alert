@@ -56,6 +56,37 @@ Expose configured versus effective state and blocking reasons in overview, munic
 
 Add `region-enable|region-disable <region-code> <revision> <actor>`, `region-status <region-code>`, `municipality-enable|municipality-disable <region-code> <istat> <revision> <actor>` and `municipality-status <region-code> <istat>` under the admin role and explicit environment wrapper. Use shared audited domain operations, JSON results and operator-safe errors as for source controls. Test parent override, child-choice preservation, wrong membership, concurrency/revision conflicts, dataset replacement and CLI/admin parity with synthetic fixtures. Regional enablement never enables municipalities or source collection automatically.
 
+### 7. Global and source embedding controls added 2 October 2026
+
+Add migration `068_embedding_control` to the queue schema. Store the global flag
+as a singleton, source choices separately and actor/revision events for both.
+The global flag starts false; absent source choices mean false, covering existing
+and future sources without modifying registry revisions or source configurations.
+The prior `IWA_SEMANTIC_LINKING_ENABLED` setting no longer grants activation.
+
+Expose native forms under Sistema → Embedding, global/source JSON mutations and
+equivalent admin-role CLI commands with expected revisions. A global disable
+preserves individual source choices. Reads and mutations do not call providers,
+start workers, enable collection or grant publication.
+
+Queue claims hold a shared lock on the global control row. Global and source
+mutations take its exclusive lock, serializing admission with disablement.
+Historical embedding payloads resolve their source through the extraction run.
+Disabled pending work keeps its state, identity and retry budget and is excluded
+from claims; already admitted work can finish. The scheduler checks both flags
+for each extraction and otherwise schedules ordinary linking. Semantic retrieval
+uses the same current flags. Enabling does not create a historical replay.
+
+Initialize embedding credentials, adapter, catalog and gate lazily after both
+levels are enabled. Keep independently configured provider gates and recovery
+controls. Provider settings still require a worker recreation when changed;
+activation flags are read live by all replicas. An explicit backlog-removal
+request archives only pending embedding jobs and retains identities/accounting.
+
+Runtime adoption must replace all workers that otherwise ignore the new gates.
+Preserve private rollback settings and database evidence, verify disabled states
+and zero embedding admission, and keep incompatible workers stopped on rollback.
+
 ## Risks / Trade-offs
 
 - Production profile merging could leave an unintended activation path → assert the resolved production worker profile and service selection.

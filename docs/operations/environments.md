@@ -106,6 +106,14 @@ scripts/compose-env.sh staging --profile application-backup config --services
 
 An explicit service target such as `scripts/compose-env.sh staging up -d --no-build --pull never worker` also activates a profiled worker; omitting the profile is not protection when naming that target. Profiles govern Compose selection, not runtime admission or cross-environment deduplication. They do not stop existing workers: `restart: unless-stopped` can recover a previously activated worker after a Docker/host restart. End a test with `stop worker` and confirm its state using `ps --all worker`. The processing worker also handles configured notifications; stopping it stops those loops too.
 
+## Embedding activation
+
+Use **Sistema → Embedding** or the [equivalent CLI controls](embedding-controls.md).
+Both global and per-source flags default to disabled, including existing sources.
+Enabling one level alone does not permit embedding work. Flags apply to all
+compatible processing replicas in the selected environment; provider settings
+remain separate.
+
 ## Territorial and source activation
 
 The selected environment owns its registry and flags. Automatic local-source processing requires **region enabled → municipality enabled → source collection enabled → worker active**. A regional source requires its region and supported profile, not a municipality flag. None of these choices grants public publication. A saved source flag does not demonstrate worker liveness.

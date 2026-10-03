@@ -6,6 +6,37 @@ Prevent accidental activation of expensive background processing while providing
 
 ## ADDED Requirements
 
+### Requirement: Global and per-source embedding activation
+
+Each environment SHALL persist independent global and source embedding flags.
+Both SHALL default to disabled, including existing sources and newly registered
+sources. The admin panel and admin-role CLI SHALL expose equivalent status,
+enable and disable operations with actor attribution and expected revisions.
+The historical semantic-linking environment variable SHALL NOT override these
+defaults or grant activation.
+
+#### Scenario: All embeddings start disabled
+- **WHEN** the migration is applied to an existing or new environment
+- **THEN** the global control and all source choices are disabled, pending embedding jobs consume no attempts, and no embedding provider setup or calls occur
+
+#### Scenario: Both controls are required
+- **WHEN** only the global control or only a source choice is enabled
+- **THEN** the source's embedding jobs remain ineligible and new extractions proceed with ordinary linking
+- **WHEN** both controls are enabled and existing territory/provider/recovery gates allow execution
+- **THEN** pending jobs and new embedding work for that source become eligible without replaying completed historical extractions or enabling other sources
+
+#### Scenario: Global disable preserves source choices
+- **WHEN** an operator disables the global embedding control
+- **THEN** all new embedding claims are blocked, queued jobs retain their identities and retry budgets, already admitted work may finish, source choices remain saved, and new extraction work uses ordinary linking without semantic retrieval
+
+#### Scenario: CLI and admin share audited state
+- **WHEN** an operator changes a global or source flag through either interface
+- **THEN** the other interface and all workers observe the saved choice, a stale revision is rejected, an audit event retains the actor and revision, and the action itself makes no provider call or starts a worker
+
+#### Scenario: Requested removal retires only pending embeddings
+- **WHEN** the operator requests removal of embedding jobs from the active queue
+- **THEN** only pending embedding jobs are archived, successful results and accounting/history are retained, and enabling embeddings later does not revive archived identities
+
 ### Requirement: Default startup excludes background workers
 
 Development and staging startup without explicit background service selection SHALL select the public/admin listeners and their existing dependencies but SHALL exclude collection/inference and application backup workers. Production preparation SHALL continue to select no services, and production core startup SHALL exclude both workers.

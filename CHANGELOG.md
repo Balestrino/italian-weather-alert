@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-02 [Added] Add disabled-by-default global and per-source embedding controls, audited admin/CLI actions and queue admission; document scoped pending embedding archival.
 - 2026-10-02 [Changed] Bind development public API/MCP/docs to all IPv4 interfaces; preserve loopback admin and release ports, verify scoped rollout and HTTP/MCP checks.
 - 2026-10-02 [Added] Add manually selected municipality publication in development with private revision-checked controls, scoped API/MCP data, explicit limitations and revocable views; preserve staging/production acceptance gates.
 

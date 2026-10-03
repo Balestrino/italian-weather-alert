@@ -23,6 +23,9 @@ var deferSchema string
 //go:embed archive_schema.sql
 var archiveSchema string
 
+//go:embed embedding_control_schema.sql
+var embeddingControlSchema string
+
 // Migrate applies the queue schema atomically and rejects edits to applied SQL.
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
@@ -36,7 +39,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	if _, err = tx.Exec(ctx, `CREATE TABLE IF NOT EXISTS iwa_migrations (name text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())`); err != nil {
 		return err
 	}
-	for _, migration := range []struct{ name, sql string }{{"003_jobs", schema}, {"024_job_relaunches", relaunchSchema}, {"048_job_deferrals", deferSchema}, {"057_job_archival", archiveSchema}} {
+	for _, migration := range []struct{ name, sql string }{{"003_jobs", schema}, {"024_job_relaunches", relaunchSchema}, {"048_job_deferrals", deferSchema}, {"057_job_archival", archiveSchema}, {"068_embedding_control", embeddingControlSchema}} {
 		hash := sha256.Sum256([]byte(migration.sql))
 		checksum := hex.EncodeToString(hash[:])
 		var previous string

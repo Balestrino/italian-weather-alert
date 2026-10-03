@@ -660,39 +660,9 @@ func run() bool {
 		linkingStore := linking.NewStore(pool)
 		linkingRunner := &linking.Runner{Store: linkingStore, Processing: processing.New(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: linkingCatalog.ConfigurationVersionID, PriceVersion: linkingCatalog.PriceVersionID, MaxCandidates: 20, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
 		handlers := map[string]jobs.Handler{ocr.Kind: ocrRunner.Handler(), classification.Kind: classificationRunner.Handler(), extraction.Kind: extractionRunner.Handler(), linking.Kind: linkingRunner.Handler()}
-		semanticEnabled, err := config.SemanticEnabled()
-		if err != nil {
-			slog.Error("semantic linking configuration invalid")
-			return false
-		}
-		if semanticEnabled {
-			embeddingConfig, loadErr := config.LoadEmbedding()
-			if loadErr != nil {
-				slog.Error("embedding configuration invalid")
-				return false
-			}
-			embedder, adapterErr := inference.NewOpenAIEmbedder(embeddingConfig.Adapter, embeddingConfig.URL, embeddingConfig.APIKey, &http.Client{Timeout: 90 * time.Second})
-			if adapterErr != nil {
-				slog.Error("embedding adapter configuration invalid")
-				return false
-			}
-			embedScope, scopeErr := inference.GateScope(embeddingConfig.URL, config.GateAlias("IWA_EMBEDDING"))
-			if scopeErr != nil {
-				slog.Error("embedding gate scope invalid")
-				return false
-			}
-			embedGate := inference.Gate{Store: gateStore, Scope: embedScope, Policy: gatePolicy}
-			gateBindings = append(gateBindings, processing.GateBinding{Kind: embedding.Kind, Scope: embedScope, Model: embeddingConfig.Model})
-
-			embeddingCatalog, catalogErr := embedding.RegisterCatalog(ctx, processing.New(pool), embeddingConfig.Adapter, embeddingConfig.Model, 1024, time.Now())
-			if catalogErr != nil {
-				slog.Error("embedding catalog registration failed")
-				return false
-			}
-			embeddingRunner := &embedding.Runner{Measures: linkingStore, Results: embedding.NewStore(pool), Processing: processing.New(pool), Adapter: &inference.GatedEmbedder{Gate: embedGate, Adapter: &inference.RecordedEmbedder{Adapter: embedder, Ledger: gateStore}}, Model: embeddingConfig.Model, ConfigurationVersion: embeddingCatalog.ConfigurationVersionID, Dimensions: 1024}
-			handlers[embedding.Kind] = embeddingRunner.Handler()
-			linkingRunner.SemanticConfiguration = embeddingCatalog.ConfigurationVersionID
-		}
+		embeddings := &embeddingRuntime{pool: pool, queue: queue, gateStore: gateStore, policy: gatePolicy, measures: linkingStore}
+		handlers[embedding.Kind] = embeddings.handle
+		linkingRunner.SemanticConfigurationFor = embeddings.semanticConfiguration
 		localFallback, fallbackErr := config.LoadLocalFallback()
 		if fallbackErr != nil {
 			slog.Error("local fallback configuration invalid")
@@ -703,7 +673,8 @@ func run() bool {
 			slog.Error("local fallback initialization failed")
 			return false
 		}
-		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, semanticEnabled)
+		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, false)
+		interpretationScheduler.EmbeddingEnabled = queue.EmbeddingAllowedForRun
 		interpretationScheduler.Preflight, err = makePreflight(ctx, pool, retained, inferenceConfig, rollout)
 		if err != nil {
 			slog.Error("preflight configuration invalid")
@@ -712,15 +683,29 @@ func run() bool {
 		handlers[ocr.Kind] = interpretationScheduler.OCRHandler(handlers[ocr.Kind])
 		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(handlers[classification.Kind])
 		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(handlers[extraction.Kind])
-		if semanticEnabled {
-			handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
-		}
+		handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
 		for kind, handler := range handlers {
 			handlers[kind] = interpretationScheduler.Guard(handler)
 		}
 		inferenceWorker := &jobs.Worker{Store: queue, Queue: inference.Queue, ID: "inference-" + workerID, Lease: 20 * time.Minute, PollInterval: 500 * time.Millisecond, Handlers: handlers}
 		var nextEquivalentRelease time.Time
+		embeddingBindingAdded := false
 		inferenceWorker.BeforeClaim = func(c context.Context, at time.Time) error {
+			if !embeddingBindingAdded {
+				enabled, err := queue.EmbeddingActive(c)
+				if err != nil {
+					return err
+				}
+				if enabled {
+					_, binding, err := embeddings.initialize(c)
+					if err != nil {
+						return err
+					}
+					gateBindings = append(gateBindings, binding)
+					embeddingBindingAdded = true
+				}
+			}
+
 			return gateStore.MaintainQueue(c, func(c context.Context) error {
 				if err := gateStore.DeferRecoveryJobs(c, at); err != nil {
 					return err
@@ -888,7 +873,7 @@ func run() bool {
 		evaluations := evaluation.New(pool)
 		adminScheduler := interpretation.New(pool, jobs.New(pool), inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
 		adminScheduler.Evaluations = evaluations
-		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
+		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Embedding: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
 		if c.Environment == "development" {
 			adminRuntime.DevelopmentPublication = domain.NewDevelopmentPublication(pool, c.Environment)
 		}

@@ -90,6 +90,11 @@ model when its required retrieval inputs are available; a held embedding provide
 can still delay new semantic linking. Do not interpret local text/OCR success as
 completion of those dependencies or public source acceptance.
 
+[Global and per-source embedding controls](embedding-controls.md) are independent
+of the local chat fallback and default to disabled. Both choices are required
+for embedding admission and semantic retrieval; ordinary linking remains
+available while either is disabled.
+
 ## Try two concurrent requests in development
 
 Each worker processes one inference job at a time. When the local server reports

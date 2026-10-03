@@ -74,6 +74,7 @@ type AdminRuntime struct {
 		Compare(context.Context, diagnostics.Comparison) (diagnostics.Comparison, error)
 	}
 	Jobs           AdminJobs
+	Embedding      AdminEmbedding
 	Interpretation AdminInterpretation
 	Evaluations    interface {
 		RecordComparison(context.Context, string, evaluation.ProcessingComparison) (evaluation.ComparisonReport, error)

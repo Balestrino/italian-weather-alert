@@ -33,6 +33,7 @@ type Runner struct {
 	PriceVersion                *string
 	MaxCandidates               int
 	SemanticConfiguration       string
+	SemanticConfigurationFor    func(context.Context, int64) (string, error)
 	DisableThinking             bool
 	Now                         func() time.Time
 }
@@ -89,8 +90,15 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, p Payload) (jobs.Result,
 	if err != nil {
 		return jobs.Result{}, failure("linking_candidates_unavailable", true)
 	}
-	if r.SemanticConfiguration != "" {
-		semantic, semanticErr := r.Store.SemanticCandidates(ctx, current, r.SemanticConfiguration, limit)
+	semanticConfiguration := r.SemanticConfiguration
+	if r.SemanticConfigurationFor != nil {
+		semanticConfiguration, err = r.SemanticConfigurationFor(ctx, current.RunID)
+		if err != nil {
+			return jobs.Result{}, failure("semantic_configuration_unavailable", true)
+		}
+	}
+	if semanticConfiguration != "" {
+		semantic, semanticErr := r.Store.SemanticCandidates(ctx, current, semanticConfiguration, limit)
 		if semanticErr != nil {
 			return jobs.Result{}, failure("semantic_candidates_unavailable", true)
 		}
