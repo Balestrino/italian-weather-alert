@@ -32,6 +32,18 @@ Add an overview read model in `internal/operations` with snapshot-consistent agg
 
 MVP refresh is explicit navigation/reload, with a visible observation time; no automatic refresh or live claim. Costs remain on the usage page with workload, currency, partial usage and pricing provenance intact.
 
+### Complete job overview and historical progress (October 2 operator request)
+
+Read queue aggregates and the existing pending-document predicate in one repeatable-read, read-only snapshot. Count distinct job rows by queue/kind and state; show archived jobs separately, the oldest creation time among waiting jobs, the last completion, jobs whose available time has arrived and running jobs whose leases have expired. Due time alone does not establish territorial/provider/equivalence admission or worker health. Add queue, kind and last-error filters to job drilldowns, preserving pagination and existing filters. Archived detail rows keep their original state but expose archive time and never offer relaunch.
+
+Aggregate recorded last error codes only on non-archived jobs without a successful current state. Show those as historical observations rather than current provider diagnoses. Read provider gates separately, with their own observation time and unavailable state; do not expose probe tokens. An account gate (`*`) can override a model gate and a local fallback can still work.
+
+Categorize each version in the unchanged pending-document scope once, in priority order: suspended source, running job, retry, queued job, failed job, incomplete result, no trigger, preparation. Aggregate work per version so multiple OCR jobs cannot inflate document counts. Provide counts by source and links to the corresponding documents; preserve existing archive, equivalence and discovery exclusions. These reads do not schedule or recover work.
+
+Use completed `processing_attempts`, grouped by `finished_at` in UTC, for historical progress. Fill zero buckets for 24 hourly buckets, 7 calendar days or 30 calendar days, including the partial current bucket. Keep succeeded, retry, failed and abandoned outcomes distinct and include attempts of currently archived jobs. Exclude unfinished attempts and records at or after the observation cutoff. Retries/relaunches contribute multiple attempts; explicitly state that this is neither unique jobs/documents nor reconstructed historical backlog. No new state-history persistence is claimed.
+
+Render stacked bars as bundled inline SVG with a common count scale, textual legend, per-bucket titles and a native expandable table of exact values. The period is a validated GET parameter. Core functionality works without JavaScript, external libraries or CSP exceptions. Use isolated PostgreSQL fixtures for counts, cutoff boundaries, archive/retry behavior and drilldown consistency; inspect desktop/mobile/zoom browser layouts and keep private operational evidence ignored.
+
 ### Section presenters and filters
 
 Introduce presentation mappings for meaningful Italian labels, primary columns, timestamp/unit formatting and status labels. Preserve all remaining fields in expandable row details, including raw error codes and evidence links. Place contextual links/actions in the same row/detail region, eliminating the duplicate action list. Keep empty lists, unavailable data and actual zero values distinct.

@@ -44,7 +44,7 @@ func (s *Store) Document(ctx context.Context, query DocumentQuery) (DocumentResu
 		err = s.pool.QueryRow(ctx, `SELECT id FROM retained_versions WHERE id=$1 AND document_id=$2 AND first_acquired_at<=$3`, versionID, documentID, qt.KnownAt).Scan(&versionID)
 	} else {
 		err = s.pool.QueryRow(ctx, `SELECT v.id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id
- WHERE v.document_id=$1 AND v.first_acquired_at<=$2 AND `+s.visibilitySQL()+` ORDER BY v.first_acquired_at DESC,v.id DESC LIMIT 1`, documentID, qt.KnownAt).Scan(&versionID)
+ WHERE v.document_id=$1 AND v.first_acquired_at<=$2 AND (`+s.visibilitySQL()+`) ORDER BY v.first_acquired_at DESC,v.id DESC LIMIT 1`, documentID, qt.KnownAt).Scan(&versionID)
 	}
 	if errors.Is(err, pgx.ErrNoRows) {
 		return DocumentResult{}, ErrUnknownIdentifier
@@ -60,7 +60,7 @@ func (s *Store) Document(ctx context.Context, query DocumentQuery) (DocumentResu
 	result.Versions = []Document{}
 	if query.IncludeVersions {
 		rows, rowsErr := s.pool.Query(ctx, `SELECT v.id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id
- WHERE v.document_id=$1 AND v.first_acquired_at<=$2 AND `+s.visibilitySQL()+` ORDER BY v.first_acquired_at,v.id`, documentID, qt.KnownAt)
+ WHERE v.document_id=$1 AND v.first_acquired_at<=$2 AND (`+s.visibilitySQL()+`) ORDER BY v.first_acquired_at,v.id`, documentID, qt.KnownAt)
 		if rowsErr != nil {
 			return DocumentResult{}, rowsErr
 		}
@@ -94,7 +94,7 @@ func (s *Store) documentVersion(ctx context.Context, versionID int64, qt QueryTi
  JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id JOIN registry_channels c ON c.id=s.channel_id
  JOIN registry_authorities publisher ON publisher.id=c.publisher_id
  LEFT JOIN registry_authorities issuer ON issuer.id=v.issuer_id
- WHERE v.id=$1 AND v.first_acquired_at<=$2 AND `+s.visibilitySQL()+``, versionID, qt.KnownAt).Scan(&numericDocumentID, &versionID, &value.SourceID, &issuer, &value.Publisher, &value.OfficialURL, &value.SHA256, &value.AcquiredAt, &metadata)
+ WHERE v.id=$1 AND v.first_acquired_at<=$2 AND (`+s.visibilitySQL()+`)`, versionID, qt.KnownAt).Scan(&numericDocumentID, &versionID, &value.SourceID, &issuer, &value.Publisher, &value.OfficialURL, &value.SHA256, &value.AcquiredAt, &metadata)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Document{}, ErrUnknownIdentifier
 	}

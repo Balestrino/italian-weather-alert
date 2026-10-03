@@ -21,6 +21,7 @@ func setup(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Setenv("IWA_ROLE", "public")
+	t.Setenv("IWA_ENVIRONMENT", "")
 	t.Setenv("IWA_LISTEN", "")
 	t.Setenv("IWA_CONTAINER_ADMIN", "")
 	t.Setenv("IWA_RUSTFS_URL", "")
@@ -195,5 +196,37 @@ func TestAdminTailscaleOrigin(t *testing.T) {
 		if _, err := Load(); err == nil {
 			t.Errorf("invalid origin accepted: %q", origin)
 		}
+	}
+}
+
+func TestEnvironmentDefaultsStrict(t *testing.T) {
+	setup(t)
+	c, err := Load()
+	if err != nil || c.Environment != "production" {
+		t.Fatal("strict default", err)
+	}
+	for _, mode := range []string{"development", "staging", "production"} {
+		t.Setenv("IWA_ENVIRONMENT", mode)
+		c, err = Load()
+		if err != nil || c.Environment != mode {
+			t.Fatal(mode, err)
+		}
+		expected := "127.0.0.1:8080"
+		if mode == "development" {
+			expected = "0.0.0.0:8080"
+		}
+		if c.Listen != expected {
+			t.Fatalf("%s public listener: got %q want %q", mode, c.Listen, expected)
+		}
+		t.Setenv("IWA_ROLE", "admin")
+		c, err = Load()
+		if err != nil || c.Listen != "127.0.0.1:8081" {
+			t.Fatalf("%s admin listener: %q %v", mode, c.Listen, err)
+		}
+		t.Setenv("IWA_ROLE", "public")
+	}
+	t.Setenv("IWA_ENVIRONMENT", "dev")
+	if _, err = Load(); err == nil {
+		t.Fatal("invalid environment accepted")
 	}
 }

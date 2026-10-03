@@ -23,6 +23,9 @@ var manifestsSchema string
 //go:embed eligibility_schema.sql
 var eligibilitySchema string
 
+//go:embed native_text_schema.sql
+var nativeTextSchema string
+
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -36,7 +39,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 		return err
 	}
 
-	for _, migration := range []struct{ name, sql string }{{"008_ocr", schema}, {"050_ocr_artifacts", artifactsSchema}, {"051_ocr_render_manifests", manifestsSchema}, {"052_ocr_eligibility", eligibilitySchema}} {
+	for _, migration := range []struct{ name, sql string }{{"008_ocr", schema}, {"050_ocr_artifacts", artifactsSchema}, {"051_ocr_render_manifests", manifestsSchema}, {"052_ocr_eligibility", eligibilitySchema}, {"066_ocr_native_text", nativeTextSchema}} {
 		hash := sha256.Sum256([]byte(migration.sql))
 		checksum := hex.EncodeToString(hash[:])
 		var previous string

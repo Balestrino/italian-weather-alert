@@ -104,7 +104,7 @@ func run() bool {
 	}
 	defer pool.Close()
 	if controlRequested {
-		if err := executeControl(ctx, pool, c.Role, control, os.Stdout); err != nil {
+		if err := executeControlEnvironment(ctx, pool, c.Role, c.Environment, control, os.Stdout); err != nil {
 			slog.Error("control command failed", "code", controlErrorCode(err))
 			return false
 		}
@@ -586,7 +586,12 @@ func run() bool {
 			slog.Error("OCR catalog registration failed")
 			return false
 		}
-		ocrRunner := &ocr.Runner{ReuseSources: rollout.OCRSources, Documents: retained, Processing: processing.New(pool), Results: ocr.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: ocrAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: ocrAdapter, Ledger: gateStore}}, Renderer: ocr.PopplerRenderer{DPI: 144}, Model: ocrConfig.Model, ConfigurationVersion: ocrCatalog.ConfigurationVersionID, PriceVersion: ocrCatalog.PriceVersionID}
+		ocrRunnerLocalConfiguration, err := processing.New(pool).RegisterLocalProcessing(ctx, ocrCatalog.ConfigurationVersionID, time.Now())
+		if err != nil {
+			slog.Error("local processing configuration registration failed")
+			return false
+		}
+		ocrRunner := &ocr.Runner{LocalConfigurationVersion: ocrRunnerLocalConfiguration, TextExtractor: ocr.PopplerText{}, ReuseSources: rollout.OCRSources, Documents: retained, Processing: processing.New(pool), Results: ocr.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: ocrAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: ocrAdapter, Ledger: gateStore}}, Renderer: ocr.PopplerRenderer{DPI: 144}, Model: ocrConfig.Model, ConfigurationVersion: ocrCatalog.ConfigurationVersionID, PriceVersion: ocrCatalog.PriceVersionID}
 		if reuseOCR {
 			rendererID := os.Getenv("IWA_OCR_RENDERER_ID")
 			if rendererID == "" {
@@ -625,7 +630,12 @@ func run() bool {
 			return false
 		}
 		reuseSources := rollout.InterpretationSources
-		classificationRunner := &classification.Runner{OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyClassification.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Processing: processing.New(pool), Results: classification.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: classificationCatalog.ConfigurationVersionID, PriceVersion: classificationCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
+		classificationRunnerLocalConfiguration, err := processing.New(pool).RegisterLocalProcessing(ctx, classificationCatalog.ConfigurationVersionID, time.Now())
+		if err != nil {
+			slog.Error("local processing configuration registration failed")
+			return false
+		}
+		classificationRunner := &classification.Runner{LocalConfigurationVersion: classificationRunnerLocalConfiguration, OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyClassification.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Processing: processing.New(pool), Results: classification.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: classificationCatalog.ConfigurationVersionID, PriceVersion: classificationCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
 		extractionCatalog, err := extraction.RegisterCatalog(ctx, processing.New(pool), qwenConfig.Adapter, qwenConfig.Model, time.Now())
 		if err != nil {
 			slog.Error("extraction catalog registration failed")
@@ -636,7 +646,12 @@ func run() bool {
 			slog.Error("legacy extraction catalog registration failed")
 			return false
 		}
-		extractionRunner := &extraction.Runner{OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyExtraction.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Classifications: classification.NewStore(pool), Processing: processing.New(pool), Results: extraction.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: extractionCatalog.ConfigurationVersionID, PriceVersion: extractionCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
+		extractionRunnerLocalConfiguration, err := processing.New(pool).RegisterLocalProcessing(ctx, extractionCatalog.ConfigurationVersionID, time.Now())
+		if err != nil {
+			slog.Error("local processing configuration registration failed")
+			return false
+		}
+		extractionRunner := &extraction.Runner{LocalConfigurationVersion: extractionRunnerLocalConfiguration, OutputFixSources: rollout.OutputFixSources, CheckpointSources: rollout.CheckpointSources, LegacyConfigurationVersion: legacyExtraction.ConfigurationVersionID, Checkpoints: processing.New(pool), Manifests: classification.NewStore(pool), ReuseSources: reuseSources, Documents: retained, OCR: ocr.NewStore(pool), Classifications: classification.NewStore(pool), Processing: processing.New(pool), Results: extraction.NewStore(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: extractionCatalog.ConfigurationVersionID, PriceVersion: extractionCatalog.PriceVersionID, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
 		linkingCatalog, err := linking.RegisterCatalog(ctx, processing.New(pool), qwenConfig.Adapter, qwenConfig.Model, time.Now())
 		if err != nil {
 			slog.Error("linking catalog registration failed")
@@ -645,39 +660,9 @@ func run() bool {
 		linkingStore := linking.NewStore(pool)
 		linkingRunner := &linking.Runner{Store: linkingStore, Processing: processing.New(pool), Adapter: &inference.GatedAdapter{Gate: qwenAdapterGate, Adapter: &inference.RecordedAdapter{Adapter: qwenAdapter, Ledger: gateStore}}, Model: qwenConfig.Model, ConfigurationVersion: linkingCatalog.ConfigurationVersionID, PriceVersion: linkingCatalog.PriceVersionID, MaxCandidates: 20, DisableThinking: qwenConfig.Adapter == "openai-chat" && qwenConfig.Model == "qwen3.8-27b"}
 		handlers := map[string]jobs.Handler{ocr.Kind: ocrRunner.Handler(), classification.Kind: classificationRunner.Handler(), extraction.Kind: extractionRunner.Handler(), linking.Kind: linkingRunner.Handler()}
-		semanticEnabled, err := config.SemanticEnabled()
-		if err != nil {
-			slog.Error("semantic linking configuration invalid")
-			return false
-		}
-		if semanticEnabled {
-			embeddingConfig, loadErr := config.LoadEmbedding()
-			if loadErr != nil {
-				slog.Error("embedding configuration invalid")
-				return false
-			}
-			embedder, adapterErr := inference.NewOpenAIEmbedder(embeddingConfig.Adapter, embeddingConfig.URL, embeddingConfig.APIKey, &http.Client{Timeout: 90 * time.Second})
-			if adapterErr != nil {
-				slog.Error("embedding adapter configuration invalid")
-				return false
-			}
-			embedScope, scopeErr := inference.GateScope(embeddingConfig.URL, config.GateAlias("IWA_EMBEDDING"))
-			if scopeErr != nil {
-				slog.Error("embedding gate scope invalid")
-				return false
-			}
-			embedGate := inference.Gate{Store: gateStore, Scope: embedScope, Policy: gatePolicy}
-			gateBindings = append(gateBindings, processing.GateBinding{Kind: embedding.Kind, Scope: embedScope, Model: embeddingConfig.Model})
-
-			embeddingCatalog, catalogErr := embedding.RegisterCatalog(ctx, processing.New(pool), embeddingConfig.Adapter, embeddingConfig.Model, 1024, time.Now())
-			if catalogErr != nil {
-				slog.Error("embedding catalog registration failed")
-				return false
-			}
-			embeddingRunner := &embedding.Runner{Measures: linkingStore, Results: embedding.NewStore(pool), Processing: processing.New(pool), Adapter: &inference.GatedEmbedder{Gate: embedGate, Adapter: &inference.RecordedEmbedder{Adapter: embedder, Ledger: gateStore}}, Model: embeddingConfig.Model, ConfigurationVersion: embeddingCatalog.ConfigurationVersionID, Dimensions: 1024}
-			handlers[embedding.Kind] = embeddingRunner.Handler()
-			linkingRunner.SemanticConfiguration = embeddingCatalog.ConfigurationVersionID
-		}
+		embeddings := &embeddingRuntime{pool: pool, queue: queue, gateStore: gateStore, policy: gatePolicy, measures: linkingStore}
+		handlers[embedding.Kind] = embeddings.handle
+		linkingRunner.SemanticConfigurationFor = embeddings.semanticConfiguration
 		localFallback, fallbackErr := config.LoadLocalFallback()
 		if fallbackErr != nil {
 			slog.Error("local fallback configuration invalid")
@@ -688,7 +673,8 @@ func run() bool {
 			slog.Error("local fallback initialization failed")
 			return false
 		}
-		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, semanticEnabled)
+		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, false)
+		interpretationScheduler.EmbeddingEnabled = queue.EmbeddingAllowedForRun
 		interpretationScheduler.Preflight, err = makePreflight(ctx, pool, retained, inferenceConfig, rollout)
 		if err != nil {
 			slog.Error("preflight configuration invalid")
@@ -697,28 +683,44 @@ func run() bool {
 		handlers[ocr.Kind] = interpretationScheduler.OCRHandler(handlers[ocr.Kind])
 		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(handlers[classification.Kind])
 		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(handlers[extraction.Kind])
-		if semanticEnabled {
-			handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
-		}
+		handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
 		for kind, handler := range handlers {
 			handlers[kind] = interpretationScheduler.Guard(handler)
 		}
 		inferenceWorker := &jobs.Worker{Store: queue, Queue: inference.Queue, ID: "inference-" + workerID, Lease: 20 * time.Minute, PollInterval: 500 * time.Millisecond, Handlers: handlers}
 		var nextEquivalentRelease time.Time
+		embeddingBindingAdded := false
 		inferenceWorker.BeforeClaim = func(c context.Context, at time.Time) error {
-			if err := gateStore.DeferRecoveryJobs(c, at); err != nil {
-				return err
-			}
-			if !at.Before(nextEquivalentRelease) {
-				if err := interpretationScheduler.ReleaseEquivalent(c, at); err != nil {
+			if !embeddingBindingAdded {
+				enabled, err := queue.EmbeddingActive(c)
+				if err != nil {
 					return err
 				}
-				nextEquivalentRelease = at.Add(30 * time.Second)
+				if enabled {
+					_, binding, err := embeddings.initialize(c)
+					if err != nil {
+						return err
+					}
+					gateBindings = append(gateBindings, binding)
+					embeddingBindingAdded = true
+				}
 			}
-			if err := interpretationScheduler.DeferEquivalent(c, at); err != nil {
-				return err
-			}
-			return gateStore.DeferHeldJobs(c, gateBindings, at)
+
+			return gateStore.MaintainQueue(c, func(c context.Context) error {
+				if err := gateStore.DeferRecoveryJobs(c, at); err != nil {
+					return err
+				}
+				if !at.Before(nextEquivalentRelease) {
+					if err := interpretationScheduler.ReleaseEquivalent(c, at); err != nil {
+						return err
+					}
+					nextEquivalentRelease = at.Add(30 * time.Second)
+				}
+				if err := interpretationScheduler.DeferEquivalent(c, at); err != nil {
+					return err
+				}
+				return gateStore.DeferHeldJobs(c, gateBindings, at)
+			})
 		}
 		checkEngine := &acquisition.Engine{Registry: registry.New(pool), Retained: retained, Crawler: &acquisition.Crawl4AI{BaseURL: c.CrawlURL, Token: c.CrawlToken, Client: &http.Client{Timeout: 90 * time.Second}}, Resources: &acquisition.DirectHTTP{Client: &http.Client{Timeout: 90 * time.Second}}, Tracking: acquisition.NewTrackingStore(pool)}
 		checkWorker := &acquisition.CheckWorker{Store: acquisition.NewScheduleStore(pool), Engine: checkEngine, ID: "acquisition-" + workerID, Lease: 20 * time.Minute, PollInterval: time.Second, Schedule: func(scheduleCtx context.Context, page acquisition.RetainedPage, at time.Time) error {
@@ -850,7 +852,8 @@ func run() bool {
 		slog.Error("public copy access initialization failed")
 		return false
 	}
-	publicRuntime := httpapi.PublicRuntime{Limits: publicLimits, Views: publicview.New(pool), ViewLifetime: c.PublicViewLifetime, CursorKey: []byte(c.PublicCursorKey), Copies: copyAccess}
+	queries := publicquery.NewForEnvironment(pool, c.Environment)
+	publicRuntime := httpapi.PublicRuntime{PublicationScope: queries.PublicationScope, Limits: publicLimits, Views: publicview.New(pool), ViewLifetime: c.PublicViewLifetime, CursorKey: []byte(c.PublicCursorKey), Copies: copyAccess}
 	var adminRuntime backoffice.AdminRuntime
 	if c.Role == "admin" {
 		storage, loadErr := config.LoadStorage()
@@ -870,9 +873,12 @@ func run() bool {
 		evaluations := evaluation.New(pool)
 		adminScheduler := interpretation.New(pool, jobs.New(pool), inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
 		adminScheduler.Evaluations = evaluations
-		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
+		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Embedding: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
+		if c.Environment == "development" {
+			adminRuntime.DevelopmentPublication = domain.NewDevelopmentPublication(pool, c.Environment)
+		}
 	}
-	handler := listenerHandler(c.Role, checks, publicquery.New(pool), publicRuntime, adminRuntime)
+	handler := listenerHandler(c.Role, checks, queries, publicRuntime, adminRuntime)
 	if err := httpserver.Serve(ctx, ln, handler); err != nil {
 		slog.Error("service stopped unexpectedly")
 		return false

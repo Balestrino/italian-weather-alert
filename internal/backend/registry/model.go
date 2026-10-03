@@ -85,6 +85,7 @@ type Discovery struct {
 // Every configuration is a complete snapshot, never a patch. Missing evidence
 // remains explicit; no source/product inherits another source's permissions.
 type Configuration struct {
+	LocalProcessing      *LocalProcessing         `json:"local_processing,omitempty"`
 	ProcessingProfile    string                   `json:"processing_profile,omitempty"`
 	InferenceEligibility *InferenceEligibility    `json:"inference_eligibility,omitempty"`
 	Attachments          *AttachmentPolicy        `json:"attachments,omitempty"`
@@ -170,6 +171,9 @@ func (c *Configuration) defaults() {
 	}
 }
 func (c Configuration) valid() bool {
+	if !c.LocalProcessing.valid(c.RegionalProduct) {
+		return false
+	}
 	if !c.Attachments.Valid() || c.Attachments != nil && (c.AccessMethod != "crawl4ai" || c.RegionalProduct != nil) {
 		return false
 	}

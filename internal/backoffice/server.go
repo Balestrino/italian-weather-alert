@@ -19,6 +19,7 @@ func Handler(checks map[string]health.Check) http.Handler {
 func HandlerWithAdministration(checks map[string]health.Check, runtime AdminRuntime) http.Handler {
 	mux := http.NewServeMux()
 	adminSourceRoutes(mux, runtime)
+	adminEmbeddingRoutes(mux, runtime)
 	adminOverviewRoutes(mux, runtime)
 	adminTerritoryRoutes(mux, runtime)
 	adminAlertRoutes(mux, runtime)

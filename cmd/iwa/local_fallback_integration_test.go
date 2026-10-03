@@ -71,6 +71,11 @@ func TestLocalFallbackCatalogsCoexistWithRemoteAndOtherLocalModels(t *testing.T)
 			t.Fatal(err)
 		}
 	}
+	runtime := &embeddingRuntime{pool: pool, queue: jobs.New(pool)}
+	configuration, runtimeErr := runtime.semanticConfiguration(ctx, 1)
+	if runtimeErr != nil || configuration != "" || runtime.runner != nil {
+		t.Fatal("disabled embedding initialized its provider", configuration, runtimeErr)
+	}
 	store := processing.New(pool)
 	now := time.Now()
 	if _, err := classification.RegisterCatalog(ctx, store, "openai-chat", "qwen3.8-27b", now); err != nil {
@@ -108,7 +113,7 @@ func TestLocalFallbackCatalogsCoexistWithRemoteAndOtherLocalModels(t *testing.T)
 		t.Fatal(err)
 	}
 	defer rows.Close()
-	count := 0
+	count, derived := 0, 0
 	for rows.Next() {
 		var raw []byte
 		if err := rows.Scan(&raw); err != nil {
@@ -118,12 +123,19 @@ func TestLocalFallbackCatalogsCoexistWithRemoteAndOtherLocalModels(t *testing.T)
 		if err := json.Unmarshal(raw, &settings); err != nil {
 			t.Fatal(err)
 		}
+		if nested, ok := settings["fallback_settings"].(map[string]any); ok {
+			if settings["local_processing"] == nil || settings["fallback_configuration"] == nil {
+				t.Fatal("local processing provenance missing")
+			}
+			settings = nested
+			derived++
+		}
 		if settings["temperature"] != float64(0) || settings["seed"] != float64(42) || settings["qwen_enable_thinking"] != false {
 			t.Fatal("sampling provenance missing")
 		}
 		count++
 	}
-	if rows.Err() != nil || count != 8 {
+	if rows.Err() != nil || count-derived != 8 || derived != 6 {
 		t.Fatal("local catalogs not independently registered", count, rows.Err())
 	}
 	var prices int

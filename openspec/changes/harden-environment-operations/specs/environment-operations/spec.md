@@ -6,6 +6,18 @@ Provide reproducible and reliable management of three isolated IWA environments 
 
 ## ADDED Requirements
 
+### Requirement: Environment-specific public listener binding
+
+Development SHALL publish its public JSON API, MCP and documentation listener on host IPv4 address `0.0.0.0` at the configured public port. Native public startup in explicit development SHALL default to `0.0.0.0:8080`, retaining explicit listener overrides. Staging and production Compose overlays SHALL replace the development port binding with exactly one loopback public binding. Administration SHALL remain loopback-bound in every environment, and internal services SHALL publish no host ports. Configuration and runtime checks SHALL enforce these environment-specific bindings while making local readiness requests through loopback.
+
+#### Scenario: A client accesses the development API from another machine
+- **WHEN** the development public listener is started
+- **THEN** its JSON API, MCP and documentation share the public port bound to `0.0.0.0`, with administrative and internal listeners retaining their separate access boundaries
+
+#### Scenario: A release environment resolves the base Compose configuration
+- **WHEN** staging or production resolves its overlay with the development base file
+- **THEN** only one loopback public port is published and validation rejects an inherited wildcard public binding or a wildcard administrative binding
+
 ### Requirement: Fixed environment identity
 
 Environment management SHALL require an explicit development, staging or production selection and SHALL use its fixed project name, configuration files and private environment file. Inherited environment overrides and conflicting command-line options SHALL NOT redirect an operation to another project's resources or replace the selected configuration. Management commands SHALL work from another working directory and from an extracted repository archive; release publication SHALL require a clean Git checkout.

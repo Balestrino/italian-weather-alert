@@ -6,6 +6,8 @@ Development and staging inherit unprofiled collection/inference and backup worke
 
 ## What Changes
 
+- Add environment-scoped global and per-source embedding controls in the admin panel and CLI, both disabled by default even in existing environments. Require both flags for scheduling, queue admission and semantic retrieval; retain paused jobs and source choices, and retire only operator-selected pending embedding jobs through archival.
+
 - **BREAKING**: Exclude the collection/inference worker and application backup worker from default development and staging service selection; give each an explicit opt-in profile.
 - Preserve production's separate `production-worker` and `application-backup` selection, its inactive preparation, and existing release gates.
 - Verify default and explicitly selected service sets in deployment checks and focused regression tests without contacting sources or inference providers.

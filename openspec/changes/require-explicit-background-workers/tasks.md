@@ -28,3 +28,10 @@ Checked tasks record repository implementation verified with synthetic fixtures;
 
 - [x] 5.1 Update developer setup, environment management and release guides with opt-in commands, region → municipality → source activation steps, explicit environment-scoped territorial/source CLI examples and equivalent admin actions, post-test stop/status commands, copied-data safeguards and the eventual production-only continuous collector policy; verify every documented CLI command names an environment and explain territorial/source/worker/publication separation, explicit-target activation, lack of cross-environment deduplication and existing-container restart behavior.
 - [x] 5.2 Document adoption preserving the current collector until an explicit handover, additive migration/compatible rollback, and update the OpenSpec index/checklist/changelog alongside implementation; verify local documentation links, strict validation of this change and `git diff --check`, and report repository validation separately from any unperformed runtime handover.
+
+## 6. Embedding activation controls — added 2 October 2026
+
+- [x] 6.1 Add disabled global/source flags and audited revisions; exclude disabled embedding claims without consuming attempts, preserve admitted completion/source choices, and verify repeated migration plus newly registered source defaults with synthetic PostgreSQL.
+- [x] 6.2 Add native admin global/source forms and equivalent admin-role CLI controls; verify shared state, stale/invalid arguments, private access boundaries and no worker/provider side effects.
+- [x] 6.3 Wire live per-extraction admission, ordinary linking while disabled, current-policy semantic retrieval and lazy embedding configuration; remove activation by the legacy environment flag and verify scheduling/provider-initialization behavior.
+- [x] 6.4 Update configuration/operations guidance, run affected repository/integration/deployment checks, adopt the development admin/workers with all flags disabled, and archive only the explicitly requested pending embedding backlog with private verification evidence.

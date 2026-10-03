@@ -4,6 +4,25 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+## 0.2.0 - 2026-10-03
+
+- 2026-10-03 [Fixed] Reserve callback connection capacity explicitly in the concurrent queue-maintenance test fixture, preventing CPU-dependent Coverage deadlocks while preserving serialization and cancellation checks.
+- 2026-10-03 [Changed] Prepare the 0.2.0 minor release with aligned OpenAPI/MCP metadata, versioned history, embedding upgrade notes and gated development-to-main promotion.
+- 2026-10-02 [Added] Add disabled-by-default global and per-source embedding controls, audited admin/CLI actions and queue admission; document scoped pending embedding archival.
+- 2026-10-02 [Changed] Bind development public API/MCP/docs to all IPv4 interfaces; preserve loopback admin and release ports, verify scoped rollout and HTTP/MCP checks.
+- 2026-10-02 [Added] Add manually selected municipality publication in development with private revision-checked controls, scoped API/MCP data, explicit limitations and revocable views; preserve staging/production acceptance gates.
+
+- 2026-10-02 [Changed] Audit source acceptance prerequisites, persist incomplete campaign assessments, verify lifecycle/query gates and record remaining reviewed-evidence and municipal-regression requirements.
+- 2026-10-02 [Changed] Document municipality situation diagnostics, separating public source acceptance, internal facts, acquisition freshness and unverified regional map levels.
+- 2026-10-02 [Changed] Open development Scalar API documentation through a dedicated private Tailscale proxy; verify browser rendering and preserve existing routes with targeted rollback documented.
+- 2026-10-02 [Changed] Expand development to six corrected worker replicas, verify preserved existing containers and queue progress, and document server concurrency limits and return to four workers.
+- 2026-10-02 [Fixed] Prevent concurrent inference workers from deadlocking during queue maintenance; test cancellation and lock release, deploy four development replicas and verify parallel processing.
+- 2026-10-02 [Changed] Run and verify two concurrent development fallback requests using existing worker replicas; document scope, private rollback evidence and return to one worker.
+- 2026-10-02 [Changed] Record retained-source replay and bounded development local-processing results, accounting and rollout limits.
+- 2026-10-02 [Changed] Reduce model dependence with reviewed article-body selection, native PDF text and deterministic regional relevance, preserving evidence and conservative fallbacks
+- 2026-10-02 [Changed] Clarify operations with complete job states, archive and reason drilldowns, document backlog categories and accessible historical attempt bars; verify database, browser and development admin rollout.
+- 2026-10-02 [Changed] Document and verify register-wide development fallback selection with existing model and independent source controls
+
 ## 0.1.2 - 2026-10-02
 
 - 2026-10-02 [Fixed] Let Docker allocate loopback ports for interpretation integration databases and clean up failed starts, avoiding published-port collisions in Coverage.

@@ -8,7 +8,11 @@ IWA uses three Docker Compose projects from one repository directory on one host
 | Staging | `iwa-staging` | `28080` / `28081` | `.local/staging.env` / `.local/staging/secrets/` | Candidate built once by the release helper |
 | Production | `iwa-production` | `38080` / `38081` | `.local/production.env` / `.local/production/secrets/` | Operator-approved GHCR digest |
 
-These are example ports; select free loopback ports in each private environment file. Only public/admin HTTP listeners publish host ports, bound to `127.0.0.1`. Databases, object storage, crawlers and workers have no host ports. A new installation has no accepted sources or live collection. Production preparation selects no services and creates no containers.
+These are example ports; select free ports in each private environment file. The development public listener binds to `0.0.0.0`, exposing JSON API, MCP and documentation on all host IPv4 interfaces at `IWA_PUBLIC_PORT` (default `8080`). Use `http://<host-address>:8080` from another machine or `http://127.0.0.1:8080` locally. Staging and production explicitly publish the public listener on `127.0.0.1`; administration stays on `127.0.0.1` in every environment. Only public/admin HTTP listeners publish host ports. Databases, object storage, crawlers and workers have no host ports. A new installation has no accepted sources or live collection. Production preparation selects no services and creates no containers.
+
+For an existing development stack, apply the API binding without rebuilding its image or restarting dependencies with `scripts/compose-env.sh development up -d --no-deps --no-build --pull never --wait public`. The runtime boundary checks verify the selected environment's host binding and use loopback for local readiness requests. Native public startup with `IWA_ENVIRONMENT=development` also defaults to `0.0.0.0:8080`; an explicit `IWA_LISTEN` takes precedence.
+
+The runtime `IWA_ENVIRONMENT` is pinned to the selected Compose environment; its software default is strict production. Development alone supports [manual municipality publication](development-publication.md) before source acceptance. Staging/production ignore these selections and retain the specified gates.
 
 All projects share CPU, RAM and disk. Their named volumes, networks and credentials are separate, but a host outage affects every environment. Review capacity and off-host recovery before production activation.
 
@@ -101,6 +105,14 @@ scripts/compose-env.sh staging --profile application-backup config --services
 ```
 
 An explicit service target such as `scripts/compose-env.sh staging up -d --no-build --pull never worker` also activates a profiled worker; omitting the profile is not protection when naming that target. Profiles govern Compose selection, not runtime admission or cross-environment deduplication. They do not stop existing workers: `restart: unless-stopped` can recover a previously activated worker after a Docker/host restart. End a test with `stop worker` and confirm its state using `ps --all worker`. The processing worker also handles configured notifications; stopping it stops those loops too.
+
+## Embedding activation
+
+Use **Sistema → Embedding** or the [equivalent CLI controls](embedding-controls.md).
+Both global and per-source flags default to disabled, including existing sources.
+Enabling one level alone does not permit embedding work. Flags apply to all
+compatible processing replicas in the selected environment; provider settings
+remain separate.
 
 ## Territorial and source activation
 

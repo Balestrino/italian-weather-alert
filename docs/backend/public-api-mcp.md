@@ -13,6 +13,26 @@ The page loads Scalar 1.72.0 from jsDelivr, so interactive rendering requires
 browser access to that CDN. The JSON specifications are served locally. These
 documentation routes are available only on the public listener.
 
+In development the public host port binds to `0.0.0.0`, so another machine can
+open `http://<host-address>:8080/docs` and use the same origin for JSON API and
+MCP. Substitute `IWA_PUBLIC_PORT` if configured. Staging/production public ports
+and every administrative host port remain on loopback.
+
+For a browser on another machine, the VM's loopback address is not the browser's
+localhost. An operator-selected Tailscale Serve HTTPS port can proxy the public
+listener privately, preserving existing admin/frontend routes. For example:
+
+```sh
+sudo tailscale serve --bg --https=8444 http://127.0.0.1:8080
+```
+
+Open `https://<vm-tailnet-name>:8444/docs`; Scalar loads the same-origin contract
+and targets that public API origin. Preserve the prior Serve configuration and
+verify browser rendering and `/openapi.json`. To remove only this proxy, run
+`sudo tailscale serve --https=8444 off`. The 2 October 2026 development browser
+check rendered all six documented endpoints; existing Serve routes were preserved.
+Environment addresses and rollback captures remain private.
+
 Integration follows the [Scalar HTML/JS documentation](https://scalar.com/products/api-references/integrations/html-js).
 
 Task 6.2 exposes the five read-only query groups from `internal/publicquery`
@@ -89,3 +109,11 @@ examples against a local service, rejects administrative paths on the public
 listener, checks that no generated-safety field is present in the public MCP
 schemas, and uses the PostgreSQL fixture to prove a retained internal DPC
 comparison document remains absent from public search and coverage.
+
+## Development publication
+
+Explicit development installations can publish manually selected municipalities,
+including their applicable regional products, before production acceptance.
+`development_publication` on municipality/coverage records and interpretation/meta
+limitations identify this scope; pending source states remain pending. Revocation
+expires saved views and cursors on API and MCP. See [operator controls and limits](../operations/development-publication.md).

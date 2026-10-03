@@ -4,6 +4,9 @@ Collect Toscana regional and municipal publications with verifiable authority, r
 
 ## ADDED Requirements
 
+The manually selected development publication exception is defined in [public alert access](../public-alert-access/spec.md#requirement-manual-municipality-publication-in-development). References below to acceptance before public activation apply to verified source publication in staging/production; the development exception grants consultation only and does not establish acceptance, infrastructure readiness or production authorization. Provenance, publication permissions, retained evidence and truthful interpretation remain mandatory.
+
+
 ### Requirement: Official source recognition and scope
 The service SHALL register authority, publisher, technical platform, territory, product scope, access method, attribution and reuse evidence separately. The first operational MVP SHALL target Calcinaia local coverage alongside Toscana regional products. Livorno, Pisa, Pontedera and Cascina SHALL remain identified as subsequent planned local scopes, without implying active coverage. Discovery of municipal channels SHALL start from the official municipal website. An external channel SHALL require an explicit official referral from that website, with referring page, destination, context and observation evidence. A referral SHALL NOT imply broader coverage or transferred authority. Attribution of a decision to an associated entity acting within transferred functions SHALL require institutional evidence covering the relevant function, municipality and applicable period. Missing transfer evidence SHALL NOT by itself block acquisition or municipal attribution of a clearly identified municipal act published through a recognized channel; all other source acceptance and interpretation conditions SHALL still apply. Unresolved competence SHALL remain explicit only for the affected attribution or scope, without implying that unrelated verified municipal publications are unverified.
 
@@ -331,9 +334,30 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 - **WHEN** the remote and configured local providers are blocked
 - **THEN** queued jobs wait before claiming, preserving attempt budgets and failure evidence
 
+#### Scenario: Fallback is selected for every registered source
+- **WHEN** the operator explicitly lists all currently registered source IDs in the fallback and evaluated output-contract selections
+- **THEN** admitted jobs from those sources may use the configured fallback while the primary is blocked, disabled sources remain disabled, source publication remains independent, and newly registered sources require an explicit configuration update
+
 #### Scenario: A provider failure first establishes a hold
 - **WHEN** an eligible remote job establishes an account hold or availability circuit
 - **THEN** a subsequent attempt within the existing budget may select a separate local run; successful results and schema/evidence failures do not trigger another model call
+
+#### Scenario: Two local server slots are used in development
+- **WHEN** the operator requests a two-request trial, the local server exposes two slots and two development worker replicas share the existing queue
+- **THEN** distinct admitted inference jobs may make concurrent requests with exclusive durable claims, separate call receipts and unchanged model, retry and source controls
+- **AND** operators verify actual overlapping requests and validated results, preserve rollback evidence and document returning to one replica; scaling also applies to primary-provider jobs and other worker loops, without changing the default replica count or limiting unrelated clients
+
+#### Scenario: Six corrected worker replicas are requested
+- **WHEN** the operator expands the verified development worker from four to six replicas
+- **THEN** the two additional replicas use the corrected queue-maintenance protocol and matching image/settings while the existing four remain running; verification distinguishes queue processing from simultaneous model calls and documents return to four workers
+
+#### Scenario: Additional workers exceed the local server slot count
+- **WHEN** the operator requests additional development worker replicas and the server exposes fewer slots than the worker count
+- **THEN** replicas retain the same image/settings and exclusive queue claims, existing replicas remain running, and verification distinguishes running workers from concurrent model executions and documents returning to the previous count
+
+#### Scenario: Concurrent workers maintain the inference queue
+- **WHEN** several workers apply recovery, equivalent-copy and provider-hold deferrals before claiming inference jobs
+- **THEN** maintenance is serialized within the database and errors or cancellation release ownership; job claiming and model execution remain parallel after maintenance returns
 
 #### Scenario: A local model has limited capabilities
 - **WHEN** a local model supports text but does not have evaluated vision or compatible embedding support
@@ -350,3 +374,41 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 #### Scenario: Image OCR has been separately evaluated
 - **WHEN** image input is enabled on the local server and its synthetic OCR test passes
 - **THEN** explicitly enabled OCR may select its own local image configuration, renderer/reuse identity and call receipts; semantic embeddings retain independent capability requirements
+
+
+### Requirement: Reviewed local processing before model inference
+The service SHALL support an optional versioned source-scoped local-processing
+policy with dated review evidence. The policy SHALL preserve full article content,
+required attachments, originals, literal evidence and page provenance. Policies
+SHALL partition processing and equivalence identities, without automatic
+historical reprocessing or changes to source/public activation.
+
+#### Scenario: Reviewed article containers match
+- **WHEN** every configured simple selector matches one nonempty article container
+- **THEN** interpretation uses their combined text in document order and retains attachment content and originals
+- **AND** missing, empty or ambiguous containers fall back to full-page text
+
+#### Scenario: A reviewed text-only PDF has complete native text
+- **WHEN** a PDF in an explicitly reviewed text-only directory has readable native text on every numbered page, no raster images and no encryption
+- **THEN** local extraction persists text with resource/page and extractor provenance without a provider call or charge
+- **AND** empty pages, scans, mixed content, images, malformed extraction or unavailable tools fall back to the original complete-resource OCR path; meaningful vector/graphical products are outside text-only scope
+
+#### Scenario: A recognized regional format establishes relevance
+- **WHEN** a reviewed regional format passes strict deterministic projection with complete content and literal evidence
+- **THEN** a positive regional relevance result is recorded locally without classification calls
+- **AND** unsupported, incomplete, ordinary or ambiguous content continues through the existing classification behavior without a keyword-based negative decision
+
+#### Scenario: Local processing policy changes
+- **WHEN** selectors, PDF scopes or structured-format policy change
+- **THEN** processing input and preflight identities differ and incompatible cached results are not reused
+- **AND** previous originals/results remain available and historical work is not automatically replayed
+
+#### Scenario: A recognized vigilance table lists no zones
+- **WHEN** the strict regional parser recognizes all six phenomenon rows and both dates, no explicit zone facts are listed, the regional bulletin title is literal original-page evidence, and required content is complete
+- **THEN** local classification establishes only the bulletin's regional relevance without a model call
+- **AND** no all-clear, alert color or local measure is inferred; a title without the recognized table or complete evidence retains normal fallback
+
+#### Scenario: A local-processing development trial is explicitly bounded
+- **WHEN** an operator requests a trial on fixed retained versions before broader activation
+- **THEN** a separate worker queue may persist evaluated candidate results with immutable processing and evidence identities, a fixed model-call cap and existing provider gates
+- **AND** candidate policies apply only to the selected trial inputs, model calls and zero-call paths remain distinguishable, the trial worker exits, and current source policies, ordinary worker routing and public activation remain unchanged

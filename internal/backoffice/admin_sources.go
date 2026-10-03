@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
 	"github.com/Balestrino/italian-weather-alert/internal/platform/httpserver"
 	"html/template"
 	"io"
@@ -56,6 +57,10 @@ type AdminInterpretation interface {
 }
 
 type AdminRuntime struct {
+	DevelopmentPublication interface {
+		State(context.Context, string, string) (domain.DevelopmentPublicationState, error)
+		Set(context.Context, string, string, int, bool, string) (int, error)
+	}
 	Territories     AdminTerritories
 	TerritoryConfig AdminTerritoryConfiguration
 	Alerts          AdminAlerts
@@ -69,6 +74,7 @@ type AdminRuntime struct {
 		Compare(context.Context, diagnostics.Comparison) (diagnostics.Comparison, error)
 	}
 	Jobs           AdminJobs
+	Embedding      AdminEmbedding
 	Interpretation AdminInterpretation
 	Evaluations    interface {
 		RecordComparison(context.Context, string, evaluation.ProcessingComparison) (evaluation.ComparisonReport, error)

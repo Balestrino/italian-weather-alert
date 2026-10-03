@@ -147,8 +147,21 @@ The [environment hardening change](../harden-environment-operations/tasks.md) an
 - [x] 14.3 Add opt-in live local-model classification, extraction, linking and image OCR tests with synthetic Italian notices, long-document cases and literal evidence checks; distinguish transport mocks from real model validation and report unsupported capabilities.
 - [x] 14.4 Deploy the evaluated fallback on development within the selected source scope, preserve the remote hold and prior image/settings, and verify representative local runs plus service stability.
 - [x] 14.5 Document local model setup, runtime configuration, rollback and the explicit OCR/embedding capability boundaries without claiming acceptance of untested stages.
+- [x] 14.6 Expand the explicitly configured development fallback and output-contract source lists to all registered sources, preserving rollback settings, the existing image and independent source/territorial/public controls.
+- [x] 14.7 Verify resolved worker configuration, local vision/OCR capability and actual local processing for the expanded scope, preserving remote holds and separately blocked embedding work.
+- [x] 14.8 Document register-snapshot selection, future-source updates and operational validation without publishing private settings or claiming source acceptance.
 
 The local fallback was verified with repository checks, isolated PostgreSQL tests, real local Qwen text/image tests and a bounded development canary. Reviewed local quote presentation and civil-protection extraction corrections retain strict contiguous evidence and independent immutable versions. Development acquisition completed a fresh municipal check, OCR and representative text interpretation succeeded, and ordinary processing resumed with the credential-wide remote hold preserved. Semantic embedding work remains separately blocked by remote entitlement; task 13.8, source acceptance and production readiness remain open. Private captures, deployment settings, dumps and call ledgers are excluded from the public repository. See [local fallback operations](../../../docs/operations/local-llm-fallback.md).
+
+The subsequent source-list expansion in tasks 14.6–14.8 was verified on
+2 October 2026 with fallback configuration/routing tests, a live synthetic
+vision/OCR check and complete development OCR results from the local runner.
+Resolved and running worker settings matched; the worker retained its existing
+image, other service identities and source controls were preserved, and the
+development HTTP/runtime smoke passed. Rollback settings, database archive and
+detailed receipts remain private. This operational selection does not restore
+remote entitlement or supply embedding support; newly registered sources require
+an explicit list update.
 
 ## 15. Territorial source knowledge guides — 2 October 2026
 
@@ -198,3 +211,142 @@ public and backup retain earlier images. Provider quota hold, fallback scope,
 source acceptance and production readiness remain separate. The OpenSpec CLI
 was unavailable; no CLI validation is claimed. Detailed evidence and rollback
 are private. See [municipal attachment operations](../../../docs/operations/municipal-attachments.md).
+
+
+## 19. Reviewed local processing before models — 2 October 2026
+
+- [x] 19.1 Add validated source-scoped local-processing policies and separate immutable configurations; include policies in retained references, processing identities and equivalence manifests while preserving legacy defaults and histories.
+- [x] 19.2 Select complete configured article containers in document order with missing/empty/ambiguous fallback, preserving attachments and evidence positions; verify misleading and late relevant content.
+- [x] 19.3 Add bounded Poppler native-text extraction for explicitly reviewed text-only PDF scopes, with whole-resource OCR fallback for incomplete, scanned, mixed, graphical, encrypted or invalid inputs; preserve page provenance and accurate zero-call accounting.
+- [x] 19.4 Add positive-only deterministic relevance for strictly recognized regional formats, with literal evidence and existing model fallback; verify unsupported/incomplete cases, compatible reuse and downstream extraction admission.
+- [x] 19.5 Verify repository regressions, disposable PostgreSQL persistence and real Poppler parsing with synthetic fixtures; update operations/territorial guidance, checklist counts and changelog without activating sources or claiming live acceptance.
+
+Verification passed the full Go race suite, vet and command builds, focused
+regressions for legacy classification/OCR and contiguous preflight reuse,
+disposable PostgreSQL tests for native text and deterministic classification,
+strict OpenSpec validation, and real Poppler tests in the application image.
+The fixtures verify complete-resource fallbacks, page provenance, zero calls and
+prices on local paths, immutable configurations, policy-separated identities,
+validated local result reuse and extraction scheduling. Local configuration and
+territorial guidance are documented in [local processing operations](../../../docs/operations/local-processing.md).
+Source policies remain opt-in and no live settings, provider accounts, acceptance
+status or production deployment were changed. Native text requires reviewed
+text-only scopes; meaningful vector graphics remain outside those scopes.
+
+## 20. Bounded local-processing replay — 2 October 2026
+
+- [x] 20.1 Replay candidate article and regional policies against a bounded sample of retained development documents using read-only database access; check complete article evidence, fallback and historical relevance agreement without provider calls.
+- [x] 20.2 Probe unique retained municipal PDFs with the current native extractor and real Poppler; distinguish technically eligible files from scopes approved for activation.
+- [x] 20.3 Keep detailed evidence private and update territorial discovery registers, operations guidance, specification and changelog with the observed results and remaining rollout boundaries.
+
+## 21. Bounded development trial — 2 October 2026
+
+- [x] 21.1 Prepare an eight-version, separate-queue trial using the checked-out implementation, reviewed candidate policies and existing local model gates; preserve a database snapshot and cap calls at twenty.
+- [x] 21.2 Persist baseline/candidate classifications and four reviewed native PDF resources in development through real queue claims and processing stores; keep results available for dashboard inspection without automatic downstream publication or broad policy activation.
+- [x] 21.3 Verify persisted evidence, usage, model-call limits, dashboard access and worker termination; record results and remaining quality/rollout limits in the territorial registers and operations guidance.
+
+The fifty-version read-only replay passed content/fallback checks, with 51.8%
+less municipal HTML input, fifteen local regional decisions, and six of fifteen
+unique PDFs accepted for native text (eleven pages). The completed development
+trial persisted sixteen successful jobs on eight fixed versions: four municipal
+baseline/candidate pairs agreed, their input tokens fell 36.8%, three regional
+classifications and four native PDF resources (seven pages) made no model calls.
+Sixteen local calls stayed below the twenty-call cap; usage/cost provenance and
+browser visibility were verified, and the separate worker exited. Focused race,
+vet, strict OpenSpec and disposable PostgreSQL checks passed. The empty-zone
+vigilance correction has positive and conservative-fallback regressions. Current
+source policies and ordinary routing remain intact; continuing rollout and
+semantic downstream acceptance remain separate. Detailed captures, configurations,
+receipts, trial programs and snapshot are private.
+
+## 22. Development fallback concurrency trials — 2 October 2026
+
+- [x] 22.1 Verify two local server slots and matching resolved/running worker settings; preserve a verified database archive and private rollback evidence, then add a second development worker without recreating the original or changing its image.
+- [x] 22.2 Verify overlapping local requests from distinct queue jobs, returned model provenance, validated results and worker stability while preserving provider holds and source controls.
+- [x] 22.3 Document replica scope, trial results and return to one worker; update the specification, checklist counts and changelog without changing the default replica count or claiming a throughput improvement from occupancy.
+
+The development trial verified two-slot occupancy in 59 of 61 samples over two
+minutes, overlapping HTTP 200 receipts from distinct worker/job identities and
+complete persisted OCR pages from both replicas with the requested local model.
+Both workers remained running with zero restarts, and all pre-existing container
+identities were preserved. The HTTP/runtime-boundary smoke passed. Full release
+image alignment remains unverified because the existing admin image differs from
+the environment's configured image. The two replicas remained active for the
+requested trial; no new image, schema, source policy or acceptance status was
+introduced. Slot occupancy establishes concurrency, not a throughput improvement.
+Private settings, database archive, samples and receipts remain ignored. See
+[local fallback operations](../../../docs/operations/local-llm-fallback.md).
+
+- [x] 22.4 Activate two additional development worker replicas on operator request; verify four running workers with matching image/settings and preserved existing identities, record the current server slot count and document return to two replicas.
+
+The subsequent operator request brought development to four running replicas
+with matching images/settings and preserved first/second worker identities.
+The server then reported one slot; this verifies worker activation rather than
+four simultaneous model executions. Pre-claim database deadlocks later exhausted
+recovery and restarted workers, requiring the fix below. The HTTP/runtime-boundary smoke passed;
+private runtime evidence is retained and return to two replicas is documented.
+
+- [x] 22.5 Serialize pre-claim inference queue maintenance across replicas with a transaction advisory lock released before job/model execution; verify four competing callbacks, callback failure and cancelled-waiter release on disposable PostgreSQL with race checks, command checks and vet.
+- [x] 22.6 Deploy the corrected image to all four development replicas; verify parallel calls, stored results, provider holds, HTTP smoke and no further pre-claim deadlocks/restarts during the observation window, preserving private logs, database archive and rollback settings.
+
+The corrected image passed focused processing integration/race checks, command
+and processing tests, vet and the application image build. All four development
+workers were recreated with that image and preserved inference settings. Over
+an eighty-second slot observation, four slots were active in 34 of 41 samples;
+receipts confirmed HTTP 200 responses with matching model provenance. Twenty-nine
+validated classifications were stored across all four workers. Two quotation
+validation failures remained rejected by the existing strict parser. No new
+pre-claim deadlocks or worker restarts occurred after the fix during observation,
+and the HTTP/runtime-boundary smoke passed. Provider holds remained separate.
+This trial establishes concurrent processing, not semantic source acceptance or
+long-term capacity; detailed logs, receipts, settings and rollback archive remain
+private. The repository default remains one replica.
+
+- [x] 22.7 Add two corrected development worker replicas on operator request for a total of six; preserve the existing four identities and settings, verify startup and processing/restart observations against current server slots, and document return to four workers with private evidence retained.
+
+The six-worker expansion preserved all four existing container identities and
+matched their corrected image/settings. Each of the six replicas performed queue
+attempts during verification, with zero restarts and no observed pre-claim
+deadlocks. The local server initially returned HTTP 503 and subsequently exposed
+six slots; the first sixty-second slot window observed no active model slots.
+This verifies six active queue workers, not six simultaneous model executions.
+The nondisruptive HTTP/runtime-boundary smoke passed. Provider retry/circuit
+controls remained active; settings, logs and observations remain private.
+
+## 23. Private browser access to API documentation — 2 October 2026
+
+- [x] 23.1 Open Scalar in the integrated browser through a dedicated private Tailscale Serve proxy to the development public listener; preserve existing Serve routes, verify all six endpoint references and the same-origin OpenAPI contract, and document targeted proxy removal with private rollback settings retained.
+
+## 24. Source acceptance prerequisite audit — 2 October 2026
+
+- [x] 24.1 Inspect the active CFR/Calcinaia revisions, declared policies, source regressions and existing observational campaigns; distinguish elapsed observation from reviewed original/attachment/failure/event evidence and preserve the source-scoped prerequisite inventory privately.
+- [x] 24.2 Persist truthful assessments of both existing campaigns through the administrative API, prepare the current retained-resource manifest and unresolved municipal comparisons, and verify that the audit does not grant acceptance or public enablement.
+- [x] 24.3 Verify registry acceptance/regression gates, campaign evidence requirements and shared public query groups with synthetic unit tests and disposable PostgreSQL; update territorial guidance, the coverage precheck note and changelog without claiming real-source acceptance.
+
+Both recorded campaign assessments remain `extended`. The recent campaign has
+sufficient elapsed observation and checks within its configured delay threshold,
+but reviewed originals/resources and error/event evidence are missing. Calcinaia
+also retains a failed service regression requiring a corrected rerun against the
+reviewed contract; successful software tests do not close that regression. The
+private dossier identifies these prerequisites and retained-resource identities.
+Tasks 9.3 and 10.1 remain open; no source was accepted or publicly enabled.
+Infrastructure/public readiness gates remain separate and unverified by this audit.
+
+## 25. Manual municipality publication in development — 2 October 2026
+
+- [x] 25.1 Add default-off municipality publication state, immutable actor/time events and revision-checked private admin/CLI controls available only in explicit development; pin all Compose runtime environments and preserve collection/source acceptance flags.
+- [x] 25.2 Share development visibility across API/MCP municipal data, applicable CFR facts, document metadata and history; constrain selected municipalities/zones and active policy-permitted acquisitions, disclose development limitations and preserve independent copy restrictions.
+- [x] 25.3 Verify strict staging/production behavior, same-zone isolation, historical mapping applicability, revocation and saved-view expiry, native-form protections, audit persistence and default/invalid environment handling with synthetic tests and disposable PostgreSQL; update documentation and coverage boundaries.
+- [x] 25.4 Deploy the reversible development public/admin change, enable Calcinaia explicitly and verify selected/unselected API behavior and administrative state with private rollback evidence; report uncertain regional levels and missing municipal facts without claiming source acceptance.
+
+Development public/admin were rebuilt, migrated and deployed; the browser's native
+form explicitly enabled Calcinaia. API/MCP agree on its saved view and the original
+HTTPS endpoint returns applicable CFR facts with development limitations. A second
+municipality sharing A4 remains unselected, and unscoped regional facts stay in A4.
+Source collection/public flags and acceptance counts are unchanged; existing workers
+and other services were preserved. Unknown regional levels and absent interpreted
+municipal measures remain explicit. The nondisruptive boundary/secret/HTTP smoke passed.
+This targeted deployment does not certify uniform application-image rollout: the full
+runtime image checker reports preserved older backup/worker images. Private database,
+listener settings, response comparisons and rollback details are retained. Source
+acceptance tasks 9.3 and 10.1 and production release gates remain open.

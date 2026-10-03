@@ -2,9 +2,18 @@
 services:
   public:
     build: !reset null
+    ports: !override ["127.0.0.1:${IWA_PUBLIC_PORT:-28080}:8080"]
+    environment:
+      IWA_ENVIRONMENT: staging
   admin:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging
   worker:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging
   backup:
     build: !reset null
+    environment:
+      IWA_ENVIRONMENT: staging

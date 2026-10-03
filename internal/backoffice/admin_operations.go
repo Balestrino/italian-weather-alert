@@ -34,6 +34,20 @@ func adminOperationRoutes(mux *http.ServeMux, a AdminRuntime) {
 				var err error
 				switch key {
 				case "source_id":
+				case "queue", "error_code":
+					if key == "queue" {
+						f.Queue = values[0]
+					} else {
+						f.ErrorCode = values[0]
+					}
+					if section != "jobs" || len(values[0]) > 200 {
+						err = operations.ErrInvalid
+					}
+				case "kind":
+					f.Kind = values[0]
+					if section != "jobs" || len(f.Kind) > 200 {
+						err = operations.ErrInvalid
+					}
 				case "issue":
 					f.Issue = values[0]
 					if section != "sources" || f.Issue != "attention" {
@@ -155,6 +169,15 @@ var operationTemplates = template.Must(uiTemplates("operations", template.FuncMa
 		}
 		if r.Filter.State != "" {
 			q.Set("state", r.Filter.State)
+		}
+		if r.Filter.Queue != "" {
+			q.Set("queue", r.Filter.Queue)
+		}
+		if r.Filter.ErrorCode != "" {
+			q.Set("error_code", r.Filter.ErrorCode)
+		}
+		if r.Filter.Kind != "" {
+			q.Set("kind", r.Filter.Kind)
 		}
 		if r.Filter.SourceID != "" {
 			q.Set("source_id", r.Filter.SourceID)

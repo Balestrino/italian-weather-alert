@@ -30,7 +30,7 @@ func primaryColumns(section string, available []string) []string {
 	return result
 }
 func statusLabel(s string) string {
-	if v, ok := map[string]string{"failed": "Fallito", "retry_wait": "Nuovo tentativo in attesa", "queued": "In coda", "running": "In corso", "succeeded": "Completato", "delayed": "In ritardo", "current": "Aggiornato", "not_yet_verified": "Non ancora verificato"}[s]; ok {
+	if v, ok := map[string]string{"archived": "Archiviato", "closed": "Disponibile", "held": "Bloccato", "open": "In pausa", "half_open": "Verifica di recupero", "failed": "Fallito", "retry_wait": "Nuovo tentativo in attesa", "queued": "In coda", "running": "In corso", "succeeded": "Completato", "delayed": "In ritardo", "current": "Aggiornato", "not_yet_verified": "Non ancora verificato"}[s]; ok {
 		return v
 	}
 	return s

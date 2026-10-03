@@ -254,3 +254,29 @@ func assertPublicError(t *testing.T, client *http.Client, endpoint string, statu
 		t.Fatalf("GET %s: status=%d error=%#v", endpoint, response.StatusCode, result.Error)
 	}
 }
+
+func TestPublicationRevocationExpiresAPIAndMCPViews(t *testing.T) {
+	clock := time.Date(2026, 9, 17, 12, 0, 30, 0, time.UTC)
+	scope := "development:enabled"
+	runtime := PublicRuntime{Limits: PublicLimits{Allowance: 120, Window: time.Minute, MaxPageSize: 10}, Views: &memoryViewStore{}, ViewLifetime: 30 * time.Minute, CursorKey: []byte(strings.Repeat("k", 32)), PublicationScope: func(context.Context) (string, error) { return scope, nil }}
+	server := httptest.NewServer(handlerWithRuntime(nil, func() time.Time { return clock }, runtime, &publicQueriesFake{coverageCount: 2}))
+	defer server.Close()
+	first := getCoverage(t, server.Client(), server.URL+"/v1/sources/coverage?municipality_istat=050004&page_size=1&evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z")
+	if first.Meta.NextCursor == nil {
+		t.Fatal("missing cursor")
+	}
+	scope = "development:revoked"
+	assertPublicError(t, server.Client(), server.URL+"/v1/sources/coverage?cursor="+url.QueryEscape(*first.Meta.NextCursor), http.StatusGone, "cursor_expired")
+	client := mcp.NewClient(&mcp.Implementation{Name: "publication-test", Version: "1"}, nil)
+	session, err := client.Connect(t.Context(), &mcp.StreamableClientTransport{Endpoint: server.URL + "/mcp", HTTPClient: server.Client(), DisableStandaloneSSE: true}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	result, err := session.CallTool(t.Context(), &mcp.CallToolParams{Name: "get_source_coverage", Arguments: map[string]any{"dataset_version": first.Meta.DatasetVersion}})
+	if err != nil || !result.IsError || !strings.Contains(fmt.Sprint(result.StructuredContent), "cursor_expired") {
+		t.Fatal("revoked MCP view served", result, err)
+	}
+	scope = "strict"
+	assertPublicError(t, server.Client(), server.URL+"/v1/sources/coverage?dataset_version="+first.Meta.DatasetVersion, http.StatusGone, "cursor_expired")
+}

@@ -33,6 +33,13 @@ Selezionare i PDF dentro `page-content`, escludendo footer e navigazione. Gli al
 
 Controllare separatamente raccolta, originali, trigger, coda e provider. Versioni identiche dello stesso documento vengono riusate dal salvataggio; originali diversi rimangono conservati. La policy interpretativa `cascina-html-v1` normalizza soltanto i valori alfanumerici di 40 caratteri nelle forme esatte di meta CSRF e input nascosto verificate; date, testo operativo, collegamenti e allegati restano significativi. Preflight e riuso dei risultati richiedono opt-in della fonte, prove complete, compatibilità e un risultato validato; le copie equivalenti aspettano la loro versione di riferimento senza duplicare l'analisi. Gli input incompleti restano distinti. Vedere CAS-005 e il [piano di efficienza](../../../../openspec/changes/reduce-regolo-token-waste/design.md). Le impostazioni e i blocchi del provider per ambiente rimangono privati.
 
+La selezione interpretativa del testo richiede un perimetro più ampio del
+contenitore usato per scoprire gli allegati. Il replay del 2026-10-02 usa
+`main#main-content`, conservando titolo, corpo e metadati controllati, oltre agli
+allegati già raccolti. CAS-006 documenta il campione di Cascina e il trial
+limitato; non estende la stessa policy ad altri comuni o a tutti i PDF del tenant.
+Vedere [elaborazione locale](../../../operations/local-processing.md).
+
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
@@ -42,6 +49,7 @@ Controllare separatamente raccolta, originali, trigger, coda e provider. Version
 | CAS-003 | Data della scheda COC nell'elenco tematico | Diagnosi del layout precedente con giorno a due cifre | Superata dalla verifica di CAS-004; date sconosciute ancora ammesse |
 | CAS-004 | Elenchi e PDF pertinenti di Cascina | Layout con giorno a una o due cifre, contenitore e permesso API del tenant esaminato | Implementato e verificato; dettagli di sviluppo privati |
 | CAS-005 | Riuso interpretativo HTML di Cascina | Normalizzare soltanto le due forme CSRF esaminate | Implementato; test di equivalenza e riuso senza chiamate |
+| CAS-006 | Testo delle notizie conservate di Cascina | `main#main-content` conserva titolo/corpo e rimuove navigazione/footer; PDF locali revisionati individualmente | Replay e trial limitato verificati; policy continuativa separata |
 
 Il permesso per gli allegati esaminati appartiene alla revisione della sola fonte Cascina; questa scheda non abilita fonti, pubblicazione o eccezioni anti-bot.
 
@@ -109,3 +117,14 @@ CAS-005 non risolve blocchi o entitlement del provider: un documento nuovo e non
 - **Conseguenza:** evita nuovi job per copie complete equivalenti mentre attendono il rappresentante; dopo un risultato compatibile validato ne riusa l'interpretazione. Un input nuovo, incompleto o diverso resta lavoro indipendente. Non sblocca il provider.
 - **Prossima verifica:** monitorare forme dei tag e risultati di riuso; qualsiasi nuova forma di normalizzazione richiede evidenza e una nuova policy.
 - **Collegamenti:** CAS-004 e [verifica operativa](../../../operations/municipal-attachments.md).
+
+
+### CAS-006 — Contenuto interpretativo e trial locale limitato
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, originali conservati, parser applicativo, modello locale e risultati persistiti in development.
+- **Ambito:** 19 versioni di notizie Cascina nel replay; due confronti municipalità baseline/candidato nel trial. I PDF rimangono risorse separate.
+- **Conoscenza:** confermato sul campione. **Intervento:** verifica applicata nel reader del trial; nessuna policy continuativa della fonte attivata.
+- **Osservazione:** `main#main-content` conserva titolo, testo completo di `article-content`, metadati controllati e testo degli allegati disponibili, riducendo del 59,4% i byte HTML normalizzati del campione. I due confronti con lo stesso modello concordano sulla pertinenza. Una classe scelta soltanto per gli allegati non basta a dimostrare copertura del titolo e dei metadati.
+- **Evidenza:** [selettore e fallback](../../../../internal/backend/classification/html_body.go), [operazioni e risultati del trial](../../../operations/local-processing.md); originali, selezioni, token e ricevute restano nel registro privato.
+- **Conseguenza:** la riduzione del testo non autorizza nuovi download o una directory PDF di solo testo. PDF con immagini mantengono il fallback; significato dei grafici vettoriali e qualità dell’estrazione delle misure richiedono verifica separata.
+- **Prossima verifica:** ampliare casi pertinenti e non pertinenti, variazioni del layout e interpretazione downstream prima di una policy continuativa.

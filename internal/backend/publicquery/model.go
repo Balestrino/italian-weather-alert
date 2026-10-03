@@ -22,9 +22,10 @@ type QueryTime struct {
 }
 
 type History struct {
-	Start       *time.Time
-	Gaps        []string
-	Limitations []string
+	PublicationScope string `json:"publication_scope,omitempty"`
+	Start            *time.Time
+	Gaps             []string
+	Limitations      []string
 }
 
 type Temporal struct {
@@ -68,12 +69,13 @@ type Quality struct {
 }
 
 type Municipality struct {
-	ISTAT              string   `json:"istat"`
-	Name               string   `json:"name"`
-	Zones              []string `json:"zones"`
-	MappingVersion     *string  `json:"mapping_version"`
-	MappingLimitations []string `json:"mapping_limitations"`
-	LocalCoverage      string   `json:"local_coverage"`
+	DevelopmentPublication bool     `json:"development_publication"`
+	ISTAT                  string   `json:"istat"`
+	Name                   string   `json:"name"`
+	Zones                  []string `json:"zones"`
+	MappingVersion         *string  `json:"mapping_version"`
+	MappingLimitations     []string `json:"mapping_limitations"`
+	LocalCoverage          string   `json:"local_coverage"`
 }
 
 type DiscoveryQuery struct {
@@ -153,14 +155,15 @@ type OperationalPhase struct {
 }
 
 type Coverage struct {
-	SourceID            string   `json:"source_id"`
-	Product             string   `json:"product"`
-	Territory           string   `json:"territory"`
-	DeclaredSections    []string `json:"declared_sections"`
-	PublicState         string   `json:"public_state"`
-	CoverageStatus      string   `json:"coverage_status"`
-	CoverageLimitations []string `json:"coverage_limitations"`
-	Quality             Quality  `json:"quality"`
+	DevelopmentPublication bool     `json:"development_publication"`
+	SourceID               string   `json:"source_id"`
+	Product                string   `json:"product"`
+	Territory              string   `json:"territory"`
+	DeclaredSections       []string `json:"declared_sections"`
+	PublicState            string   `json:"public_state"`
+	CoverageStatus         string   `json:"coverage_status"`
+	CoverageLimitations    []string `json:"coverage_limitations"`
+	Quality                Quality  `json:"quality"`
 }
 
 type SituationQuery struct {

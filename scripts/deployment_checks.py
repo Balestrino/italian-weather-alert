@@ -20,6 +20,9 @@ from environment_config import (APPLICATIONS, CORE, ROOT, PROJECTS, DIGEST,
 def validate_config(environment: Environment, config: dict) -> None:
     if config['name'] != environment.project:
         raise EnvironmentError('Resolved Compose project differs from the selected environment.')
+    for name in APPLICATIONS:
+        if config['services'][name].get('environment', {}).get('IWA_ENVIRONMENT') != environment.name:
+            raise EnvironmentError(f'{name} runtime environment must match the selected Compose environment.')
     for name in ('public', 'admin'):
         listener_origin(config, name)
     for name, service in config['services'].items():

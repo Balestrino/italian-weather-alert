@@ -4,6 +4,8 @@ This is the public procedure for preparing and checking an IWA release. The prod
 
 ## Versioned software releases
 
+The current minor release is [v0.2.0](../releases/v0.2.0.md), with disabled-by-default global/source embedding controls, reviewed local processing, clearer operations history and explicitly scoped development publication. Its upgrade notes require replacing every processing replica to enforce the embedding policy.
+
 The first software release is [v0.1.0](../releases/v0.1.0.md), an internal-pilot baseline. The [v0.1.2 patch](../releases/v0.1.2.md) adds reviewed municipal attachment handling, Cascina interpretation reuse and backoffice improvements, including the background and territorial controls described in the earlier [v0.1.1 preparation notes](../releases/v0.1.1.md). A Git tag and GitHub release identify published source code. Image publication and production activation follow the separate checks below.
 
 Prepare software releases on `dev`: move the dated entries being released from `CHANGELOG.md` into a version/date section, keep exactly one `## Unreleased` section for future changes, and add a new dated entry describing the release preparation. Keep the release notes concise, covering the available features, installation references and known limits. Preserve historical entries and keep private deployment evidence out of the notes.

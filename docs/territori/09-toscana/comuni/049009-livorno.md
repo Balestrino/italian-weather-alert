@@ -29,12 +29,20 @@ Il [collector](../../../../internal/backend/acquisition/preview.go) supporta ora
 
 Il ricontrollo del 2026-10-02 ha rivalutato LIV-001 e LIV-002 mediante pagina ufficiale, codice e un nuovo giro programmato. In quella fase nessuna correzione era stata introdotta; LIV-006 registra la successiva implementazione e verifica. Nell'acquisizione programmata l'errore ferma il giro prima dei documenti successivi: distinguere target scoperti e originali conservati; esiti per ambiente nel registro privato. Vedere LIV-003.
 
+La selezione interpretativa del testo richiede un perimetro più ampio del
+contenitore usato per scoprire gli allegati. Il replay del 2026-10-02 usa
+`main#main-content`, conservando titolo, corpo e metadati controllati, oltre agli
+allegati già raccolti. LIV-007 documenta il campione di Livorno e il trial
+limitato; non estende la stessa policy ad altri comuni o a tutti i PDF del tenant.
+Vedere [elaborazione locale](../../../operations/local-processing.md).
+
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
 | --- | --- | --- | --- |
 | LIV-001 | PDF della pagina esaminata | Allegati esterni ammessi solo nel perimetro HTTPS/percorso revisionato; altri riferimenti restano `forbidden` | Correzione implementata e verificata sul perimetro; LIV-006 |
 | LIV-002 | Discovery degli allegati | Selezione entro `article-content`, con esclusione di footer, navigazione e intestazioni | Correzione implementata e verificata sul perimetro; LIV-006 |
+| LIV-007 | Testo delle notizie conservate di Livorno | `main#main-content` conserva titolo/corpo e rimuove navigazione/footer; PDF locali revisionati individualmente | Replay e trial limitato verificati; policy continuativa separata |
 
 L'eventuale ammissione di risorse Municipium deve essere esplicita e limitata alla fonte e ai percorsi verificati. La nota di piattaforma non costituisce una autorizzazione generale.
 
@@ -115,3 +123,14 @@ Le voci LIV-001–LIV-005 descrivono gli stati osservati nelle rispettive fasi d
 - **Conseguenza:** chiude i criteri di correzione di LIV-001 e LIV-002 sul perimetro verificato; gli altri comuni e i domini generici non ereditano la regola. Un download riuscito non garantisce l'accessibilità futura o la copertura di altri canali.
 - **Prossima verifica:** osservare la continuità del recupero; rivalutare nuovi host, percorsi, eccezioni dei documenti o cambiamenti dell'HTML. Paginazione completa, altri portali, trial e accettazione restano da verificare.
 - **Collegamenti:** LIV-001–LIV-005; [specifica](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md) e task 17; issue non disponibile.
+
+
+### LIV-007 — Contenuto interpretativo e trial locale limitato
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, originali conservati, parser applicativo, modello locale e risultati persistiti in development.
+- **Ambito:** 16 versioni di notizie Livorno nel replay; due confronti municipalità baseline/candidato nel trial. I PDF rimangono risorse separate.
+- **Conoscenza:** confermato sul campione. **Intervento:** verifica applicata nel reader del trial; nessuna policy continuativa della fonte attivata.
+- **Osservazione:** `main#main-content` conserva titolo, testo completo di `article-content`, metadati controllati e testo degli allegati disponibili, riducendo del 45,3% i byte HTML normalizzati del campione. I due confronti con lo stesso modello concordano sulla pertinenza. Una classe scelta soltanto per gli allegati non basta a dimostrare copertura del titolo e dei metadati.
+- **Evidenza:** [selettore e fallback](../../../../internal/backend/classification/html_body.go), [operazioni e risultati del trial](../../../operations/local-processing.md); originali, selezioni, token e ricevute restano nel registro privato.
+- **Conseguenza:** la riduzione del testo non autorizza nuovi download o una directory PDF di solo testo. PDF con immagini mantengono il fallback; significato dei grafici vettoriali e qualità dell’estrazione delle misure richiedono verifica separata.
+- **Prossima verifica:** ampliare casi pertinenti e non pertinenti, variazioni del layout e interpretazione downstream prima di una policy continuativa.

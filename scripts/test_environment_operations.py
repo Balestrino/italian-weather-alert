@@ -16,8 +16,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from environment_config import (APPLICATIONS, CORE, Environment, EnvironmentError,
-                                inspect_boundaries, verify_staging_release)
-from deployment_checks import check_runtime, templates, validate_background_selection
+                                inspect_boundaries, listener_origin, verify_staging_release)
+from deployment_checks import check_runtime, templates, validate_background_selection, validate_config
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('smoke_compose', ROOT / 'scripts/smoke-compose.py')
@@ -171,6 +171,10 @@ elif 'ps' in args:
             self.assertEqual(result.returncode, 0, result.stderr)
             config = json.loads(result.stdout)
             self.assertEqual(config['name'], project)
+            self.assertEqual(config['services']['public']['ports'][0]['host_ip'],
+                             '0.0.0.0' if name == 'development' else '127.0.0.1')
+            self.assertEqual(len(config['services']['public']['ports']), 1)
+            self.assertEqual(config['services']['admin']['ports'][0]['host_ip'], '127.0.0.1')
             self.assertEqual(config['volumes']['postgres_data']['name'], project + '_postgres_data')
             self.assertTrue(config['secrets']['postgres_password']['file'].startswith(str(self.root / f'.local/{name}/secrets')))
             if name != 'development':
@@ -216,6 +220,29 @@ class RuntimeTests(unittest.TestCase):
                 service['ports'] = [{'host_ip': '127.0.0.1', 'published': port}]
                 bindings = {'8080/tcp': [{'HostIp': '127.0.0.1', 'HostPort': port}]}
             self.containers.append({'Config': {'Labels': {'com.docker.compose.project': 'iwa-staging', 'com.docker.compose.service': role}}, 'State': {'Running': True}, 'Image': 'sha256:candidate', 'HostConfig': {'PortBindings': bindings, 'RestartPolicy': {'Name': 'unless-stopped'}}, 'NetworkSettings': {'Ports': bindings}, 'Mounts': []})
+
+    def test_development_public_binding_and_runtime_match(self):
+        self.environment.name, self.environment.project = 'development', 'iwa'
+        for role in CORE:
+            self.config['services'][role]['environment'] = {'IWA_ENVIRONMENT': 'development'}
+        for container in self.containers:
+            container['Config']['Labels']['com.docker.compose.project'] = 'iwa'
+        self.config['services']['public']['ports'][0]['host_ip'] = '0.0.0.0'
+        self.containers[0]['NetworkSettings']['Ports']['8080/tcp'][0]['HostIp'] = '0.0.0.0'
+        self.assertEqual(listener_origin(self.config, 'public'), 'http://127.0.0.1:28080')
+        self.assertEqual(inspect_boundaries(self.environment, self.config, self.containers), set(CORE))
+        self.containers[0]['NetworkSettings']['Ports']['8080/tcp'][0]['HostIp'] = '127.0.0.1'
+        with self.assertRaises(EnvironmentError):
+            inspect_boundaries(self.environment, self.config, self.containers)
+
+    def test_wildcard_binding_rejected_for_admin_and_release_environments(self):
+        for environment, role in [('development', 'admin'), ('staging', 'public'), ('production', 'public')]:
+            with self.subTest(environment=environment, role=role):
+                config = copy.deepcopy(self.config)
+                config['services'][role]['environment'] = {'IWA_ENVIRONMENT': environment}
+                config['services'][role]['ports'][0]['host_ip'] = '0.0.0.0'
+                with self.assertRaises(EnvironmentError):
+                    listener_origin(config, role)
 
     def test_runtime_wrong_project_or_actual_port_fails(self):
         for change in ('project', 'port', 'mount'):
@@ -298,6 +325,14 @@ class BackgroundSelectionTests(unittest.TestCase):
             environment = Environment(name, example=True)
             config = environment.config(all_services=True)
             validate_background_selection(environment, config)
+            validate_config(environment, config)
+            for role in APPLICATIONS:
+                self.assertEqual(config['services'][role]['environment']['IWA_ENVIRONMENT'], name)
+                broken = copy.deepcopy(config)
+                broken['services'][role]['environment']['IWA_ENVIRONMENT'] = 'development' if name != 'development' else 'production'
+                with self.assertRaisesRegex(EnvironmentError, 'runtime environment'):
+                    validate_config(environment, broken)
+
             for service in ('worker', 'backup'):
                 options = ('--profile', 'production') if name == 'production' else ()
                 selected = json.loads(environment.capture(*options, 'config', '--format', 'json', service))['services']

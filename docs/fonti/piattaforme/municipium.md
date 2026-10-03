@@ -14,6 +14,11 @@ Il [collector](../../../internal/backend/acquisition/preview.go) mantiene per le
 
 Per ogni comune verificare separatamente riferimento ufficiale, emittente/pubblicatore, domini, percorsi, allegati pertinenti, accesso e riuso. La presenza del nome Municipium non autorizza tutti i suoi host o tutti i loro contenuti. Eventuali eccezioni del collector devono avere un perimetro esplicito e testare il rifiuto delle risorse fuori da quel perimetro.
 
+Il replay interpretativo di Cascina e Livorno del 2026-10-02 ha usato
+`main#main-content` per conservare titolo, corpo e metadati controllati. La classe
+scelta per scoprire allegati non dimostra da sola copertura di tutta la notizia.
+MUN-005 precisa il campione e la distinzione fra trial e policy continuativa.
+
 ## Problemi e interventi proposti
 
 La scansione generica può includere PDF di navigazione che non documentano la notizia; il vincolo sul dominio può escludere un vero allegato ufficialmente collegato. Vedere `LIV-001` e `LIV-002` per il caso concreto, i criteri di chiusura e la distinzione fra comportamento presente e correzione proposta. La correzione del collector è successiva alle guide iniziali: LIV-006 e MUN-003 documentano il comportamento opt-in implementato.
@@ -68,3 +73,14 @@ MUN-001 e MUN-002 registrano il comportamento osservato prima della correzione o
 - **Evidenza:** [CAS-004, referral e condizioni](../../territori/09-toscana/comuni/050008-cascina.md), [policy](../../../internal/backend/registry/attachments.go), [fixture](../../../internal/backend/acquisition/scoped_attachments_test.go), [verifica operativa](../../operations/municipal-attachments.md).
 - **Conseguenza:** supera per il perimetro revisionato l'intervento proposto in MUN-002; non trasferisce il permesso di Livorno, né autorizza tutti gli host Municipium. Non verifica formati diversi dai PDF o tutti i documenti del tenant.
 - **Prossima verifica:** osservare struttura, download, condizioni ed eccezioni documentali; verificare indipendentemente ogni ulteriore comune o directory.
+
+
+### MUN-005 — Il perimetro interpretativo comprende titolo e metadati
+
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, originali conservati di Cascina/Livorno e trial limitato in development.
+- **Ambito:** solo i due comuni esaminati; selettore `main#main-content`, distinto dalle classi per la discovery PDF.
+- **Conoscenza:** confermato nel campione. **Intervento:** replay e confronti con modello applicati; nessuna policy comune attivata.
+- **Osservazione:** il contenitore principale conserva titolo, corpo di `article-content` e metadati controllati, riducendo il testo di navigazione/footer. I quattro confronti municipalità baseline/candidato concordano sulla pertinenza; allegati e originali rimangono separati e completi quando disponibili.
+- **Evidenza:** [CAS-006](../../territori/09-toscana/comuni/050008-cascina.md), [LIV-007](../../territori/09-toscana/comuni/049009-livorno.md), [trial e limiti](../../operations/local-processing.md). Evidenza dettagliata privata.
+- **Conseguenza:** verificare contenitore e layout per ogni comune. PDF tecnicamente estraibili non stabiliscono un permesso di attivare un’intera directory di documenti come solo testo.
+- **Prossima verifica:** casi significativi, cambiamenti del layout e qualità downstream prima del rollout della singola fonte.

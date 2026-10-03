@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/territory"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -31,13 +32,21 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 	c.Name = args[0]
 	var count int
 	switch c.Name {
+	case "source-embedding-status":
+		count = 2
+	case "source-embedding-enable", "source-embedding-disable":
+		count = 4
+	case "embedding-status":
+		count = 1
+	case "embedding-enable", "embedding-disable":
+		count = 3
 	case "source-status", "region-status":
 		count = 2
-	case "municipality-status":
+	case "municipality-status", "municipality-development-publication-status":
 		count = 3
 	case "source-enable-collection", "source-suspend-collection", "region-enable", "region-disable":
 		count = 4
-	case "municipality-enable", "municipality-disable":
+	case "municipality-enable", "municipality-disable", "municipality-development-publication-enable", "municipality-development-publication-disable":
 		count = 5
 	default:
 		return c, false, nil
@@ -51,6 +60,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		}
 	}
 	switch {
+	case strings.HasPrefix(c.Name, "embedding-"):
 	case strings.HasPrefix(c.Name, "source-"):
 		c.Source = args[1]
 	case strings.HasPrefix(c.Name, "region-"):
@@ -66,7 +76,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 	}
 	if !strings.HasSuffix(c.Name, "-status") {
 		rev, err := strconv.Atoi(args[len(args)-2])
-		if err != nil || rev < 0 || (c.Source != "" && rev == 0) {
+		if err != nil || rev < 0 || (c.Source != "" && rev == 0 && !strings.HasPrefix(c.Name, "source-embedding-")) {
 			return c, true, errControlArguments
 		}
 		c.Revision, c.Actor = rev, args[len(args)-1]
@@ -88,6 +98,9 @@ func controlDigits(s string, n int) bool {
 
 // No worker, crawler, provider or container client is constructed by controls.
 func executeControl(ctx context.Context, pool *pgxpool.Pool, role string, c controlCommand, out io.Writer) error {
+	return executeControlEnvironment(ctx, pool, role, "production", c, out)
+}
+func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, environment string, c controlCommand, out io.Writer) error {
 	if role != "admin" {
 		return errControlRole
 	}
@@ -97,6 +110,30 @@ func executeControl(ctx context.Context, pool *pgxpool.Pool, role string, c cont
 	var result any
 	var err error
 	switch c.Name {
+	case "source-embedding-enable", "source-embedding-disable", "source-embedding-status":
+		queue := jobs.New(pool)
+		if c.Name != "source-embedding-status" {
+			_, err = queue.SetSourceEmbeddingEnabled(ctx, c.Source, c.Revision, c.Name == "source-embedding-enable", c.Actor, time.Now())
+		}
+		if err == nil {
+			result, err = queue.SourceEmbeddingState(ctx, c.Source)
+		}
+	case "embedding-enable", "embedding-disable", "embedding-status":
+		queue := jobs.New(pool)
+		if c.Name != "embedding-status" {
+			_, err = queue.SetEmbeddingEnabled(ctx, c.Revision, c.Name == "embedding-enable", c.Actor, time.Now())
+		}
+		if err == nil {
+			result, err = queue.EmbeddingState(ctx)
+		}
+	case "municipality-development-publication-enable", "municipality-development-publication-disable", "municipality-development-publication-status":
+		publication := domain.NewDevelopmentPublication(pool, environment)
+		if !strings.HasSuffix(c.Name, "-status") {
+			_, err = publication.Set(ctx, c.Region, c.ISTAT, c.Revision, strings.HasSuffix(c.Name, "-enable"), c.Actor)
+		}
+		if err == nil {
+			result, err = publication.State(ctx, c.Region, c.ISTAT)
+		}
 	case "source-enable-collection", "source-suspend-collection", "source-status":
 		if c.Name == "source-enable-collection" {
 			err = reg.EnableCollection(ctx, c.Source, c.Revision, c.Actor)
@@ -136,13 +173,15 @@ func executeControl(ctx context.Context, pool *pgxpool.Pool, role string, c cont
 
 func controlErrorCode(err error) string {
 	switch {
-	case errors.Is(err, errControlArguments), errors.Is(err, registry.ErrInvalid), errors.Is(err, domain.ErrInvalid):
+	case errors.Is(err, domain.ErrDevelopmentOnly):
+		return "development_environment_required"
+	case errors.Is(err, errControlArguments), errors.Is(err, registry.ErrInvalid), errors.Is(err, domain.ErrInvalid), errors.Is(err, jobs.ErrInvalid):
 		return "invalid_arguments"
 	case errors.Is(err, errControlRole):
 		return "admin_role_required"
 	case errors.Is(err, registry.ErrNotFound), errors.Is(err, domain.ErrTerritoryNotFound):
 		return "not_found"
-	case errors.Is(err, registry.ErrConflict), errors.Is(err, domain.ErrConflict):
+	case errors.Is(err, registry.ErrConflict), errors.Is(err, domain.ErrConflict), errors.Is(err, jobs.ErrConflict):
 		return "revision_conflict"
 	case errors.Is(err, registry.ErrPrerequisite):
 		return "preview_or_policy_required"

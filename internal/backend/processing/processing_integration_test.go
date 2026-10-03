@@ -23,7 +23,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func processingTestDB(t *testing.T) *pgxpool.Pool {
+func processingTestDB(t *testing.T, maxConns ...int32) *pgxpool.Pool {
 	t.Helper()
 	random := make([]byte, 16)
 	if _, err := rand.Read(random); err != nil {
@@ -68,6 +68,9 @@ func processingTestDB(t *testing.T) *pgxpool.Pool {
 	configuration.ConnConfig.Host = host
 	configuration.ConnConfig.Port = uint16(portNumber)
 	configuration.ConnConfig.Password = password
+	if len(maxConns) > 0 {
+		configuration.MaxConns = maxConns[0]
+	}
 	pool, err := pgxpool.NewWithConfig(context.Background(), configuration)
 	if err != nil {
 		t.Fatal(err)

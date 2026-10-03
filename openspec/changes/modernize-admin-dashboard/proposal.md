@@ -8,6 +8,7 @@ The MVP administration currently exposes plain HTML, generic database tables and
 
 - Introduce a shared dark terminal-inspired layout, compact navigation, semantic status labels and responsive tables across administrative HTML pages.
 - Replace the link-only landing page with an operational overview of source issues, failed jobs, documents awaiting interpretation and incidents, with honest scope and freshness information.
+- Extend the operations overview with full queue state totals, per-kind/coda drilldowns, recorded failure/deferral causes, separately observed provider gates, a mutually exclusive breakdown of incomplete documents and accessible bars of persisted attempt outcomes over 24 hourly buckets, 7 days or 30 days.
 - Present section-specific columns, contextual actions, expandable evidence and URL-preserved filters; use Jobs as the first complete implementation slice.
 - Provide guided forms for job relaunch and routine source controls, retaining concurrency checks, explicit operator attribution and JSON client compatibility.
 - Add optional in-page search and discoverable keyboard navigation; core navigation, filtering and submissions remain functional without JavaScript.

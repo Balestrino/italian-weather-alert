@@ -38,3 +38,11 @@ These checkboxes reflect the private project task list on 30 September 2026. A c
 
 - [x] 7.1 Add a private read-only today/tomorrow page with separate official regional and municipal sections, Europe/Rome dates, latest retained bulletin provenance, explicit unavailable/unconsolidated/undated states and no inference side effects. Verify date boundaries, escaping, private access, database reads and responsive browser rendering.
 - [x] 7.2 Deploy the verified page to the existing admin URL and record health, unchanged recovery limits/provider usage and navigation checks.
+
+## 8. Complete operations overview (operator request, October 2)
+
+- [x] 8.1 Add snapshot-consistent job state totals and queue/kind summaries, recorded reason counts and matching state/kind/queue/error/archive drilldowns; verify full counts, archive separation and pagination with isolated PostgreSQL.
+- [x] 8.2 Explain incomplete document totals using exclusive per-source categories with the existing list exclusions; verify multiple OCR jobs count once, suspended sources, missing triggers and incomplete results.
+- [x] 8.3 Add UTC historical attempt bars for 24 hourly buckets, 7 days and 30 days, including zero buckets, retries and archived work, with exact accessible values and truthful partial/cutoff semantics; verify SQL boundaries and server rendering.
+- [x] 8.4 Verify private access, input validation, safe rendering, independent unavailable sections, responsive/no-JavaScript browser behavior and ordinary/race/vet checks; document scope and validation.
+- [x] 8.5 Update only the existing development admin service and verify overview, periods, drilldowns and readiness; preserve rollback identity and private evidence separately.

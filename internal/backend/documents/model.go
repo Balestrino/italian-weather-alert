@@ -47,16 +47,17 @@ type Acquisition struct {
 }
 
 type Reference struct {
-	Inference     *registry.EligibilityDecision `json:"inference,omitempty"`
-	URL           string                        `json:"url"`
-	Role          string                        `json:"role"`
-	Required      bool                          `json:"required"`
-	SourceID      string                        `json:"source_id"`
-	Configuration int                           `json:"configuration"`
-	MediaType     string                        `json:"media_type"`
-	Hash          string                        `json:"sha256,omitempty"`
-	Size          int64                         `json:"size"`
-	Missing       string                        `json:"missing,omitempty"`
+	LocalProcessing *registry.LocalProcessing     `json:"local_processing,omitempty"`
+	Inference       *registry.EligibilityDecision `json:"inference,omitempty"`
+	URL             string                        `json:"url"`
+	Role            string                        `json:"role"`
+	Required        bool                          `json:"required"`
+	SourceID        string                        `json:"source_id"`
+	Configuration   int                           `json:"configuration"`
+	MediaType       string                        `json:"media_type"`
+	Hash            string                        `json:"sha256,omitempty"`
+	Size            int64                         `json:"size"`
+	Missing         string                        `json:"missing,omitempty"`
 }
 
 type Version struct {
@@ -71,6 +72,22 @@ type Version struct {
 }
 
 const MaxAcquisitionBytes = 32 << 20
+
+// LocalProcessingIdentity partitions interpretation by the reviewed policies on
+// every resource, including attachments governed by a separate configuration.
+func (v Version) LocalProcessingIdentity() string {
+	policies := map[string]string{}
+	for _, ref := range v.Resources {
+		if identity := ref.LocalProcessing.Identity(); identity != "" {
+			policies[ref.URL] = identity
+		}
+	}
+	if len(policies) == 0 {
+		return ""
+	}
+	body, _ := json.Marshal(policies)
+	return digest(body)
+}
 
 // Drupal Views generates a new opaque DOM marker on every response. It can
 // appear in comments and CSS classes; neither changes publication content.

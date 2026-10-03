@@ -5,6 +5,7 @@ import (
 	"embed"
 	"html/template"
 	"net/http"
+	"time"
 )
 
 //go:embed ui/*
@@ -27,7 +28,12 @@ func uiTemplates(name string, funcs template.FuncMap) *template.Template {
 	return template.Must(template.New(name).Funcs(funcs).ParseFS(adminUI, "ui/shell.html"))
 }
 
-var landingTemplates = template.Must(uiTemplates("landing", nil).ParseFS(adminUI, "ui/home.html"))
+var landingTemplates = template.Must(uiTemplates("landing", template.FuncMap{"jobURL": jobOverviewURL, "jobKind": jobKindLabel, "reason": jobReasonLabel, "status": statusLabel, "value": func(t *time.Time) string {
+	if t == nil {
+		return "Non disponibile"
+	}
+	return t.UTC().Format("02/01/2006 15:04:05 UTC")
+}}).ParseFS(adminUI, "ui/home.html"))
 
 func renderUI(w http.ResponseWriter, t *template.Template, name string, data any) {
 	var body bytes.Buffer

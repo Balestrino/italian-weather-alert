@@ -81,13 +81,19 @@ WHERE queue=$1 AND state='running' AND lease_expires_at <= $2 AND attempt_count 
 	}
 	var c Claim
 	var previousState string
+	// Serialize embedding admission with operator changes. Disabling leaves
+	// pending work and retry budgets intact; an already admitted call may finish.
+	var embeddingEnabled bool
+	if err = tx.QueryRow(ctx, `SELECT enabled FROM processing_embedding_control WHERE singleton FOR SHARE`).Scan(&embeddingEnabled); err != nil {
+		return Claim{}, err
+	}
 	err = tx.QueryRow(ctx, `SELECT id,queue,kind,idempotency_key,payload,state,max_attempts,attempt_count,available_at
  FROM processing_jobs
- WHERE queue=$1 `+gate+` AND archived_at IS NULL AND attempt_count < max_attempts AND (
+ WHERE queue=$1 `+gate+` AND (kind<>'embed_measure' OR ($3::boolean AND processing_embedding_source_allowed(payload))) AND archived_at IS NULL AND attempt_count < max_attempts AND (
    (state IN ('queued','retry_wait') AND available_at <= $2)
    OR (state='running' AND lease_expires_at <= $2)
  )
-	 ORDER BY available_at,id FOR UPDATE SKIP LOCKED LIMIT 1`, queue, now.UTC()).Scan(&c.ID, &c.Queue, &c.Kind, &c.IdempotencyKey, &c.Payload, &previousState, &c.MaxAttempts, &c.Attempt, &c.AvailableAt)
+	 ORDER BY available_at,id FOR UPDATE SKIP LOCKED LIMIT 1`, queue, now.UTC(), embeddingEnabled).Scan(&c.ID, &c.Queue, &c.Kind, &c.IdempotencyKey, &c.Payload, &previousState, &c.MaxAttempts, &c.Attempt, &c.AvailableAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		if err = tx.Commit(ctx); err != nil {
 			return Claim{}, err

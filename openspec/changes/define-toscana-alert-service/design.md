@@ -228,6 +228,45 @@ The evaluated local policy uses greedy decoding (temperature 0, seed 42) with th
 
 Local classification tolerates typographic double-quote presentation through a separately versioned contiguous matcher that returns the original source substring and preserves Unicode byte offsets. Remote and legacy parsing remain unchanged; invented words and disjoint quotations remain rejected. Local extraction records a concise prompt with explicit civil-protection opening rules, validated on long notices as well as isolated operative sentences. Catalog names/revisions isolate concurrent remote and local configurations, including distinct text/image model capabilities; immutable earlier local versions remain auditable.
 
+### Development fallback concurrency trial — 2 October 2026
+
+Use two replicas of the existing worker to exercise a local server's two slots.
+Each replica runs one inference job at a time; PostgreSQL claims coordinate jobs
+and scheduled source checks, while notification delivery uses durable locks.
+Verify the resolved image/settings against the current worker, retain a database
+archive and add the replica with `--no-recreate --no-deps --no-build --pull never`.
+This uses the existing runtime rather than introducing another inference policy.
+The count also applies to primary-provider work after recovery and scales the
+other worker loops. It does not cap unrelated server clients. Observe overlapping
+receipts, validated results and worker stability; slot occupancy alone does not
+establish a throughput improvement. Keep operational evidence private, leave the
+repository default at one replica and document explicit scale-down recovery.
+
+The subsequent operator request expands development to four replicas using the
+same image/settings without recreating the first two. Check current server slots
+again: worker count and simultaneous server executions are independent. When the
+server exposes fewer slots, requests may queue there. Record this capacity limit
+and the explicit return to two workers alongside runtime verification.
+
+Four-worker observation reproduced deadlocks in the pre-claim bulk queue updates,
+exhausting worker recovery and causing process restarts. Wrap the complete
+recovery/equivalence/provider-hold maintenance callback in a PostgreSQL
+transaction advisory lock (`730072`). The transaction reserves one pool
+connection; callback queries use the remaining pool connections. Hold the lock
+only for queue maintenance and release it before claims or provider calls.
+Commit on success; bounded independent-context rollback releases ownership after
+errors or cancellation. Integration checks exercise four competing callbacks,
+parallel work after maintenance and lock release after failure/cancelled waiting.
+Deploy the corrected image to all four replicas so they share the lock protocol;
+an older worker does not coordinate on this lock.
+
+The next operator request expands the corrected development worker to six
+replicas. Add the two replicas without recreating the existing four or changing
+their image/settings. Verify current server capacity, running queue loops and
+restart/deadlock observations; preserve private rollback evidence and document
+`--scale worker=4` as the return to the previous count. The existing lock protocol
+and source/provider controls apply to all six replicas.
+
 ## Territorial source knowledge guides
 
 Maintain a human-readable knowledge base under `docs/territori/`, with region directories keyed by two-digit codes and municipality files keyed by six-digit ISTAT identity. Create files when research begins. Each guide puts current source maps, operational rules and open problems before its dated discovery register. A shared template records stable finding IDs, scope, evidence dates, knowledge status and intervention status independently. Subsequent entries reference superseded findings without deleting them.
@@ -243,3 +282,86 @@ An optional `attachments` contract belongs to the immutable source revision. `co
 Preview and scheduled collection share document/attachment retention. `DirectHTTP.CrawlBounded` validates the initial URL and each redirect before sending the request, retains the existing prohibition on leaving the file's initial origin, and constrains paths using the source contract. Opt-in `validate_pdf` checks response type, PDF framing and the Poppler parser already shipped in the application image. HTML error pages and truncated/unreadable PDFs become visible missing references; persistence remains content-addressed and verified by the document store. Scanned PDFs do not require extractable text for acquisition. Missing-resource reasons and publication metadata participate in acquisition identities to keep diagnostic changes replayable and prevent collisions between previews and later dated collection. Invalid PDFs use the existing unavailable-reference vocabulary and the distinct scheduled error `invalid_attachment_pdf`, avoiding a storage-schema change.
 
 Use a reviewed candidate revision and successful preview before changing active collection. Preserve original evidence and prior revision/image for rollback, then verify a fresh normal worker check and stored attachment bytes. Existing backoff, source retry instructions, provider controls and public-enablement gates remain separate. A development recovery does not establish acceptance or future remote availability.
+
+
+## Local processing before model inference — 2 October 2026
+
+A versioned optional `local_processing` source policy requires dated review
+evidence. It declares simple article-body selectors, text-only PDF directory
+scopes, and/or one recognized regional product format. No existing source is
+opted in by this implementation. This is an interpretation policy, not permission
+to discover or acquire resources. It follows the active reviewed source revision,
+like resource eligibility. Policy fingerprints partition run, preflight and result
+reuse identities, and separate immutable local-first processing configurations
+preserve the original model configurations as fallbacks. Policy changes do not
+replay historical work automatically.
+
+Article selectors are a bounded subset (tag, #id, .class, tag.class, tag#id).
+All configured selectors must match exactly one nonempty container; distinct
+containers are combined in document order without duplicating nested content.
+Missing, ambiguous or empty containers fall back to full-page text. Attachments
+and original bytes remain intact. A configured selector asserts the reviewed
+full article scope; fixture checks cannot certify an actual website's coverage.
+
+PDF native text is used only in explicitly reviewed text-only path scopes. Local
+Poppler commands read private temporary files under bounded contexts and output
+limits. Require readable text for every numbered page and reject any raster
+images, encrypted content, malformed output or invalid Unicode. Otherwise retain
+the existing image/OCR path for the entire resource. Vector graphics cannot be
+reliably excluded by text extraction, so mapped/graphical products must never be
+declared text-only. Persist original URL, resource hash, page number and local
+extractor identity; no provider call, token usage or remote charge is invented.
+
+For a configured regional format, reuse the existing strict HTML projection.
+Only a successfully parsed explicit fact/table or explicit monitoring no-event
+statement can establish a positive regional relevance result. Complete retained
+content and literal evidence remain mandatory. Unsupported layouts, incomplete
+resources and all unresolved or ordinary notices use normal full-content model
+classification. No keyword-based negative filter is added. Relevant notices
+continue through the existing extraction pipeline; this does not replace
+semantic interpretation of municipal measures or graphical evidence. Existing
+provider admission/holds remain in force, including pre-claim holds.
+
+Validate synthetic selectors, attachment coverage, misleading/late notices,
+text/scanned/mixed/graphical PDF fallbacks, literal regional facts, result/run
+provenance, policy-separated equivalence and durable persistence on disposable
+PostgreSQL. Source-specific review/activation and live quality observation remain
+separate from this repository implementation.
+
+Native PDF page inputs require additive migration `066_ocr_native_text`, expanding
+only the page-result media constraint. Prior images, records and migration
+checksums remain valid. Article selectors apply to original HTML notices; HTML
+attachments retain their full text. Native and model page writes preserve their
+selected path across retries rather than mixing extraction methods in one run.
+See [local processing operations](../../../docs/operations/local-processing.md).
+
+
+## Bounded local-processing verification — 2 October 2026
+
+A read-only retained-development replay compares candidate selectors with full
+page text, checks title/article/metadata and attachment preservation, exercises
+missing/ambiguous selector fallback, and probes unique municipal PDFs with real
+Poppler. It separates technical native-text eligibility from approval of a
+text-only directory. A validated vigilance table remains relevant when its six
+phenomena have no listed zones: use the literal regional bulletin title only
+after strict table/date recognition, without inferring an all-clear.
+
+For the explicitly requested development trial, use eight fixed versions and a
+separate queue with one attempt per job and at most twenty calls to the existing
+local model. Trial document readers attach reviewed candidate policies only to
+those versions and exact reviewed PDF hashes. Processing stores, manifests,
+queue claims and call receipts are real; policy identity separates results from
+ordinary reuse. Four municipal baseline/candidate pairs use the same model;
+regional classification and reviewed native PDFs exercise zero-call paths.
+Preserve a private database snapshot and input/output evidence. Existing source
+policies and normal worker routing remain intact; no automatic downstream
+extraction, embedding, linking or publication is requested by this diagnostic
+worker. The worker exits after the fixed queue, with results retained for admin
+inspection. This bounded trial is separate from a continuing source rollout or
+semantic extraction acceptance.
+
+## Manual municipal development publication — 2 October 2026
+
+Use additive migration `067_development_publication` for default-off municipal choices and immutable events, with no automatic backfill or rewrite of source acceptance/public flags. Private admin forms and explicit CLI commands use expected revisions. The current municipality register determines eligibility, and historic choices can be revoked. `IWA_ENVIRONMENT` defaults to strict production and Compose pins each environment. The development query store alone adds a municipality-scoped visibility path for policy-permitted active configurations and retained acquisitions under that revision. Municipalities sharing a regional zone do not inherit each other's selection; unscoped regional facts are restricted to mappings selected at the query knowledge boundary. Regional bulletin metadata remains attributable to the shared original. Copy authorization stays separate.
+
+Municipality/coverage response fields identify development publication; acceptance remains pending where pending and quality limitations disclose the manual override. No uncertain regional map color or missing municipal measure is invented. A publication scope stored privately with each saved view binds it to environment, municipal revisions, region revisions, source active/public settings and territorial associations. API/MCP reject views after scope changes, including revocation and a copied database served by a strict runtime. Production source gates remain independently testable. Verification uses synthetic facts, native forms, API/MCP views, disposable PostgreSQL and resolved Compose templates; live development activation is recorded separately from acceptance.

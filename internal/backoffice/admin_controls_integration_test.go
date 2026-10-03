@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/operations"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 )
@@ -31,7 +32,7 @@ func TestCLIAdminActivationParity(t *testing.T) {
 	if _, err := geo.ConfigureRegion(ctx, "09", 1, domain.RegionConfiguration{MunicipalityDataset: dataset, Profiles: []string{"municipal-html"}}, "fixture"); err != nil {
 		t.Fatal(err)
 	}
-	h := HandlerWithAdministration(nil, AdminRuntime{Territories: operations.New(p), TerritoryConfig: geo, Registry: reg})
+	h := HandlerWithAdministration(nil, AdminRuntime{Territories: operations.New(p), TerritoryConfig: geo, Registry: reg, Embedding: jobs.New(p)})
 	post := func(path string, fields url.Values, status int, back string) {
 		t.Helper()
 		r := httptest.NewRequest("POST", "http://127.0.0.1"+path, strings.NewReader(fields.Encode()))
@@ -112,6 +113,31 @@ func TestCLIAdminActivationParity(t *testing.T) {
 	cfg := registry.Configuration{URL: "https://example.test", Sections: []string{"https://example.test"}, AccessMethod: "html", Attribution: "Synthetic fixture", Policy: registry.Policy{CollectionPermitted: true, RetentionPermitted: true, Evidence: &registry.Evidence{URL: "https://example.test", Locator: "synthetic", ObservedAt: time.Now()}}}
 	if err := reg.CreateSource(ctx, registry.Source{ID: "source", AuthorityID: "a", ChannelID: "c", ProductID: "municipal", Territory: "909000"}, cfg, "fixture"); err != nil {
 		t.Fatal(err)
+	}
+	if cli("", "embedding-status")["enabled"] != false || cli("", "source-embedding-status", "source")["enabled"] != false {
+		t.Fatal("embedding controls did not default to disabled")
+	}
+	cli("", "embedding-enable", "0", "cli-global")
+	post("/admin/sources/source/embedding", url.Values{"actor": {"admin-source"}, "expected_revision": {"0"}, "enabled": {"true"}}, 303, "/admin/embedding")
+	if cli("", "source-embedding-status", "source")["enabled"] != true {
+		t.Fatal("source embedding admin change not visible to CLI")
+	}
+	post("/admin/embedding", url.Values{"actor": {"admin-global"}, "expected_revision": {"1"}, "enabled": {"false"}}, 303, "/admin/embedding")
+	if cli("", "embedding-status")["enabled"] != false || cli("", "source-embedding-status", "source")["enabled"] != true {
+		t.Fatal("global disable erased source choice")
+	}
+	cli("revision_conflict", "embedding-enable", "1", "stale")
+	cli("", "embedding-enable", "2", "cli-global")
+	cli("", "source-embedding-disable", "source", "1", "cli-source")
+	post("/admin/sources/source/embedding", url.Values{"actor": {"stale"}, "expected_revision": {"1"}, "enabled": {"true"}}, 409, "")
+	post("/admin/embedding", url.Values{"actor": {""}, "expected_revision": {"3"}, "enabled": {"true"}}, 400, "")
+	cli("", "embedding-disable", "3", "cli-global")
+	embeddingRequest := httptest.NewRequest("GET", "http://127.0.0.1/admin/embedding", nil)
+	embeddingRequest.Header.Set("Accept", "text/html")
+	embeddingResponse := httptest.NewRecorder()
+	h.ServeHTTP(embeddingResponse, embeddingRequest)
+	if embeddingResponse.Code != 200 || !strings.Contains(embeddingResponse.Body.String(), "Disabilitato") || !strings.Contains(embeddingResponse.Body.String(), "/admin/sources/source/embedding") {
+		t.Fatal("embedding form missing", embeddingResponse.Code, embeddingResponse.Body)
 	}
 	sourcePost := func(action, revision, actor string, status int) {
 		t.Helper()

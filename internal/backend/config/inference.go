@@ -62,17 +62,6 @@ func LoadOCR() (InferenceEndpoint, error) {
 	return loadOCR(os.Getenv("IWA_REGOLO_API_KEY_FILE"))
 }
 
-func SemanticEnabled() (bool, error) {
-	raw := os.Getenv("IWA_SEMANTIC_LINKING_ENABLED")
-	if raw == "" || raw == "false" {
-		return false, nil
-	}
-	if raw == "true" {
-		return true, nil
-	}
-	return false, errors.New("IWA_SEMANTIC_LINKING_ENABLED is invalid")
-}
-
 func LoadEmbedding() (InferenceEndpoint, error) {
 	shared := os.Getenv("IWA_REGOLO_API_KEY_FILE")
 	c := InferenceEndpoint{Adapter: env("IWA_EMBEDDING_ADAPTER", "openai-embeddings"), URL: env("IWA_EMBEDDING_ENDPOINT", defaultRegoloEmbeddingEndpoint), Model: env("IWA_EMBEDDING_MODEL", "Qwen3-Embedding-8B")}

@@ -14,6 +14,7 @@ import (
 )
 
 type Config struct {
+	Environment                                                            string
 	AdminTailscaleOrigin                                                   string
 	Role, Listen, PostgresHost, PostgresUser, PostgresDB, PostgresPassword string
 	RustFSURL, CrawlURL, CrawlToken                                        string
@@ -28,11 +29,18 @@ type Config struct {
 
 // Load accepts secrets only through files; errors never contain secret contents.
 func Load() (Config, error) {
-	c := Config{Role: env("IWA_ROLE", "public"), PostgresHost: env("IWA_POSTGRES_HOST", "postgres:5432"), PostgresUser: "iwa", PostgresDB: "iwa", RustFSURL: env("IWA_RUSTFS_URL", "http://rustfs:9000"), CrawlURL: env("IWA_CRAWL_URL", "http://crawl4ai:11235")}
+	c := Config{Environment: env("IWA_ENVIRONMENT", "production"), Role: env("IWA_ROLE", "public"), PostgresHost: env("IWA_POSTGRES_HOST", "postgres:5432"), PostgresUser: "iwa", PostgresDB: "iwa", RustFSURL: env("IWA_RUSTFS_URL", "http://rustfs:9000"), CrawlURL: env("IWA_CRAWL_URL", "http://crawl4ai:11235")}
+	if c.Environment != "development" && c.Environment != "staging" && c.Environment != "production" {
+		return Config{}, errors.New("invalid IWA_ENVIRONMENT")
+	}
 	if c.Role != "public" && c.Role != "admin" && c.Role != "worker" {
 		return Config{}, errors.New("invalid service role")
 	}
-	c.Listen = env("IWA_LISTEN", "127.0.0.1:8080")
+	defaultListen := "127.0.0.1:8080"
+	if c.Environment == "development" && c.Role == "public" {
+		defaultListen = "0.0.0.0:8080"
+	}
+	c.Listen = env("IWA_LISTEN", defaultListen)
 	if c.Role == "admin" {
 		c.Listen = env("IWA_LISTEN", "127.0.0.1:8081")
 		c.AdminTailscaleOrigin = os.Getenv("IWA_ADMIN_TAILSCALE_ORIGIN")

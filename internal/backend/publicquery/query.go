@@ -7,6 +7,7 @@ import (
 )
 
 func (s *Store) MunicipalitySituation(ctx context.Context, query SituationQuery) (Situation, error) {
+	s = s.forMunicipality(query.MunicipalityISTAT)
 	qt, err := normalizeTime(query.QueryTime)
 	if err != nil || len(query.MunicipalityISTAT) != 6 {
 		return Situation{}, ErrInvalidParameters
@@ -56,6 +57,7 @@ func (s *Store) MunicipalitySituation(ctx context.Context, query SituationQuery)
 }
 
 func (s *Store) Search(ctx context.Context, query SearchQuery) (SearchResult, error) {
+	s = s.forMunicipality(query.MunicipalityISTAT)
 	qt, err := normalizeTime(query.QueryTime)
 	if err != nil || !validStatus(query.Status) || !validProduct(query.Product) || !validRisk(query.Risk) || (query.Kind != "document" && query.Kind != "measure" && query.Kind != "regional") || (query.MunicipalityISTAT != "" && len(query.MunicipalityISTAT) != 6) || (query.From != nil && query.To != nil && !query.From.Before(*query.To)) {
 		return SearchResult{}, ErrInvalidParameters
@@ -110,7 +112,7 @@ func (s *Store) searchDocuments(ctx context.Context, query SearchQuery) ([]Docum
 	rows, err := s.pool.Query(ctx, `SELECT DISTINCT ON (d.id) v.id
  FROM retained_documents d JOIN retained_versions v ON v.document_id=d.id
  JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id
- WHERE `+s.visibilitySQL()+` AND v.first_acquired_at<=$1 AND ($2='' OR s.id=$2)
+ WHERE (`+s.visibilitySQL()+`) AND v.first_acquired_at<=$1 AND ($2='' OR s.id=$2)
    AND ($3='' OR s.territory=$3 OR s.product_id<>'municipal')
  ORDER BY d.id,v.first_acquired_at DESC,v.id DESC`, query.KnownAt, query.SourceID, query.MunicipalityISTAT)
 	if err != nil {

@@ -13,7 +13,7 @@ python3 scripts/init-secrets.py --directory .local/development/secrets
 scripts/compose-env.sh development config --quiet
 ```
 
-The ignored environment file selects development's image and loopback ports, defaulting to `8080` and `8081`. Edit these ports if occupied. The wrapper clears shell overrides; persistent values belong in `.local/development.env`. Secret generation preserves existing values and creates disabled notification/backup configurations. It does not create an inference-provider key.
+The ignored environment file selects development's image and ports, defaulting to `8080` and `8081`. The public API/MCP port binds to `0.0.0.0`; the admin port binds to loopback. Edit these ports if occupied. The wrapper clears shell overrides; persistent values belong in `.local/development.env`. Secret generation preserves existing values and creates disabled notification/backup configurations. It does not create an inference-provider key.
 
 ## 2. Start dependencies and initialize storage
 

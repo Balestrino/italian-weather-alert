@@ -43,12 +43,20 @@ func addLocalFallback(ctx context.Context, store *processing.Store, policy proce
 		return nil, err
 	}
 	localClassifier := *classifier
+	localClassifier.LocalConfigurationVersion, err = store.RegisterLocalProcessing(ctx, catalog.ConfigurationVersionID, now)
+	if err != nil {
+		return nil, err
+	}
 	localClassifier.Model, localClassifier.Adapter, localClassifier.ConfigurationVersion, localClassifier.LegacyConfigurationVersion, localClassifier.PriceVersion, localClassifier.DisableThinking = e.Model, adapter, catalog.ConfigurationVersionID, catalog.ConfigurationVersionID, catalog.PriceVersionID, true
 	extractionCatalog, err := extraction.RegisterCatalog(ctx, store, e.Adapter, e.Model, now)
 	if err != nil {
 		return nil, err
 	}
 	localExtractor := *extractor
+	localExtractor.LocalConfigurationVersion, err = store.RegisterLocalProcessing(ctx, extractionCatalog.ConfigurationVersionID, now)
+	if err != nil {
+		return nil, err
+	}
 	localExtractor.Model, localExtractor.Adapter, localExtractor.ConfigurationVersion, localExtractor.LegacyConfigurationVersion, localExtractor.PriceVersion, localExtractor.DisableThinking = e.Model, adapter, extractionCatalog.ConfigurationVersionID, extractionCatalog.ConfigurationVersionID, extractionCatalog.PriceVersionID, true
 	linkCatalog, err := linking.RegisterCatalog(ctx, store, e.Adapter, e.Model, now)
 	if err != nil {
@@ -64,6 +72,10 @@ func addLocalFallback(ctx context.Context, store *processing.Store, policy proce
 		}
 		localOCR := *reader
 		localOCR.DisableThinking = true
+		localOCR.LocalConfigurationVersion, err = store.RegisterLocalProcessing(ctx, ocrCatalog.ConfigurationVersionID, now)
+		if err != nil {
+			return nil, err
+		}
 		localOCR.Model, localOCR.Adapter, localOCR.ConfigurationVersion, localOCR.PriceVersion, localOCR.ProviderScope = e.Model, adapter, ocrCatalog.ConfigurationVersionID, ocrCatalog.PriceVersionID, scope
 		alternatives[ocr.Kind] = localOCR.Handler()
 	}

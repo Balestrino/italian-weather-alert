@@ -24,6 +24,7 @@ x-app: &app
     start_period: 60s
 
 x-env: &env
+  IWA_ENVIRONMENT: development
   IWA_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
   IWA_CRAWL_TOKEN_FILE: /run/secrets/crawl_token
 
@@ -46,7 +47,7 @@ services:
       IWA_RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_access_key
       IWA_RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
       IWA_RUSTFS_BUCKET: iwa-originals
-    ports: ["127.0.0.1:${IWA_PUBLIC_PORT:-8080}:8080"]
+    ports: ["0.0.0.0:${IWA_PUBLIC_PORT:-8080}:8080"]
   admin:
     <<: *app
     secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key]
@@ -87,11 +88,14 @@ services:
       IWA_OCR_REUSE_ENABLED: ${IWA_OCR_REUSE_ENABLED:-false}
       IWA_OCR_RENDERER_ID: ${IWA_OCR_RENDERER_ID:-}
       IWA_QWEN_GATE_SCOPE: ${IWA_QWEN_GATE_SCOPE:-}
+      IWA_EMBEDDING_ADAPTER: ${IWA_EMBEDDING_ADAPTER:-openai-embeddings}
+      IWA_EMBEDDING_ENDPOINT: ${IWA_EMBEDDING_ENDPOINT:-https://api.regolo.ai/v1/embeddings}
+      IWA_EMBEDDING_MODEL: ${IWA_EMBEDDING_MODEL:-Qwen3-Embedding-8B}
+      IWA_EMBEDDING_API_KEY_FILE: ${IWA_EMBEDDING_API_KEY_FILE:-}
       IWA_EMBEDDING_GATE_SCOPE: ${IWA_EMBEDDING_GATE_SCOPE:-}
       IWA_PROVIDER_FAILURE_THRESHOLD: ${IWA_PROVIDER_FAILURE_THRESHOLD:-3}
       IWA_PROVIDER_COOLDOWN_SECONDS: ${IWA_PROVIDER_COOLDOWN_SECONDS:-60}
       IWA_PROVIDER_MAX_COOLDOWN_SECONDS: ${IWA_PROVIDER_MAX_COOLDOWN_SECONDS:-900}
-      IWA_SEMANTIC_LINKING_ENABLED: ${IWA_SEMANTIC_LINKING_ENABLED:-false}
       IWA_NOTIFICATIONS_CONFIG_FILE: /run/secrets/notifications_config
       IWA_ROLE: worker
     networks: [backend, inference_egress]

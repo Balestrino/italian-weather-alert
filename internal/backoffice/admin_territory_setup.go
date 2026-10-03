@@ -55,6 +55,27 @@ func setupRegion(r *http.Request, a AdminRuntime) (domain.Region, error) {
 	return a.TerritoryConfig.Region(r.Context(), r.PathValue("region"))
 }
 func adminTerritorySetupRoutes(mux *http.ServeMux, a AdminRuntime) {
+	if a.DevelopmentPublication != nil {
+		mux.HandleFunc("POST /admin/regions/{region}/municipalities/{istat}/development-publication", func(w http.ResponseWriter, r *http.Request) {
+			if err := territoryForm(w, r, "actor", "expected_revision", "enabled"); err != nil {
+				territoryFailure(w, r, err)
+				return
+			}
+			rev, err := territoryRevision(r.PostForm.Get("expected_revision"))
+			raw := r.PostForm.Get("enabled")
+			if err != nil || (raw != "true" && raw != "false") {
+				territoryFailure(w, r, domain.ErrInvalid)
+				return
+			}
+			ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+			defer cancel()
+			if _, err = a.DevelopmentPublication.Set(ctx, r.PathValue("region"), r.PathValue("istat"), rev, raw == "true", r.PostForm.Get("actor")); err != nil {
+				territoryFailure(w, r, err)
+				return
+			}
+			http.Redirect(w, r, "/admin/regions/"+url.PathEscape(r.PathValue("region"))+"/municipalities/"+url.PathEscape(r.PathValue("istat"))+"?tab=configuration", http.StatusSeeOther)
+		})
+	}
 	mux.HandleFunc("GET /admin/regions/{region}/setup", func(w http.ResponseWriter, r *http.Request) {
 		region, err := setupRegion(r, a)
 		if err != nil {

@@ -50,6 +50,15 @@ func (s *Store) RecordReuse(ctx context.Context, runID, original int64, at time.
 // RemapResult revalidates every segment decision against its current literal
 // interval. Any shape or quotation uncertainty falls back to ordinary inference.
 func RemapResult(old Result, segments []Segment, content Content, runID, versionID int64, at time.Time) (Result, bool) {
+	if old.ReturnedModel == StructuredClassifierVersion && old.ProviderResponseID == "local:"+StructuredClassifierVersion && old.Status == "classified" && old.Relevant != nil && *old.Relevant && old.ReasonCode == "regional_warning" && old.ContentComplete && content.Complete && len(old.Segments) == 0 && len(segments) > 0 {
+		if quote, ok := CanonicalLiteral(content.Text, old.EvidenceQuote); ok && quote != "" {
+			old.RunID, old.DocumentVersionID, old.ContentSHA256, old.CreatedAt = runID, versionID, content.Hash, at
+			old.EvidenceQuote = quote
+			old.InputTokens, old.OutputTokens, old.CacheReadTokens = nil, nil, nil
+			return old, true
+		}
+		return Result{}, false
+	}
 	if old.Status != "classified" || old.Relevant == nil || !old.ContentComplete || !content.Complete || len(old.Segments) != len(segments) || len(segments) == 0 {
 		return Result{}, false
 	}
