@@ -23,6 +23,14 @@ Il [coverage tracker](../../coverage.md) resta il riferimento per l'accettazione
 
 ## Guida operativa
 
+La [vista di situazione API/MCP](../../backend/public-api-mcp.md#situation-response)
+include una sintesi separata `cittadino_informato`. `not_collected` significa che
+la vista non dispone di acquisizioni pubblicabili del canale: non significa che
+la piattaforma non abbia avvisi. Il trial dedicato non alimenta automaticamente
+il database operativo. Identità del canale, raccolta, confronti e accettazione
+restano separati, come verificato in CLN-018 della scheda Calcinaia.
+
+
 La [specifica](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification)
 include la piattaforma come canale aggiuntivo di acquisizione/discovery per comuni
 selezionati, con referral propri e verifica multipla Regione/CFR–Comune–piattaforma.
@@ -183,3 +191,11 @@ Il criterio documentale di chiusura di questa voce è superato da CIN-006; le os
 - **Osservazione ed evidenza:** il [task 26.2](../../../openspec/changes/define-toscana-alert-service/tasks.md) ora richiede un percorso funzionante acquisizione–verifica con ricevute persistenti e verifica delimitata in development, senza ottenere licenze, accordi o documentazione della base giuridica.
 - **Conseguenza:** CFR primario per dati regionali, Comune/atto primario per misure locali; non applicabilità, mancato riscontro, indisponibilità, non comparabilità e conflitto restano distinti. Nessun voto a maggioranza o obbligo di tre pubblicazioni concordi.
 - **Prossima verifica:** implementare 26.3/26.4 e verificare il nuovo 26.2; poi valutazione 26.5 e trial programmato 26.6. Copie pubbliche link-only e accettazione restano separati.
+
+### CIN-011 — Disponibilità del canale distinta nella situazione
+
+- **Data e ultima verifica:** 2026-10-03; test sintetici e risposta API/MCP development, senza nuovi fetch della piattaforma.
+- **Ambito:** sintesi di situazione del database operativo per Calcinaia, distinta dal trial isolato CIN-010.
+- **Conoscenza e intervento:** comportamento confermato; presentazione verificata dal task 28.
+- **Osservazione ed evidenza:** identità del canale ricavata dalla piattaforma configurata, senza deduzione dal nome della fonte. Una fonte configurata ma senza dati pubblicabili è indisponibile; senza canale nella vista la sintesi è `not_collected`. Nessuna importazione dei risultati privati del trial o conferma implicita dei candidati. [CLN-018](../../territori/09-toscana/comuni/050004-calcinaia.md#cln-018--situazione-apimcp-centrata-su-conclusioni-e-fonti).
+- **Conseguenza e prossima verifica:** rendere esplicita l'assenza dei dati operativi; raccolta continuativa, riscontro dei contenuti e accettazione restano separati.

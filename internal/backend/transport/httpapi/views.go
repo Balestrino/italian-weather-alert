@@ -56,6 +56,9 @@ func (s *publicService) invoke(ctx context.Context, operation string, raw json.R
 	if s.views == nil {
 		response, status := s.invokeUnviewed(ctx, operation, raw)
 		if status == http.StatusOK {
+			if situation, ok := response.Data.(publicquery.Situation); ok {
+				response.Data = summarizeSituation(situation)
+			}
 			var err error
 			response.Data, err = s.applyCopyLinks(ctx, response.Data)
 			if err != nil {
@@ -174,11 +177,14 @@ func (s *publicService) page(ctx context.Context, view publicview.View, data any
 			return s.failure(servedAt, errCursorExpired, nil)
 		}
 	}
+	data = refreshData(data, servedAt)
+	if situation, ok := data.(publicquery.Situation); ok {
+		data = summarizeSituation(situation)
+	}
 	page, next, more, err := paginateData(data, positions, pageSize)
 	if err != nil {
 		return s.failure(servedAt, err, nil)
 	}
-	page = refreshData(page, servedAt)
 	page, err = s.applyCopyLinks(ctx, page)
 	if err != nil {
 		return s.failure(servedAt, err, nil)
@@ -364,6 +370,24 @@ func decodeStoredData(operation string, request, raw json.RawMessage) (any, erro
 
 func paginateData(data any, positions map[string]int, size int) (any, map[string]int, bool, error) {
 	switch value := data.(type) {
+	case situationData:
+		keys := []string{"processed_data.local_measures", "processed_data.regional_alerts", "processed_data.operational_phases"}
+		if !onlyPositionKeys(positions, keys...) {
+			return nil, nil, false, errCursorMismatch
+		}
+		next := map[string]int{}
+		more := false
+		collections := []*[]situationFact{&value.ProcessedData.LocalMeasures, &value.ProcessedData.RegionalAlerts, &value.ProcessedData.OperationalPhases}
+		for index, collection := range collections {
+			items, end, itemMore, err := slicePage(*collection, positions[keys[index]], size)
+			if err != nil {
+				return nil, nil, false, err
+			}
+			*collection = items
+			next[keys[index]] = end
+			more = more || itemMore
+		}
+		return value, next, more, nil
 	case []publicquery.Municipality:
 		page, next, more, err := pageSlice(value, positions, "data", size)
 		return page, next, more, err

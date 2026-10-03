@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 146 | 12 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 149 | 12 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |
@@ -142,3 +142,10 @@ attribution, historical preservation and actual HTTPS API/MCP equivalence. No
 regional level remains unknown for A4 in that verified response. Other unsupported
 label positions and vigilance graphics remain part of 27.4; municipal temporal
 conflicts and source acceptance are not completed by this correction.
+
+Tasks 28.1–28.3 replace the raw municipality situation presentation with processed
+conclusions and separate regional, municipal and Cittadino Informato summaries.
+Synthetic/PostgreSQL, schema, real API/MCP, pagination, historical and development
+rollout checks preserve evidence and affected uncertainty while removing the
+document backlog from public situation rows. See [response fields](../docs/backend/public-api-mcp.md#situation-response).
+The change does not complete source acceptance or continuous platform collection.

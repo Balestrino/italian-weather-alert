@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-03 [Changed] Present municipality situations as processed conclusions and separate source summaries, preserving evidence, uncertainty and API/MCP pagination.
 - 2026-10-03 [Fixed] Determine scoped criticality levels from retained PDF vector maps with page evidence, precise alert validity and historical preservation.
 - 2026-10-03 [Fixed] Connect primary municipal extractions to public facts, preserve provenance history and worker catalogs, and verify development API/MCP behavior.
 - 2026-10-03 [Changed] Complete tasks 26.5 and 26.6, record delegated document reviews and development rollback, and document remaining source-acceptance failures.

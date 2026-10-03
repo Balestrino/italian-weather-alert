@@ -42,6 +42,15 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
+La vista API/MCP di situazione presenta ora `processed_data` e
+`source_summaries` (CLN-018): conclusioni e fatti separati dalle sintesi
+Regione/CFR, Comune e Cittadino Informato. Le misure documentate con validità
+`undetermined` non sono confermate in vigore; il verde regionale non risolve le
+date comunali. Un canale `not_collected` indica assenza di dati pubblicabili nella
+vista, non assenza di avvisi. Documenti, ricevute e qualità dettagliata restano
+negli endpoint dedicati. Vedere [contratto](../../../backend/public-api-mcp.md#situation-response).
+
+
 Confrontare le sezioni configurate e la paginazione: un elenco generale non dimostra l'esaustività degli elenchi tematici. Distinguere data di pubblicazione, aggiornamento della pagina e validità di una misura. Acquisire e interpretare gli atti necessari prima di determinare durata o cessazione di chiusure.
 
 Per documenti 404/410 usare la [procedura di recupero](../../../operations/acquisition-recovery.md): assenza dagli elenchi completamente traversati, riferimenti e misure ancora aperte vanno verificati prima di una esclusione. Conservare lo storico; un'assenza non prova revoca né equivalenza a un altro URL.
@@ -293,3 +302,11 @@ Il criterio documentale di chiusura di questa voce è superato da CLN-012; le os
 - **Conseguenza:** usare CFR per le affermazioni regionali e Comune/atto per le misure locali; registrare controlli non applicabili, indisponibili, mancati riscontri, non comparabilità e conflitti. Nessuna maggioranza fra rilanci o obbligo di presenza su tutti i canali; candidati senza sostegno primario restano diagnostici.
 - **Prossima verifica:** implementare acquisizione 26.3 e confronti 26.4, poi chiudere 26.2 con ricevute del controllo development; completare 26.5/26.6 separatamente. Copie pubbliche link-only, copertura e accettazione restano distinte.
 - **Collegamenti:** CIN-006 nelle [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md), [dossier aggiornato](../../../fonti/piattaforme/cittadino-informato-review.md).
+
+### CLN-018 — Situazione API/MCP centrata su conclusioni e fonti
+
+- **Data e ultima verifica:** 2026-10-03, test sintetici/PostgreSQL e risposta development HTTPS; nessuna nuova acquisizione richiesta dalla vista.
+- **Ambito:** situazione di Calcinaia `050004`, fonti pubblicabili nel database operativo e conoscenza fissata; il trial separato di Cittadino Informato non è importato.
+- **Conoscenza:** comportamento confermato nel perimetro provato. **Intervento:** presentazione applicata e verificata, task 28; raccolta e accettazione restano distinte.
+- **Osservazione ed evidenza:** conclusioni, quattordici fatti regionali e sette misure comunali documentate, riferimenti deduplicati e tre sintesi; la piattaforma senza dati pubblicabili è dichiarata separatamente. Il backlog comunale produce un limite di completezza anziché centinaia di righe e ulteriori pagine. [Contratto e limiti](../../../backend/public-api-mcp.md#situation-response), [verifica development](../../../operations/development-publication.md#situazione-sintetica--3-ottobre-2026); registro privato `CLN-SUMMARY-20261003-01`.
+- **Conseguenza e prossima verifica:** consultare i fatti per rischio/validità e gli endpoint documentali per dettagli; non considerare confermate in vigore le misure con date non determinabili e non trasformare l'assenza dei dati della piattaforma in assenza di avvisi. Accettazione, completezza municipale e raccolta continuativa rimangono da verificare.

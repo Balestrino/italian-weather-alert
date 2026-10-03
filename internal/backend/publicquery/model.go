@@ -160,6 +160,7 @@ type OperationalPhase struct {
 }
 
 type Coverage struct {
+	Platform               string   `json:"platform,omitempty"`
 	DevelopmentPublication bool     `json:"development_publication"`
 	SourceID               string   `json:"source_id"`
 	Product                string   `json:"product"`

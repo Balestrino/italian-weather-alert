@@ -9,9 +9,14 @@ The first request resolves default `evaluation_time` and `known_at` before it
 queries prepared public data, normalizes the filters and effective page size,
 and stores the complete result plus history metadata in migration
 `020_public_views`. Pages contain only the configured/requested number of items.
-Municipality situations retain an independent position for local measures,
-operational phases, regional products, documents requiring attention and
-coverage. Documents retain a version position; the other collection operations
+Municipality situations retain independent positions for
+`processed_data.local_measures`, `processed_data.operational_phases` and
+`processed_data.regional_alerts`. Full-scope conclusions, the three source
+summaries and deduplicated references repeat on every page; pending document
+backlogs and coverage do not generate situation pages. Legacy situation cursors
+using the old collection paths are rejected with `cursor_mismatch`; restart the
+query. A retained `dataset_version` still renders its pinned domain knowledge
+in the current presentation. Documents retain a version position; the other collection operations
 retain one data position.
 
 `next_cursor` is a base64url payload authenticated with HMAC-SHA-256. It binds

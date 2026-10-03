@@ -114,6 +114,53 @@ comparison document remains absent from public search and coverage.
 
 Explicit development installations can publish manually selected municipalities,
 including their applicable regional products, before production acceptance.
-`development_publication` on municipality/coverage records and interpretation/meta
-limitations identify this scope; pending source states remain pending. Revocation
+`development_publication` on discovery/coverage records and `meta.limitations`
+identify this scope; situation source products retain pending acceptance. Revocation
 expires saved views and cursors on API and MCP. See [operator controls and limits](../operations/development-publication.md).
+
+## Situation response
+
+`GET /v1/municipalities/{municipality_istat}/situation` and
+`get_municipality_situation` return the same `data` shape:
+
+```json
+{
+  "municipality": {"istat": "050004", "name": "Calcinaia", "zones": ["A4"]},
+  "processed_data": {
+    "summary": "Conclusions supported by the available sources.",
+    "regional_alerts": [],
+    "local_measures": [],
+    "operational_phases": [],
+    "references": []
+  },
+  "source_summaries": {
+    "regional": {"name": "Regione Toscana / CFR", "status": "not_collected", "summary": "No publishable data in this view.", "products": []},
+    "municipal": {"name": "Comune di Calcinaia", "status": "not_collected", "summary": "No publishable data in this view.", "products": []},
+    "cittadino_informato": {"name": "Cittadino Informato", "status": "not_collected", "summary": "No publishable data in this view.", "products": []}
+  }
+}
+```
+
+This illustrates structure only, not the live Calcinaia contents. The usual `meta`
+envelope retains evaluation/view/history/cursor information. Processed facts carry
+`status`, `reliability`, compact `validity`, affected `limitations` and
+`reference_ids`; references identify exact documents, versions, official URLs and
+PDF pages. `supported` describes interpreted evidence, not source acceptance.
+An `undetermined` measure is documented but cannot be confirmed in force. Regional
+`not_applicable` remains distinct from green and unknown. Conclusions describe
+prepared evidence and never generate conduct advice.
+
+Each source summary states its contents and data availability; individual
+products preserve check timestamps and `coverage_status`. `available` identifies
+fresh available acquisitions, not complete interpretation or accepted coverage.
+`partial` can indicate mixed availability or delayed checks. No acquired/publishable
+platform data is `not_collected`, not proof that the platform has no notices.
+No isolated trial or private channel contents are inserted into this view.
+
+This replaces the former raw top-level situation lists. Consumers should use
+`processed_data.local_measures`, `processed_data.regional_alerts` and
+`processed_data.operational_phases`. Full document metadata, verification receipts
+and detailed quality/coverage remain in search, document and coverage operations.
+The status frontend consumes coverage and does not depend on the changed fields.
+See [snapshot pagination](public-views.md) for cursor transition and repeatable
+full-scope summaries.

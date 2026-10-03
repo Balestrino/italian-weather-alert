@@ -490,3 +490,23 @@ reject unproven and future reuse.
 - [ ] 27.4 Complete and validate product-specific CFR graphical interpretation against the retained maps/PDFs, including applicability and all seven risks, before replacing unresolved per-zone levels or claiming full source acceptance.
 
 - [x] 27.5 Resolve the current Calcinaia criticality situation from retained matching PDF vector evidence for all seven risks and both days; preserve unknown unsupported zones, PDF/page attribution, precise explicit table intervals and historical projections, test synthetic non-green/missing/conflicting cases, and verify actual HTTPS API/MCP after development deployment. This bounded completion does not close the full product/zone interpretation and source acceptance in 27.4.
+
+## 28. Concise municipality situation — 3 October 2026
+
+- [x] 28.1 Replace the raw API/MCP situation presentation with processed conclusions and separate regional, municipal and Cittadino Informato summaries; preserve validity, applicability, evidence, missing-channel semantics, source identity, source acceptance and detailed operations.
+- [x] 28.2 Align shared schemas, documented consumer paths and snapshot pagination; verify rich API/MCP equivalence, uncertainty, missing/platform-only channels, pending backlog, full-scope conclusions, deduplicated evidence and truthful saved-view freshness with synthetic and PostgreSQL checks.
+- [x] 28.3 Build and deploy the reversible development presentation update and verify the actual Calcinaia HTTPS API/MCP response and controls, retaining private rollback evidence.
+
+**Task 28 verification — 3 October 2026:** synthetic rich situation tests verify
+source attribution, unavailable/platform channels, deduplicated evidence, literal
+uncertainty, unknown/non-applicable/elevated levels, pending notices and full-scope
+conclusions across pages. Real MCP client, disposable PostgreSQL, race and vet
+checks pass. The development public service alone runs the new presentation;
+actual HTTPS API/MCP on the same dataset_version agree, the JSON Schema validates,
+and compact JSON decreases from approximately 186 KB to 14 KB in the observed
+response without losing the fourteen regional facts or seven municipal measures.
+Historic unknown levels, unselected municipality isolation and unchanged source
+publication/acceptance states are verified. Other persistent development services
+are preserved; prior image/environment remain available for rollback. Private
+record: `CLN-SUMMARY-20261003-01`. This presentation change does not complete
+source acceptance, municipal dates/completeness or continuous platform collection.

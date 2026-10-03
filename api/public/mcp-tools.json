@@ -710,6 +710,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -767,46 +770,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -1383,6 +1359,309 @@
                 "additionalProperties": false
               }
             ]
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -2117,6 +2396,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -2181,46 +2463,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -3002,6 +3257,309 @@
             ],
             "additionalProperties": false,
             "description": "Field-evidence comparison, independent of source acceptance; admission refers to the candidate. Private channel evidence is withheld. At most the latest 100 publishable receipts at the knowledge boundary are included, with explicit truncation limitations."
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -3014,7 +3572,7 @@
     },
     {
       "name": "get_municipality_situation",
-      "description": "get municipality situation",
+      "description": "Municipality situation: processed conclusions and separate regional, municipal and Cittadino Informato source summaries, with compact evidence references.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3717,6 +4275,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -3774,46 +4335,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -4390,6 +4924,309 @@
                 "additionalProperties": false
               }
             ]
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -5121,6 +5958,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -5185,46 +6025,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -6006,6 +6819,309 @@
             ],
             "additionalProperties": false,
             "description": "Field-evidence comparison, independent of source acceptance; admission refers to the candidate. Private channel evidence is withheld. At most the latest 100 publishable receipts at the knowledge boundary are included, with explicit truncation limitations."
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -6775,6 +7891,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -6832,46 +7951,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -7448,6 +8540,309 @@
                 "additionalProperties": false
               }
             ]
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -8192,6 +9587,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -8256,46 +9654,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -9077,6 +10448,309 @@
             ],
             "additionalProperties": false,
             "description": "Field-evidence comparison, independent of source acceptance; admission refers to the candidate. Private channel evidence is withheld. At most the latest 100 publishable receipts at the knowledge boundary are included, with explicit truncation limitations."
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -9799,6 +11473,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -9856,46 +11533,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -10472,6 +12122,309 @@
                 "additionalProperties": false
               }
             ]
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -11219,6 +13172,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -11283,46 +13239,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -12104,6 +14033,309 @@
             ],
             "additionalProperties": false,
             "description": "Field-evidence comparison, independent of source acceptance; admission refers to the candidate. Private channel evidence is withheld. At most the latest 100 publishable receipts at the knowledge boundary are included, with explicit truncation limitations."
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -12824,6 +15056,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -12881,46 +15116,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -13497,6 +15705,309 @@
                 "additionalProperties": false
               }
             ]
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -14231,6 +16742,9 @@
               },
               "quality": {
                 "$ref": "#/$defs/Quality"
+              },
+              "platform": {
+                "type": "string"
               }
             },
             "required": [
@@ -14295,46 +16809,19 @@
             "type": "object",
             "properties": {
               "municipality": {
-                "$ref": "#/$defs/Municipality"
+                "$ref": "#/$defs/SituationMunicipality"
               },
-              "local_measures": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Measure"
-                }
+              "processed_data": {
+                "$ref": "#/$defs/ProcessedSituation"
               },
-              "operational_phases": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/OperationalPhase"
-                }
-              },
-              "regional_products": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/RegionalWarning"
-                }
-              },
-              "documents_requiring_attention": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Document"
-                }
-              },
-              "coverage": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/Coverage"
-                }
+              "source_summaries": {
+                "$ref": "#/$defs/SituationSources"
               }
             },
             "required": [
               "municipality",
-              "local_measures",
-              "operational_phases",
-              "regional_products",
-              "documents_requiring_attention",
-              "coverage"
+              "processed_data",
+              "source_summaries"
             ],
             "additionalProperties": false
           },
@@ -15116,6 +17603,309 @@
             ],
             "additionalProperties": false,
             "description": "Field-evidence comparison, independent of source acceptance; admission refers to the candidate. Private channel evidence is withheld. At most the latest 100 publishable receipts at the knowledge boundary are included, with explicit truncation limitations."
+          },
+          "SituationMunicipality": {
+            "type": "object",
+            "properties": {
+              "istat": {
+                "type": "string",
+                "pattern": "^[0-9]{6}$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mapping_version": {
+                "type": "string"
+              },
+              "mapping_limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "istat",
+              "name",
+              "zones"
+            ],
+            "additionalProperties": false
+          },
+          "SituationValidity": {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "date",
+                  "interval",
+                  "conditional",
+                  "unknown"
+                ]
+              },
+              "original": {
+                "type": "string"
+              },
+              "instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_instant": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "assumption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "precision"
+            ],
+            "additionalProperties": false
+          },
+          "SituationReference": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "document_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "document_id",
+              "version_id",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "SituationFact": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "risk": {
+                "type": "string"
+              },
+              "risk_label": {
+                "type": "string"
+              },
+              "zone": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "territorial_scope": {
+                "type": "string"
+              },
+              "authority": {
+                "type": "string"
+              },
+              "phase": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "reliability": {
+                "type": "string"
+              },
+              "validity": {
+                "$ref": "#/$defs/SituationValidity"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "reliability",
+              "validity",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "ProcessedSituation": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "regional_alerts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "local_measures": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "operational_phases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationFact"
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SituationReference"
+                }
+              }
+            },
+            "required": [
+              "summary",
+              "regional_alerts",
+              "local_measures",
+              "operational_phases",
+              "references"
+            ],
+            "additionalProperties": false
+          },
+          "SourceProductSummary": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "last_checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "coverage_status": {
+                "type": "string"
+              },
+              "reference_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source_id",
+              "product",
+              "status",
+              "summary",
+              "coverage_status",
+              "reference_ids"
+            ],
+            "additionalProperties": false
+          },
+          "SourceSummary": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "not_collected"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SourceProductSummary"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "status",
+              "summary",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "SituationSources": {
+            "type": "object",
+            "properties": {
+              "regional": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "municipal": {
+                "$ref": "#/$defs/SourceSummary"
+              },
+              "cittadino_informato": {
+                "$ref": "#/$defs/SourceSummary"
+              }
+            },
+            "required": [
+              "regional",
+              "municipal",
+              "cittadino_informato"
+            ],
+            "additionalProperties": false
           }
         }
       },

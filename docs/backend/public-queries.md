@@ -10,8 +10,10 @@ The package implements the five reviewed contract groups:
 
 - `DiscoverMunicipalities`: name, ISTAT, postal candidates and selected
   municipality-zone mapping;
-- `MunicipalitySituation`: local measures first, operational phases, distinct
-  regional products, newer uninterpreted documents and regional/local coverage;
+- `MunicipalitySituation`: a pinned internal domain situation rendered publicly
+  as processed deductions and separate regional, municipal and Cittadino Informato
+  summaries; structured measures, regional products and phases retain evidence
+  and validity, while pending notices produce a completeness statement;
 - `Search`: documents, measures or regional facts with compatible filters and
   documented temporal intersection behavior;
 - `Document`: a selected/latest eligible version and optional retained version

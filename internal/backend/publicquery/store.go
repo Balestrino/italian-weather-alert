@@ -337,7 +337,7 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 	if err != nil || (query.MunicipalityISTAT != "" && len(query.MunicipalityISTAT) != 6) {
 		return CoverageResult{}, ErrInvalidParameters
 	}
-	rows, err := s.pool.Query(ctx, `SELECT s.id,s.product_id,s.territory,s.public_enabled,s.collection_enabled,
+	rows, err := s.pool.Query(ctx, `SELECT s.id,s.product_id,s.territory,ch.platform,s.public_enabled,s.collection_enabled,
  COALESCE(EXISTS(SELECT 1 FROM registry_events e JOIN registry_acceptance_reviews rr ON rr.acceptance_event_id=e.id
   WHERE e.source_id=s.id AND e.revision=s.active_revision AND e.kind='acceptance' AND rr.status='accepted'
   AND e.id=(SELECT max(latest.id) FROM registry_events latest WHERE latest.source_id=e.source_id AND latest.revision=e.revision AND latest.kind='acceptance')
@@ -349,6 +349,7 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 	  AND NOT EXISTS(SELECT 1 FROM registry_regressions r WHERE r.source_id=s.id AND r.revision=s.active_revision AND NOT r.passed AND r.recorded_at>=e.created_at)
 	  ORDER BY rr.id DESC LIMIT 1),'{}'::jsonb)
  FROM `+s.sourcesSQL()+` s JOIN registry_products p ON p.id=s.product_id
+ JOIN registry_channels ch ON ch.id=s.channel_id
  JOIN registry_configurations c ON c.source_id=s.id AND c.revision=COALESCE(s.active_revision,s.latest_revision)
  WHERE p.public_eligible AND ($1='' OR s.id=$1) AND ($2='' OR s.product_id=$2)
    AND ($3='' OR s.territory=$3 OR s.product_id<>'municipal')
@@ -362,7 +363,7 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 		var value Coverage
 		var publicEnabled, collectionEnabled, accepted bool
 		var raw, releaseRaw []byte
-		if err = rows.Scan(&value.SourceID, &value.Product, &value.Territory, &publicEnabled, &collectionEnabled, &accepted, &raw, &releaseRaw); err != nil {
+		if err = rows.Scan(&value.SourceID, &value.Product, &value.Territory, &value.Platform, &publicEnabled, &collectionEnabled, &accepted, &raw, &releaseRaw); err != nil {
 			return CoverageResult{}, err
 		}
 		var configuration struct {

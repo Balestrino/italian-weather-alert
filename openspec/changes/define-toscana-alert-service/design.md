@@ -510,3 +510,31 @@ unresolved labels elsewhere in the bulletin remain in source coverage, while an
 unambiguously supported zone's fact is assessed separately. This verifies the
 current Calcinaia criticality scope, not all label placements, vigilance graphics,
 municipal expiry or source acceptance.
+
+## Concise situation presentation — 3 October 2026
+
+Keep the shared domain query and immutable complete snapshots. At delivery, refresh
+source updating against served time, build a deterministic concise presentation
+from the full pinned situation, and paginate only regional facts, local measures
+and phases. Full-scope conclusions, all three source summaries and deduplicated
+evidence references repeat on each page. Pending unstructured notices affect the
+municipal completeness statement but no longer produce hundreds of public rows
+or additional situation pages. Detailed document/quality/verification operations
+remain available. Source identity uses the configured channel platform, never a
+source-name heuristic; unavailable source evidence is not cited.
+
+`processed_data` carries an attributed factual summary, separate regional/local/
+phase facts with precise validity, field limitations and compact reference IDs.
+`source_summaries` contains `regional`, `municipal` and `cittadino_informato`, each
+with content, availability and individual product/check/acceptance summaries.
+Missing platform data means not collected in the publication view, never no
+notices. A municipal statement lists documented measures and distinguishes known
+current validity from undetermined validity. Known regional green does not establish
+municipal all-clear. Regional products and zones retain separate applicability.
+
+The response shape intentionally replaces the previous situation data contract;
+HTTP route, envelope, search/document/coverage and saved snapshot identity stay
+the same. New cursors use processed-data collection paths. Earlier situation
+cursors with old collection positions fail explicitly with cursor_mismatch and
+require restarting; a retained dataset_version can render the same pinned domain
+knowledge in the new presentation. API/MCP share the same rendering and schemas.

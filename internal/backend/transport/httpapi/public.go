@@ -356,7 +356,7 @@ func withinPageLimit(data any, maximum int) bool {
 	case []publicquery.Municipality:
 		return len(value) <= maximum
 	case publicquery.Situation:
-		return len(value.LocalMeasures) <= maximum && len(value.OperationalPhases) <= maximum && len(value.RegionalProducts) <= maximum && len(value.DocumentsRequiringAttention) <= maximum && len(value.Coverage) <= maximum
+		return len(value.LocalMeasures) <= maximum && len(value.OperationalPhases) <= maximum && len(value.RegionalProducts) <= maximum
 	case []publicquery.Document:
 		return len(value) <= maximum
 	case []publicquery.Measure:

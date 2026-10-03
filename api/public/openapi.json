@@ -343,7 +343,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Processed source-supported conclusions and separate regional, municipal and Cittadino Informato summaries. Detailed documents, quality and verification receipts are available through search, document and coverage operations."
       }
     },
     "/v1/search": {

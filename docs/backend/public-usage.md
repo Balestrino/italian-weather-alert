@@ -54,6 +54,8 @@ MCP requests consume the same per-IP budget.
 
 ## Consumer boundaries
 
+The situation operation presents processed conclusions and separate source
+summaries; see [the response fields](public-api-mcp.md#situation-response).
 The public listener exposes observations, evidence, official risk labels,
 quality dimensions, coverage limitations, and official document links. It
 does not expose administration or configuration mutation, internal DPC

@@ -55,3 +55,13 @@ the explicit delegation, original versions/pages and supported or unresolved
 fields. Do not describe delegated analysis as a new human review. The delegation
 does not waive failed regressions, independent collection, the observational
 period, per-source acceptance or separate public activation.
+
+## Concise municipality situation — 3 October 2026
+
+The operator requests a situation response centred on deductions and the summaries
+of each source. Replace the raw situation lists in API/MCP presentation with
+`processed_data` and `source_summaries`, plus municipality identity. Keep traceable
+references and literal uncertainty; retain detailed documents, receipts, quality
+and source acceptance in their dedicated operations. Toscana includes separate
+regional, municipal and Cittadino Informato summaries even when a channel has no
+publishable acquisitions. This presentation change does not activate collection.

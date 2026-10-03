@@ -122,7 +122,7 @@ Responses SHALL identify development publication on municipality and source cove
 
 
 ### Requirement: Municipal progress is independent of source acceptance
-API/MCP SHALL distinguish source acceptance from interpretation progress over latest visible municipal notices at the requested knowledge boundary. Typed section containers and pagination SHALL NOT be treated as individual pending notices. Irrelevant classified publications SHALL NOT require a measure extraction to count as interpreted. Validated extraction awaiting domain projection SHALL remain partial. The situation SHALL expose unresolved first municipal notices even when no preceding measure exists. Public local measures MAY expose their evidence-supported subject separately from action and place.
+API/MCP SHALL distinguish source acceptance from interpretation progress over latest visible municipal notices at the requested knowledge boundary. Typed section containers and pagination SHALL NOT be treated as individual pending notices. Irrelevant classified publications SHALL NOT require a measure extraction to count as interpreted. Validated extraction awaiting domain projection SHALL remain partial. The situation SHALL disclose incomplete interpretation of unresolved first municipal notices in its municipal source summary even when no preceding measure exists; document discovery/details SHALL retain their official links. Public local measures MAY expose their evidence-supported subject separately from action and place.
 
 #### Scenario: A selected development municipality has processed notices but pending acceptance
 - **WHEN** ordinary municipal interpretations exist and source acceptance remains pending
@@ -130,4 +130,30 @@ API/MCP SHALL distinguish source acceptance from interpretation progress over la
 
 #### Scenario: A first relevant notice has not been interpreted
 - **WHEN** a visible municipal notice has no preceding structured measure and no supported interpretation
-- **THEN** the situation includes its document and official link among documents requiring attention without inventing a measure or all-clear
+- **THEN** the situation municipal summary reports incomplete interpretation, while document discovery/details retain the document and official link without inventing a measure or all-clear
+
+### Requirement: Concise deductions and separate source summaries
+The municipality situation API/MCP data SHALL expose municipality identity,
+`processed_data` and `source_summaries`. Processed data SHALL contain factual
+conclusions supported by the prepared sources, distinct regional risks/levels/
+zones, local actions/subjects/places, operational phases, validity and affected
+limitations, with deduplicated document/version/URL/page references. It SHALL NOT
+return the raw backlog of uninterpreted documents or repeated quality/receipt
+structures. Those details SHALL remain available through document, search and
+coverage operations. Toscana SHALL have separate regional, municipal and
+Cittadino Informato summaries with source-specific contents and availability;
+regional products SHALL remain individually identified. No publishable channel
+data SHALL mean not collected/unavailable, never absence of notices. Acquisition
+freshness, interpretation and source acceptance SHALL remain distinguishable.
+
+#### Scenario: Regional green with ambiguous municipal validity
+- **WHEN** the CFR supports green for applicable current risks and municipal publications document restrictions with conflicting or missing dates
+- **THEN** the processed data reports those regional levels and documented restrictions separately, marks their current validity undetermined and does not infer all-clear or confirmation that restrictions are in force
+
+#### Scenario: The platform has no publishable acquisitions
+- **WHEN** a Toscana municipality has regional and municipal data but no publishable Cittadino Informato data in the query view
+- **THEN** the platform summary states not collected/unavailable without inventing platform contents, assuming no notices or reusing a separate trial's data
+
+#### Scenario: Many documents await interpretation
+- **WHEN** the pinned municipal situation contains many pending notices
+- **THEN** the municipal source summary reports incomplete interpretation; situation pages contain only structured facts, and full-scope conclusions/source summaries stay consistent across API/MCP pages while check freshness changes truthfully at delivery

@@ -77,3 +77,22 @@ separate. The current development public/admin and six workers run the correctio
 source controls, backup and infrastructure are preserved. Municipal date conflicts,
 unestablished expiry and formal source acceptance are not changed by the regional
 parser. The original dated observations above remain historical evidence.
+
+## Situazione sintetica — 3 ottobre 2026
+
+Il task 28 aggiorna la presentazione di situazione nell'ambiente development.
+La risposta HTTPS API e il client MCP reale sulla stessa vista restituiscono
+`processed_data` e tre `source_summaries`, con riferimenti documentali compatti.
+Nel perimetro verificato rimangono quattordici fatti regionali e sette misure
+comunali documentate: i livelli regionali sono determinati, la validità attuale
+delle misure comunali resta non determinabile e Cittadino Informato non dispone
+di dati pubblicabili nel database operativo. Il trial separato non è importato.
+Il backlog non genera più righe o pagine di situazione; i dettagli rimangono
+in ricerca, documenti e coverage.
+
+Test sintetici, PostgreSQL, race e vet verificano schema, canali distinti,
+evidenze deduplicate, incertezza, paginazione e aggiornamento della freschezza
+delle viste. La sostituzione riguarda il solo servizio public; gli altri servizi,
+i controlli di raccolta e accettazione sono preservati. L'immagine precedente
+e la configurazione sono conservate per rollback; registro privato
+`CLN-SUMMARY-20261003-01`. Accettazione e completezza delle fonti rimangono separate.
