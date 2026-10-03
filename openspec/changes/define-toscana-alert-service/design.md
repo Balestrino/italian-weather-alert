@@ -408,6 +408,20 @@ implementation; task 26.5 extends evaluation and task 26.6 controls the subseque
 scheduled trial. This planning revision implements no collector, completes no
 runtime task and does not accept or publicly activate a source.
 
+Task 26.3 implementation uses the typed `cittadino_informato` opt-in contract,
+separate municipality-bound external source and direct HTTP adapter. The register
+and retention store enforce municipality/query/dependency boundaries. Retain exact
+API JSON under its API URL, with public notice links and date meanings in metadata;
+only explicit `data_pubblicazione` supplies the source publication date. The optional
+absolute display-start filter limits discovery without establishing publication or
+operative coverage. Bounded pagination, existing target/version tracking,
+unavailable-detail backoff and validated PDF dependencies preserve visible failures
+and recoveries. Operator selection/referral supplies configuration evidence without
+a license-document prerequisite. Notices and risks remain pending verification.
+Synthetic persistence tests and a bounded isolated Calcinaia HTTP run verify this
+acquisition step; no multi-source receipt/admission implementation or scheduled
+activation is claimed. See [operations](../../../docs/operations/cittadino-informato.md).
+
 ## Manual municipal development publication — 2 October 2026
 
 Use additive migration `067_development_publication` for default-off municipal choices and immutable events, with no automatic backfill or rewrite of source acceptance/public flags. Private admin forms and explicit CLI commands use expected revisions. The current municipality register determines eligibility, and historic choices can be revoked. `IWA_ENVIRONMENT` defaults to strict production and Compose pins each environment. The development query store alone adds a municipality-scoped visibility path for policy-permitted active configurations and retained acquisitions under that revision. Municipalities sharing a regional zone do not inherit each other's selection; unscoped regional facts are restricted to mappings selected at the query knowledge boundary. Regional bulletin metadata remains attributable to the shared original. Copy authorization stays separate.

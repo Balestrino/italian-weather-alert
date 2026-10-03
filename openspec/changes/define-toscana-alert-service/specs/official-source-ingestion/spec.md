@@ -91,6 +91,22 @@ Task 26.2 SHALL remain open until a bounded development run exercises the acquis
 - **WHEN** a platform republication and CFR product refer to different issuance or validity periods
 - **THEN** the comparison records non-comparability and does not report an actual conflict or replace the CFR level
 
+#### Scenario: An explicitly selected API scope is acquired
+- **WHEN** a municipality-specific external platform source selects updates and/or risks with its own referral, publisher and page/document bounds
+- **THEN** the service checks the API municipality identity, retains versioned JSON and separate public links, rejects cross-municipality resources and leaves every notice/risk pending primary verification
+
+#### Scenario: A platform display-date filter limits discovery
+- **WHEN** the operator selects an absolute API display-start date and the acquired notice has different publication or operative dates
+- **THEN** the filter limits only the declared discovery scope, only the explicit source publication date governs the revision window, and missing validity stays unknown without inferred completeness
+
+#### Scenario: A selected platform dependency fails validation
+- **WHEN** an obligatory PDF is outside the configured paths, unavailable or not a valid PDF
+- **THEN** the original notice remains retained with an explicit missing dependency, the check is incomplete, and later recovery creates a new version without overwriting the failure evidence
+
+#### Scenario: A platform detail disappears temporarily
+- **WHEN** a tracked API detail returns 404 or 410
+- **THEN** the failure and next permitted attempt remain tracked, a deferred check is incomplete, and recovery preserves prior evidence without asserting cancellation
+
 #### Scenario: Primary verification is unavailable
 - **WHEN** a platform candidate is acquired but the municipal source cannot be checked
 - **THEN** the candidate and failed verification remain diagnostic with explicit limits, without asserting a confirmed measure, revocation or absence

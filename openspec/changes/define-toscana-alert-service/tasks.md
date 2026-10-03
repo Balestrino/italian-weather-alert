@@ -355,7 +355,7 @@ acceptance tasks 9.3 and 10.1 and production release gates remain open.
 
 - [x] 26.1 Formalize the requested additional institutional acquisition/discovery channel for selected municipalities in proposal, design and the three specifications; preserve independent municipal/CFR collection, scoped referrals, candidate limits and separate permissions/acceptance/activation. Record platform guidance and dated findings without claiming runtime adoption. The subsequent 3 October revision replaces the original reviewed-grounds gate with technical multi-source verification; this historical planning task does not complete the revised runtime work.
 - [ ] 26.2 Deliver and verify a working multi-source acquisition-to-verification system for Regione Toscana/CFR, the selected municipality and cittadinoinformato.it. After 26.3 and 26.4, exercise a bounded development run with regional and local cases and inspect persisted receipts identifying candidate, channel roles, source/version evidence, passages, check times, compared fields and outcomes. Verify missing/unavailable/non-comparable/not-applicable/conflicting evidence behavior and diagnostic-only admission without required primary support. Completion requires working tested comparisons, not obtaining licenses, agreements or legal-basis documentation; retain bounded public access, independent primary collection and link-only platform copies.
-- [ ] 26.3 Implement separate source identities and opt-in bounded acquisition for explicitly selected recognized municipality sections, with versioned originals, date meanings, dependencies, retries and visible failures; do not inherit recognition or permission across municipalities.
+- [x] 26.3 Implement separate source identities and opt-in bounded acquisition for explicitly selected recognized municipality sections, with versioned originals, date meanings, dependencies, retries and visible failures; do not inherit recognition or permission across municipalities. Verified with synthetic unit/disposable PostgreSQL cases and two bounded isolated Calcinaia HTTP checks on 3 October 2026; pending verification candidates, no live source activation. See [operations](../../../docs/operations/cittadino-informato.md).
 - [ ] 26.4 Implement persistent, evidence-bound multi-source verification receipts and candidate-to-domain admission: municipal publications/referenced acts for local fields, comparable originating CFR products for regional republications; record all three channel roles and distinguish corroboration, missing primary evidence, unavailable checks, non-comparable evidence, not-applicable checks and actual conflicts; preserve changes/history, avoid duplicate measures and never use majority vote between republications.
 - [ ] 26.5 Verify synthetic and reviewed real-source cases covering primary-only/platform-only notices, date/version mismatches, unavailable checks, actual conflicts, local measures without regional alerts, unchanged/revised content, same-platform unselected municipalities and equivalent API/MCP attribution; retain link-only copies and explicit coverage limits.
 - [ ] 26.6 Run a bounded operator-selected development preview/trial for Calcinaia before separately activating scheduled acquisition; verify independent municipal/CFR checks and comparison receipts, scoped visibility and rollback, without completing source acceptance or enabling other municipalities by inference.
@@ -372,6 +372,14 @@ user decision supersedes the licensing/documentation completion gate. Task 26.2
 remains unchecked because the implemented multi-source system and bounded run are
 still missing; there was no collector activation or external communication. This
 review does not complete tasks 26.3–26.6.
+
+**26.3 implementation — 3 October 2026:** the typed opt-in API adapter, registry
+and storage guards are implemented. Tests verify scoped acquisition, byte-exact
+originals, repeat/revised versions, date meanings, invalid/missing dependencies,
+rate limits and unavailable-detail deferral/recovery. Two bounded isolated HTTP
+checks verify Calcinaia access and unchanged-version reuse. This later work completes
+26.3 only; persistent multi-source comparisons/admission (26.4) and the complete
+26.2 development run remain open. Private source captures are excluded from Git.
 
 **Revised sequence:** implement 26.3 acquisition and 26.4 persistent comparisons,
 then close 26.2 from the bounded development run and inspected receipts. Complete

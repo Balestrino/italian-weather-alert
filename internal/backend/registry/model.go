@@ -85,26 +85,27 @@ type Discovery struct {
 // Every configuration is a complete snapshot, never a patch. Missing evidence
 // remains explicit; no source/product inherits another source's permissions.
 type Configuration struct {
-	LocalProcessing      *LocalProcessing         `json:"local_processing,omitempty"`
-	ProcessingProfile    string                   `json:"processing_profile,omitempty"`
-	InferenceEligibility *InferenceEligibility    `json:"inference_eligibility,omitempty"`
-	Attachments          *AttachmentPolicy        `json:"attachments,omitempty"`
-	Unresolved           []string                 `json:"unresolved"`
-	URL                  string                   `json:"url"`
-	Sections             []string                 `json:"sections"`
-	AccessMethod         string                   `json:"access_method"`
-	Attribution          string                   `json:"attribution"`
-	Provenance           *Evidence                `json:"provenance,omitempty"`
-	Referral             *Referral                `json:"referral,omitempty"`
-	Policy               Policy                   `json:"policy"`
-	CheckSeconds         int                      `json:"check_seconds"`
-	DelaySeconds         int                      `json:"delay_seconds"`
-	BackoffBaseSeconds   int                      `json:"backoff_base_seconds"`
-	BackoffMaxSeconds    int                      `json:"backoff_max_seconds"`
-	Limitations          []string                 `json:"limitations"`
-	Discovery            Discovery                `json:"discovery,omitempty"`
-	ExpectedPublication  *ExpectedPublication     `json:"expected_publication,omitempty"`
-	RegionalProduct      *RegionalProductContract `json:"regional_product,omitempty"`
+	CittadinoInformato   *CittadinoInformatoContract `json:"cittadino_informato,omitempty"`
+	LocalProcessing      *LocalProcessing            `json:"local_processing,omitempty"`
+	ProcessingProfile    string                      `json:"processing_profile,omitempty"`
+	InferenceEligibility *InferenceEligibility       `json:"inference_eligibility,omitempty"`
+	Attachments          *AttachmentPolicy           `json:"attachments,omitempty"`
+	Unresolved           []string                    `json:"unresolved"`
+	URL                  string                      `json:"url"`
+	Sections             []string                    `json:"sections"`
+	AccessMethod         string                      `json:"access_method"`
+	Attribution          string                      `json:"attribution"`
+	Provenance           *Evidence                   `json:"provenance,omitempty"`
+	Referral             *Referral                   `json:"referral,omitempty"`
+	Policy               Policy                      `json:"policy"`
+	CheckSeconds         int                         `json:"check_seconds"`
+	DelaySeconds         int                         `json:"delay_seconds"`
+	BackoffBaseSeconds   int                         `json:"backoff_base_seconds"`
+	BackoffMaxSeconds    int                         `json:"backoff_max_seconds"`
+	Limitations          []string                    `json:"limitations"`
+	Discovery            Discovery                   `json:"discovery,omitempty"`
+	ExpectedPublication  *ExpectedPublication        `json:"expected_publication,omitempty"`
+	RegionalProduct      *RegionalProductContract    `json:"regional_product,omitempty"`
 }
 type Version struct {
 	SourceID      string
@@ -171,6 +172,9 @@ func (c *Configuration) defaults() {
 	}
 }
 func (c Configuration) valid() bool {
+	if (c.AccessMethod == CittadinoInformatoAccess) != (c.CittadinoInformato != nil) || c.CittadinoInformato != nil && !c.CittadinoInformato.Valid(c) {
+		return false
+	}
 	if !c.LocalProcessing.valid(c.RegionalProduct) {
 		return false
 	}

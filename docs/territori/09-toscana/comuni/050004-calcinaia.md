@@ -68,14 +68,16 @@ multipla Regione/CFR–Comune–piattaforma, senza un gate di ottenimento licenz
 o documentazione della base giuridica. Mantenere controlli comunali
 indipendenti per gli avvisi assenti dalla piattaforma; confrontare con il CFR soltanto
 le affermazioni regionali comparabili, senza richiedere un'allerta regionale per ogni
-provvedimento locale. I task 26.2–26.6 restano aperti; il coverage tracker è invariato.
+provvedimento locale. Il task 26.3 è completato; 26.2 e 26.4–26.6 restano aperti,
+con il coverage tracker invariato.
 
 La [revisione preliminare del canale](../../../fonti/piattaforme/cittadino-informato-review.md)
 identifica l'indice REST e i limiti delle date del contenitore WordPress. Il
 trattamento dei visitatori dichiarato da ANCI Toscana non risolve i diritti sul
 flusso IWA. Il precedente criterio documentale è superato da CLN-012; occorrono
-ricevute persistenti con fonti/versioni, tempi, campi ed esiti distinti. Route degli
-avvisi, paginazione e cadenza restano da collaudare tecnicamente. Il CFR può essere
+ricevute persistenti con fonti/versioni, tempi, campi ed esiti distinti. CLN-013
+verifica le route API, i limiti e la persistenza dell’acquisizione; confronti e
+cadenza operativa restano da collaudare. Il CFR può essere
 non applicabile a una misura locale; non è richiesto un accordo unanime di tre canali.
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
@@ -103,6 +105,14 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-013 — Acquisizione Cittadino Informato delimitata verificata
+
+- **Data e ultima verifica:** 2026-10-03, implementazione, fixture sintetiche/PostgreSQL isolato e due controlli HTTP.
+- **Ambito:** canale aggiuntivo Calcinaia, ISTAT `050004`, aggiornamenti del pubblicatore comunale selezionato e rischi oggi/domani.
+- **Conoscenza:** confermato nel perimetro verificato. **Intervento:** codice applicato e verificato in isolamento; nessuna modifica o attivazione della fonte live.
+- **Osservazione ed evidenza:** originali API JSON e link pubblici separati; date di pubblicazione/visualizzazione conservate con significati distinti, controlli di paginazione, dipendenze e retry. La ripetizione invariata riusa le versioni. [Procedura e test](../../../operations/cittadino-informato.md); evidenza privata `CIN-ACQUIRE-20261003-01`.
+- **Conseguenza e prossima verifica:** aggiorna lo stato tecnico di CLN-011 e completa 26.3; i candidati rimangono pending. Implementare confronti persistenti e ammissione in 26.4, compreso il collegamento al dominio municipale di CLN-007, prima di chiudere 26.2.
 
 ### CLN-001 — Il canale secondario non dimostra la copertura primaria
 

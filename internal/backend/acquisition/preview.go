@@ -166,7 +166,9 @@ func (e *Engine) Check(ctx context.Context, sourceID string, revision int, start
 	}
 	var report Preview
 	var state acquisitionState
-	if v.Configuration.RegionalProduct != nil {
+	if v.Configuration.CittadinoInformato != nil {
+		report, state, err = e.acquireCittadinoInformato(ctx, sourceID, revision, v.Configuration, e.Tracking != nil)
+	} else if v.Configuration.RegionalProduct != nil {
 		report, state, err = e.acquireRegional(ctx, sourceID, revision, v.Configuration)
 	} else if e.Tracking != nil {
 		report, state, err = e.scheduledAcquire(ctx, sourceID, revision, v.Configuration)
@@ -199,6 +201,9 @@ func (e *Engine) Check(ctx context.Context, sourceID string, revision int, start
 }
 
 func (e *Engine) acquire(ctx context.Context, sourceID string, revision int, cfg registry.Configuration) (Preview, acquisitionState, error) {
+	if cfg.CittadinoInformato != nil {
+		return e.acquireCittadinoInformato(ctx, sourceID, revision, cfg, false)
+	}
 	if cfg.RegionalProduct != nil {
 		return e.acquireRegional(ctx, sourceID, revision, cfg)
 	}
@@ -638,6 +643,12 @@ func validateDiscovery(cfg registry.Configuration) error {
 }
 
 func validateAcquisitionConfiguration(cfg registry.Configuration) error {
+	if cfg.CittadinoInformato != nil {
+		if !cfg.CittadinoInformato.Valid(cfg) {
+			return ErrInvalidConfiguration
+		}
+		return nil
+	}
 	if !cfg.Attachments.Valid() || cfg.Attachments != nil && cfg.RegionalProduct != nil {
 		return ErrInvalidConfiguration
 	}

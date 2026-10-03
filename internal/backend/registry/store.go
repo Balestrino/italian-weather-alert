@@ -54,6 +54,25 @@ func (s *Store) CreateSource(ctx context.Context, src Source, c Configuration, a
 	return tx.Commit(ctx)
 }
 func insertConfig(ctx context.Context, tx pgx.Tx, id string, revision int, c Configuration, actor string) error {
+	var platform string
+	if err := tx.QueryRow(ctx, `SELECT ch.platform FROM registry_sources s JOIN registry_channels ch ON ch.id=s.channel_id WHERE s.id=$1`, id).Scan(&platform); err != nil {
+		return err
+	}
+	if (platform == "cittadino-informato") != (c.CittadinoInformato != nil) {
+		return ErrInvalid
+	}
+	if c.CittadinoInformato != nil {
+		var matched bool
+		if err := tx.QueryRow(ctx, `SELECT s.product_id='municipal' AND s.territory=$2
+ AND ch.external AND ch.platform='cittadino-informato' AND ch.url=$3
+ FROM registry_sources s JOIN registry_channels ch ON ch.id=s.channel_id WHERE s.id=$1`,
+			id, c.CittadinoInformato.MunicipalityISTAT, c.URL).Scan(&matched); err != nil {
+			return err
+		}
+		if !matched {
+			return ErrInvalid
+		}
+	}
 	b, err := json.Marshal(c)
 	if err != nil {
 		return err

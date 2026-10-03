@@ -17,7 +17,10 @@ sostituisce quel criterio: il task 26.2 deve essere chiuso mediante un sistema
 funzionante di verifica multipla Regione Toscana/CFR–Comune–cittadinoinformato.it,
 senza ottenere licenze, accordi o documentazione della base giuridica.
 
-Il task resta aperto perché il sistema non è ancora implementato e verificato.
+Il task resta aperto perché confronti persistenti, ammissione e controllo del
+percorso completo non sono ancora implementati e verificati. La successiva
+[implementazione della 26.3](../../operations/cittadino-informato.md) verifica
+l’acquisizione delimitata; ricevuta privata `CIN-ACQUIRE-20261003-01`.
 Nessuna attivazione è stata effettuata durante questa revisione; le copie pubbliche
 rimangono link-only. Le osservazioni originarie sotto riportate restano evidenze
 storiche e non costituiscono il gate di chiusura corrente.
@@ -33,6 +36,10 @@ storiche e non costituiscono il gate di chiusura corrente.
 | Emittenti | La presentazione descrive avvisi delle amministrazioni e contenuti regionali | Identificare emittente e diritti del singolo avviso; non trasferire quelli di un atto a immagini, mappe, materiali incorporati o raccolta complessiva |
 
 ## Accesso tecnico osservato
+
+Questo inventario riguarda la revisione preliminare. Il successivo collaudo
+26.3 aggiorna lo stato delle route aggiornamenti/rischi come registrato in
+[CIN-007](cittadino-informato.md#cin-007--acquisizione-api-delimitata-e-persistenza-verificate).
 
 Le letture sono consultazioni manuali delimitate, senza login, scansione di altri
 comuni, polling, chiamate a provider o operazioni di scrittura sulla piattaforma.
@@ -70,7 +77,8 @@ maggioranza sul prodotto originario.
 
 Per chiudere il task 26.2 occorre:
 
-1. Implementare l’acquisizione delimitata e le identità separate del task 26.3.
+1. Acquisizione delimitata e identità separate del task 26.3: implementate e
+   verificate successivamente alla revisione preliminare; confronti ancora pendenti.
 2. Implementare confronti persistenti e ammissione dei soli campi sostenuti secondo
    il task 26.4, mantenendo indipendenti raccolta comunale e CFR.
 3. Eseguire un controllo delimitato in development del percorso completo per un

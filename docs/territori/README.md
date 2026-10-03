@@ -46,7 +46,8 @@ Quando una scoperta è sostenuta solo da evidenza privata, conservarne lì il de
 
 Le note di [Cittadino Informato](../fonti/piattaforme/cittadino-informato.md)
 distinguono riconoscimento istituzionale, verifica multipla Regione/CFR–Comune–
-piattaforma e collaudo tecnico ancora da eseguire. Il criterio corrente del task
+piattaforma e collaudo dell’acquisizione 26.3 completato in isolamento; confronti
+persistenti e controllo del percorso completo sono ancora da eseguire. Il criterio corrente del task
 26.2 è un sistema implementato e verificato, senza ottenere licenze o documentazione
 giuridica; le scoperte datate conservano e segnalano il precedente gate superato.
 

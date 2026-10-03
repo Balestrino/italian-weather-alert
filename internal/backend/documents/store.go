@@ -66,6 +66,10 @@ func (s *Store) Stage(ctx context.Context, input Acquisition) error {
 		if json.Unmarshal(raw, &c) != nil {
 			return ErrPolicy
 		}
+		if c.CittadinoInformato != nil && (c.Policy.CopiesPermitted ||
+			r.Missing == "" && (r.Role == "resource" || r.Role == "original" && !c.CittadinoInformato.AllowsOriginal(r.URL) || r.Role == "attachment" && !c.CittadinoInformato.AllowsAttachment(r.URL))) {
+			return ErrPolicy
+		}
 		if r.Missing == "" && (!c.Policy.CollectionPermitted || !c.Policy.RetentionPermitted || c.Policy.Evidence == nil) {
 			return ErrPolicy
 		}

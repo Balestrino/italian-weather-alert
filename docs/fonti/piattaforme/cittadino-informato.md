@@ -39,10 +39,13 @@ mancato riscontro, controllo indisponibile e conflitto reale. Non trasferire dat
 della piattaforma alla validità operativa né usare la somiglianza come equivalenza.
 
 Mantenere discovery comunale e CFR indipendente per gli avvisi assenti dalla
-piattaforma. Sezioni, paginazione, dipendenze, aggiornamenti e cadenza effettiva sono
-da collaudare. La [revisione preliminare del 3 ottobre](cittadino-informato-review.md)
-verifica l’indice REST collegato dalla pagina Calcinaia e due risposte descrittive;
-le route degli aggiornamenti sono dichiarate dal server, ma non ancora collaudate.
+piattaforma. Il task 26.3 implementa ora le route API degli aggiornamenti e dei
+rischi, paginazione delimitata, originali versionati e dipendenze PDF esplicite.
+La [procedura](../../operations/cittadino-informato.md) documenta il contratto,
+i test sintetici di persistenza e la prova HTTP isolata su Calcinaia del 2026-10-03.
+La [revisione preliminare](cittadino-informato-review.md) conserva l’inventario
+anteriore al collaudo; CIN-007 aggiorna lo stato tecnico. Confronti persistenti,
+cadenza operativa e copertura continuativa restano da verificare.
 Feed degli avvisi e intervalli di polling non sono stati individuati nelle risorse
 consultate. Preferire un accesso API/feed verificato tecnicamente quando disponibile.
 I metadati WordPress della pagina non datano i bollettini dinamici.
@@ -69,21 +72,30 @@ CIN-006 ne supera l’uso come prerequisito del piano.
 | --- | --- | --- |
 | CIN-001 | Calcinaia | Referral verificato; altri comuni richiedono evidenze proprie |
 | CIN-002 | Condizioni | Link copyright senza documento nella homepage consultata; osservazione conservata, precedente gate superato da CIN-006 |
-| CIN-003 | Nuovo flusso IWA | Acquisizione aggiuntiva con verifica primaria pianificata; implementazione e attivazione aperte |
+| CIN-003 | Nuovo flusso IWA | Piano originario; acquisizione implementata da CIN-007, confronti e attivazione ancora aperti |
 | CIN-004 | Revisione originaria Calcinaia | Osservazioni conservate; criterio documentale di chiusura superato da CIN-006 |
 | CIN-005 | Accesso tecnico Calcinaia | Indice REST osservato; date del contenitore non operative, route degli avvisi e cadenza da collaudare |
 | CIN-006 | Criterio corrente del task 26.2 | Sistema di verifica multipla implementato e verificato, con ricevute persistenti; nessun gate di ottenimento licenze/documentazione |
+| CIN-007 | Acquisizione Calcinaia | Contratto API e guardie implementati; prove sintetiche e due passaggi HTTP isolati verificati, candidati pending |
 
 ## Problemi aperti
 
 I [task 26.2–26.6](../../../openspec/changes/define-toscana-alert-service/tasks.md)
-richiedono acquisizione delimitata, confronti persistenti, verifica del percorso in
+registrano la 26.3 completata e richiedono ancora confronti persistenti, verifica del percorso in
 development, valutazione estesa e trial programmato. Il [dossier](cittadino-informato-review.md)
 conserva l’inventario tecnico e i criteri correnti. Il task 26.2 resta aperto perché
-il sistema di verifica multipla non è ancora implementato e verificato.
+il confronto e l’ammissione dei candidati non sono ancora implementati e verificati.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-007 — Acquisizione API delimitata e persistenza verificate
+
+- **Data e ultima verifica:** 2026-10-03, codice, fixture sintetiche/PostgreSQL isolato e due controlli HTTP delimitati.
+- **Ambito:** percorso Calcinaia, aggiornamenti del pubblicatore selezionato e rischi oggi/domani; nessuna estensione ad altri Comuni.
+- **Conoscenza:** confermato nel perimetro provato. **Intervento:** adattatore applicato al codice e verificato in isolamento; nessuna attivazione live.
+- **Osservazione ed evidenza:** identità comunale e API dettaglio verificate; originali JSON versionati, link pubblici separati, date di pubblicazione distinte da visualizzazione/validità. Test e limiti nella [procedura](../../operations/cittadino-informato.md); ricevuta privata `CIN-ACQUIRE-20261003-01`.
+- **Conseguenza e prossima verifica:** aggiorna il collaudo mancante di CIN-005 e completa 26.3. I candidati restano pending; implementare 26.4 prima di chiudere 26.2. Non dimostra copertura, accettazione o confronti con Comune/CFR.
 
 ### CIN-001 — Referral istituzionale di Calcinaia
 
