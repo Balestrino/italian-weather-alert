@@ -25,7 +25,11 @@ Il [coverage tracker](../../coverage.md) resta il riferimento per l'accettazione
 
 La [specifica](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification)
 include la piattaforma come canale aggiuntivo di acquisizione/discovery per comuni
-selezionati, con referral e condizioni propri. La decisione non attiva un collector.
+selezionati, con referral propri e verifica multipla Regione/CFR–Comune–piattaforma.
+La revisione dell’utente del 2026-10-03 sostituisce il precedente requisito di base
+verificata: ottenere licenze, accordi o documentazione giuridica non è il criterio
+di chiusura del task 26.2. Occorre un sistema implementato e verificato con confronti
+persistenti. La decisione non attiva un collector.
 Le pubblicazioni generano candidati con URL/versione, emittente, territorio ed
 espressioni temporali. Verificare misure locali nel sito comunale o nell'atto
 richiamato; confrontare rilanci regionali con prodotto CFR, rischio, zona, emissione
@@ -36,41 +40,48 @@ della piattaforma alla validità operativa né usare la somiglianza come equival
 
 Mantenere discovery comunale e CFR indipendente per gli avvisi assenti dalla
 piattaforma. Sezioni, paginazione, dipendenze, aggiornamenti e cadenza effettiva sono
-da collaudare; questa indagine non certifica endpoint API/feed o intervalli di
-polling. Preferire un accesso documentato e ammesso quando disponibile.
+da collaudare. La [revisione preliminare del 3 ottobre](cittadino-informato-review.md)
+verifica l’indice REST collegato dalla pagina Calcinaia e due risposte descrittive;
+le route degli aggiornamenti sono dichiarate dal server, ma non ancora collaudate.
+Feed degli avvisi e intervalli di polling non sono stati individuati nelle risorse
+consultate. Preferire un accesso API/feed verificato tecnicamente quando disponibile.
+I metadati WordPress della pagina non datano i bollettini dinamici.
 
-Prima della raccolta automatica identificare una base verificata per accesso,
-conservazione, trattamento tramite provider e riuso previsto: licenza, disposizione
-applicabile o accordo. Non presumere un obbligo generale di permesso individuale,
-né un'autorizzazione illimitata dalla sola accessibilità o attribuzione della fonte.
-Il riscontro primario verifica i fatti e non sana un'acquisizione priva dei
-presupposti richiesti. Le copie pubbliche restano link-only nella specifica IWA;
-diritti sui contenuti e sulla banca dati, condizioni tecniche ed eventuali dati
-personali richiedono valutazioni distinte.
+Ogni ricevuta deve identificare il candidato, i tre ruoli di canale, fonti e versioni
+consultate, passaggi probatori, tempi dei controlli, campi confrontati ed esito.
+Distinguere conferma, evidenza primaria non trovata, controllo indisponibile,
+contenuti non comparabili, controllo non applicabile e conflitto reale. Per una
+misura soltanto locale il CFR può essere non applicabile; per un fatto regionale
+fa riferimento il prodotto CFR originario anche senza un rilancio comunale.
+Non richiedere unanimità fra tre pubblicazioni né contare i rilanci come voti
+indipendenti. Un candidato senza il necessario sostegno primario resta diagnostico.
 
-Le [linee guida AgID](https://www.agid.gov.it/sites/agid/files/2024-05/lg-open-data_v.1.0_1.pdf)
-descrivono apertura per impostazione predefinita nei casi applicabili e la distinta
-posizione dei testi degli atti ufficiali. L'applicabilità ai titolari e ai contenuti
-di questo canale va accertata. La [direttiva sulle banche dati, articoli 7–8](https://eur-lex.europa.eu/legal-content/IT/ALL/?uri=celex%3A31996L0009)
-disciplina anche estrazioni sostanziali e, alle condizioni previste, ripetute e
-sistematiche; pochi campi e confronto successivo non costituiscono una verifica
-dei diritti. Questi riferimenti orientano la revisione, senza concluderla.
+Il task 26.2 si chiude dopo l’implementazione dei task 26.3/26.4 e una verifica
+in development del percorso acquisizione–confronto con ricevute ispezionabili per
+casi regionali e locali, inclusi errori e conflitti. Raccolta indipendente comunale
+e CFR, copie pubbliche link-only, accettazione e trial programmato restano distinti.
+Le osservazioni originarie sulle condizioni sono conservate nel registro datato;
+CIN-006 ne supera l’uso come prerequisito del piano.
 
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola e stato |
 | --- | --- | --- |
 | CIN-001 | Calcinaia | Referral verificato; altri comuni richiedono evidenze proprie |
-| CIN-002 | Condizioni | Link copyright senza documento nella homepage consultata; base del flusso da verificare |
+| CIN-002 | Condizioni | Link copyright senza documento nella homepage consultata; osservazione conservata, precedente gate superato da CIN-006 |
 | CIN-003 | Nuovo flusso IWA | Acquisizione aggiuntiva con verifica primaria pianificata; implementazione e attivazione aperte |
+| CIN-004 | Revisione originaria Calcinaia | Osservazioni conservate; criterio documentale di chiusura superato da CIN-006 |
+| CIN-005 | Accesso tecnico Calcinaia | Indice REST osservato; date del contenitore non operative, route degli avvisi e cadenza da collaudare |
+| CIN-006 | Criterio corrente del task 26.2 | Sistema di verifica multipla implementato e verificato, con ricevute persistenti; nessun gate di ottenimento licenze/documentazione |
 
 ## Problemi aperti
 
 I [task 26.2–26.6](../../../openspec/changes/define-toscana-alert-service/tasks.md)
-richiedono condizioni/accesso verificati, collector separato, confronti persistenti,
-valutazione e trial delimitato. Una pagina senza licenza individuata non dimostra
-che manchino ovunque condizioni o altre basi applicabili. La lettura HTTP non
-certifica aggiornamento continuo, completezza o assenza di avvisi.
+richiedono acquisizione delimitata, confronti persistenti, verifica del percorso in
+development, valutazione estesa e trial programmato. Il [dossier](cittadino-informato-review.md)
+conserva l’inventario tecnico e i criteri correnti. Il task 26.2 resta aperto perché
+il sistema di verifica multipla non è ancora implementato e verificato.
+La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
 
@@ -83,6 +94,8 @@ certifica aggiornamento continuo, completezza o assenza di avvisi.
 - **Conseguenza e prossima verifica:** riconoscimento circoscritto; verificare separatamente ulteriori comuni e contenuti.
 
 ### CIN-002 — Link copyright senza documento operativo
+
+Il prerequisito proposto in questa voce è superato da CIN-006; l’osservazione HTTP resta conservata.
 
 - **Data e ultima verifica:** 2026-10-03, lettura HTTP ordinaria e consultazione web.
 - **Ambito:** homepage e link «Note legali e copyright».
@@ -97,3 +110,30 @@ certifica aggiornamento continuo, completezza o assenza di avvisi.
 - **Conoscenza:** requisito confermato. **Intervento:** pianificato, non applicato al runtime.
 - **Osservazione ed evidenza:** proposta, design, tre specifiche e task 26 del [change Toscana](../../../openspec/changes/define-toscana-alert-service/proposal.md) descrivono candidati e riscontro comunale/CFR.
 - **Conseguenza e prossima verifica:** completare presupposti, implementazione e trial; il piano non certifica accettazione, diritti o pubblicazione.
+
+### CIN-004 — Revisione distinta per accesso, conservazione, provider e riuso
+
+Il criterio documentale di chiusura di questa voce è superato da CIN-006; le osservazioni originarie restano conservate.
+
+- **Data e ultima verifica:** 2026-10-03, letture HTTP delimitate di progetto, contatti, privacy e cookie policy.
+- **Ambito:** canale Calcinaia; nessuna estensione ad altri comuni.
+- **Conoscenza:** ANCI Toscana identificata come titolare del trattamento dei visitatori; diritti sui contenuti e sulla banca dati da accertare. **Intervento:** revisione preliminare documentata, nessuna attivazione.
+- **Osservazione ed evidenza:** la privacy policy non è una licenza dei contenuti; il footer copyright resta senza documento raggiungibile. Il [dossier](cittadino-informato-review.md) distingue le quattro operazioni IWA e le possibili basi da valutare. Registro privato `CIN-REVIEW-20261003-02`.
+- **Conseguenza e prossima verifica:** chiudere la matrice con licenza, base normativa applicabile o accordo verificati; conservare link-only, verifiche primarie e accettazione separati. Nessun divieto generale dedotto dall'assenza di licenza individuata.
+
+### CIN-005 — API esposta e metadati del contenitore non equivalenti agli avvisi
+
+- **Data e ultima verifica:** 2026-10-03, pagina Calcinaia, indice REST, metadati WordPress e risposte API di identità/progetto.
+- **Ambito:** `/calcinaia/` e collegamenti REST dichiarati dal suo HTML.
+- **Conoscenza:** accessibilità delle risorse consultate confermata; contratto degli avvisi non collaudato. **Intervento:** diagnosi documentata.
+- **Osservazione ed evidenza:** l'indice espone route di rischi e aggiornamenti con filtri comunali; i metadati della pagina risalgono al 2017–2018, il corpo REST è vuoto e l'HTML mostra un bollettino del 2026. Percorsi e limiti nel [dossier](cittadino-informato-review.md); ricevute private `CIN-REVIEW-20261003-02`.
+- **Conseguenza e prossima verifica:** non acquisire il contenitore come se fosse un avviso né usarne le date come emissione; verificare le route dei contenuti, cadenza e condizioni prima del collector. La precedente assenza di un endpoint certificato non significa assenza di un'API tecnicamente esposta.
+
+### CIN-006 — Verifica multipla come criterio di chiusura del task 26.2
+
+- **Data e ultima verifica:** 2026-10-03, decisione esplicita dell’utente e revisione documentale; nessun nuovo fetch o test runtime.
+- **Ambito:** flusso IWA Regione Toscana/CFR–Comune–cittadinoinformato.it, primo comune Calcinaia.
+- **Conoscenza:** requisito confermato; gate documentale delle voci CIN-002/CIN-004 superato. **Intervento:** applicato a proposta, design, specifiche, checklist e guide; sistema da implementare.
+- **Osservazione ed evidenza:** il [task 26.2](../../../openspec/changes/define-toscana-alert-service/tasks.md) ora richiede un percorso funzionante acquisizione–verifica con ricevute persistenti e verifica delimitata in development, senza ottenere licenze, accordi o documentazione della base giuridica.
+- **Conseguenza:** CFR primario per dati regionali, Comune/atto primario per misure locali; non applicabilità, mancato riscontro, indisponibilità, non comparabilità e conflitto restano distinti. Nessun voto a maggioranza o obbligo di tre pubblicazioni concordi.
+- **Prossima verifica:** implementare 26.3/26.4 e verificare il nuovo 26.2; poi valutazione 26.5 e trial programmato 26.6. Copie pubbliche link-only e accettazione restano separati.

@@ -92,7 +92,7 @@ Expose versioned query views so pagination and equivalent cross-interface reques
 
 Retention is configurable, initially three calendar months from the first acquisition of each version, for structured records and acquired originals/versions. Unchanged checks do not reset that clock. Bootstrap collection covers the previous 30 days and explicitly referenced older documents without claiming complete pre-startup history. Measures still valid or without established cessation protect the documents and versions needed to reconstruct them beyond the horizon. An unresolved measure does not become confirmed active through this exception.
 
-A changed duration applies to existing data at the next cleanup: increases protect remaining data longer, reductions make older unprotected data eligible, and deleted data is not restored. When protection ends, already-expired versions become eligible. Define calendar arithmetic and dependency-safe cleanup in the technical contract, including month-end cases. Retention cannot silently discard evidence required by an exception. Source-specific reuse constraints remain an acceptance condition and any resulting limits must be disclosed.
+A changed duration applies to existing data at the next cleanup: increases protect remaining data longer, reductions make older unprotected data eligible, and deleted data is not restored. When protection ends, already-expired versions become eligible. Define calendar arithmetic and dependency-safe cleanup in the technical contract, including month-end cases. Retention cannot silently discard evidence required by an exception. Source-specific reuse constraints remain an acceptance condition and any resulting limits must be disclosed. For the scoped Cittadino Informato workflow, task 26.2 uses the multi-source technical criterion below rather than a license or legal-basis documentation prerequisite.
 
 ### 6. Diagnose quality rather than manually curate notices
 
@@ -193,9 +193,19 @@ The dependency table in tasks.md governs sequencing: foundation, generic domain 
 
 ## Remaining Verification Prerequisites
 
+The 3 October preliminary Cittadino Informato review found a Calcinaia-linked
+REST index and municipality/project responses. The subsequent user decision
+replaces the original documentation/licensing prerequisite with an implemented
+multi-source verification system. Declared notice routes still require technical
+validation; WordPress container dates and its empty REST body cannot substitute
+for dynamically rendered notice versions. The [scoped review dossier](../../../docs/fonti/piattaforme/cittadino-informato-review.md)
+records the original findings and revised completion criteria. Task 26.2 remains
+open because the acquisition-to-verification system has not yet been implemented
+and exercised, rather than because license or legal-basis documents are missing.
+
 The architecture and collection approach below are decided. These checks remain prerequisites for their dependent tasks, not evidence of completed implementation:
 
-1. Complete and verify the product-specific collection contracts for the selected CFR routes and the municipal/additional-platform/referenced-act boundaries, including independent primary collection, required attachments, reviewed access/reuse grounds, recorded comparisons and graphical zone/level extraction.
+1. Complete and verify the product-specific collection contracts for the selected CFR routes and the municipal/additional-platform/referenced-act boundaries, including independent primary collection, required attachments, recorded multi-source comparisons and graphical zone/level extraction. Cittadino Informato readiness follows task 26.2's technical criterion; the other source/product contracts retain their own access/reuse requirements.
 2. Implement conflict-aware operational extraction windows, compact indexed evidence and validated candidate merge, then rerun the full retained-case extraction evaluation, including long/scanned ordinances and cross-window temporal conflicts.
 3. Complete live regional and municipal integration and verify the reviewed API/MCP contract, consistent views/cursors, retention behavior and the initial public limits behind the existing proxy.
 4. Prepare the dedicated trial VM, configure the existing SMTP path, confirm PBS whole-VM protection, perform an isolated restore, complete at least seven full observational days across all four scopes and then derive the operating budget from measured consumption.
@@ -362,35 +372,41 @@ semantic extraction acceptance.
 
 ## Cittadino Informato acquisition and corroboration — 3 October 2026
 
-The user-authorized target extends the retained diagnostic sentinel into a scoped
-acquisition/discovery channel for selected municipalities. Calcinaia has a verified
-municipal referral; other municipalities require their own recognition and policies.
-Use a separate channel/source identity rather than silently appending platform URLs
-to the existing municipal source. Record authority, publisher, operator, exact scope,
-reviewed access/retention/interpretation/reuse grounds and dated evidence separately.
-The reviewed basis may be a license, applicable statutory permission or agreement;
-the absence of a visible license is neither a blanket prohibition nor permission.
-At this planning revision no basis for systematic platform acquisition has been
-established. The homepage copyright link observed on 3 October points to `#`;
-that finding does not determine rights over the data. Prefer a documented permitted
-feed/API if available, with separately verified cadence and bounded retries.
+The revised user-authorized target is a scoped acquisition/discovery channel with
+an implemented verification system spanning Regione Toscana/CFR, municipality and
+cittadinoinformato.it. Task 26.2 no longer requires obtaining license, agreement or
+legal-basis documentation. Calcinaia has a verified municipal referral; each other
+municipality requires its own recognition and explicit selection. Use a separate
+channel/source identity, bounded public sections/endpoints, operator-configured
+cadence and upstream retry instructions. Prefer technically verified API/feed
+access. Validate the notice routes independently of CMS container metadata.
 
-Acquisition creates attributable candidates and bounded primary-verification work,
-independent of anonymous API/MCP queries. Persist source/version evidence and the
-comparison's scope, time, supported fields and outcome. Match municipal actions,
-places and original validity expressions against municipal notices/referenced acts;
-match regional republications to the CFR product, risk, zone, issuance and validity.
-Keep uncorroborated, unavailable and conflicting evidence distinct. No unsupported
-candidate enters confirmed municipal projection or overwrites the CFR risk level.
-Local measures remain independent of regional alert presence. Preserve updates and
-earlier knowledge, deduplicate matching publications and reevaluate changed versions.
+Acquisition creates attributable candidates and bounded verification work,
+independent of anonymous API/MCP queries. Persist a receipt identifying the
+candidate, all three channel roles, consulted source/version evidence and passages,
+attempted-check times, compared fields, outcome and reasons. Distinguish supported
+fields, primary evidence not found, unavailable checks, non-comparable evidence,
+checks not applicable to the claim and actual conflicts. Preserve earlier receipts
+and reevaluate changed versions without rewriting historical knowledge.
+
+Compare municipal actions, places and original validity expressions against
+municipal notices or referenced acts; compare regional republications against the
+originating CFR product, risk, zone, issuance and validity. CFR may be not applicable
+to a local-only measure; municipal republication is not required for a supported
+regional claim. Do not require three-channel unanimity or count republications as
+independent majority votes. Unsupported candidates remain diagnostic and cannot
+create confirmed municipal fields or overwrite the originating CFR risk level.
+Deduplicate matching publications and preserve each channel's evidence.
 
 Continue independent municipal and CFR discovery, including primary-only notices.
-Expose truthful scope/check limitations and corroboration evidence for permitted
-validated facts; diagnostic-only candidates are not confirmed alert output. Public
-platform copies remain link-only under the existing restriction. Legal review,
-implementation, representative comparisons, technical acceptance and scoped rollout
-are open tasks; this decision activates no collector and accepts no source.
+Equivalent API/MCP output retains channel attribution, primary evidence and scoped
+verification outcomes. Public platform copies remain link-only. Task 26.2 closes
+only after a bounded development run exercises acquisition and persistent
+verification for regional and local cases, and failure/conflict cases pass with
+inspectable receipts. Tasks 26.3 and 26.4 supply the acquisition and persistence
+implementation; task 26.5 extends evaluation and task 26.6 controls the subsequent
+scheduled trial. This planning revision implements no collector, completes no
+runtime task and does not accept or publicly activate a source.
 
 ## Manual municipal development publication — 2 October 2026
 

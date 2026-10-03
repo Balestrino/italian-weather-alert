@@ -27,7 +27,7 @@ The service SHALL register authority, publisher, technical platform, territory, 
 - **THEN** the service records the stated issuer and missing institutional evidence without asserting verified competence or assigning the decision to a municipality by inference
 
 ### Requirement: Source acceptance before verified activation
-The service SHALL report sources as not yet verified until official provenance, access/reuse conditions, declared sections and product coverage, representative extraction and update handling have been verified. Acceptance SHALL include real documents and applicable updates, cancellations and attachments, comparisons with originals, delay measurements, failure and ambiguity behavior, and API/MCP equivalence. Untested cases and unresolved conditions SHALL be explicit. Partial coverage SHALL NOT be described as complete, and an accepted sample SHALL NOT imply coverage of every publication or other municipalities.
+The service SHALL report sources as not yet verified until official provenance, access/reuse conditions, declared sections and product coverage, representative extraction and update handling have been verified. For the scoped Cittadino Informato workflow, the technical multi-source verification requirement below SHALL define acquisition readiness without requiring acquisition of a license, agreement or separately verified legal basis as a task completion gate; public copies SHALL remain link-only. Acceptance SHALL include real documents and applicable updates, cancellations and attachments, comparisons with originals, delay measurements, failure and ambiguity behavior, and API/MCP equivalence. Untested cases and unresolved conditions SHALL be explicit. Partial coverage SHALL NOT be described as complete, and an accepted sample SHALL NOT imply coverage of every publication or other municipalities.
 
 #### Scenario: One initial municipality is not ready
 - **WHEN** regional products are accepted but a planned municipal channel has unresolved acceptance evidence
@@ -66,21 +66,28 @@ Municipal acceptance SHALL identify configured channels and sections, evaluated 
 ### Requirement: Scoped Cittadino Informato acquisition and primary verification
 The service SHALL support Cittadino Informato as an additional acquisition/discovery channel for explicitly selected municipalities. Recognition SHALL identify the municipal referral, exact destination, covered sections, municipality ISTAT and observation date. Calcinaia's recognition SHALL NOT recognize or activate any other municipality or the entire platform. Platform operator, publisher and originating municipal or regional authority SHALL remain separate.
 
-Before active acquisition, each declared scope SHALL record reviewed grounds for access, automated collection, retention, interpretation and intended reuse, including applicable license, statutory basis or agreement and any third-party rights or personal-data limitations. Institutional recognition, public accessibility, robots directives, attribution or corroboration SHALL NOT substitute for this assessment. Missing explicit license SHALL NOT itself establish either prohibition or unrestricted permission. Available official API/feed access SHOULD be preferred where verified; endpoints and polling limits SHALL NOT be invented. Public copies SHALL retain the independently restricted link-only policy.
+Recurring acquisition readiness and task 26.2 completion SHALL be based on an implemented, tested multi-source verification system spanning Regione Toscana/CFR, the selected municipality and cittadinoinformato.it. Obtaining licenses, agreements or documentation of a separately verified legal basis SHALL NOT be a prerequisite or completion criterion for this workflow. Acquisition SHALL use explicitly selected recognized channels, bounded publicly accessible sections/endpoints, operator-configured cadence and upstream retry instructions. Available official API/feed access SHOULD be preferred where technically verified; endpoints and upstream polling limits SHALL NOT be invented. Public platform copies SHALL remain link-only.
 
 Acquired platform publications SHALL generate evidence-bound candidates and bounded verification work. Local measures and operational dates SHALL be verified against the municipal publication or its referenced official act. Regional republications SHALL be compared with the originating CFR product for the same risk, zone, issuance/version and validity. A local measure SHALL NOT require a concurrent regional alert. Comparisons SHALL retain both source/version identities, relevant passages, comparison time and supported fields; textual similarity alone SHALL NOT establish equivalence. Independent municipal and CFR collection SHALL continue within their declared scopes.
 
-The service SHALL distinguish corroborated fields, primary evidence not found, primary check unavailable and actual comparable conflicts. Missing or failed primary retrieval SHALL NOT be reported as contradiction, cancellation, absence of risk or established validity. Candidates without required primary support SHALL remain diagnostic and SHALL NOT become confirmed local measures or substitute regional levels in API/MCP. Agreement SHALL NOT complete source acceptance or establish real-world completeness. New or changed evidence SHALL trigger versioned reevaluation without rewriting earlier knowledge.
+The service SHALL distinguish corroborated fields, primary evidence not found, primary check unavailable, non-comparable evidence, checks not applicable to the claim and actual comparable conflicts. Each verification receipt SHALL identify the candidate, the three channel roles, consulted source/version identities and relevant passages where available, attempted-check times, field-level results and reasons for missing or inapplicable comparisons. Regional claims SHALL use the originating CFR product; local claims SHALL use municipal publications or referenced acts. A local-only measure MAY have the CFR check marked not applicable; a missing municipal republication SHALL NOT invalidate a supported originating CFR claim. The service SHALL NOT require unanimous three-channel agreement or resolve disagreements by majority vote between republications of the same original. Missing or failed primary retrieval SHALL NOT be reported as contradiction, cancellation, absence of risk or established validity. Candidates without required primary support SHALL remain diagnostic and SHALL NOT become confirmed local measures or substitute regional levels in API/MCP. Agreement SHALL NOT complete source acceptance or establish real-world completeness. New or changed evidence SHALL trigger versioned reevaluation without rewriting earlier knowledge.
 
-#### Scenario: A recognized municipal page has unresolved acquisition grounds
-- **WHEN** the municipal referral is verified but the basis for automated collection and intended retention/reuse remains unresolved
-- **THEN** channel recognition is recorded, acquisition remains inactive and coverage identifies the pending condition without treating the channel as unofficial
+Task 26.2 SHALL remain open until a bounded development run exercises the acquisition-to-verification path and persists inspectable receipts across the three channel roles, including a regional republication and a local measure, with tested missing, unavailable, non-comparable and conflicting evidence behavior. The run SHALL verify independent primary collection and diagnostic-only admission for unsupported candidates. A planning edit or legal/technical documentation inventory alone SHALL NOT complete the task. The subsequent scheduled trial, source acceptance and public activation SHALL remain separate tasks.
+
+#### Scenario: Multi-source verification closes acquisition readiness
+- **WHEN** recognized selected channels have a working bounded acquisition and persistent verification path, and the required development run and failure cases pass
+- **THEN** task 26.2 can be completed from inspectable multi-source results without obtaining license or legal-basis documentation, while source acceptance and scheduled activation remain separate
 
 #### Scenario: A platform communication is corroborated by a municipal ordinance
-- **WHEN** a selected permitted channel reports a closure and the municipal publication or referenced ordinance supports the same action, place and period
+- **WHEN** a selected recognized channel reports a closure and the municipal publication or referenced ordinance supports the same action, place and period
 - **THEN** the candidate retains both evidence identities and only supported fields enter the validated municipal projection, with independent interpretation and publication gates
 
+#### Scenario: Container metadata does not represent the dynamic notice
+- **WHEN** a recognized platform page's CMS response has an empty body or creation/modification dates belonging to the page container rather than its displayed notices
+- **THEN** the service does not treat those fields as notice content, issuance or operational validity and verifies a content-specific technical acquisition contract before collecting the notices
+
 #### Scenario: Regional colors disagree for different validities
+
 - **WHEN** a platform republication and CFR product refer to different issuance or validity periods
 - **THEN** the comparison records non-comparability and does not report an actual conflict or replace the CFR level
 
@@ -91,6 +98,14 @@ The service SHALL distinguish corroborated fields, primary evidence not found, p
 #### Scenario: An independent municipal check finds a platform omission
 - **WHEN** the municipal channel publishes a relevant notice absent from the platform
 - **THEN** primary collection and interpretation proceed independently and the platform omission is recorded within the compared scope
+
+#### Scenario: A local measure has no applicable regional warning
+- **WHEN** a platform candidate is corroborated by a municipal act and no regional warning is applicable to that local claim
+- **THEN** the receipt records the CFR role as not applicable, retains municipal/platform evidence and admits only the supported local fields without requiring three matching publications
+
+#### Scenario: Two republications disagree with the originating CFR product
+- **WHEN** platform and municipal republications agree with each other but conflict with the comparable originating CFR product
+- **THEN** the system preserves the conflict and originating level rather than selecting the republications by majority vote
 
 ### Requirement: Retained acquisition and versions
 The service SHALL retain original document bytes where permitted, source URL, acquisition time, hash, available publication/update metadata and interpretation version. It SHALL detect changes at stable URLs, preserve prior versions within retention, and avoid duplicate versions for unchanged content. An unchanged successful check SHALL NOT change publication time. Required linked resources SHALL be included or explicitly reported missing.

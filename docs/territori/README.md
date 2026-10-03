@@ -45,8 +45,10 @@ Quando una scoperta è sostenuta solo da evidenza privata, conservarne lì il de
 ## Manutenzione
 
 Le note di [Cittadino Informato](../fonti/piattaforme/cittadino-informato.md)
-distinguono riconoscimento istituzionale, nuovo flusso pianificato con verifica
-primaria e condizioni di acquisizione ancora da verificare.
+distinguono riconoscimento istituzionale, verifica multipla Regione/CFR–Comune–
+piattaforma e collaudo tecnico ancora da eseguire. Il criterio corrente del task
+26.2 è un sistema implementato e verificato, senza ottenere licenze o documentazione
+giuridica; le scoperte datate conservano e segnalano il precedente gate superato.
 
 Aggiornare le schede durante l'indagine o la modifica relativa alla fonte, prima di dichiarare conclusa la verifica. Rivalutare le indicazioni quando cambiano sito, piattaforma, configurazione, diritti d'uso o comportamento del collector. Una nuova evidenza contraria riapre il problema.
 

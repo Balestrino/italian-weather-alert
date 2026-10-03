@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-03 [Planned] Replace the Cittadino Informato licensing prerequisite with tested persistent multi-source verification across Regione Toscana/CFR, municipality and platform
+- 2026-10-03 [Changed] Document the preliminary Calcinaia Cittadino Informato access and reuse review, exposed API scope and unresolved acquisition prerequisites
 - 2026-10-03 [Changed] Plan Cittadino Informato as a scoped institutional acquisition/discovery channel with municipal/CFR corroboration, independent primary checks and separate access/reuse review; leave implementation and activation pending.
 
 - 2026-10-03 [Changed] Record institutional referrals for Calcinaia's Cittadino Informato channel, distinguishing recognized provenance from technical reliability, collection activation and reuse conditions.

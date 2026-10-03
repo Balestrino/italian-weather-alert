@@ -16,7 +16,7 @@ Comune di Calcinaia, provincia di Pisa, ISTAT `050004`. Fonte IWA: `calcinaia-mu
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria | [Notizie](https://www.comune.calcinaia.pi.it/tipi-di-notizia/notizie), [Avvisi](https://www.comune.calcinaia.pi.it/tipi-di-notizia/avvisi), [Comunicati](https://www.comune.calcinaia.pi.it/tipi-di-notizia/comunicati); sezioni da verificare nella configurazione |
-| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03, condizioni, implementazione e attivazione del nuovo flusso da verificare |
+| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03, verifica multipla, implementazione e attivazione del nuovo flusso da verificare |
 | Albo pretorio | Atti di supporto | Cercare gli atti citati nelle notizie primarie; il riferimento al singolo atto va verificato |
 
 La mappa consolida la [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). La sezione Notizie è stata consultata il 2026-10-02; ciò non verifica tutte le altre sezioni o i canali secondari.
@@ -63,11 +63,20 @@ mantengono i requisiti della specifica. Vedere CLN-006.
 ## Regole ed eccezioni
 
 Consultare le [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md)
-prima del nuovo flusso: raccolta automatica, conservazione e riuso richiedono una
-base verificata separatamente dalla conferma dei fatti. Mantenere controlli comunali
+prima del nuovo flusso: il task 26.2 ora richiede un sistema funzionante di verifica
+multipla Regione/CFR–Comune–piattaforma, senza un gate di ottenimento licenze, accordi
+o documentazione della base giuridica. Mantenere controlli comunali
 indipendenti per gli avvisi assenti dalla piattaforma; confrontare con il CFR soltanto
 le affermazioni regionali comparabili, senza richiedere un'allerta regionale per ogni
 provvedimento locale. I task 26.2–26.6 restano aperti; il coverage tracker è invariato.
+
+La [revisione preliminare del canale](../../../fonti/piattaforme/cittadino-informato-review.md)
+identifica l'indice REST e i limiti delle date del contenitore WordPress. Il
+trattamento dei visitatori dichiarato da ANCI Toscana non risolve i diritti sul
+flusso IWA. Il precedente criterio documentale è superato da CLN-012; occorrono
+ricevute persistenti con fonti/versioni, tempi, campi ed esiti distinti. Route degli
+avvisi, paginazione e cadenza restano da collaudare tecnicamente. Il CFR può essere
+non applicabile a una misura locale; non è richiesto un accordo unanime di tre canali.
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
 | --- | --- | --- | --- |
@@ -194,6 +203,8 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ### CLN-010 — Canale aggiuntivo pianificato con riscontro primario
 
+Il precedente prerequisito documentale di questa voce è superato da CLN-012; le evidenze storiche restano conservate.
+
 - **Data e ultima verifica:** 2026-10-03, decisione dell'utente, consultazione web delle condizioni e coerenza documentale.
 - **Ambito:** Calcinaia come primo perimetro; altri comuni selezionati richiedono evidenze proprie.
 - **Conoscenza:** requisito confermato; base di acquisizione/riuso da accertare. **Intervento:** pianificato, collector non attivato.
@@ -201,3 +212,25 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Evidenza:** [specifica aggiornata](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification), [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md), [task 26](../../../../openspec/changes/define-toscana-alert-service/tasks.md). Registro privato `CIN-REVIEW-20261003-01`.
 - **Conseguenza:** il riscontro primario non autorizza retroattivamente l'acquisizione e non completa accettazione o pubblicazione; originali e condizioni dei canali restano separati.
 - **Prossima verifica:** task 26.2 per titolarità e base applicabile, poi implementazione, valutazione e trial delimitato. CLN-008 resta il riscontro datato del runtime precedente.
+
+### CLN-011 — API candidata e presupposti ancora da chiudere
+
+Il criterio documentale di chiusura di questa voce è superato da CLN-012; le osservazioni tecniche restano conservate.
+
+- **Data e ultima verifica:** 2026-10-03, consultazioni HTTP delimitate del canale e dei riferimenti pubblicati; nessun polling o trattamento tramite provider.
+- **Ambito:** pagina Calcinaia e relativo indice REST, ISTAT `050004`.
+- **Conoscenza:** accessibilità tecnica e date del contenitore confermate; base del flusso e contratto degli avvisi da accertare. **Intervento:** revisione preliminare documentata; nessuna attivazione effettuata.
+- **Osservazione:** l'indice dichiara route comunali per aggiornamenti e rischi. La risposta WordPress della pagina ha corpo vuoto e date 2017–2018, distinte dal bollettino 2026 nell'HTML. La privacy indica ANCI Toscana come titolare del trattamento, senza risolvere diritti sui singoli contenuti o sulla banca dati.
+- **Evidenza:** [dossier del task 26.2](../../../fonti/piattaforme/cittadino-informato-review.md), scoperte CIN-004 e CIN-005 nelle [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md). Ricevute e originali nel registro privato `CIN-REVIEW-20261003-02`.
+- **Conseguenza:** non usare date del contenitore per emissione/validità e non considerare l'API esposta come autorizzazione del flusso. CLN-010 resta un requisito pianificato; il task 26.2 non è concluso.
+- **Prossima verifica:** accertare base applicabile o condizioni concordate per accesso ricorrente, originali, provider e risultati; poi collaudare il contratto tecnico e il trial Calcinaia previsto, mantenendo primaria comunale/CFR e copie pubbliche link-only.
+
+### CLN-012 — Task 26.2 orientato al sistema di verifica multipla
+
+- **Data e ultima verifica:** 2026-10-03, decisione dell’utente e verifica documentale; nessuna nuova acquisizione o verifica runtime.
+- **Ambito:** Calcinaia `050004`, Comune/atti richiamati, Regione Toscana/CFR e cittadinoinformato.it.
+- **Conoscenza:** nuovo criterio confermato; gate documentale precedente superato. **Intervento:** specifiche e checklist aggiornate; codice e trial ancora da eseguire.
+- **Osservazione ed evidenza:** la [specifica](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification) richiede confronti persistenti, esiti per campo e una verifica delimitata del percorso completo per chiudere 26.2; ottenere licenze, accordi o documentazione giuridica non è un prerequisito.
+- **Conseguenza:** usare CFR per le affermazioni regionali e Comune/atto per le misure locali; registrare controlli non applicabili, indisponibili, mancati riscontri, non comparabilità e conflitti. Nessuna maggioranza fra rilanci o obbligo di presenza su tutti i canali; candidati senza sostegno primario restano diagnostici.
+- **Prossima verifica:** implementare acquisizione 26.3 e confronti 26.4, poi chiudere 26.2 con ricevute del controllo development; completare 26.5/26.6 separatamente. Copie pubbliche link-only, copertura e accettazione restano distinte.
+- **Collegamenti:** CIN-006 nelle [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md), [dossier aggiornato](../../../fonti/piattaforme/cittadino-informato-review.md).
