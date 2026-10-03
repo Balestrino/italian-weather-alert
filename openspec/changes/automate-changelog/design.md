@@ -20,4 +20,11 @@ versions since the last published baseline without claiming that each was tagged
 
 ## Validation
 
+The 0.2.0 minor preparation groups subsequent development history, aligns OpenAPI
+and MCP implementation metadata and documents the independent embedding controls,
+local processing and development-only publication. Every processing replica must
+be replaced after the additive migration to enforce disabled embedding defaults.
+Promotion uses the existing pull-request, merge-commit and exact-revision workflow
+gates; the annotated tag and GitHub release identify the verified main revision.
+
 Use temporary synthetic Git repositories to verify automatic insertion, idempotence, blocked unstaged changelog edits, and CI detection of a bypassed hook. Run the repository's Go and static checks after integration.

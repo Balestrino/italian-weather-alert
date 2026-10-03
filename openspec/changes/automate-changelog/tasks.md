@@ -29,3 +29,14 @@ Patch validation on 1 October 2026: OpenAPI/MCP metadata both identify 0.1.1, hi
 - [x] 5.3 Repair the interpretation integration fixture's observed published-port collision by letting Docker allocate its loopback port, registering cleanup before startup and verifying the affected PostgreSQL suite without weakening coverage gates.
 
 Preparation validation on 2 October 2026: OpenAPI/MCP metadata identify 0.1.2; historical entries and release notes are unchanged. All six changelog regressions, public transport tests, the full isolated interpretation integration suite, tagged vet, local-link and whitespace checks passed. Docker now allocates the integration fixture loopback port after an observed Coverage startup collision. The OpenSpec CLI was unavailable; no CLI validation is claimed. Promotion, tagging and GitHub publication remain gated on the exact revision workflows; container publication and production activation remain separate.
+
+## 6. Minor release preparation — 3 October 2026
+
+- [x] 6.1 Align OpenAPI/MCP metadata to 0.2.0, group subsequent dated changes under the minor version, preserve historical sections/notes and document upgrade requirements and pilot limits.
+- [x] 6.2 Verify metadata, history, release-note links, changelog regressions/enforcement and public transport tests; prepare promotion through the existing exact-revision CI/Coverage/Security gates without asserting container publication or production activation.
+
+Preparation validation on 3 October 2026: OpenAPI/MCP metadata identify 0.2.0;
+historical changelog sections and release notes are unchanged. Six changelog
+regressions, public transport/backoffice tests, 54 local documentation links and
+whitespace checks passed. Promotion and publication retain the exact-revision
+workflow gates; these checks do not publish an image or activate production.

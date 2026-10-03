@@ -12,7 +12,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 136 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 11 | 0 |
+| [Automatic changelog](changes/automate-changelog/proposal.md) | 13 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
@@ -71,6 +71,13 @@ original snapshot with a dated precheck note; detailed evidence remains private.
 For new work, propose a change through an issue or pull request and update the relevant specification and checklist alongside code. Keep publication status and evidence limitations explicit. The repository includes [OpenSpec agent workflows](../docs/development/agent-tools.md); an agent or CLI is not required to inspect the plans.
 
 The application-separation change reorganizes implementation and guide locations. Historical snapshot prose can retain earlier source paths; use the [architecture mapping](../docs/architecture/README.md) to locate their current equivalents. Snapshot checks do not certify the current checkout.
+
+Two subsequent release-preparation tasks align OpenAPI/MCP metadata to 0.2.0,
+preserve dated history and historical releases, and verify changelog regressions,
+public transport tests and local links. The [minor release notes](../docs/releases/v0.2.0.md)
+describe embedding defaults, worker replacement and pilot limits. Promotion and
+software publication retain the exact-revision workflow gates independently of
+container publication and production activation.
 
 Three subsequent implementation tasks add manually selected municipality publication
 in explicit development, with immutable private controls, scoped API/MCP visibility

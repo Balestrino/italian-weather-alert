@@ -452,7 +452,7 @@ type mcpDescriptorFile struct {
 
 func publicMCPHandler(service *publicService, limits PublicLimits) http.Handler {
 	instructions := fmt.Sprintf("Anonymous API and MCP requests share a per-IP sliding budget of %d requests every %s; callers behind one IP share it. Maximum page size is %d.", limits.Allowance, limits.Window, limits.MaxPageSize)
-	server := mcp.NewServer(&mcp.Implementation{Name: "iwa-public", Title: "Toscana public alert access", Version: "0.1.2"}, &mcp.ServerOptions{Capabilities: &mcp.ServerCapabilities{}, Instructions: instructions})
+	server := mcp.NewServer(&mcp.Implementation{Name: "iwa-public", Title: "Toscana public alert access", Version: "0.2.0"}, &mcp.ServerOptions{Capabilities: &mcp.ServerCapabilities{}, Instructions: instructions})
 	var descriptors mcpDescriptorFile
 	if err := json.Unmarshal(contract.MCPTools, &descriptors); err != nil {
 		panic(fmt.Sprintf("invalid embedded MCP contract: %v", err))
