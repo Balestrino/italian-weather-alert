@@ -44,7 +44,8 @@ type Campaign struct {
 	Latest       *Assessment `json:"latest_assessment,omitempty"`
 }
 
-// Review is human evidence associated with retained service evidence. Actual
+// Review is attributable evidence, including explicitly delegated document
+// review, associated with retained service evidence. Actual
 // observations must identify a persisted version or failed check. Retained
 // cases are allowed only for an event/failure absent during the live period.
 type Review struct {

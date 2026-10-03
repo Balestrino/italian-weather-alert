@@ -337,7 +337,7 @@ Processing SHALL preserve job states, errors and attempt history across restarts
 - **THEN** the recovery guard applies the parent document's scope and quarantine, permits allowed dependencies, and retains the shared provider-call cap
 
 ### Requirement: Measured quality before source publication
-Source acceptance SHALL include human-reviewed expected outputs for observed cases and labeled simulations, covering irrelevant notices, omissions, partial reopenings, exceptions, conflicting dates, newer uninterpreted documents and scanned attachments. A missed relevant notice or unsupported asserted measure in evaluation SHALL block public activation of the affected source until correction and successful re-evaluation. Evaluation SHALL also report indeterminate fields and extraction usefulness. An observational collection trial SHALL last at least seven days and SHALL be extended for unresolved problems or insufficient observations; retained cases SHALL exercise significant events absent from the trial.
+Source acceptance SHALL include attributable reviewed expected outputs for observed cases and labeled simulations, covering irrelevant notices, omissions, partial reopenings, exceptions, conflicting dates, newer uninterpreted documents and scanned attachments. Review SHALL be performed by a human or by the assistant after explicit operator delegation. A delegated review SHALL identify the assistant, delegation, retained original versions/pages, evidence dates and unresolved fields, preserve prior human approvals and SHALL NOT be labeled a new human review. Delegation SHALL NOT waive source acceptance evidence or failed regression gates. A missed relevant notice or unsupported asserted measure in evaluation SHALL block public activation of the affected source until correction and successful re-evaluation. Evaluation SHALL also report indeterminate fields and extraction usefulness. An observational collection trial SHALL last at least seven days and SHALL be extended for unresolved problems or insufficient observations; retained cases SHALL exercise significant events absent from the trial.
 
 #### Scenario: A test misses a relevant municipal notice
 - **WHEN** expected-source comparison detects the omission during acceptance
@@ -490,3 +490,20 @@ historical reprocessing or changes to source/public activation.
 - **WHEN** an operator requests a trial on fixed retained versions before broader activation
 - **THEN** a separate worker queue may persist evaluated candidate results with immutable processing and evidence identities, a fixed model-call cap and existing provider gates
 - **AND** candidate policies apply only to the selected trial inputs, model calls and zero-call paths remain distinguishable, the trial worker exits, and current source policies, ordinary worker routing and public activation remain unchanged
+
+#### Scenario: The operator delegates the remaining PDF review
+- **WHEN** the operator explicitly asks the assistant to analyze the originals for the acceptance review
+- **THEN** the assistant records attributable document comparisons with its own identity and the delegation, preserves existing human approvals, and reports unsupported fields and failed service outputs without accepting the source by inference
+
+
+### Requirement: Campaign review of unchanged retained evidence
+A campaign review SHALL bind an original or attachment to the campaign source
+configuration. When unchanged content retains an earlier resource configuration,
+a finalized acquisition of the same source and content version under the campaign
+configuration, preceding the review evidence time, SHALL establish that binding.
+Unproven reuse and acquisitions later than the review SHALL NOT establish it.
+
+#### Scenario: Original reused after a configuration revision
+- **WHEN** a campaign reviews unchanged original evidence first retained under an earlier configuration
+- **THEN** the service accepts the configuration binding only if an already finalized matching acquisition proves reuse under the campaign configuration
+- **AND** the original resource/version history remains unchanged

@@ -98,7 +98,7 @@ A changed duration applies to existing data at the next cleanup: increases prote
 
 Internal monitoring assesses source availability, update timeliness and interpretation correctness. Keep reproducible cases and expected outcomes for code/process evaluation, including false positives and missed publications. DPC supplies internal comparisons only where risk, territory and time are actually comparable. Successful HTTP responses and LLM self-assessment alone do not establish correctness.
 
-Build human-reviewed expected outputs for real Calcinaia notices, irrelevant content, partial reopenings, conflicting dates, attachments and scanned PDFs; label simulations separately. A missed relevant notice or unsupported measure in evaluation blocks public activation of the affected source until correction and successful rerun. Also measure unresolved fields so an extractor that returns no useful facts cannot pass on precision alone. Run at least seven complete 24-hour observational intervals across vigilance, criticality/alert, monitoring and Calcinaia, persist daily checks, and compare originals and attachments manually. Retain cases for significant events absent during the trial. Extend the trial for omissions, delays, missing evidence, unresolved defects or insufficient observations. Source acceptance is distinct from any per-notice editorial gate.
+Build attributable reviewed expected outputs for real Calcinaia notices, irrelevant content, partial reopenings, conflicting dates, attachments and scanned PDFs; label simulations separately. A missed relevant notice or unsupported measure in evaluation blocks public activation of the affected source until correction and successful rerun. Also measure unresolved fields so an extractor that returns no useful facts cannot pass on precision alone. Run at least seven complete 24-hour observational intervals across vigilance, criticality/alert, monitoring and Calcinaia, persist daily checks, and compare originals and attachments by human review or an explicitly operator-delegated assistant review. Retain cases for significant events absent during the trial. Extend the trial for omissions, delays, missing evidence, unresolved defects or insufficient observations. Source acceptance is distinct from any per-notice editorial gate.
 
 ### 7. Modular Go service and durable storage
 
@@ -460,3 +460,23 @@ worker and existing live source controls were preserved.
 Use additive migration `067_development_publication` for default-off municipal choices and immutable events, with no automatic backfill or rewrite of source acceptance/public flags. Private admin forms and explicit CLI commands use expected revisions. The current municipality register determines eligibility, and historic choices can be revoked. `IWA_ENVIRONMENT` defaults to strict production and Compose pins each environment. The development query store alone adds a municipality-scoped visibility path for policy-permitted active configurations and retained acquisitions under that revision. Municipalities sharing a regional zone do not inherit each other's selection; unscoped regional facts are restricted to mappings selected at the query knowledge boundary. Regional bulletin metadata remains attributable to the shared original. Copy authorization stays separate.
 
 Municipality/coverage response fields identify development publication; acceptance remains pending where pending and quality limitations disclose the manual override. No uncertain regional map color or missing municipal measure is invented. A publication scope stored privately with each saved view binds it to environment, municipal revisions, region revisions, source active/public settings and territorial associations. API/MCP reject views after scope changes, including revocation and a copied database served by a strict runtime. Production source gates remain independently testable. Verification uses synthetic facts, native forms, API/MCP views, disposable PostgreSQL and resolved Compose templates; live development activation is recorded separately from acceptance.
+
+## Attributable document review and public receipts — 3 October 2026
+
+The operator explicitly delegates the remaining document review to the assistant.
+Preserve historical human approvals and record new assistant analysis against
+the original PDF pages, retained HTML/JSON and actual output. Identify the review
+method, actor, evidence date and unresolved fields rather than relabeling model
+output or the delegation itself as approval of the facts. Software comparisons
+against expected outcomes remain a separate step. Failed cases still prevent
+acceptance.
+
+Public document, measure, regional and phase records may carry the latest 100
+publishable verification receipts at the same knowledge boundary. Apply source
+publication and development municipality selection to the candidate and each
+evidence channel. Redact unpublished evidence identities, values and selectors
+while retaining the channel role/outcome with a limitation. Exclude request keys,
+OCR run identities and operator-only notes. Expose comparison direction, literal
+passages and source/version/hash attribution only for visible evidence. API and
+MCP share these structures and limits; candidate admission is distinct from the
+independently supported primary projection and source acceptance.

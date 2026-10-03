@@ -157,6 +157,44 @@ func TestCampaignDerivesSevenDayEvidenceAndRefusesPrematureCompletion(t *testing
 	if _, err = pool.Exec(ctx, "UPDATE observation_campaigns SET actor='tampered' WHERE id=$1", campaign.ID); err == nil {
 		t.Fatal("append-only campaign was mutable")
 	}
+	t.Run("review unchanged original under a later acquisition configuration", func(t *testing.T) {
+		v, err := reg.Version(ctx, "monitoring", 1)
+		if err != nil {
+			t.Fatal(err)
+		}
+		revision, err := reg.AppendConfiguration(ctx, "monitoring", 1, v.Configuration, "test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err = reg.RecordPreview(ctx, "monitoring", revision, "test", evidence); err != nil {
+			t.Fatal(err)
+		}
+		if err = reg.EnableCollection(ctx, "monitoring", revision, "test"); err != nil {
+			t.Fatal(err)
+		}
+		c, err := store.Start(ctx, StartRequest{ID: "reused-original", Actor: "operator", StartedAt: started, SourceIDs: []string{"monitoring"}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		version := versions["monitoring"]
+		review := Review{ID: "reused", SourceID: "monitoring", Kind: "original_comparison", Status: "pass", VersionID: &version, Evidence: reviewed}
+		if _, err = store.RecordReview(ctx, c.ID, "delegated-assistant", review); !errors.Is(err, ErrInvalid) {
+			t.Fatalf("unproven configuration reuse accepted: %v", err)
+		}
+		if _, err = pool.Exec(ctx, `INSERT INTO retained_acquisitions(id,document_id,source_id,configuration,request_hash,content_hash,acquired_at,version_id)
+ SELECT 'reused-fixture',document_id,'monitoring',$2,content_hash,content_hash,$3,id FROM retained_versions WHERE id=$1`, version, revision, reviewed.ObservedAt.Add(time.Minute)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err = store.RecordReview(ctx, c.ID, "delegated-assistant", review); !errors.Is(err, ErrInvalid) {
+			t.Fatalf("future acquisition proved earlier review: %v", err)
+		}
+		if _, err = pool.Exec(ctx, "UPDATE retained_acquisitions SET acquired_at=$1 WHERE id='reused-fixture'", reviewed.ObservedAt.Add(-time.Minute)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err = store.RecordReview(ctx, c.ID, "delegated-assistant", review); err != nil {
+			t.Fatalf("finalized matching acquisition was rejected: %v", err)
+		}
+	})
 }
 
 func slicesContains(values []string, expected string) bool {

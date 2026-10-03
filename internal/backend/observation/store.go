@@ -119,9 +119,14 @@ func (s *Store) RecordReview(ctx context.Context, campaignID, actor string, revi
 		if review.Status == "pass" {
 			roleCondition += " AND r.object_hash IS NOT NULL"
 		}
+		// Unchanged originals retain their first resource configuration. A later
+		// finalized acquisition proves reuse under the campaign configuration
+		// without rewriting that original or creating a new content version.
 		query := `SELECT EXISTS(SELECT 1 FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
- JOIN retained_resources r ON r.version_id=v.id WHERE v.id=$1 AND d.source_id=$2 AND r.source_id=$2 AND r.configuration=$3` + roleCondition + `)`
-		if err = tx.QueryRow(ctx, query, *review.VersionID, review.SourceID, configuration).Scan(&matches); err != nil {
+	 JOIN retained_resources r ON r.version_id=v.id WHERE v.id=$1 AND d.source_id=$2 AND r.source_id=$2
+	 AND (r.configuration=$3 OR EXISTS(SELECT 1 FROM retained_acquisitions a
+	 WHERE a.version_id=v.id AND a.source_id=$2 AND a.configuration=$3 AND a.content_hash=v.content_hash AND a.acquired_at<=$4))` + roleCondition + `)`
+		if err = tx.QueryRow(ctx, query, *review.VersionID, review.SourceID, configuration, review.Evidence.ObservedAt.UTC()).Scan(&matches); err != nil {
 			return Review{}, err
 		}
 		if !matches {

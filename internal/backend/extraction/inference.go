@@ -305,11 +305,163 @@ func parseCompactWindowV2(raw string, window Window) ([]Measure, error) {
 	measures = supplementExplicitOperativeMeasures(measures, window)
 	if !window.legacyLiteral {
 		measures = supplementRetainedClosures(measures, window)
+		measures = supplementRoadClearance(measures, window)
+		measures = supplementDirectiveClosures(measures, window)
 	}
 	if len(decoded.Measures) > 0 && len(measures) == 0 && headingOnly != len(decoded.Measures) {
 		return nil, ErrEvidence
 	}
 	return measures, nil
+}
+
+var directiveClosures = regexp.MustCompile(`(?i)(?:^|[.;]\s+|,\s+)(ORDINA in via (?:contingibile|contingenti) e urgente[^:]{0,300}):\s*-\s*la chiusura al pubblico:\s*((?:[-○•]\s*(?:dell['’]|della|delle|degli|dei|del)\s*[^;:.]{1,180};\s*){1,5})`)
+var closureListArticle = regexp.MustCompile(`(?i)^[-○•]\s*(?:dell['’]|della|delle|degli|dei|del)\s*`)
+var directiveStart = regexp.MustCompile(`(?i)a partire dalle ore [0-9]{1,2}[.:][0-9]{2} del giorno [0-9]{1,2} [[:alpha:]àèéìòù]+ [0-9]{4}`)
+var directiveConditionalEnd = regexp.MustCompile(`(?i)fino al perdurare dell['’]emergenza`)
+
+// Complete a literal dispositive list only: headings and preamble lists cannot
+// supply closures, and the following prohibition/activation has a separate scope.
+func supplementDirectiveClosures(measures []Measure, window Window) []Measure {
+	start, end := window.CoreStartByte-window.ContextStartByte, window.CoreEndByte-window.ContextStartByte
+	if start < 0 || end > len(window.Text) || end <= start {
+		return measures
+	}
+	core := window.Text[start:end]
+	for _, indices := range directiveClosures.FindAllStringSubmatchIndex(core, -1) {
+		prefix := strings.ToLower(core[:indices[2]])
+		if boundary := strings.LastIndexAny(prefix, ".;"); boundary >= 0 {
+			prefix = prefix[boundary+1:]
+		}
+		if strings.Contains(" "+prefix, " non ") || strings.Contains(" "+prefix, " se ") || strings.Contains(" "+prefix, " qualora ") || strings.Contains(prefix, "\"") || strings.Contains(prefix, "«") {
+			continue
+		}
+		header, list := core[indices[2]:indices[3]], core[indices[4]:indices[5]]
+		quote := core[indices[2]:indices[5]]
+		if len(quote) > 1000 {
+			continue
+		}
+		for _, item := range strings.Split(list, ";") {
+			subject := strings.TrimSpace(closureListArticle.ReplaceAllString(strings.TrimSpace(item), ""))
+			if subject == "" {
+				continue
+			}
+			present := false
+			for _, measure := range measures {
+				if measure.Kind == "closure" && strings.EqualFold(measure.Subject, subject) {
+					present = true
+				}
+			}
+			if present {
+				continue
+			}
+			kind := Evidence{Field: "kind", ResourceURL: window.ResourceURL, Page: windowPage(window), Quote: quote, SegmentOrdinal: window.Ordinal}
+			support := kind
+			support.Field = "subject"
+			measure := Measure{Kind: "closure", Subject: subject, Evidence: []Evidence{kind, support}}
+			for _, field := range []struct {
+				name       string
+				expression *regexp.Regexp
+			}{{"valid_from", directiveStart}, {"valid_until", directiveConditionalEnd}} {
+				if expression := field.expression.FindString(header); expression != "" {
+					e := kind
+					e.Field, e.Quote = field.name, header
+					measure.TemporalCandidates = append(measure.TemporalCandidates, TemporalCandidate{Field: field.name, OriginalExpression: expression, Evidence: []Evidence{e}})
+					measure.Evidence = append(measure.Evidence, e)
+				}
+			}
+			if projectTemporalCandidates(&measure) == nil {
+				measures = append(measures, measure)
+			}
+		}
+		bodyEnd := len(core)
+		for _, marker := range []string{"avverte", "dispone"} {
+			if offset := strings.Index(strings.ToLower(core[indices[5]:]), marker); offset >= 0 && indices[5]+offset < bodyEnd {
+				bodyEnd = indices[5] + offset
+			}
+		}
+		body := core[indices[2]:bodyEnd]
+		for index := range measures {
+			measure := &measures[index]
+			if measure.Kind != "closure" && measure.Kind != "prohibition" && measure.Kind != "suspension" {
+				continue
+			}
+			if !strings.Contains(strings.ToLower(body), strings.ToLower(measure.Subject)) || !windowKindSupportedByEvidence(measure.Kind, []Evidence{{Quote: body}}, window) {
+				continue
+			}
+			for _, field := range []struct {
+				name       string
+				expression *regexp.Regexp
+			}{{"valid_from", directiveStart}, {"valid_until", directiveConditionalEnd}} {
+				expression := field.expression.FindString(header)
+				if expression == "" {
+					continue
+				}
+				present := false
+				for _, candidate := range measure.TemporalCandidates {
+					if candidate.Field == field.name && candidate.OriginalExpression == expression {
+						present = true
+					}
+				}
+				if present {
+					continue
+				}
+				e := Evidence{Field: field.name, ResourceURL: window.ResourceURL, Page: windowPage(window), Quote: body, SegmentOrdinal: window.Ordinal}
+				measure.TemporalCandidates = append(measure.TemporalCandidates, TemporalCandidate{Field: field.name, OriginalExpression: expression, Evidence: []Evidence{e}})
+				measure.Evidence = append(measure.Evidence, e)
+			}
+			_ = projectTemporalCandidates(measure)
+		}
+	}
+	for index := range measures {
+		measures[index].Ordinal = index + 1
+	}
+	return measures
+}
+
+// A positive, completed clearance report is an operational update. It does not
+// revoke a separately stated closure or establish a formal reopening time.
+var completedRoadClearance = regexp.MustCompile(`(?i)(?:^|[.!?]\s+)(?:aggiornamento:\s*)?si informa la cittadinanza che (tutte le strade[^.!?;:]{0,400}) sono state liberate[^.!?;:]{0,300}(?:[.!?]|$)`)
+
+func supplementRoadClearance(measures []Measure, window Window) []Measure {
+	start, end := window.CoreStartByte-window.ContextStartByte, window.CoreEndByte-window.ContextStartByte
+	if start < 0 || end > len(window.Text) || end <= start {
+		return measures
+	}
+	core := window.Text[start:end]
+	for _, match := range completedRoadClearance.FindAllStringSubmatch(core, -1) {
+		quote, subject := strings.TrimSpace(match[0]), strings.TrimSpace(match[1])
+		// Refuse embedded negation, conditions and future/prospective wording.
+		lower := " " + strings.ToLower(quote) + " "
+		if strings.Contains(lower, " non ") || strings.Contains(lower, " se ") || strings.Contains(lower, " qualora ") {
+			continue
+		}
+		present := false
+		for _, measure := range measures {
+			if measure.Kind != "operational_update" {
+				continue
+			}
+			for _, evidence := range measure.Evidence {
+				if evidence.Field == "kind" && strings.Contains(strings.ToLower(evidence.Quote), strings.ToLower(subject)+" sono state liberate") {
+					present = true
+				}
+			}
+		}
+		if present {
+			continue
+		}
+		kind := Evidence{Field: "kind", ResourceURL: window.ResourceURL, Page: windowPage(window), Quote: quote, SegmentOrdinal: window.Ordinal}
+		subjectEvidence := kind
+		subjectEvidence.Field = "subject"
+		measure := Measure{Kind: "operational_update", Subject: subject, Evidence: []Evidence{kind, subjectEvidence}}
+		if projectTemporalCandidates(&measure) != nil {
+			continue
+		}
+		measures = append(measures, measure)
+	}
+	for index := range measures {
+		measures[index].Ordinal = index + 1
+	}
+	return measures
 }
 
 func supplementExplicitOperativeMeasures(measures []Measure, window Window) []Measure {
@@ -649,6 +801,20 @@ func expandCompactMeasureV2(ordinal int, candidate compactWireMeasureV2, window 
 		}
 		if candidate.Kind == "activation" && !referencesContainActivation(raw.Evidence, quotes, window) {
 			continue
+		}
+		if !window.legacyLiteral && candidate.Kind != "activation" {
+			supported := false
+			for _, reference := range raw.Evidence {
+				if reference >= 0 && reference < len(quotes) && strings.Contains(strings.ToLower(quotes[reference]), strings.ToLower(expression)) {
+					anchor := temporalSubjectAnchor(candidate.Subject)
+					if (anchor == "" || strings.Contains(strings.ToLower(quotes[reference]), anchor)) && windowKindSupportedByEvidence(candidate.Kind, []Evidence{{Quote: quotes[reference]}}, window) {
+						supported = true
+					}
+				}
+			}
+			if !supported {
+				continue
+			}
 		}
 		selected, err := appendEvidence(raw.Field, raw.Evidence)
 		if err != nil {
