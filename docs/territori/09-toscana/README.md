@@ -58,7 +58,8 @@ aggiunge discovery per i comuni selezionati e verifica primaria; i rilanci
 regionali si confrontano con rischio, zona, emissione e validità del prodotto CFR
 originario. Le raccolte CFR e comunali restano indipendenti e una misura locale
 non richiede un'allerta regionale. TOS-009 registra il piano; TOS-010 documenta
-il verificatore implementato e le prove sintetiche, senza attivazione operativa.
+il verificatore implementato e le prove sintetiche; TOS-011 verifica il percorso
+development delimitato senza adozione programmata.
 
 Per diagnosticare una situazione API vuota, controllare prima `coverage.public_state`
 e `coverage_status`: controlli di acquisizione recenti e `updating.state=ok` non
@@ -99,6 +100,14 @@ tecniche del software non sostituiscono gli esiti attesi revisionati da una pers
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-011 — Rilancio regionale verificato come diagnostico in development
+
+- **Data e ultima verifica:** 2026-10-03, acquisizione CFR HTTP indipendente, originali/versioni e confronto persistente sullo sviluppo con dati dedicati.
+- **Ambito:** un prodotto di criticità originario e il rilancio dei rischi oggi/domani nel canale Calcinaia della piattaforma; confronto regionale distinto dalla misura locale.
+- **Conoscenza:** non comparabilità confermata nei campi disponibili. **Intervento:** percorso delimitato della 26.2 verificato, nessuna nuova lettura dei colori o attivazione programmata.
+- **Osservazione ed evidenza:** la ricevuta conserva il CFR e la piattaforma senza inferire prodotto/zona/emissione/validità mancanti o verde dalle etichette e dalla legenda. Il caso reale resta diagnostico; i controlli sintetici regionali verificano corroborazione e conflitto, con il livello primario preservato contro due rilanci concordi. [Procedura](../../operations/cittadino-informato.md#prova-completa-in-development--task-262); registro privato `CIN-DEV-20261003-01`.
+- **Conseguenza e prossima verifica:** completa la prova dell’ingresso implementato in TOS-010, senza risolvere l’interpretazione grafica TOS-008 o l’accettazione. Completare valutazione estesa e attribuzione API/MCP delle ricevute in 26.5 prima della successiva adozione 26.6.
 
 ### TOS-010 — Confronti dei rilanci con primaria regionale verificati
 

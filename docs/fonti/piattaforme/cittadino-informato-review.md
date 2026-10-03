@@ -4,7 +4,8 @@ Revisione ed evidenze HTTP: **3 ottobre 2026**. Ambito: Comune di Calcinaia,
 ISTAT `050004`, pagina `https://cittadinoinformato.it/calcinaia/` e riferimenti
 pubblicati dalla piattaforma. Questa è la revisione preliminare del
 [task 26.2](../../../openspec/changes/define-toscana-alert-service/tasks.md),
-ancora aperto. Le [note correnti](cittadino-informato.md) conservano le regole
+completato successivamente dalla prova development descritta sotto. Le
+[note correnti](cittadino-informato.md) conservano le regole
 applicabili; risposte originali e ricevute sono nel registro privato
 `CIN-REVIEW-20261003-02`.
 
@@ -17,9 +18,12 @@ sostituisce quel criterio: il task 26.2 deve essere chiuso mediante un sistema
 funzionante di verifica multipla Regione Toscana/CFR–Comune–cittadinoinformato.it,
 senza ottenere licenze, accordi o documentazione della base giuridica.
 
-Il task resta aperto perché confronti persistenti, ammissione e controllo del
-percorso completo non sono ancora implementati e verificati. La successiva
-[implementazione della 26.3](../../operations/cittadino-informato.md) verifica
+La successiva 26.4 implementa confronti persistenti e ammissione; la prova
+delimitata in development della 26.2 verifica il percorso completo con dieci
+ricevute reali/sintetiche distinte, conservate nel registro privato
+`CIN-DEV-20261003-01`. Vedere
+[procedura e limiti](../../operations/cittadino-informato.md#prova-completa-in-development--task-262).
+La [implementazione della 26.3](../../operations/cittadino-informato.md) verifica
 l’acquisizione delimitata; ricevuta privata `CIN-ACQUIRE-20261003-01`.
 Nessuna attivazione è stata effettuata durante questa revisione; le copie pubbliche
 rimangono link-only. Le osservazioni originarie sotto riportate restano evidenze
@@ -75,18 +79,22 @@ motivazione. L’assenza di una pubblicazione non prova assenza di rischio o rev
 Tre pubblicazioni concordi non sono richieste e due rilanci non prevalgono per
 maggioranza sul prodotto originario.
 
-Per chiudere il task 26.2 occorre:
+I criteri della 26.2, verificati successivamente alla revisione preliminare, sono:
 
 1. Acquisizione delimitata e identità separate del task 26.3: implementate e
-   verificate successivamente alla revisione preliminare; confronti ancora pendenti.
-2. Implementare confronti persistenti e ammissione dei soli campi sostenuti secondo
-   il task 26.4, mantenendo indipendenti raccolta comunale e CFR.
-3. Eseguire un controllo delimitato in development del percorso completo per un
-   rilancio regionale e una misura locale, conservando ricevute ispezionabili.
-4. Verificare mancato riscontro, controllo indisponibile, non comparabilità, non
-   applicabilità e conflitto; candidati privi di sostegno primario restano diagnostici.
+   verificate successivamente alla revisione preliminare.
+2. Confronti persistenti e ammissione dei soli campi sostenuti implementati dalla
+   26.4, mantenendo indipendenti raccolta comunale e CFR.
+3. Controllo delimitato in development del percorso completo per casi regionali
+   e locali, con ricevute persistite e rilette; reali non comparabili/diagnostici
+   distinti dai controlli sintetici positivi e di conflitto.
+4. Mancato riscontro, indisponibilità, non comparabilità, non applicabilità e
+   conflitto verificati; candidati senza sostegno primario restano diagnostici.
 
-L’inventario HTTP e questa revisione della specifica non chiudono il task runtime.
+L’inventario HTTP e la revisione preliminare non chiudevano il task runtime.
+La successiva prova completa chiude la 26.2, conservando il fallimento della
+finestra ampia della piattaforma su un PDF comunale esterno al suo contratto;
+soltanto il perimetro successivo riuscito è dichiarato completo.
 La valutazione estesa del task 26.5 e il successivo trial programmato del task 26.6
-restano separati, come accettazione delle fonti e pubblicazione. La mancanza di
-licenze, accordi o documentazione giuridica non è il motivo per lasciare aperto 26.2.
+restano separati, come accettazione delle fonti e pubblicazione. La chiusura della
+26.2 non è subordinata a licenze, accordi o documentazione giuridica.

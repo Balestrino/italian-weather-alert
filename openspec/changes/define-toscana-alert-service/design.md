@@ -196,12 +196,12 @@ The dependency table in tasks.md governs sequencing: foundation, generic domain 
 The 3 October preliminary Cittadino Informato review found a Calcinaia-linked
 REST index and municipality/project responses. The subsequent user decision
 replaces the original documentation/licensing prerequisite with an implemented
-multi-source verification system. Declared notice routes still require technical
-validation; WordPress container dates and its empty REST body cannot substitute
+multi-source verification system. Task 26.3 validates the selected notice routes;
+WordPress container dates and its empty REST body cannot substitute
 for dynamically rendered notice versions. The [scoped review dossier](../../../docs/fonti/piattaforme/cittadino-informato-review.md)
-records the original findings and revised completion criteria. Task 26.2 remains
-open because the acquisition-to-verification system has not yet been implemented
-and exercised, rather than because license or legal-basis documents are missing.
+records the original findings and revised completion criteria. Tasks 26.3/26.4
+implement acquisition and verification; the subsequent bounded development run
+closes 26.2 through inspectable receipts, rather than legal-basis documents.
 
 The architecture and collection approach below are decided. These checks remain prerequisites for their dependent tasks, not evidence of completed implementation:
 
@@ -442,9 +442,18 @@ records field-supported interpretation separately from provenance/acceptance.
 Retention includes bidirectional proof dependencies while any counterpart is
 protected, then purges fully expired graphs. Synthetic PostgreSQL and public
 query tests verify these behaviors. The entry point consumes interpreted
-selectors/check results; automatic counterpart discovery, worker orchestration,
-reviewed real-source evaluation and the bounded development run remain separate
-operational/evaluation steps in 26.2, 26.5 and 26.6. No live configuration changed.
+selectors/check results. Task 26.2 now verifies that entry point after independent
+real-source acquisition on development PostgreSQL/RustFS with dedicated data.
+Ten receipts distinguish three real-source cases from seven synthetic controls;
+incomplete external platform dependencies and unverified CFR map colors remain
+explicit diagnostics, with supported local primary fields admitted separately.
+The wider failed platform window is preserved, and the successful display window
+and exact local detail have separate boundaries. Request retry/history and primary
+fact reuse are checked without enabling scheduled sources or public copies.
+See [bounded development verification](../../../docs/operations/cittadino-informato.md#prova-completa-in-development--task-262).
+Automatic counterpart discovery, worker orchestration and broader reviewed
+real-source/API-MCP evaluation remain separate work in 26.5/26.6; the generic
+worker and existing live source controls were preserved.
 
 ## Manual municipal development publication — 2 October 2026
 

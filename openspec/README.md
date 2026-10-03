@@ -6,7 +6,8 @@ with primary municipal/CFR verification and independent primary collection. Task
 26.1 records the documentation update. The subsequent user revision replaces the
 license/legal-basis documentation gate with a working multi-source verification
 system: implement acquisition and persistent comparisons in 26.3/26.4, then close
-26.2 from a bounded development run. Evaluation and scoped adoption remain open. The decision activates
+26.2 from a bounded development run, now verified with ten persisted receipts.
+Evaluation and scoped adoption remain open. The decision activates
 no platform collector and does not complete source acceptance. See
 [platform guidance](../docs/fonti/piattaforme/cittadino-informato.md).
 
@@ -14,13 +15,18 @@ A subsequent bounded manual review identifies Calcinaia's exposed REST index,
 declared notice routes and the limits of WordPress page-container metadata.
 The [review dossier](../docs/fonti/piattaforme/cittadino-informato-review.md)
 preserves the initial review and revised technical closure criteria. Task 26.2
-remains open because the bounded complete verification run in development is
-still missing. Task 26.3 implements scoped API acquisition, verified
+is now completed by a bounded acquisition-to-verification run on development
+PostgreSQL/RustFS with dedicated private data, real-source diagnostics and
+separately labelled synthetic controls; existing services/source controls remain
+preserved. Task 26.3 implements scoped API acquisition, verified
 with synthetic persistence cases and two bounded isolated Calcinaia HTTP checks;
 no live collector was activated. Task 26.4 now implements immutable evidence-bound
 receipts, primary-only projection and historical/current deduplication, verified
-with synthetic disposable PostgreSQL and public-query cases. Counterpart discovery,
-reviewed real-source evaluation and scheduled adoption remain separate. See [operations](../docs/operations/cittadino-informato.md).
+with synthetic disposable PostgreSQL and public-query cases. The 26.2 run verifies
+receipt readback, history/idempotence, primary-only local admission and diagnostic regional/non-comparable candidates. A wider platform
+window with an external municipal PDF remains explicitly incomplete. Counterpart
+discovery, broader reviewed real-source/API-MCP evaluation and scheduled adoption
+remain separate. See [operations](../docs/operations/cittadino-informato.md).
 
 This directory publishes IWA's change proposals, designs, capability specifications, and task checklists so contributors can see the intended behavior and work still open. Start with a change's `proposal.md`, then read its `design.md`, `specs/`, and `tasks.md`.
 
@@ -31,7 +37,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 139 | 14 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 140 | 13 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |

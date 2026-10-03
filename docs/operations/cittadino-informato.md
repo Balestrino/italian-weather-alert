@@ -1,8 +1,8 @@
 # Acquisizione delimitata di Cittadino Informato
 
 I task 26.3 e 26.4 implementano acquisizione delimitata, ricevute persistenti di
-verifica multipla e ammissione dei campi sostenuti dalla primaria. La chiusura
-della 26.2 richiede il successivo controllo in development del percorso completo. Vedere
+verifica multipla e ammissione dei campi sostenuti dalla primaria. Il controllo
+delimitato del percorso completo in development chiude la 26.2 il 3 ottobre 2026. Vedere
 [piano](../../openspec/changes/define-toscana-alert-service/tasks.md) e
 [guida della piattaforma](../fonti/piattaforme/cittadino-informato.md).
 
@@ -182,8 +182,8 @@ semantica dell’interpretazione. Il task 26.5 comprende la valutazione con casi
 reali revisionati e l’attribuzione API/MCP estesa. Il normale worker di estrazione
 non viene convertito da questo comando in un orchestratore dei tre canali:
 CLN-007 resta pertinente al percorso generico; la nuova proiezione verificata ha
-un ingresso programmatico distinto. Collegamento operativo, prova completa della
-26.2 e trial programmato 26.6 restano da eseguire. Il collector continua a
+un ingresso programmatico distinto. Orchestrazione continuativa e trial programmato 26.6 restano da eseguire;
+la prova delimitata della 26.2 è descritta sotto. Il collector continua a
 conservare il metadato iniziale `verification_state: pending`; le rivalutazioni
 sono ricevute separate, non riscritture dell’originale.
 
@@ -195,3 +195,72 @@ atti PDF con OCR e retention. Il [test delle query](../../internal/backend/publi
 verifica la proiezione primaria e la selezione corrente/storica senza duplicati.
 Sono fixture sintetiche su PostgreSQL usa e getta: nessun nuovo caso reale,
 rollout, accettazione o copertura continuativa viene dichiarato dalla 26.4.
+
+## Prova completa in development — task 26.2
+
+Il 3 ottobre 2026 è stato eseguito il percorso acquisizione–selezione delle
+evidenze–verifica–proiezione sui servizi PostgreSQL e RustFS di development,
+con database e bucket dedicati. Le ricevute persistenti, gli originali integri,
+le configurazioni, gli input e un dump del database restano nell’archivio
+privato `CIN-DEV-20261003-01`. Nessuna fonte del trial ha raccolta programmata,
+accettazione o pubblicazione abilitate; i controlli delle fonti esistenti e i
+container sono stati confrontati prima e dopo e risultano preservati.
+
+La raccolta primaria è stata eseguita prima di quella della piattaforma: una
+pagina dell’elenco Notizie comunale, con 24 documenti, e un prodotto CFR di
+criticità, con le risorse richieste. Due passaggi della piattaforma sulla finestra
+di visualizzazione dal 1° ottobre hanno acquisito quattro avvisi e i rischi
+oggi/domani, riusando le versioni invariate. Un avviso locale individuato
+nell’elenco più ampio è stato acquisito anche tramite il suo esatto dettaglio
+API; il PDF richiamato dalla pubblicazione primaria è stato scaricato nel
+perimetro comunale, conservato e validato con Poppler. Le selezioni del confronto
+locale usano il testo dell’avviso, senza dichiarare una nuova interpretazione OCR
+o l’accettazione semantica dell’atto e della sua autorità emittente.
+
+Il primo passaggio della piattaforma, dal 23 settembre, si era fermato su un PDF
+comunale fuori dal contratto della piattaforma. Il fallimento e l’originale
+incompleto sono conservati: la finestra ampia non è dichiarata completa e non
+sono stati estesi i permessi del canale. Anche il dettaglio locale selezionato
+resta incompleto per la sua dipendenza esterna; la primaria possiede il proprio
+originale completo. La successiva finestra riuscita non sostituisce quel risultato.
+
+Dieci ricevute sono state persistite, rilette e controllate per ruoli,
+fonti/versioni/configurazioni, hash, passaggi e selettori, tempi, direzioni e campi:
+
+| Caso | Esito verificato |
+| --- | --- |
+| Rilancio locale reale | `non_comparable` per identità/edizione non stabilite; dipendenza del canale `unavailable`, candidato non ammesso, primaria conservata separatamente |
+| Pubblicazione locale primaria indipendente | `corroborated`, misura ammessa dalla primaria; piattaforma `missing_evidence` nel solo perimetro temporale riuscito, CFR `not_applicable` |
+| Rilancio regionale reale | `non_comparable`, diagnostico: prodotto/zona/emissione/validità non tutti sostenuti nel rilancio e colore CFR non verificato; nessun verde dedotto dalla legenda o da `NESSUNA` |
+| Sette controlli sintetici distinti | Primaria mancante e indisponibile, corroborazione locale e regionale, edizione diversa, conflitto locale e due rilanci regionali concordi contro il CFR |
+
+Le date di pubblicazione dei due avvisi locali non sono state trasformate in
+equivalenza dell’edizione dell’atto o validità operativa. Il caso primario conserva
+l’espressione di validità senza inferire un’ora di cessazione. Il risultato
+`missing_evidence` del controllo temporale non dichiara assenza dalla piattaforma
+nel suo complesso. I conflitti della prova sono sintetici, non conflitti osservati
+fra fonti reali; i due rilanci sintetici non prevalgono sul livello CFR primario.
+
+Ripetere ciascun input ha restituito lo stesso ID; riusare l’ID con input diverso
+è stato rifiutato. Gli storici conservano tutte le rivalutazioni e i due percorsi
+locali reali riusano una sola misura primaria. I candidati senza primaria
+necessaria non producono fatti. Tutti gli originali del trial sono stati riletti
+dall’archivio oggetti con verifica d’integrità. I test di acquisizione, registro,
+verificatore e CLI, le integrazioni con PostgreSQL usa e getta e i cinque gruppi
+delle query pubbliche sono passati; lo smoke development ha verificato readiness
+e separazione public/admin. Il percorso non ha chiamato provider.
+
+Per ripetere una prova, selezionare esplicitamente ambiente e perimetro, conservare
+configurazioni e stato iniziale e usare dati dedicati. Eseguire le acquisizioni
+primarie indipendentemente dalla piattaforma; selezionare i passaggi dagli
+originali conservati e usare `verify-candidate` oppure `VerifyMultiSource` sul
+database scelto. Rileggere ogni ricevuta e lo storico, verificare idempotenza,
+campi primari e assenza di fatti diagnostici, quindi confrontare lo stato finale.
+Il runner del collaudo usa l’ingresso programmatico e resta privato insieme ai
+suoi input reali; la CLI ordinaria usa il database configurato dall’applicazione.
+Conservare ricevute, dump e originali prima di rimuovere i dati dedicati.
+
+Questa prova chiude soltanto la 26.2. La valutazione estesa con esiti reali
+revisionati, l’attribuzione API/MCP delle ricevute (26.5), l’orchestrazione e il
+trial programmato (26.6), la diagnosi del worker generico CLN-007 e l’accettazione
+restano separati. Le copie della piattaforma restano link-only.

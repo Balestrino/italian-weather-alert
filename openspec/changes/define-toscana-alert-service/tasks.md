@@ -354,13 +354,13 @@ acceptance tasks 9.3 and 10.1 and production release gates remain open.
 ## 26. Cittadino Informato acquisition with multi-source verification — 3 October 2026
 
 - [x] 26.1 Formalize the requested additional institutional acquisition/discovery channel for selected municipalities in proposal, design and the three specifications; preserve independent municipal/CFR collection, scoped referrals, candidate limits and separate permissions/acceptance/activation. Record platform guidance and dated findings without claiming runtime adoption. The subsequent 3 October revision replaces the original reviewed-grounds gate with technical multi-source verification; this historical planning task does not complete the revised runtime work.
-- [ ] 26.2 Deliver and verify a working multi-source acquisition-to-verification system for Regione Toscana/CFR, the selected municipality and cittadinoinformato.it. After 26.3 and 26.4, exercise a bounded development run with regional and local cases and inspect persisted receipts identifying candidate, channel roles, source/version evidence, passages, check times, compared fields and outcomes. Verify missing/unavailable/non-comparable/not-applicable/conflicting evidence behavior and diagnostic-only admission without required primary support. Completion requires working tested comparisons, not obtaining licenses, agreements or legal-basis documentation; retain bounded public access, independent primary collection and link-only platform copies.
+- [x] 26.2 Deliver and verify a working multi-source acquisition-to-verification system for Regione Toscana/CFR, the selected municipality and cittadinoinformato.it. After 26.3 and 26.4, exercise a bounded development run with regional and local cases and inspect persisted receipts identifying candidate, channel roles, source/version evidence, passages, check times, compared fields and outcomes. Verify missing/unavailable/non-comparable/not-applicable/conflicting evidence behavior and diagnostic-only admission without required primary support. Completion requires working tested comparisons, not obtaining licenses, agreements or legal-basis documentation; retain bounded public access, independent primary collection and link-only platform copies.
 - [x] 26.3 Implement separate source identities and opt-in bounded acquisition for explicitly selected recognized municipality sections, with versioned originals, date meanings, dependencies, retries and visible failures; do not inherit recognition or permission across municipalities. Verified with synthetic unit/disposable PostgreSQL cases and two bounded isolated Calcinaia HTTP checks on 3 October 2026; pending verification candidates, no live source activation. See [operations](../../../docs/operations/cittadino-informato.md).
 - [x] 26.4 Implement persistent, evidence-bound multi-source verification receipts and candidate-to-domain admission: municipal publications/referenced acts for local fields, comparable originating CFR products for regional republications; record all three channel roles and distinguish corroboration, missing primary evidence, unavailable checks, non-comparable evidence, not-applicable checks and actual conflicts; preserve changes/history, avoid duplicate measures and never use majority vote between republications.
 - [ ] 26.5 Verify synthetic and reviewed real-source cases covering primary-only/platform-only notices, date/version mismatches, unavailable checks, actual conflicts, local measures without regional alerts, unchanged/revised content, same-platform unselected municipalities and equivalent API/MCP attribution; retain link-only copies and explicit coverage limits.
 - [ ] 26.6 Run a bounded operator-selected development preview/trial for Calcinaia before separately activating scheduled acquisition; verify independent municipal/CFR checks and comparison receipts, scoped visibility and rollback, without completing source acceptance or enabling other municipalities by inference.
 
-**26.2 progress — 3 October 2026:** bounded manual HTTP review identified the
+**26.2 preliminary progress — 3 October 2026 (superseded by the completed run below):** bounded manual HTTP review identified the
 Calcinaia-linked REST index, declared updates/risk routes and successful
 municipality/project responses. WordPress page metadata has old container dates
 and an empty body, distinct from the current HTML bulletin; it cannot supply
@@ -371,8 +371,8 @@ records the original review and revised technical closure criteria. The subseque
 user decision supersedes the licensing/documentation completion gate. Task 26.2
 remains unchecked: the later 26.3/26.4 work implements acquisition and the
 programmatic verifier, but the bounded end-to-end development run is still missing;
-there was no collector activation or external communication. This
-review does not complete tasks 26.3–26.6.
+there was no collector activation or external communication in that review.
+The completed run below supersedes only the outstanding 26.2 execution.
 
 **26.3 implementation — 3 October 2026:** the typed opt-in API adapter, registry
 and storage guards are implemented. Tests verify scoped acquisition, byte-exact
@@ -413,4 +413,28 @@ current and past knowledge selection without duplicate measures. See
 This completes 26.4; the verifier consumes interpreted selectors and prior check
 results, not an automatic counterpart-discovery workflow. No new real-source
 run, live migration/activation, generic extraction-worker wiring or API/MCP
-verification-output extension is claimed. Tasks 26.2, 26.5 and 26.6 remain open.
+verification-output extension is claimed by 26.4. The subsequent 26.2 run below
+closes that execution; tasks 26.5 and 26.6 remain open.
+
+
+**26.2 development verification — 3 October 2026:** independent municipal and
+CFR acquisition, scoped platform API acquisition and evidence-selector verification
+ran on the development PostgreSQL/RustFS services with dedicated private data. Ten
+persisted receipts cover three real-source cases and seven labelled synthetic
+controls: supported independent local fields, non-comparable local/regional
+republications, missing/unavailable primary checks, not-applicable roles, matching
+local/regional facts, edition mismatch and comparable conflicts without majority
+voting. Receipt readback, literal selectors/hashes/configurations/check times,
+request idempotence, immutable-input conflicts, histories, primary fact reuse and
+diagnostic-only unsupported candidates passed. The wider platform window's
+external municipal PDF failure remains recorded; no complete traversal of that
+window or widened platform permissions is claimed. Two successful passes use the
+display window since 1 October plus today/tomorrow risks; the exact local notice
+was checked separately with the independently retained municipal publication and
+referenced PDF. Real regional map colors remain unverified. Repository unit,
+disposable integration/query tests and nondisruptive development smoke passed.
+Existing containers/source controls were preserved; trial sources remain disabled
+and copies link-only. Private evidence: `CIN-DEV-20261003-01`. See
+[procedure and limits](../../../docs/operations/cittadino-informato.md#prova-completa-in-development--task-262).
+This completes 26.2 only: broader reviewed evaluation/API-MCP attribution (26.5),
+scheduled adoption (26.6), generic worker wiring and source acceptance remain open.

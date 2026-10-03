@@ -16,7 +16,7 @@ Comune di Calcinaia, provincia di Pisa, ISTAT `050004`. Fonte IWA: `calcinaia-mu
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria | [Notizie](https://www.comune.calcinaia.pi.it/tipi-di-notizia/notizie), [Avvisi](https://www.comune.calcinaia.pi.it/tipi-di-notizia/avvisi), [Comunicati](https://www.comune.calcinaia.pi.it/tipi-di-notizia/comunicati); sezioni da verificare nella configurazione |
-| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03; acquisizione e verificatore implementati, percorso development e adozione operativa da verificare |
+| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03; acquisizione e verificatore implementati, percorso development verificato da CLN-015, adozione programmata separata |
 | Albo pretorio | Atti di supporto | Cercare gli atti citati nelle notizie primarie; il riferimento al singolo atto va verificato |
 
 La mappa consolida la [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). La sezione Notizie è stata consultata il 2026-10-02; ciò non verifica tutte le altre sezioni o i canali secondari.
@@ -28,7 +28,8 @@ documentato dall'acquisizione configurata: verificare una fonte/sezione dedicata
 e ricevute recenti prima di dichiarare il confronto automatico operativo. La
 limitazione storica CLN-008 rinviava l’acquisizione alla revisione delle condizioni
 di riuso. CLN-012 supera quel prerequisito documentale; CLN-013/CLN-014 registrano
-il codice e i collaudi successivi, con il percorso development ancora da eseguire.
+il codice e i collaudi successivi; CLN-015 verifica il percorso delimitato in
+development con dati dedicati.
 
 CLN-009 conferma il riconoscimento istituzionale del canale di Calcinaia: il
 Comune lo collega e lo raccomanda, mentre Regione e ANCI documentano il servizio.
@@ -69,7 +70,7 @@ multipla Regione/CFR–Comune–piattaforma, senza un gate di ottenimento licenz
 o documentazione della base giuridica. Mantenere controlli comunali
 indipendenti per gli avvisi assenti dalla piattaforma; confrontare con il CFR soltanto
 le affermazioni regionali comparabili, senza richiedere un'allerta regionale per ogni
-provvedimento locale. I task 26.3 e 26.4 sono completati; 26.2, 26.5 e 26.6 restano aperti,
+provvedimento locale. I task 26.2, 26.3 e 26.4 sono completati; 26.5 e 26.6 restano aperti,
 con il coverage tracker invariato.
 
 La [revisione preliminare del canale](../../../fonti/piattaforme/cittadino-informato-review.md)
@@ -78,8 +79,9 @@ trattamento dei visitatori dichiarato da ANCI Toscana non risolve i diritti sul
 flusso IWA. Il precedente criterio documentale è superato da CLN-012; occorrono
 ricevute persistenti con fonti/versioni, tempi, campi ed esiti distinti. CLN-013
 verifica le route API, i limiti e la persistenza dell’acquisizione; CLN-014 aggiunge
-ricevute e proiezione primaria con prove sintetiche. Percorso development e
-cadenza operativa restano da collaudare. Il CFR può essere
+ricevute e proiezione primaria con prove sintetiche. CLN-015 aggiunge il
+percorso development delimitato; cadenza operativa e valutazione estesa restano
+da collaudare. Il CFR può essere
 non applicabile a una misura locale; non è richiesto un accordo unanime di tre canali.
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
@@ -102,7 +104,8 @@ aggiunge un ingresso programmatico separato per la proiezione da selezioni di
 evidenza verificate, con stato di interpretazione e validità primaria. Non
 collega automaticamente tutte le righe di `extracted_measures` al dominio né
 esegue discovery delle controparti: verificare questo percorso in development
-prima di considerare superata la diagnosi operativa CLN-007.
+prima di considerare superata la diagnosi operativa CLN-007. CLN-015 verifica
+l’ingresso separato con selezioni esplicite, senza risolvere il worker generico.
 
 Trial e accettazione restano quelli del coverage tracker. Le lacune dei canali secondari vanno registrate separatamente dalle omissioni nel perimetro primario. Consultare il registro privato per errori e recuperi dell'ambiente; non considerarli una certificazione pubblica.
 
@@ -112,6 +115,14 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-015 — Acquisizione e verifica delimitate in development
+
+- **Data e ultima verifica:** 2026-10-03, controlli HTTP, originali conservati e ricevute persistenti su servizi development con dati dedicati.
+- **Ambito:** una pagina Notizie comunale e 24 documenti, confronto di un avviso locale con il dettaglio della piattaforma selezionato, PDF richiamato dalla pubblicazione primaria; nessuna traversata completa di tutte le sezioni.
+- **Conoscenza:** comportamento confermato nel campione. **Intervento:** prova della 26.2 completata; nessuna attivazione delle fonti del trial, controlli e container esistenti preservati.
+- **Osservazione ed evidenza:** la primaria locale viene acquisita indipendentemente e produce una sola misura dai campi sostenuti. Il rilancio resta non comparabile, con dipendenza comunale esterna non consentita nel contratto della piattaforma; il PDF è conservato e validato dalla primaria. Date di pubblicazione diverse non provano equivalenza di edizione o validità. Il controllo CFR è non applicabile alla misura locale. Ricevute, errori sintetici e limiti nella [procedura](../../../operations/cittadino-informato.md#prova-completa-in-development--task-262); registro privato `CIN-DEV-20261003-01`.
+- **Conseguenza e prossima verifica:** completa la prova runtime dell’ingresso separato di CLN-014. L’assenza dal perimetro temporale riuscito non è assenza dall’intera piattaforma; la finestra più ampia fallita resta incompleta. CLN-007, interpretazione/autorità dell’atto, valutazione estesa 26.5, adozione 26.6 e accettazione restano separati.
 
 ### CLN-014 — Proiezione con riscontro primario implementata
 

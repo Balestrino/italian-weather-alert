@@ -80,6 +80,14 @@ Task 26.2 SHALL remain open until a bounded development run exercises the acquis
 - **WHEN** recognized selected channels have a working bounded acquisition and persistent verification path, and the required development run and failure cases pass
 - **THEN** task 26.2 can be completed from inspectable multi-source results without obtaining license or legal-basis documentation, while source acceptance and scheduled activation remain separate
 
+#### Scenario: A bounded development check finds an incomplete secondary dependency
+- **WHEN** a selected platform notice references a required PDF outside its contract and the municipality independently retains its own supported publication and referenced dependency
+- **THEN** the platform notice remains incomplete and diagnostic with an unavailable-channel receipt, while a separate primary-only evaluation may admit supported municipal fields; the failed platform scope is retained and is not reported complete or granted broader permissions
+
+#### Scenario: Real-source republications lack comparable evidence in development
+- **WHEN** a bounded development run retains local and regional republications whose act edition, originating product, zone, issuance, validity or required primary fields cannot be established
+- **THEN** inspectable receipts preserve the available literal evidence and non-comparability without inventing dates or alert levels; separately labelled synthetic controls verify corroboration and comparable conflicts, without claiming those conflicts occurred in the real sources or completing their semantic acceptance
+
 #### Scenario: A platform communication is corroborated by a municipal ordinance
 - **WHEN** a selected recognized channel reports a closure and the municipal publication or referenced ordinance supports the same action, place and period
 - **THEN** the candidate retains both evidence identities and only supported fields enter the validated municipal projection, with independent interpretation and publication gates

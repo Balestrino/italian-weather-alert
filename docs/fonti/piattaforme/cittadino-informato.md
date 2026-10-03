@@ -45,8 +45,10 @@ La [procedura](../../operations/cittadino-informato.md) documenta il contratto,
 i test sintetici di persistenza e la prova HTTP isolata su Calcinaia del 2026-10-03.
 La [revisione preliminare](cittadino-informato-review.md) conserva l’inventario
 anteriore al collaudo; CIN-007 aggiorna l’acquisizione e CIN-008 la verifica
-persistente del task 26.4, provata con fixture sintetiche. Il percorso completo in
-development, la cadenza operativa e la copertura continuativa restano da verificare.
+persistente del task 26.4, provata con fixture sintetiche. CIN-009 registra la
+prova delimitata completa della 26.2 in development, con ricevute reali e
+controlli sintetici distinti. Cadenza operativa, valutazione estesa e copertura
+continuativa restano da verificare.
 Feed degli avvisi e intervalli di polling non sono stati individuati nelle risorse
 consultate. Preferire un accesso API/feed verificato tecnicamente quando disponibile.
 I metadati WordPress della pagina non datano i bollettini dinamici.
@@ -78,20 +80,31 @@ CIN-006 ne supera l’uso come prerequisito del piano.
 | CIN-005 | Accesso tecnico Calcinaia | Indice REST osservato; date del contenitore non operative, route collaudate da CIN-007, cadenza continuativa da verificare |
 | CIN-006 | Criterio corrente del task 26.2 | Sistema di verifica multipla implementato e verificato, con ricevute persistenti; nessun gate di ottenimento licenze/documentazione |
 | CIN-007 | Acquisizione Calcinaia | Contratto API e guardie implementati; prove sintetiche e due passaggi HTTP isolati verificati, candidati inizialmente pending |
-| CIN-008 | Verifica multipla | Ricevute, confronti e proiezione primaria implementati e provati con fixture; percorso reale e adozione operativa separati |
+| CIN-008 | Verifica multipla | Ricevute, confronti e proiezione primaria implementati e provati con fixture; CIN-009 aggiunge il percorso development |
+| CIN-009 | Percorso development | Dieci ricevute reali/sintetiche distinte ispezionate; perimetro riuscito separato da dipendenze mancanti, adozione programmata e accettazione |
 
 ## Problemi aperti
 
 I [task 26.2–26.6](../../../openspec/changes/define-toscana-alert-service/tasks.md)
-registrano la 26.3 e la 26.4 completate e richiedono ancora verifica del percorso in
-development, valutazione estesa e trial programmato. Il [dossier](cittadino-informato-review.md)
-conserva l’inventario tecnico e i criteri correnti. Il task 26.2 resta aperto perché
-il percorso completo con evidenze reali e ricevute in development resta da eseguire.
+registrano la 26.2, la 26.3 e la 26.4 completate; valutazione estesa e trial
+programmato restano aperti. Il [dossier](cittadino-informato-review.md)
+conserva l’inventario tecnico e i criteri correnti. CIN-009 verifica il percorso
+completo nel solo perimetro development dichiarato: dipendenze esterne non
+consentite e dati regionali non comparabili restano diagnostici, con il primo
+passaggio più ampio esplicitamente incompleto.
 La verifica implementata consuma selezioni interpretate e risultati dei controlli:
 non costituisce da sola discovery delle controparti o accettazione semantica.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-009 — Percorso completo delimitato verificato in development
+
+- **Data e ultima verifica:** 2026-10-03, acquisizioni HTTP reali, ricevute persistenti, controlli sintetici e smoke development.
+- **Ambito:** Calcinaia `050004`, una pagina Notizie primaria, criticità CFR, aggiornamenti dal 1° ottobre e rischi oggi/domani della piattaforma; dettaglio locale esatto selezionato separatamente.
+- **Conoscenza:** comportamento confermato nel perimetro provato. **Intervento:** task 26.2 verificato su PostgreSQL/RustFS development con dati dedicati; nessuna raccolta programmata o pubblicazione del trial.
+- **Osservazione ed evidenza:** dieci ricevute con tre ruoli, originali/versioni, passaggi, tempi e risultati; primaria locale indipendente riusata, rilanci reali non comparabili e candidati incompleti diagnostici. Sette controlli sintetici distinguono riscontro, indisponibilità e conflitto senza maggioranza. Il primo passaggio dal 23 settembre resta incompleto per un PDF comunale esterno al contratto; nessuna estensione dei permessi. [Procedura e limiti](../../operations/cittadino-informato.md#prova-completa-in-development--task-262), registro privato `CIN-DEV-20261003-01`.
+- **Conseguenza e prossima verifica:** completa la prova mancante di CIN-008; non certifica colori CFR, semantica degli atti, copertura della finestra ampia o attribuzione API/MCP delle ricevute. Completare 26.5 prima dell’adozione programmata 26.6 e dell’accettazione separata.
 
 ### CIN-008 — Ricevute persistenti e ammissione primaria verificate
 
