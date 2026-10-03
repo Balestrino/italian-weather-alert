@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-03 [Changed] Plan Cittadino Informato as a scoped institutional acquisition/discovery channel with municipal/CFR corroboration, independent primary checks and separate access/reuse review; leave implementation and activation pending.
+
 - 2026-10-03 [Changed] Record institutional referrals for Calcinaia's Cittadino Informato channel, distinguishing recognized provenance from technical reliability, collection activation and reuse conditions.
 
 - 2026-10-03 [Changed] Document the missing municipal extraction-to-domain connection, situation attention and quality limits, unverified CFR map levels and the distinction between the planned secondary sentinel and active collection.

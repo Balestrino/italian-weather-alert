@@ -44,6 +44,8 @@ Equivalent API and MCP queries against the same data version and evaluation time
 ### Requirement: Citizen-facing evidence and official instructions
 Municipal-status results SHALL give relevant local provisions priority while keeping regional products distinct and available. Structured MCP results SHALL carry authority, supporting document/link, territory, risk or measure, documented validity, last complete check and uncertainty next to the affected information. The service SHALL expose official instructions with attribution and SHALL NOT generate independent safety judgments, invent emergency advice or claim to issue official warnings. Acquired external text SHALL be treated as data rather than executable instructions. These guarantees SHALL apply to service output and SHALL NOT be represented as control over an external assistant's final wording.
 
+For facts discovered through Cittadino Informato, equivalent API/MCP output SHALL retain permitted channel attribution and supporting primary document identities alongside field-level corroboration limitations. Diagnostic candidates without required primary support SHALL NOT be presented as confirmed local measures or originating regional alert levels. Collection permission, source acceptance, corroboration and public publication SHALL remain independent; the existing link-only restriction on platform copies SHALL still apply.
+
 #### Scenario: A closure accompanies a regional yellow warning
 - **WHEN** the municipality has documented a relevant local closure
 - **THEN** the closure is prominent with its official evidence while the regional warning remains separate context

@@ -45,7 +45,7 @@ The service SHALL record acceptance independently for vigilance, criticality/ale
 - **THEN** monitoring acceptance remains pending and does not inherit vigilance permissions or the separate DPC license
 
 ### Requirement: Bounded municipal coverage evidence
-Municipal acceptance SHALL identify configured channels and sections, evaluated period, listing traversal and pagination, required attachments, known-publication comparisons and unresolved gaps. A complete successful check SHALL certify only the declared checking scope. Neither a nonempty listing nor finding every sampled notice SHALL establish completeness of all municipal publications. A known relevant omission within the declared scope SHALL block that scope's acceptance until corrected and successfully re-evaluated; publishing narrower accepted scopes SHALL retain explicit coverage limitations. For Calcinaia, the direct municipal website SHALL be the primary collection channel. Cittadino Informato SHALL be used only as a secondary discovery sentinel and coverage diagnostic and SHALL NOT establish completeness, dates or measures without supporting primary evidence. The albo pretorio SHALL be queried only for acts explicitly referenced by a primary municipal notice. Content found only through a secondary channel SHALL remain a diagnostic discrepancy until supported by a recognized primary publication or referenced act.
+Municipal acceptance SHALL identify configured channels and sections, evaluated period, listing traversal and pagination, required attachments, known-publication comparisons and unresolved gaps. A complete successful check SHALL certify only the declared checking scope. Neither a nonempty listing nor finding every sampled notice SHALL establish completeness of all municipal publications. A known relevant omission within the declared scope SHALL block that scope's acceptance until corrected and successfully re-evaluated; publishing narrower accepted scopes SHALL retain explicit coverage limitations. For Calcinaia, the direct municipal website SHALL remain the primary reference and an independently collected channel. Cittadino Informato SHALL be registered as an additional institutional acquisition/discovery channel under the scoped verification requirement below. Its role SHALL NOT establish completeness, operational dates or confirmed measures without supporting primary evidence. The albo pretorio SHALL be queried only for acts explicitly referenced by a primary municipal notice. Content found only through the additional channel SHALL remain an explicit diagnostic candidate until supported by a recognized primary publication or referenced act.
 
 #### Scenario: General and typed listings differ
 - **WHEN** a relevant known notice is absent from the general listing but appears in a configured typed section
@@ -62,6 +62,35 @@ Municipal acceptance SHALL identify configured channels and sections, evaluated 
 #### Scenario: A municipal notice references an albo act
 - **WHEN** a primary Calcinaia notice cites an ordinance or other act available through the albo pretorio
 - **THEN** the service retrieves that referenced act as supporting evidence without treating the whole albo as an exhaustively collected alert channel
+
+### Requirement: Scoped Cittadino Informato acquisition and primary verification
+The service SHALL support Cittadino Informato as an additional acquisition/discovery channel for explicitly selected municipalities. Recognition SHALL identify the municipal referral, exact destination, covered sections, municipality ISTAT and observation date. Calcinaia's recognition SHALL NOT recognize or activate any other municipality or the entire platform. Platform operator, publisher and originating municipal or regional authority SHALL remain separate.
+
+Before active acquisition, each declared scope SHALL record reviewed grounds for access, automated collection, retention, interpretation and intended reuse, including applicable license, statutory basis or agreement and any third-party rights or personal-data limitations. Institutional recognition, public accessibility, robots directives, attribution or corroboration SHALL NOT substitute for this assessment. Missing explicit license SHALL NOT itself establish either prohibition or unrestricted permission. Available official API/feed access SHOULD be preferred where verified; endpoints and polling limits SHALL NOT be invented. Public copies SHALL retain the independently restricted link-only policy.
+
+Acquired platform publications SHALL generate evidence-bound candidates and bounded verification work. Local measures and operational dates SHALL be verified against the municipal publication or its referenced official act. Regional republications SHALL be compared with the originating CFR product for the same risk, zone, issuance/version and validity. A local measure SHALL NOT require a concurrent regional alert. Comparisons SHALL retain both source/version identities, relevant passages, comparison time and supported fields; textual similarity alone SHALL NOT establish equivalence. Independent municipal and CFR collection SHALL continue within their declared scopes.
+
+The service SHALL distinguish corroborated fields, primary evidence not found, primary check unavailable and actual comparable conflicts. Missing or failed primary retrieval SHALL NOT be reported as contradiction, cancellation, absence of risk or established validity. Candidates without required primary support SHALL remain diagnostic and SHALL NOT become confirmed local measures or substitute regional levels in API/MCP. Agreement SHALL NOT complete source acceptance or establish real-world completeness. New or changed evidence SHALL trigger versioned reevaluation without rewriting earlier knowledge.
+
+#### Scenario: A recognized municipal page has unresolved acquisition grounds
+- **WHEN** the municipal referral is verified but the basis for automated collection and intended retention/reuse remains unresolved
+- **THEN** channel recognition is recorded, acquisition remains inactive and coverage identifies the pending condition without treating the channel as unofficial
+
+#### Scenario: A platform communication is corroborated by a municipal ordinance
+- **WHEN** a selected permitted channel reports a closure and the municipal publication or referenced ordinance supports the same action, place and period
+- **THEN** the candidate retains both evidence identities and only supported fields enter the validated municipal projection, with independent interpretation and publication gates
+
+#### Scenario: Regional colors disagree for different validities
+- **WHEN** a platform republication and CFR product refer to different issuance or validity periods
+- **THEN** the comparison records non-comparability and does not report an actual conflict or replace the CFR level
+
+#### Scenario: Primary verification is unavailable
+- **WHEN** a platform candidate is acquired but the municipal source cannot be checked
+- **THEN** the candidate and failed verification remain diagnostic with explicit limits, without asserting a confirmed measure, revocation or absence
+
+#### Scenario: An independent municipal check finds a platform omission
+- **WHEN** the municipal channel publishes a relevant notice absent from the platform
+- **THEN** primary collection and interpretation proceed independently and the platform omission is recorded within the compared scope
 
 ### Requirement: Retained acquisition and versions
 The service SHALL retain original document bytes where permitted, source URL, acquisition time, hash, available publication/update metadata and interpretation version. It SHALL detect changes at stable URLs, preserve prior versions within retention, and avoid duplicate versions for unchanged content. An unchanged successful check SHALL NOT change publication time. Required linked resources SHALL be included or explicitly reported missing.

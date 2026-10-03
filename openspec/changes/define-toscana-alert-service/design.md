@@ -32,7 +32,7 @@ Research context (the detailed investigation records are retained separately):
 
 - National and Toscana legal responsibilities, effective dates, and later amendments require continuing verification.
 - The operational CFR routes selected for the MVP are the vigilance page at `https://cfr.toscana.it/index.php?IDS=2&IDSS=71`, the criticality/alert page at `https://cfr.toscana.it/index.php?IDS=2&IDSS=76`, and monitoring at `https://www.cfr.toscana.it/mobile3/avviso-criticita/`. The CFR homepage is a secondary emission/adoption signal. Graphical resources, observed HTTP 429 behavior, and product-specific extraction remain part of acceptance.
-- Cittadino Informato and the Calcinaia municipal site have non-equivalent dates and coverage. An explicit municipal referral does not make the secondary platform a complete primary source.
+- Cittadino Informato and the Calcinaia municipal site have non-equivalent dates and coverage. The 3 October 2026 decision formally adds the platform as a scoped institutional acquisition/discovery channel with primary verification; recognition does not establish completeness, permissions or activation.
 - Livorno, Pisa, Pontedera, and Cascina are subsequent municipal rollout targets. Calcinaia is the initial local channel; each municipality requires separate source acceptance.
 
 The latest agreed requirements are in this change's three specs. Research notes remain dated evidence; not all later conversational decisions have been copied into docs. Firenze remains research material, not an initial local collection target.
@@ -110,7 +110,7 @@ Docker Compose runs Go processes, PostgreSQL, RustFS and local Crawl4AI in separ
 
 ### 8. Configured discovery, OCR and separate LLM stages
 
-Operators configure sources and sections through administration; the service discovers documents within those boundaries rather than autonomously discovering new channels. Crawl4AI is an internal acquisition component called by Go workers. Preserve original bytes and required resources alongside extracted text. For Calcinaia, the direct municipal site is the primary collection source, Cittadino Informato is a secondary sentinel used to diagnose coverage differences, and the albo pretorio is queried only for acts referenced by primary notices. A secondary-only observation cannot establish a municipal fact or completeness without primary evidence.
+Operators configure sources and sections through administration; the service discovers documents within those boundaries rather than autonomously discovering new channels. Crawl4AI is an internal acquisition component called by Go workers. Preserve original bytes and required resources alongside extracted text where permitted. For selected municipalities, register Cittadino Informato as an additional institutional acquisition/discovery channel with its own municipality referral, sections and policy. Platform notices generate candidates checked against municipal publications/referenced acts and, for quoted regional warnings, originating CFR products. Preserve independent primary collection; a platform omission must not hide a municipal notice. Secondary-only candidates do not establish confirmed measures or completeness. The albo pretorio remains limited to acts referenced by primary notices. The 3 October decision below is a planned extension, not a live policy activation.
 
 Classify full content of new/changed documents using Qwen3.8-27B. For pertinent notices, fetch necessary attachments and interpret them together, retaining evidence per document and page. Include scanned PDFs using DeepSeek-OCR-2. Use separate Qwen stages/prompts for relevance, structured measure extraction and links to previous measures. OCR remains retained verbatim; before classification or extraction, presentation-only markers introduced by OCR are normalized through a deterministic view that keeps offsets resolvable to the retained OCR page and original document.
 
@@ -195,7 +195,7 @@ The dependency table in tasks.md governs sequencing: foundation, generic domain 
 
 The architecture and collection approach below are decided. These checks remain prerequisites for their dependent tasks, not evidence of completed implementation:
 
-1. Complete and verify the product-specific collection contracts for the selected CFR routes and the Calcinaia primary/sentinel/referenced-act boundaries, including required attachments, reuse conditions, known-publication comparisons and graphical zone/level extraction.
+1. Complete and verify the product-specific collection contracts for the selected CFR routes and the municipal/additional-platform/referenced-act boundaries, including independent primary collection, required attachments, reviewed access/reuse grounds, recorded comparisons and graphical zone/level extraction.
 2. Implement conflict-aware operational extraction windows, compact indexed evidence and validated candidate merge, then rerun the full retained-case extraction evaluation, including long/scanned ordinances and cross-window temporal conflicts.
 3. Complete live regional and municipal integration and verify the reviewed API/MCP contract, consistent views/cursors, retention behavior and the initial public limits behind the existing proxy.
 4. Prepare the dedicated trial VM, configure the existing SMTP path, confirm PBS whole-VM protection, perform an isolated restore, complete at least seven full observational days across all four scopes and then derive the operating budget from measured consumption.
@@ -359,6 +359,38 @@ extraction, embedding, linking or publication is requested by this diagnostic
 worker. The worker exits after the fixed queue, with results retained for admin
 inspection. This bounded trial is separate from a continuing source rollout or
 semantic extraction acceptance.
+
+## Cittadino Informato acquisition and corroboration — 3 October 2026
+
+The user-authorized target extends the retained diagnostic sentinel into a scoped
+acquisition/discovery channel for selected municipalities. Calcinaia has a verified
+municipal referral; other municipalities require their own recognition and policies.
+Use a separate channel/source identity rather than silently appending platform URLs
+to the existing municipal source. Record authority, publisher, operator, exact scope,
+reviewed access/retention/interpretation/reuse grounds and dated evidence separately.
+The reviewed basis may be a license, applicable statutory permission or agreement;
+the absence of a visible license is neither a blanket prohibition nor permission.
+At this planning revision no basis for systematic platform acquisition has been
+established. The homepage copyright link observed on 3 October points to `#`;
+that finding does not determine rights over the data. Prefer a documented permitted
+feed/API if available, with separately verified cadence and bounded retries.
+
+Acquisition creates attributable candidates and bounded primary-verification work,
+independent of anonymous API/MCP queries. Persist source/version evidence and the
+comparison's scope, time, supported fields and outcome. Match municipal actions,
+places and original validity expressions against municipal notices/referenced acts;
+match regional republications to the CFR product, risk, zone, issuance and validity.
+Keep uncorroborated, unavailable and conflicting evidence distinct. No unsupported
+candidate enters confirmed municipal projection or overwrites the CFR risk level.
+Local measures remain independent of regional alert presence. Preserve updates and
+earlier knowledge, deduplicate matching publications and reevaluate changed versions.
+
+Continue independent municipal and CFR discovery, including primary-only notices.
+Expose truthful scope/check limitations and corroboration evidence for permitted
+validated facts; diagnostic-only candidates are not confirmed alert output. Public
+platform copies remain link-only under the existing restriction. Legal review,
+implementation, representative comparisons, technical acceptance and scoped rollout
+are open tasks; this decision activates no collector and accepts no source.
 
 ## Manual municipal development publication — 2 October 2026
 

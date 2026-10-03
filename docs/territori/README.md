@@ -44,6 +44,10 @@ Quando una scoperta è sostenuta solo da evidenza privata, conservarne lì il de
 
 ## Manutenzione
 
+Le note di [Cittadino Informato](../fonti/piattaforme/cittadino-informato.md)
+distinguono riconoscimento istituzionale, nuovo flusso pianificato con verifica
+primaria e condizioni di acquisizione ancora da verificare.
+
 Aggiornare le schede durante l'indagine o la modifica relativa alla fonte, prima di dichiarare conclusa la verifica. Rivalutare le indicazioni quando cambiano sito, piattaforma, configurazione, diritti d'uso o comportamento del collector. Una nuova evidenza contraria riapre il problema.
 
 Verificare link locali, codici territoriali, identificativi delle scoperte, coerenza tra guida e registro e distinzione fra proposte e regole applicate. Collegare specifica e task OpenSpec quando cambia una capacità; registrare gli aggiornamenti nel [changelog](../../CHANGELOG.md). Le verifiche documentali non richiedono fetch o chiamate ai modelli.

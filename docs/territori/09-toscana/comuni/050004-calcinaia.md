@@ -16,13 +16,14 @@ Comune di Calcinaia, provincia di Pisa, ISTAT `050004`. Fonte IWA: `calcinaia-mu
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria | [Notizie](https://www.comune.calcinaia.pi.it/tipi-di-notizia/notizie), [Avvisi](https://www.comune.calcinaia.pi.it/tipi-di-notizia/avvisi), [Comunicati](https://www.comune.calcinaia.pi.it/tipi-di-notizia/comunicati); sezioni da verificare nella configurazione |
-| Cittadino Informato | Canale riconosciuto dal Comune; diagnostica secondaria nella specifica IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento istituzionale verificato il 2026-10-03, completezza e aggiornamento da collaudare |
+| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03, condizioni, implementazione e attivazione del nuovo flusso da verificare |
 | Albo pretorio | Atti di supporto | Cercare gli atti citati nelle notizie primarie; il riferimento al singolo atto va verificato |
 
 La mappa consolida la [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). La sezione Notizie è stata consultata il 2026-10-02; ciò non verifica tutte le altre sezioni o i canali secondari.
 
-Cittadino Informato è previsto come sentinella di confronto nella specifica,
-ma questo non certifica un controllo periodico attivo. CLN-008 distingue il ruolo
+Cittadino Informato, già previsto come sentinella di confronto, è incluso dalla
+decisione CLN-010 come canale aggiuntivo di acquisizione/discovery con verifica
+primaria. Il nuovo piano non certifica un controllo periodico attivo. CLN-008 distingue il ruolo
 documentato dall'acquisizione configurata: verificare una fonte/sezione dedicata
 e ricevute recenti prima di dichiarare il confronto automatico operativo. La
 limitazione registrata rinvia l'acquisizione attiva alla revisione delle condizioni
@@ -60,6 +61,13 @@ Gli stati pendenti e i livelli non verificati restano espliciti; staging e produ
 mantengono i requisiti della specifica. Vedere CLN-006.
 
 ## Regole ed eccezioni
+
+Consultare le [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md)
+prima del nuovo flusso: raccolta automatica, conservazione e riuso richiedono una
+base verificata separatamente dalla conferma dei fatti. Mantenere controlli comunali
+indipendenti per gli avvisi assenti dalla piattaforma; confrontare con il CFR soltanto
+le affermazioni regionali comparabili, senza richiedere un'allerta regionale per ogni
+provvedimento locale. I task 26.2–26.6 restano aperti; il coverage tracker è invariato.
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
 | --- | --- | --- | --- |
@@ -183,3 +191,13 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Conseguenza:** l'esclusione dalla raccolta attiva di CLN-008 non è una dichiarazione di fonte non autentica. Il riconoscimento istituzionale non completa l'accettazione tecnica né determina le condizioni di riuso.
 - **Prossima verifica:** identificare l'emittente dei messaggi nel perimetro comunale e confrontare contenuti, date, aggiornamenti e omissioni con gli originali; verificare separatamente il contratto di acquisizione prima dell'attivazione.
 - **Collegamenti:** CLN-001, CLN-008 e [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md).
+
+### CLN-010 — Canale aggiuntivo pianificato con riscontro primario
+
+- **Data e ultima verifica:** 2026-10-03, decisione dell'utente, consultazione web delle condizioni e coerenza documentale.
+- **Ambito:** Calcinaia come primo perimetro; altri comuni selezionati richiedono evidenze proprie.
+- **Conoscenza:** requisito confermato; base di acquisizione/riuso da accertare. **Intervento:** pianificato, collector non attivato.
+- **Osservazione:** il nuovo requisito estende il ruolo diagnostico: candidati verificati nei siti comunali/atti richiamati e, per rilanci regionali, nei prodotti CFR comparabili. Controlli indipendenti restano necessari; mancato riscontro e indisponibilità non diventano conflitti o assenza di allerte.
+- **Evidenza:** [specifica aggiornata](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification), [note della piattaforma](../../../fonti/piattaforme/cittadino-informato.md), [task 26](../../../../openspec/changes/define-toscana-alert-service/tasks.md). Registro privato `CIN-REVIEW-20261003-01`.
+- **Conseguenza:** il riscontro primario non autorizza retroattivamente l'acquisizione e non completa accettazione o pubblicazione; originali e condizioni dei canali restano separati.
+- **Prossima verifica:** task 26.2 per titolarità e base applicabile, poi implementazione, valutazione e trial delimitato. CLN-008 resta il riscontro datato del runtime precedente.

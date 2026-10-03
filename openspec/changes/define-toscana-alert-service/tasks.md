@@ -350,3 +350,18 @@ This targeted deployment does not certify uniform application-image rollout: the
 runtime image checker reports preserved older backup/worker images. Private database,
 listener settings, response comparisons and rollback details are retained. Source
 acceptance tasks 9.3 and 10.1 and production release gates remain open.
+
+## 26. Cittadino Informato acquisition with primary verification — 3 October 2026
+
+- [x] 26.1 Formalize the requested additional institutional acquisition/discovery channel for selected municipalities in proposal, design and the three specifications; preserve independent municipal/CFR collection, scoped referrals, candidate limits and separate permissions/acceptance/activation. Record platform guidance and dated findings without claiming runtime adoption.
+- [ ] 26.2 Review the exact channel's automated access, retention, provider processing and intended reuse grounds, identifying license, applicable statutory basis or agreement, rights holders and limits; verify any documented API/feed and cadence. Keep unresolved scopes inactive and preserve the independent link-only copy restriction.
+- [ ] 26.3 Implement separate source identities and opt-in bounded acquisition for selected permitted municipality sections, with versioned originals, date meanings, dependencies, retries and visible failures; do not inherit recognition or permission across municipalities.
+- [ ] 26.4 Implement persistent, evidence-bound primary verification and candidate-to-domain admission: municipal publications/referenced acts for local fields, comparable originating CFR products for regional republications; distinguish corroboration, missing primary evidence, unavailable checks and actual conflicts, preserve changes/history and avoid duplicate measures.
+- [ ] 26.5 Verify synthetic and reviewed real-source cases covering primary-only/platform-only notices, date/version mismatches, unavailable checks, actual conflicts, local measures without regional alerts, unchanged/revised content, same-platform unselected municipalities and equivalent API/MCP attribution; retain legal and coverage limits.
+- [ ] 26.6 Run a bounded permitted development preview/trial for Calcinaia before separately activating scheduled acquisition; verify independent municipal/CFR checks and comparison receipts, scoped visibility and rollback, without completing source acceptance or enabling other municipalities by inference.
+
+This is an authorized planning revision. It does not activate platform acquisition,
+resolve legal conditions, implement municipal projection or certify source acceptance.
+The historical checked bootstrap comparison in task 1.11 remains dated evidence,
+not proof of this new recurring workflow. Document consistency, scenario structure
+and local links are verified separately from runtime behavior and source acceptance.

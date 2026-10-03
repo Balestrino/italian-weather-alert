@@ -53,6 +53,12 @@ mantengono i requisiti della specifica. Vedere TOS-007.
 
 Non derivare colori delle mappe dal testo circostante. Le pubblicazioni comunali che rilanciano un bollettino non costituiscono automaticamente una nuova allerta o una misura locale.
 
+Il flusso pianificato di [Cittadino Informato](../../fonti/piattaforme/cittadino-informato.md)
+aggiunge discovery per i comuni selezionati con condizioni verificate; i rilanci
+regionali si confrontano con rischio, zona, emissione e validità del prodotto CFR
+originario. Le raccolte CFR e comunali restano indipendenti e una misura locale
+non richiede un'allerta regionale. La decisione è documentata in TOS-009.
+
 Per diagnosticare una situazione API vuota, controllare prima `coverage.public_state`
 e `coverage_status`: controlli di acquisizione recenti e `updating.state=ok` non
 abilitano la pubblicazione. La query pubblica richiede `public_enabled` e una
@@ -179,3 +185,11 @@ tecniche del software non sostituiscono gli esiti attesi revisionati da una pers
 - **Conseguenza:** una risposta con quattordici combinazioni per due date e sette rischi non dimostra lettura dei colori; controlli recenti e pubblicazione manuale non colmano i livelli sconosciuti o le valutazioni di provenienza mancanti.
 - **Prossima verifica:** definire e validare separatamente la lettura delle evidenze grafiche e la rappresentazione della dichiarazione ufficiale; preservare validità e casi non supportati. Completare le valutazioni di provenienza con evidenza revisionata.
 - **Collegamenti:** TOS-005, TOS-007 e [CLN-007](comuni/050004-calcinaia.md#cln-007--estrazioni-conservate-senza-proiezione-comunale-nella-situazione).
+
+### TOS-009 — Riscontro CFR dei rilanci scoperti sul canale aggiuntivo
+
+- **Data e ultima verifica:** 2026-10-03, decisione dell'utente e coerenza delle specifiche; nessun nuovo fetch CFR o attivazione.
+- **Ambito:** candidati regionali da Cittadino Informato per comuni selezionati.
+- **Conoscenza:** requisito confermato. **Intervento:** pianificato; confronto persistente da implementare.
+- **Osservazione ed evidenza:** il [nuovo requisito](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification) conserva origine CFR e confronto per prodotto, rischio, zona, emissione e validità. Dati non comparabili e fonte primaria indisponibile restano distinti da conflitti.
+- **Conseguenza e prossima verifica:** la piattaforma non colma per inferenza i colori CFR `unknown`; implementare e collaudare i confronti nei task 26, mantenendo separati misure locali, condizioni di riuso e accettazione. Vedere [CLN-010](comuni/050004-calcinaia.md#cln-010--canale-aggiuntivo-pianificato-con-riscontro-primario).

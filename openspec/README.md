@@ -1,5 +1,13 @@
 # OpenSpec: project plans and progress
 
+The 3 October 2026 planning revision formally includes Cittadino Informato as an
+additional institutional acquisition/discovery channel for selected municipalities,
+with primary municipal/CFR verification and independent primary collection. Task
+26.1 records the documentation update; tasks 26.2–26.6 leave reviewed access/reuse
+grounds, implementation, comparisons and scoped adoption open. The decision activates
+no platform collector and does not complete source acceptance. See
+[platform guidance](../docs/fonti/piattaforme/cittadino-informato.md).
+
 This directory publishes IWA's change proposals, designs, capability specifications, and task checklists so contributors can see the intended behavior and work still open. Start with a change's `proposal.md`, then read its `design.md`, `specs/`, and `tasks.md`.
 
 The original checklists are a **30 September 2026 snapshot** of work tracked in the private project. Later public-checkout tasks and changes are marked in their own files. A checked task does not certify public source acceptance, deployment, or that all supporting evidence is redistributable. The public [coverage tracker](../docs/coverage.md) describes source status. Detailed operational notes and research evidence remain separate while their contents and reuse terms are reviewed.

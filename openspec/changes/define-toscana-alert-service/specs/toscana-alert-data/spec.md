@@ -89,6 +89,12 @@ Responses SHALL expose provenance, interpretation and updating as separate dimen
 ### Requirement: Coverage and comparable discrepancies
 The service SHALL separately report regional and local coverage. Regional products SHALL remain available when local channels are unverified or unavailable, with local limitations and the last successful acquisition if known. Empty results SHALL NOT mean no local measures or safety. Discrepancies SHALL be evaluated only after comparing risk, territory, issuance and validity; both conflicting publications SHALL remain attributable, with the regional bulletin defining its own technical level.
 
+Cittadino Informato candidates SHALL retain channel-specific evidence and the outcome of the primary verification defined in official-source-ingestion. Corroboration SHALL be field-scoped and SHALL NOT transfer dates, validity, authority or completeness by inference. A primary check failure or an unmatched candidate SHALL remain distinct from an actual comparable disagreement; uncorroborated candidates SHALL NOT create confirmed measures or replace originating regional levels.
+
+#### Scenario: A local activation is verified without a regional alert
+- **WHEN** a platform candidate and municipal act support a local activation but no applicable regional warning is acquired
+- **THEN** the supported local measure remains separate and no regional color or absence-of-risk conclusion is inferred
+
 #### Scenario: Local coverage is unavailable
 - **WHEN** regional applicability is known but the municipal channel cannot be verified
 - **THEN** regional information is returned alongside an explicit local-coverage limitation rather than a claim of no municipal provisions
