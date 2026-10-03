@@ -47,6 +47,18 @@ func (s *Store) MunicipalitySituation(ctx context.Context, query SituationQuery)
 			result.DocumentsRequiringAttention = append(result.DocumentsRequiringAttention, document.Document)
 		}
 	}
+	// First/uninterpreted notices also matter when no previous measure exists.
+	documents, documentErr := s.searchDocuments(ctx, SearchQuery{Kind: "attention", QueryTime: qt, MunicipalityISTAT: query.MunicipalityISTAT})
+	if documentErr != nil {
+		return Situation{}, documentErr
+	}
+	for _, document := range documents {
+		if seen[document.ID] || document.Quality.Interpretation.State == "supported" {
+			continue
+		}
+		seen[document.ID] = true
+		result.DocumentsRequiringAttention = append(result.DocumentsRequiringAttention, document)
+	}
 	coverage, err := s.Coverage(ctx, CoverageQuery{QueryTime: qt, MunicipalityISTAT: query.MunicipalityISTAT})
 	if err != nil {
 		return Situation{}, err
@@ -109,11 +121,15 @@ func (s *Store) filterMeasuresBySource(ctx context.Context, values []Measure, so
 }
 
 func (s *Store) searchDocuments(ctx context.Context, query SearchQuery) ([]Document, error) {
+	additionalScope := ""
+	if query.Kind == "attention" {
+		additionalScope = " AND s.product_id='municipal' AND " + municipalNoticeSQL
+	}
 	rows, err := s.pool.Query(ctx, `SELECT DISTINCT ON (d.id) v.id
  FROM retained_documents d JOIN retained_versions v ON v.document_id=d.id
  JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id
  WHERE (`+s.visibilitySQL()+`) AND v.first_acquired_at<=$1 AND ($2='' OR s.id=$2)
-   AND ($3='' OR s.territory=$3 OR s.product_id<>'municipal')
+   AND ($3='' OR s.territory=$3 OR s.product_id<>'municipal')`+additionalScope+`
  ORDER BY d.id,v.first_acquired_at DESC,v.id DESC`, query.KnownAt, query.SourceID, query.MunicipalityISTAT)
 	if err != nil {
 		return nil, err

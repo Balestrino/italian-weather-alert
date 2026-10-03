@@ -121,6 +121,7 @@ type Measure struct {
 	MunicipalityISTAT             string         `json:"municipality_istat"`
 	Issuer                        *string        `json:"issuer"`
 	Action                        string         `json:"action"`
+	Subject                       string         `json:"subject,omitempty"`
 	Place                         *string        `json:"place"`
 	TerritorialScope              string         `json:"territorial_scope"`
 	Validity                      Temporal       `json:"validity"`

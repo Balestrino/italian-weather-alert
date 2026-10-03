@@ -480,3 +480,11 @@ acceptance remain separate; tasks 9.3 and 10.1 are not completed by these review
 Unchanged originals can be reviewed under a later campaign configuration only
 when a finalized matching acquisition already proves that reuse; regression tests
 reject unproven and future reuse.
+
+
+## 27. Repair the live Calcinaia situation — 3 October 2026
+
+- [x] 27.1 Reproduce the development API response and distinguish real interpretation limits from missing extraction-to-domain integration, missing provenance history and stale deployed images; preserve the response and source controls privately.
+- [x] 27.2 Wire validated primary municipal extraction and supported update links to atomic, idempotent domain projection; preserve field evidence, temporal ambiguity and knowledge boundaries, exclude evaluation/platform-only/incomplete/suspended inputs, and verify shared API/MCP schemas, source quality and first notices requiring attention with synthetic PostgreSQL tests; preserve historical fallback catalogs when registering local worker configurations.
+- [x] 27.3 Build and deploy the reversible development correction, replay a bounded set of retained ordinary primary results without new model calls, carry registered provenance into quality history, and verify Calcinaia on the actual HTTPS API/MCP with source controls preserved and private rollback evidence.
+- [ ] 27.4 Complete and validate product-specific CFR graphical interpretation against the retained maps/PDFs, including applicability and all seven risks, before replacing unresolved per-zone levels or claiming full source acceptance.

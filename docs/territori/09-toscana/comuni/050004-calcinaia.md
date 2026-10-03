@@ -70,7 +70,7 @@ multipla Regione/CFR–Comune–piattaforma, senza un gate di ottenimento licenz
 o documentazione della base giuridica. Mantenere controlli comunali
 indipendenti per gli avvisi assenti dalla piattaforma; confrontare con il CFR soltanto
 le affermazioni regionali comparabili, senza richiedere un'allerta regionale per ogni
-provvedimento locale. I task 26.2, 26.3 e 26.4 sono completati; 26.5 e 26.6 restano aperti,
+provvedimento locale. I task 26.2–26.6 sono completati nei rispettivi perimetri delimitati,
 con il coverage tracker invariato.
 
 La [revisione preliminare del canale](../../../fonti/piattaforme/cittadino-informato-review.md)
@@ -91,21 +91,20 @@ non applicabile a una misura locale; non è richiesto un accordo unanime di tre 
 
 ## Problemi aperti
 
-CLN-007 conferma un collegamento da completare fra estrazioni e dominio comunale:
-il salvataggio in `extracted_measures` non inserisce misure in
-`domain_local_measures` né fasi in `domain_operational_phases`. La query di
-situazione legge queste ultime tabelle. Verificare separatamente i candidati
-estratti, la loro proiezione con evidenza/validità e gli stati di interpretazione
-richiesti dalla query; la pubblicazione manuale non esegue questo passaggio.
-`documents_requiring_attention` raccoglie soltanto avvisi collegati a misure già
-presenti: se queste mancano, l'array vuoto non esclude documenti non interpretati.
-La ricerca API dei documenti conservati è un percorso distinto. Il task 26.4
-aggiunge un ingresso programmatico separato per la proiezione da selezioni di
-evidenza verificate, con stato di interpretazione e validità primaria. Non
-collega automaticamente tutte le righe di `extracted_measures` al dominio né
-esegue discovery delle controparti: verificare questo percorso in development
-prima di considerare superata la diagnosi operativa CLN-007. CLN-015 verifica
-l’ingresso separato con selezioni esplicite, senza risolvere il worker generico.
+CLN-017 supera la lacuna di integrazione del worker descritta da CLN-007:
+l’estrazione primaria completa ora alimenta le misure del dominio con legami alle
+evidenze, validità letterale e confine di conoscenza. Gli aggiornamenti collegati
+sono applicati solo con entrambe le misure sostenute; un’attivazione del COC non
+inventa una fase operativa. Valutazioni, canali piattaforma, risorse mancanti e
+fonti sospese sono esclusi da questo ingresso. La situazione segnala anche i
+primi avvisi non interpretati, senza richiedere una misura precedente, e distingue
+l’elaborazione dall’accettazione pendente. Il recupero delimitato dei risultati
+conservati non certifica l’intero corpus né corregge i falsi positivi del modello.
+
+Restano da completare la correttezza semantica delle estrazioni e il merge della
+riapertura parziale di CLN-016. Date in conflitto, termini condizionali senza
+inizio stabilito e ambiti territoriali mancanti rimangono indeterminati; una
+misura visibile non viene dichiarata automaticamente vigente oggi.
 
 Trial e accettazione restano quelli del coverage tracker. Le lacune dei canali secondari vanno registrate separatamente dalle omissioni nel perimetro primario. Consultare il registro privato per errori e recuperi dell'ambiente; non considerarli una certificazione pubblica.
 
@@ -115,6 +114,14 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-017 — Integrazione ordinaria delle misure verificata in development
+
+- **Data e ultima verifica:** 2026-10-03; codice, fixture sintetiche PostgreSQL e controllo HTTPS API/MCP sul servizio development.
+- **Ambito e conoscenza:** comportamento verificato per estrazioni primarie complete e recupero delimitato di risultati conservati; supera la lacuna tecnica di CLN-007 nel perimetro provato.
+- **Intervento e verifica:** proiezione con binding atomico e ripetizione idempotente, esclusione delle valutazioni e sospensioni, storico senza retrodatazione, evidenze e soggetto consultabili. La provenienza configurata alimenta una valutazione separata senza sostituire esiti espliciti. Pubblicazione manuale e controlli delle fonti sono preservati. API/MCP concordano; paginazione e isolamento di un altro comune verificati. Corretto anche il conflitto dei cataloghi locali fra revisioni, conservando le configurazioni storiche; worker riavviati con successo.
+- **Limiti e prossima verifica:** recupero senza nuove chiamate ai modelli; un falso positivo non meteo individuato nel campione è escluso dal replay e conservato nell’evidenza privata. Questo non risolve tutti i falsi positivi futuri, la completezza comunale, la riapertura parziale o l’interpretazione grafica CFR. Accettazione pending nel coverage tracker. Procedura di [pubblicazione development](../../../operations/development-publication.md).
+
 
 ### CLN-016 — Revisione delegata e trial con visibilità revocata
 

@@ -480,3 +480,10 @@ OCR run identities and operator-only notes. Expose comparison direction, literal
 passages and source/version/hash attribution only for visible evidence. API and
 MCP share these structures and limits; candidate admission is distinct from the
 independently supported primary projection and source acceptance.
+
+
+## Live municipal integration repair — 3 October 2026
+
+The deployed situation can return no local facts despite stored successful extraction. Add a primary municipal projection at the ordinary extraction scheduling boundary, before downstream linking, and an update-link projection after linking. Both use retained results without additional model calls. Preserve atomic measure/evidence binding, literal temporal expressions, knowledge dates and source suspensions. Evaluation runs remain separate. Carry the reviewed official-provenance evidence from the active configuration into an independent append-only assessment without overriding explicit existing assessments. Public coverage summarizes ordinary interpretation of latest visible notices independently of acceptance. First pending notices must remain visible without prior measures; configured listing containers and pagination are excluded. The public subject accompanies action/place. Deployment and bounded retained-data recovery are verified separately from code tests. Graphical CFR interpretation remains an explicit follow-up and cannot be replaced by forced green values.
+
+Local worker startup must tolerate several immutable fallback revisions sharing a catalog name. Preserve legacy local registrations where compatible; when the legacy name/revision key collides, derive a separate identity and name from the exact fallback. Never rewrite an existing configuration to make startup pass. Verify both fallback associations, repeated registration and preservation of prior hashes.

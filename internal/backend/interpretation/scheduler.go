@@ -26,13 +26,15 @@ import (
 var ErrInvalid = errors.New("invalid interpretation schedule")
 
 type Scheduler struct {
-	pool             *pgxpool.Pool
-	Queue            *jobs.Store
-	Policy           inference.RetryPolicy
-	Semantic         bool
-	EmbeddingEnabled func(context.Context, int64) (bool, error)
-	Preflight        *Preflight
-	Evaluations      interface {
+	pool              *pgxpool.Pool
+	Queue             *jobs.Store
+	Policy            inference.RetryPolicy
+	Semantic          bool
+	EmbeddingEnabled  func(context.Context, int64) (bool, error)
+	ProjectExtraction func(context.Context, int64, time.Time) (int, error)
+	ProjectLinks      func(context.Context, int64, time.Time) error
+	Preflight         *Preflight
+	Evaluations       interface {
 		Passed(context.Context, string) (string, error)
 	}
 }
@@ -282,6 +284,11 @@ func (s *Scheduler) AfterExtraction(ctx context.Context, r extraction.Result, wo
 		return 0, err
 	}
 	r.RunID = canonical
+	if s.ProjectExtraction != nil && workload != "evaluation" {
+		if _, err := s.ProjectExtraction(ctx, canonical, at); err != nil {
+			return 0, err
+		}
+	}
 	semantic := s.Semantic
 	if s.EmbeddingEnabled != nil {
 		var err error
@@ -409,6 +416,23 @@ func (s *Scheduler) EmbeddingHandler(next jobs.Handler) jobs.Handler {
 		}
 		if _, err = s.AfterEmbedding(ctx, output.ExtractionRunID, output.MeasureOrdinal, input.Workload, time.Now().UTC()); err != nil {
 			return jobs.Result{}, scheduleFailure("semantic_linking_dependency_schedule_failed", true)
+		}
+		return result, nil
+	}
+}
+
+func (s *Scheduler) LinkingHandler(next jobs.Handler) jobs.Handler {
+	return func(ctx context.Context, job jobs.Job) (jobs.Result, error) {
+		result, err := next(ctx, job)
+		if err != nil || s.ProjectLinks == nil {
+			return result, err
+		}
+		var input linking.Payload
+		if json.Unmarshal(job.Payload, &input) != nil || input.Workload == "evaluation" {
+			return result, nil
+		}
+		if err = s.ProjectLinks(ctx, input.ExtractionRunID, time.Now().UTC()); err != nil {
+			return jobs.Result{}, scheduleFailure("municipal_link_projection_failed", true)
 		}
 		return result, nil
 	}

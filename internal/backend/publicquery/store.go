@@ -408,6 +408,14 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 			if accepted {
 				interpretation = Dimension{State: "supported", Limitations: []string{"source acceptance is recorded separately from individual facts"}, Evidence: []Evidence{}}
 			}
+			if value.Product == "municipal" {
+				progress, progressErr := s.municipalInterpretation(ctx, value.SourceID, qt)
+				if progressErr != nil {
+					return CoverageResult{}, progressErr
+				}
+				progress.Limitations = append(progress.Limitations, interpretation.Limitations...)
+				interpretation = progress
+			}
 			if value.Product == "criticality" || value.Product == "vigilance" || value.Product == "monitoring" {
 				var status, statement string
 				var versionID int64

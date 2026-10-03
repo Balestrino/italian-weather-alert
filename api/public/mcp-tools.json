@@ -568,6 +568,10 @@
                   "type": "string",
                   "minLength": 1
                 }
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -1964,6 +1968,10 @@
                   "$ref": "#/$defs/Verification"
                 },
                 "maxItems": 100
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -3567,6 +3575,10 @@
                   "type": "string",
                   "minLength": 1
                 }
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -4960,6 +4972,10 @@
                   "$ref": "#/$defs/Verification"
                 },
                 "maxItems": 100
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -6617,6 +6633,10 @@
                   "type": "string",
                   "minLength": 1
                 }
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -8023,6 +8043,10 @@
                   "$ref": "#/$defs/Verification"
                 },
                 "maxItems": 100
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -9633,6 +9657,10 @@
                   "type": "string",
                   "minLength": 1
                 }
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -11042,6 +11070,10 @@
                   "$ref": "#/$defs/Verification"
                 },
                 "maxItems": 100
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -12650,6 +12682,10 @@
                   "type": "string",
                   "minLength": 1
                 }
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [
@@ -14046,6 +14082,10 @@
                   "$ref": "#/$defs/Verification"
                 },
                 "maxItems": 100
+              },
+              "subject": {
+                "type": "string",
+                "description": "Evidence-supported subject of the municipal action, distinct from its place."
               }
             },
             "required": [

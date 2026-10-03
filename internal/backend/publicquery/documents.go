@@ -159,9 +159,19 @@ func (s *Store) documentInterpretation(ctx context.Context, versionID int64, kno
 	var status, reason string
 	var createdAt time.Time
 	var runID int64
-	err := s.pool.QueryRow(ctx, `SELECT e.status,e.reason_code,e.created_at,e.run_id FROM extraction_results e
- WHERE e.document_version_id=$1 AND e.created_at<=registry_interpretation_cutoff((SELECT d.source_id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id WHERE v.id=$1),$2) ORDER BY e.created_at DESC,e.run_id DESC LIMIT 1`, versionID, knownAt).Scan(&status, &reason, &createdAt, &runID)
+	err := s.pool.QueryRow(ctx, `SELECT e.status,e.reason_code,e.created_at,e.run_id FROM extraction_results e JOIN processing_runs p ON p.id=e.run_id
+ WHERE p.workload<>'evaluation' AND e.document_version_id=$1 AND e.created_at<=registry_interpretation_cutoff((SELECT d.source_id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id WHERE v.id=$1),$2) ORDER BY e.created_at DESC,e.run_id DESC LIMIT 1`, versionID, knownAt).Scan(&status, &reason, &createdAt, &runID)
 	if errors.Is(err, pgx.ErrNoRows) {
+		// Irrelevant publications intentionally have no extraction job.
+		var irrelevant bool
+		classificationErr := s.pool.QueryRow(ctx, `SELECT NOT COALESCE(c.relevant,true) FROM classification_results c JOIN processing_runs p ON p.id=c.run_id
+ WHERE p.workload<>'evaluation' AND c.document_version_id=$1 AND c.created_at<=registry_interpretation_cutoff((SELECT d.source_id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id WHERE v.id=$1),$2) ORDER BY c.created_at DESC,c.run_id DESC LIMIT 1`, versionID, knownAt).Scan(&irrelevant)
+		if classificationErr != nil && !errors.Is(classificationErr, pgx.ErrNoRows) {
+			return Dimension{}, nil, nil, classificationErr
+		}
+		if irrelevant {
+			return Dimension{State: "supported", Limitations: []string{"classified_not_relevant"}, Evidence: []Evidence{}}, nil, nil, nil
+		}
 		return Dimension{State: "not_processed", Limitations: []string{"no interpretation was available at the knowledge boundary"}, Evidence: []Evidence{}}, nil, nil, nil
 	}
 	if err != nil {
@@ -170,6 +180,20 @@ func (s *Store) documentInterpretation(ctx context.Context, versionID int64, kno
 	state := "failed"
 	if status == "extracted" || status == "not_applicable" {
 		state = "supported"
+	}
+	if status == "extracted" {
+		var unprojected bool
+		if err = s.pool.QueryRow(ctx, `WITH RECURSIVE lineage(id) AS (
+ SELECT $1::bigint UNION ALL SELECT u.original_run_id FROM interpretation_reuse u JOIN lineage l ON l.id=u.run_id WHERE u.created_at<=$3)
+ SELECT EXISTS(SELECT 1 FROM extracted_measures m WHERE m.run_id=$1 AND NOT EXISTS(
+ SELECT 1 FROM domain_measure_bindings b JOIN domain_local_measures projected ON projected.id=b.local_measure_id
+ WHERE b.extraction_run_id IN(SELECT id FROM lineage) AND b.extraction_ordinal=m.ordinal AND projected.recorded_at<=$3)) AND EXISTS(SELECT 1 FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id JOIN registry_sources s ON s.id=d.source_id WHERE v.id=$2 AND s.product_id='municipal')`, runID, versionID, knownAt).Scan(&unprojected); err != nil {
+			return Dimension{}, nil, nil, err
+		}
+		if unprojected {
+			state = "partial"
+			reason = "validated extraction has municipal facts awaiting domain projection"
+		}
 	}
 	createdAt = createdAt.UTC()
 	id := stringID(runID)

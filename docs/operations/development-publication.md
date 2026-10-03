@@ -34,3 +34,28 @@ older software cannot enforce the added view scope. Preserve source evidence and
 additive migration. Restore the individually recorded listener images/configuration,
 without rebuilding or restarting workers. Ordinary revocation on current software
 requires only the revision-checked municipal control above.
+
+
+On 2026-10-03 the primary municipal extraction path was connected to the domain
+and verified in development. Completed ordinary extractions retain action,
+subject, field evidence, literal validity and projection knowledge time; a COC
+activation does not imply a named phase. Supported linking results are applied
+when both measure bindings exist. Evaluation runs, platform-only candidates,
+incomplete resources and suspended sources are excluded. Repeat projection is
+idempotent. A bounded retained-result recovery makes no model calls, excludes
+reviewed non-weather false positives and preserves source controls.
+
+Coverage reports interpretation progress separately from source acceptance.
+Pending first notices appear in the situation even without previous measures;
+configured section listings and pagination are excluded. Existing official
+provenance evidence is recorded at the actual assessment time without replacing
+explicit assessments. Source acceptance stays pending. Date conflicts and
+unverified CFR graphical levels remain unresolved.
+
+The corrected public/admin listeners and six development workers were verified,
+including actual HTTPS API/MCP equivalence, pagination, past knowledge and an
+unselected municipality. Worker startup preserves prior processing catalogs when
+several fallback revisions share a name; new local registrations are bound to the
+exact fallback. A failed initial worker rollout was reverted before this fix and
+the final workers started successfully. Backup and infrastructure were preserved.
+Exact images, controls, excluded results and rollback steps remain private.

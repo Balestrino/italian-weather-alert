@@ -25,6 +25,14 @@ require successful verification. No source acceptance or public enablement was
 inferred from the document review or development trial. See
 [the procedure](operations/cittadino-informato.md#valutazione-e-trial-delimitato--task-265266).
 
+**Subsequent municipal integration verification — 3 October 2026:** primary
+municipal extraction-to-domain integration and configured provenance history are
+now verified in development, including a bounded retained-result replay and
+actual API/MCP equivalence. This supersedes the generic projection gap above in
+the tested scope. Municipal completeness, false-positive handling and graphical
+CFR interpretation still require successful verification; source acceptance and
+production publication remain pending. See [CLN-017](territori/09-toscana/comuni/050004-calcinaia.md#cln-017--integrazione-ordinaria-delle-misure-verificata-in-development).
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

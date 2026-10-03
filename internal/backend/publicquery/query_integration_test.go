@@ -852,6 +852,110 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		}
 	})
 
+	t.Run("primary-extraction-projection", func(t *testing.T) {
+		createSource(registry.Source{ID: "projection-primary", AuthorityID: "comune-calcinaia", ChannelID: "calcinaia", ProductID: "municipal", Territory: "050004"}, "https://calcinaia.example/projection", true)
+		version := retain("projection-closure", "projection-primary", "https://calcinaia.example/projection/closure", "Chiusura del ponte sintetico in Via Sintetica fino a revoca", &issuer, metadata)
+		provenanceBoundary := time.Now().UTC().Truncate(time.Microsecond)
+		time.Sleep(time.Millisecond)
+		for i := 0; i < 2; i++ {
+			if e := domainStore.RecordConfiguredProvenance(ctx, "projection-primary", time.Now()); e != nil {
+				t.Fatal(e)
+			}
+		}
+		var provenanceCount int
+		if e := pool.QueryRow(ctx, `SELECT count(*) FROM domain_provenance_events WHERE source_id='projection-primary'`).Scan(&provenanceCount); e != nil || provenanceCount != 1 {
+			t.Fatal("provenance repeated", provenanceCount, e)
+		}
+		currentQuality, e := store.quality(ctx, "projection-primary", QueryTime{KnownAt: time.Now(), EvaluationTime: time.Now()}, Dimension{State: "supported"})
+		if e != nil || currentQuality.Provenance.State != "verified" {
+			t.Fatal("registered evidence lost", currentQuality, e)
+		}
+		pastQuality, e := store.quality(ctx, "projection-primary", QueryTime{KnownAt: provenanceBoundary, EvaluationTime: provenanceBoundary}, Dimension{State: "supported"})
+		if e != nil || pastQuality.Provenance.State != "unresolved" {
+			t.Fatal("future provenance leaked", pastQuality, e)
+		}
+		processingStore := processing.New(pool)
+		classCatalog, e := classification.RegisterCatalog(ctx, processingStore, "openai-chat", "synthetic-model", time.Now())
+		if e != nil {
+			t.Fatal(e)
+		}
+		extractCatalog, e := extraction.RegisterCatalog(ctx, processingStore, "openai-chat", "synthetic-model", time.Now())
+		if e != nil {
+			t.Fatal(e)
+		}
+		sourceID := "projection-primary"
+		classRun, e := processingStore.StartRun(ctx, processing.RunRequest{IdempotencyKey: "projection-class", Workload: "ordinary", Stage: "classification", ConfigurationVersionID: classCatalog.ConfigurationVersionID, SourceID: &sourceID, DocumentVersionID: &version.ID, Subject: json.RawMessage(`{}`), CreatedAt: time.Now()})
+		if e != nil {
+			t.Fatal(e)
+		}
+		relevant := true
+		if e = classification.NewStore(pool).Put(ctx, classification.Result{RunID: classRun.ID, DocumentVersionID: version.ID, Status: "classified", Relevant: &relevant, ReasonCode: "local_weather_measure", EvidenceQuote: "Chiusura del ponte sintetico", ContentSHA256: strings.Repeat("a", 64), ContentComplete: true, ProviderResponseID: "synthetic", ReturnedModel: "synthetic-model", CreatedAt: time.Now()}); e != nil {
+			t.Fatal(e)
+		}
+		put := func(key, workload string) int64 {
+			t.Helper()
+			run, e := processingStore.StartRun(ctx, processing.RunRequest{IdempotencyKey: key, Workload: workload, Stage: "extraction", ConfigurationVersionID: extractCatalog.ConfigurationVersionID, SourceID: &sourceID, DocumentVersionID: &version.ID, Subject: json.RawMessage(`{}`), CreatedAt: time.Now()})
+			if e != nil {
+				t.Fatal(e)
+			}
+			m := extraction.Measure{Ordinal: 1, Kind: "closure", Subject: "ponte sintetico", Place: stringPointer("Via Sintetica"), ValidUntil: stringPointer("fino a revoca"), IndeterminateFields: []string{"valid_from"}, Evidence: []extraction.Evidence{{Field: "kind", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "Chiusura"}, {Field: "subject", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "ponte sintetico"}, {Field: "place", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "Via Sintetica"}, {Field: "valid_until", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "fino a revoca"}}}
+			if e = extraction.NewStore(pool).Put(ctx, extraction.Result{RunID: run.ID, DocumentVersionID: version.ID, ClassificationRunID: classRun.ID, Status: "extracted", ReasonCode: "measures_extracted", ContentSHA256: strings.Repeat("b", 64), ContentComplete: true, ProviderResponseID: "synthetic", ReturnedModel: "synthetic-model", CreatedAt: time.Now(), Measures: []extraction.Measure{m}}); e != nil {
+				t.Fatal(e)
+			}
+			return run.ID
+		}
+		listing := retain("projection-listing", "projection-primary", "https://calcinaia.example/projection?page=1", "Synthetic section container", &issuer, metadata)
+		situation, e := store.MunicipalitySituation(ctx, SituationQuery{MunicipalityISTAT: "050004"})
+		if e != nil {
+			t.Fatal(e)
+		}
+		firstVisible := false
+		for _, d := range situation.DocumentsRequiringAttention {
+			if d.ID == stringID(listing.DocumentID) {
+				t.Fatal("listing reported as a pending notice")
+			}
+			if d.ID == stringID(version.DocumentID) {
+				firstVisible = true
+			}
+		}
+		if !firstVisible {
+			t.Fatal("first notice disappeared without a previous measure")
+		}
+		runID := put("projection-extract", "ordinary")
+		progress, e := store.Coverage(ctx, CoverageQuery{SourceID: sourceID, MunicipalityISTAT: "050004"})
+		if e != nil || len(progress.Sources) != 1 || progress.Sources[0].Quality.Interpretation.State != "partial" {
+			t.Fatal("projection gap not reflected in source interpretation", progress, e)
+		}
+		before := time.Now().UTC()
+		if d, e := store.Document(ctx, DocumentQuery{DocumentID: stringID(version.DocumentID), QueryTime: QueryTime{KnownAt: before, EvaluationTime: before}}); e != nil || d.Document.Quality.Interpretation.State != "partial" {
+			t.Fatal("unprojected extraction claimed complete", d, e)
+		}
+		for i := 0; i < 2; i++ {
+			if n, e := domainStore.ProjectMunicipalExtraction(ctx, runID, time.Now()); e != nil || n != 1 {
+				t.Fatal("idempotent primary projection", n, e)
+			}
+		}
+		q := SearchQuery{Kind: "measure", SourceID: sourceID, MunicipalityISTAT: "050004"}
+		found, e := store.Search(ctx, q)
+		if e != nil || len(found.Measures) != 1 || len(found.Measures[0].Evidence) != 4 || found.Measures[0].Validity.Precision != "conditional" || found.Measures[0].Status != "undetermined" {
+			t.Fatal("primary evidence/unknown validity lost", found, e)
+		}
+		q.QueryTime = QueryTime{KnownAt: before, EvaluationTime: before}
+		if found, e = store.Search(ctx, q); e != nil || len(found.Measures) != 0 {
+			t.Fatal("future projection leaked into history", found, e)
+		}
+		evaluationID := put("projection-evaluation", "evaluation")
+		if n, e := domainStore.ProjectMunicipalExtraction(ctx, evaluationID, time.Now()); e != nil || n != 0 {
+			t.Fatal("evaluation published facts", n, e)
+		}
+		if e = reg.SuspendInterpretation(ctx, sourceID, 1, "fixture", registry.Evidence{URL: "https://calcinaia.example/projection", Locator: "synthetic defect", ObservedAt: time.Now()}); e != nil {
+			t.Fatal(e)
+		}
+		if n, e := domainStore.ProjectMunicipalExtraction(ctx, runID, time.Now()); e != nil || n != 0 {
+			t.Fatal("suspended source projected facts", n, e)
+		}
+	})
+
 }
 
 func stringPointer(value string) *string { return &value }

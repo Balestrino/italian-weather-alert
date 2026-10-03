@@ -87,10 +87,10 @@ func (s *Store) measureEvidence(ctx context.Context, measureID string) ([]Eviden
 func (s *Store) measure(ctx context.Context, id string, qt QueryTime) (Measure, error) {
 	var value Measure
 	var versionID int64
-	err := s.pool.QueryRow(ctx, `SELECT m.id,m.document_version_id,m.municipality_istat,a.name,m.kind,m.place
+	err := s.pool.QueryRow(ctx, `SELECT m.id,m.document_version_id,m.municipality_istat,a.name,m.kind,m.subject,m.place
  FROM domain_local_measures m JOIN retained_versions v ON v.id=m.document_version_id
  JOIN `+s.sourcesSQL()+` s ON s.id=m.source_id LEFT JOIN registry_authorities a ON a.id=m.issuing_authority_id
-	 WHERE m.id=$1 AND v.first_acquired_at<=$2 AND m.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND `+s.visibilitySQL()+``, id, qt.KnownAt).Scan(&value.ID, &versionID, &value.MunicipalityISTAT, &value.Issuer, &value.Action, &value.Place)
+		 WHERE m.id=$1 AND v.first_acquired_at<=$2 AND m.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND `+s.visibilitySQL()+``, id, qt.KnownAt).Scan(&value.ID, &versionID, &value.MunicipalityISTAT, &value.Issuer, &value.Action, &value.Subject, &value.Place)
 	if err != nil {
 		return Measure{}, err
 	}

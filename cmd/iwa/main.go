@@ -679,6 +679,8 @@ func run() bool {
 		}
 		interpretationScheduler := interpretation.New(pool, queue, inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase}, false)
 		interpretationScheduler.EmbeddingEnabled = queue.EmbeddingAllowedForRun
+		interpretationScheduler.ProjectExtraction = domain.New(pool).ProjectMunicipalExtraction
+		interpretationScheduler.ProjectLinks = domain.New(pool).ProjectMunicipalLinks
 		interpretationScheduler.Preflight, err = makePreflight(ctx, pool, retained, inferenceConfig, rollout)
 		if err != nil {
 			slog.Error("preflight configuration invalid")
@@ -688,6 +690,7 @@ func run() bool {
 		handlers[classification.Kind] = interpretationScheduler.ClassificationHandler(handlers[classification.Kind])
 		handlers[extraction.Kind] = interpretationScheduler.ExtractionHandler(handlers[extraction.Kind])
 		handlers[embedding.Kind] = interpretationScheduler.EmbeddingHandler(handlers[embedding.Kind])
+		handlers[linking.Kind] = interpretationScheduler.LinkingHandler(handlers[linking.Kind])
 		for kind, handler := range handlers {
 			handlers[kind] = interpretationScheduler.Guard(handler)
 		}
@@ -728,6 +731,18 @@ func run() bool {
 		}
 		checkEngine := &acquisition.Engine{Registry: registry.New(pool), Retained: retained, Crawler: &acquisition.Crawl4AI{BaseURL: c.CrawlURL, Token: c.CrawlToken, Client: &http.Client{Timeout: 90 * time.Second}}, Resources: &acquisition.DirectHTTP{Client: &http.Client{Timeout: 90 * time.Second}}, Tracking: acquisition.NewTrackingStore(pool)}
 		checkWorker := &acquisition.CheckWorker{Store: acquisition.NewScheduleStore(pool), Engine: checkEngine, ID: "acquisition-" + workerID, Lease: 20 * time.Minute, PollInterval: time.Second, Schedule: func(scheduleCtx context.Context, page acquisition.RetainedPage, at time.Time) error {
+			version, versionErr := retained.Version(scheduleCtx, page.VersionID)
+			if versionErr != nil {
+				return versionErr
+			}
+			for _, resource := range version.Resources {
+				if resource.Role == "original" {
+					if err := domain.New(pool).RecordConfiguredProvenance(scheduleCtx, resource.SourceID, at); err != nil {
+						return err
+					}
+					break
+				}
+			}
 			if _, err := domain.New(pool).ProjectCFR(scheduleCtx, retained, page.VersionID); err != nil {
 				return err
 			}

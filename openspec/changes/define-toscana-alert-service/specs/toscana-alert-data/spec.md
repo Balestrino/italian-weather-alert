@@ -134,3 +134,23 @@ Update linking SHALL work with structured and textual candidate retrieval when s
 #### Scenario: A semantically similar notice concerns another place
 - **WHEN** semantic retrieval returns that candidate
 - **THEN** similarity alone does not cancel or update the unrelated measure
+
+
+### Requirement: Validated municipal extraction reaches the public domain
+Validated, complete primary municipal extraction SHALL feed an atomic and idempotent domain projection before ordinary downstream linking. The projection SHALL retain action, subject, place, original evidence and explicit temporal uncertainty. Evaluation-only runs, platform-only candidates, incomplete inputs and suspended interpretations SHALL NOT enter this path. Supported update links SHALL apply only after both primary measures are bound, with evidence on both sides and service-knowledge history preserved. An extracted activation SHALL NOT establish a named operational phase by inference.
+
+#### Scenario: An ordinary extraction contains a closure without a definite end
+- **WHEN** a retained primary publication produces a validated closure and a conditional end
+- **THEN** API/MCP return the supported action, subject, place and passages, disclose unresolved current validity, and repeated projection creates no duplicate measure
+
+#### Scenario: A newer extraction is used only for evaluation
+- **WHEN** a evaluation run interprets an existing municipal document
+- **THEN** it changes neither public facts nor the ordinary interpretation status of that document
+
+### Requirement: Municipal processing startup preserves historical catalogs
+The worker SHALL support multiple immutable fallback configuration revisions with the same catalog name without overwriting historical configurations or failing local configuration registration.
+
+#### Scenario: A newer fallback encounters an existing local catalog name
+- **WHEN** a newer fallback revision shares the original catalog name and its local registration encounters the legacy name/stage/revision constraint
+- **THEN** the worker obtains an independent local configuration bound to that exact fallback
+- **AND** repeated startup returns the same configuration and preserves the previous configuration and its hash

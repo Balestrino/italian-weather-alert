@@ -119,3 +119,15 @@ Responses SHALL identify development publication on municipality and source cove
 #### Scenario: A development database is used in production
 - **WHEN** development publication choices exist in the database and the runtime is staging, production or unspecified
 - **THEN** those choices grant no public visibility and manual activation commands are unavailable
+
+
+### Requirement: Municipal progress is independent of source acceptance
+API/MCP SHALL distinguish source acceptance from interpretation progress over latest visible municipal notices at the requested knowledge boundary. Typed section containers and pagination SHALL NOT be treated as individual pending notices. Irrelevant classified publications SHALL NOT require a measure extraction to count as interpreted. Validated extraction awaiting domain projection SHALL remain partial. The situation SHALL expose unresolved first municipal notices even when no preceding measure exists. Public local measures MAY expose their evidence-supported subject separately from action and place.
+
+#### Scenario: A selected development municipality has processed notices but pending acceptance
+- **WHEN** ordinary municipal interpretations exist and source acceptance remains pending
+- **THEN** coverage retains pending acceptance and separately reports actual interpretation progress rather than setting interpretation to not_processed solely because acceptance is pending
+
+#### Scenario: A first relevant notice has not been interpreted
+- **WHEN** a visible municipal notice has no preceding structured measure and no supported interpretation
+- **THEN** the situation includes its document and official link among documents requiring attention without inventing a measure or all-clear

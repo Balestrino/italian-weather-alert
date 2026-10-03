@@ -4,6 +4,7 @@ package interpretation
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -28,6 +29,11 @@ func TestExtractionSchedulesEmbeddingOnlyForEnabledSources(t *testing.T) {
 	queue := jobs.New(pool)
 	s := New(pool, queue, inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
 	s.EmbeddingEnabled = queue.EmbeddingAllowedForRun
+	var projected []int64
+	s.ProjectExtraction = func(_ context.Context, id int64, _ time.Time) (int, error) {
+		projected = append(projected, id)
+		return 1, nil
+	}
 	now := time.Now()
 	extract := func(run int64, want string) {
 		t.Helper()
@@ -53,4 +59,23 @@ func TestExtractionSchedulesEmbeddingOnlyForEnabledSources(t *testing.T) {
 		t.Fatal(err)
 	}
 	extract(4, "link_measure_update")
+	if len(projected) != 4 {
+		t.Fatal("ordinary projection callback omitted", projected)
+	}
+	if _, e := pool.Exec(ctx, `INSERT INTO processing_runs VALUES(5,'source-a','extraction'),(6,'source-a','extraction')`); e != nil {
+		t.Fatal(e)
+	}
+	s.ProjectExtraction = func(context.Context, int64, time.Time) (int, error) {
+		return 0, errors.New("synthetic projection error")
+	}
+	if _, e := s.AfterExtraction(ctx, extraction.Result{RunID: 5, Status: "extracted", Measures: []extraction.Measure{{Ordinal: 1}}}, "ordinary", now); e == nil {
+		t.Fatal("projection failure swallowed")
+	}
+	var scheduled int
+	if e := pool.QueryRow(ctx, `SELECT count(*) FROM processing_jobs WHERE payload->>'extraction_run_id'='5'`).Scan(&scheduled); e != nil || scheduled != 0 {
+		t.Fatal("linking scheduled after projection failure", scheduled, e)
+	}
+	if _, e := s.AfterExtraction(ctx, extraction.Result{RunID: 6, Status: "extracted", Measures: []extraction.Measure{{Ordinal: 1}}}, "evaluation", now); e != nil {
+		t.Fatal("evaluation called public projector", e)
+	}
 }

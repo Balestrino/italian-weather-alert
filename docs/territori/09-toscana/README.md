@@ -78,8 +78,9 @@ testuali esplicite, ma non i colori delle mappe. La dichiarazione `NESSUNA` rest
 una dichiarazione del bollettino; le combinazioni rischio/zona/data conservate con
 livello `unknown` non sono livelli verdi verificati. Accettazione e pubblicazione
 in development non completano questa capacità. `provenance.state=unresolved`
-segnala inoltre l'assenza di una valutazione in `domain_provenance_events` al
-confine temporale della query, separatamente dall'identità della fonte nel registro.
+segnala inoltre l’assenza di una valutazione al confine temporale della query.
+TOS-013 collega l’evidenza già registrata nella configurazione attiva alla storia
+della provenienza, senza retrodatare le risposte o completare l’accettazione.
 
 Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel coverage tracker e nei [task del servizio Toscana](../../../openspec/changes/define-toscana-alert-service/tasks.md). Verificare sul canale operativo il monitoraggio e i casi senza evento. In presenza di `missing`, verificare il percorso che alimenta la data della pubblicazione: gli esiti per ambiente appartengono all'archivio privato.
 
@@ -101,6 +102,14 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-013 — Provenienza configurata collegata alla qualità API
+
+- **Data e ultima verifica:** 2026-10-03; fixture sintetiche PostgreSQL e servizio development verificato tramite HTTPS API/MCP.
+- **Ambito e conoscenza:** valutazione della provenienza dei tre prodotti CFR configurati e della primaria Calcinaia, separata dalla lettura delle mappe.
+- **Intervento e verifica:** registrazione append-only dell’evidenza ufficiale già presente nella configurazione attiva, con tempo di valutazione effettivo; valutazioni esplicite precedenti sono preservate. Storico e controlli delle fonti invariati. L’integrazione comunale è descritta da [CLN-017](comuni/050004-calcinaia.md#cln-017--integrazione-ordinaria-delle-misure-verificata-in-development).
+- **Limiti e prossima verifica:** la provenienza verificata non certifica livelli, rischi, applicabilità o validità grafica. TOS-008 resta aperto e nessun livello `unknown` viene sostituito con verde. Accettazione dei prodotti pending.
+
 
 ### TOS-012 — Revisione degli originali CFR su delega e limiti confermati
 
