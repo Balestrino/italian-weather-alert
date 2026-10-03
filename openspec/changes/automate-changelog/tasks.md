@@ -34,9 +34,16 @@ Preparation validation on 2 October 2026: OpenAPI/MCP metadata identify 0.1.2; h
 
 - [x] 6.1 Align OpenAPI/MCP metadata to 0.2.0, group subsequent dated changes under the minor version, preserve historical sections/notes and document upgrade requirements and pilot limits.
 - [x] 6.2 Verify metadata, history, release-note links, changelog regressions/enforcement and public transport tests; prepare promotion through the existing exact-revision CI/Coverage/Security gates without asserting container publication or production activation.
+- [x] 6.3 Reproduce the Coverage maintenance fixture deadlock on two-CPU affinity, reserve four lock connections plus one callback connection explicitly, and verify the focused constrained-CPU regression and full processing integration/race suite without weakening runtime or coverage gates.
 
 Preparation validation on 3 October 2026: OpenAPI/MCP metadata identify 0.2.0;
 historical changelog sections and release notes are unchanged. Six changelog
 regressions, public transport/backoffice tests, 54 local documentation links and
 whitespace checks passed. Promotion and publication retain the exact-revision
 workflow gates; these checks do not publish an image or activate production.
+
+The first Coverage run failed in the concurrent maintenance fixture. Its CPU-derived
+pool was too small for four lock transactions and a callback query. Two-CPU
+affinity reproduced the timeout; an explicit five-connection fixture passed three
+focused constrained-CPU runs and the complete processing integration suite with
+the race detector. Runtime configuration and the coverage floor remain unchanged.

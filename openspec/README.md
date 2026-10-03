@@ -12,7 +12,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 136 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 13 | 0 |
+| [Automatic changelog](changes/automate-changelog/proposal.md) | 14 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
@@ -78,6 +78,8 @@ public transport tests and local links. The [minor release notes](../docs/releas
 describe embedding defaults, worker replacement and pilot limits. Promotion and
 software publication retain the exact-revision workflow gates independently of
 container publication and production activation.
+One further task fixes the reproduced CPU-dependent concurrent maintenance test
+fixture, verified with two-CPU affinity and full processing integration/race checks.
 
 Three subsequent implementation tasks add manually selected municipality publication
 in explicit development, with immutable private controls, scoped API/MCP visibility

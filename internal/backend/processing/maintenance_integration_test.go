@@ -13,7 +13,9 @@ import (
 func TestQueueMaintenanceSerializesWorkersAndReleasesBeforeInference(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Second)
 	defer cancel()
-	pool := processingTestDB(t)
+	// Four lock transactions share this fixture pool; callback queries need
+	// a fifth connection. The default pool size depends on the machine's CPUs.
+	pool := processingTestDB(t, 5)
 	s := New(pool)
 	var active atomic.Int32
 	ready := make(chan error, 4)

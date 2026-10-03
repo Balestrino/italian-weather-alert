@@ -6,6 +6,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## 0.2.0 - 2026-10-03
 
+- 2026-10-03 [Fixed] Reserve callback connection capacity explicitly in the concurrent queue-maintenance test fixture, preventing CPU-dependent Coverage deadlocks while preserving serialization and cancellation checks.
 - 2026-10-03 [Changed] Prepare the 0.2.0 minor release with aligned OpenAPI/MCP metadata, versioned history, embedding upgrade notes and gated development-to-main promotion.
 - 2026-10-02 [Added] Add disabled-by-default global and per-source embedding controls, audited admin/CLI actions and queue admission; document scoped pending embedding archival.
 - 2026-10-02 [Changed] Bind development public API/MCP/docs to all IPv4 interfaces; preserve loopback admin and release ports, verify scoped rollout and HTTP/MCP checks.
