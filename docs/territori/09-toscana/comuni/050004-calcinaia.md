@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050004"
-ultima_revisione: "2026-10-02"
+ultima_revisione: "2026-10-03"
 ---
 
 # Calcinaia
@@ -16,10 +16,26 @@ Comune di Calcinaia, provincia di Pisa, ISTAT `050004`. Fonte IWA: `calcinaia-mu
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria | [Notizie](https://www.comune.calcinaia.pi.it/tipi-di-notizia/notizie), [Avvisi](https://www.comune.calcinaia.pi.it/tipi-di-notizia/avvisi), [Comunicati](https://www.comune.calcinaia.pi.it/tipi-di-notizia/comunicati); sezioni da verificare nella configurazione |
-| Cittadino Informato | Diagnostica secondaria | Ruolo definito dalla specifica; non stabilisce da solo completezza, date o misure |
+| Cittadino Informato | Canale riconosciuto dal Comune; diagnostica secondaria nella specifica IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento istituzionale verificato il 2026-10-03, completezza e aggiornamento da collaudare |
 | Albo pretorio | Atti di supporto | Cercare gli atti citati nelle notizie primarie; il riferimento al singolo atto va verificato |
 
 La mappa consolida la [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). La sezione Notizie è stata consultata il 2026-10-02; ciò non verifica tutte le altre sezioni o i canali secondari.
+
+Cittadino Informato è previsto come sentinella di confronto nella specifica,
+ma questo non certifica un controllo periodico attivo. CLN-008 distingue il ruolo
+documentato dall'acquisizione configurata: verificare una fonte/sezione dedicata
+e ricevute recenti prima di dichiarare il confronto automatico operativo. La
+limitazione registrata rinvia l'acquisizione attiva alla revisione delle condizioni
+di riuso; questa scheda non ne rivaluta le condizioni correnti.
+
+CLN-009 conferma il riconoscimento istituzionale del canale di Calcinaia: il
+Comune lo collega e lo raccomanda, mentre Regione e ANCI documentano il servizio.
+Il ruolo secondario assegnato dalla specifica IWA descrive la gerarchia di
+acquisizione; non è un giudizio di mancata ufficialità. Provenienza riconosciuta,
+affidabilità tecnica misurata e condizioni di acquisizione/riuso sono verifiche
+distinte. Attribuire ogni comunicazione al suo emittente e conservare il prodotto
+CFR originario per livelli regionali; non trasferire l'autorevolezza a tutti i
+contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
@@ -51,6 +67,16 @@ mantengono i requisiti della specifica. Vedere CLN-006.
 | CLN-002 | Target 404/410 | Esclusione solo con decisione motivata per fonte/configurazione/URL; rediscovery ripristina il controllo | Procedura e codice presenti; applicazione al singolo target da verificare |
 
 ## Problemi aperti
+
+CLN-007 conferma un collegamento da completare fra estrazioni e dominio comunale:
+il salvataggio in `extracted_measures` non inserisce misure in
+`domain_local_measures` né fasi in `domain_operational_phases`. La query di
+situazione legge queste ultime tabelle. Verificare separatamente i candidati
+estratti, la loro proiezione con evidenza/validità e gli stati di interpretazione
+richiesti dalla query; la pubblicazione manuale non esegue questo passaggio.
+`documents_requiring_attention` raccoglie soltanto avvisi collegati a misure già
+presenti: se queste mancano, l'array vuoto non esclude documenti non interpretati.
+La ricerca API dei documenti conservati è un percorso distinto.
 
 Trial e accettazione restano quelli del coverage tracker. Le lacune dei canali secondari vanno registrate separatamente dalle omissioni nel perimetro primario. Consultare il registro privato per errori e recuperi dell'ambiente; non considerarli una certificazione pubblica.
 
@@ -124,3 +150,36 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Evidenza:** [controlli operativi](../../../operations/development-publication.md) e [specifica pubblica](../../../../openspec/changes/define-toscana-alert-service/specs/public-alert-access/spec.md#requirement-manual-municipality-publication-in-development).
 - **Conseguenza:** in development dati consultabili possono accompagnare `public_state=pending` e `development_publication=true`; nessuna misura locale o colore regionale viene dedotto per colmare dati mancanti.
 - **Prossima verifica:** usare i controlli separati per la consultazione di sviluppo; completare le revisioni e le rivalutazioni registrate prima della pubblicazione verificata in produzione.
+
+### CLN-007 — Estrazioni conservate senza proiezione comunale nella situazione
+
+- **Data:** 2026-10-03. **Ultima verifica:** 2026-10-03, codice, database e API development in sola lettura; nessuna nuova acquisizione o inferenza avviata.
+- **Ambito:** estrazioni di `calcinaia-municipal`, dominio comunale e situazione API del comune `050004`.
+- **Conoscenza:** confermato sul percorso esaminato. **Intervento:** diagnosi registrata; collegamento e rappresentazione dei documenti pendenti da implementare e validare.
+- **Osservazione:** `extraction.Store.Put` conserva risultati, misure candidate ed evidenze nelle tabelle di estrazione senza alimentare le tabelle del dominio lette da `measures` e `phases`. I metodi di inserimento del dominio esistono, ma non sono collegati al salvataggio delle estrazioni. La situazione costruisce i documenti da attenzionare soltanto dagli avvisi delle misure già restituite. La copertura comunale in development conserva inoltre lo stato iniziale `not_processed` con motivazione di accettazione pendente, senza riassumere le estrazioni interne.
+- **Evidenza:** [salvataggio estrazioni](../../../../internal/backend/extraction/store.go), [store del dominio](../../../../internal/backend/domain/store.go), [query dei fatti](../../../../internal/backend/publicquery/facts.go), [situazione e ricerca documenti](../../../../internal/backend/publicquery/query.go), [copertura](../../../../internal/backend/publicquery/store.go). Conteggi, versioni e risposte development restano nel registro privato `SITUATION-20261003-01`.
+- **Conseguenza:** gli array vuoti non dipendono necessariamente dall'accettazione o dall'assenza di comunicazioni; estrazione riuscita e pubblicazione development non dimostrano una proiezione comunale completa. Un'attivazione estratta non determina automaticamente una fase operativa.
+- **Prossima verifica:** collegare le estrazioni validate a una proiezione comunale versionata e idempotente, conservando evidenze, campi indeterminati e storico; verificare il percorso worker–dominio–API/MCP e un replay esplicitamente delimitato. Verificare anche documenti pendenti senza misure precedenti e qualità distinta dall'accettazione.
+- **Collegamenti:** CLN-004, CLN-006 e [TOS-008](../README.md#tos-008--la-consultazione-in-development-non-completa-la-lettura-delle-mappe).
+
+### CLN-008 — Sentinella secondaria prevista e raccolta attiva sono distinte
+
+- **Data:** 2026-10-03. **Ultima verifica:** 2026-10-03, specifiche, codice e configurazione development in sola lettura; nessuna consultazione del sito secondario.
+- **Ambito:** ruolo di Cittadino Informato per Calcinaia e perimetro del collector municipale.
+- **Conoscenza:** confermato sul perimetro verificato. **Intervento:** diagnosi registrata; nessuna attivazione.
+- **Osservazione:** proposta, design e specifica prevedono un confronto diagnostico secondario; il task storico 1.11 non dimostra un controllo continuativo corrente. La configurazione esaminata dichiara esclusione dell'acquisizione attiva in attesa delle condizioni di riuso e limita le sezioni ai tre elenchi del sito comunale. Il controllo del registro e degli originali conservati non ha individuato un canale acquisito del dominio secondario nell'ambiente esaminato.
+- **Evidenza:** [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md), [design](../../../../openspec/changes/define-toscana-alert-service/design.md), [task storico](../../../../openspec/changes/define-toscana-alert-service/tasks.md). Riscontro operativo: registro privato `SITUATION-20261003-01`.
+- **Conseguenza:** la presenza del nome nelle limitazioni non significa che il worker confronti periodicamente i due siti; il canale secondario non stabilisce misure, date o completezza senza riscontro primario.
+- **Prossima verifica:** revisionare separatamente il perimetro e le condizioni del canale secondario, poi implementare/configurare e verificare il confronto diagnostico prima di dichiararlo operativo.
+- **Collegamenti:** CLN-001 e CLN-007.
+
+### CLN-009 — Riconoscimento istituzionale del canale di Calcinaia
+
+- **Data:** 2026-10-03. **Ultima verifica:** 2026-10-03, consultazione web di fonti istituzionali e della presentazione della piattaforma; nessun collaudo continuativo o attivazione del collector.
+- **Ambito:** referral comunale a `https://cittadinoinformato.it/calcinaia/` e collaborazione Regione Toscana–ANCI sul servizio.
+- **Conoscenza:** confermato per il riconoscimento del canale; affidabilità operativa da misurare. **Intervento:** guida aggiornata; policy IWA invariata.
+- **Osservazione:** la homepage comunale collega direttamente la pagina Calcinaia nella sezione dei siti tematici per allerte e piano di protezione civile; una comunicazione meteo del Comune invita a usare l'app. Regione e ANCI documentano il protocollo di collaborazione sul servizio. Queste evidenze sostengono il riconoscimento come canale istituzionale aggiuntivo, senza dimostrare esaustività, tempestività o la provenienza di ogni singolo messaggio.
+- **Evidenza:** [homepage del Comune](https://comune.calcinaia.pi.it/), [comunicazione comunale](https://comune.calcinaia.pi.it/novita/allerta-meteo-giovedi-17-settembre), [notizia della Regione](https://www.toscana-notizie.it/-/l-app-cittadino-informato-si-rinnova-protocollo-d-intesa-tra-regione-e-anci), [conferma ANCI](https://ancitoscana.it/protezione-civile-anci-toscana-e-regione-toscana-siglano-un-protocollo-dintesa-per-lo-sviluppo-e-la-diffusione-dellapp-cittadino-informato/), [presentazione della piattaforma](https://cittadinoinformato.it/il-progetto/).
+- **Conseguenza:** l'esclusione dalla raccolta attiva di CLN-008 non è una dichiarazione di fonte non autentica. Il riconoscimento istituzionale non completa l'accettazione tecnica né determina le condizioni di riuso.
+- **Prossima verifica:** identificare l'emittente dei messaggi nel perimetro comunale e confrontare contenuti, date, aggiornamenti e omissioni con gli originali; verificare separatamente il contratto di acquisizione prima dell'attivazione.
+- **Collegamenti:** CLN-001, CLN-008 e [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md).

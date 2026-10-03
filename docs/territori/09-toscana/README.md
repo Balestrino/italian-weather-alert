@@ -1,7 +1,7 @@
 ---
 tipo: "regione"
 codice_regione: "09"
-ultima_revisione: "2026-10-02"
+ultima_revisione: "2026-10-03"
 ---
 
 # Toscana
@@ -64,6 +64,14 @@ conserva la dichiarazione di assenza di criticità con livelli per zona `unknown
 quando i colori delle mappe non sono verificati. Vedere TOS-005.
 
 ## Problemi aperti
+
+La diagnosi TOS-008 conferma che la proiezione `cfr-html-v2` interpreta le righe
+testuali esplicite, ma non i colori delle mappe. La dichiarazione `NESSUNA` resta
+una dichiarazione del bollettino; le combinazioni rischio/zona/data conservate con
+livello `unknown` non sono livelli verdi verificati. Accettazione e pubblicazione
+in development non completano questa capacità. `provenance.state=unresolved`
+segnala inoltre l'assenza di una valutazione in `domain_provenance_events` al
+confine temporale della query, separatamente dall'identità della fonte nel registro.
 
 Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel coverage tracker e nei [task del servizio Toscana](../../../openspec/changes/define-toscana-alert-service/tasks.md). Verificare sul canale operativo il monitoraggio e i casi senza evento. In presenza di `missing`, verificare il percorso che alimenta la data della pubblicazione: gli esiti per ambiente appartengono all'archivio privato.
 
@@ -160,3 +168,14 @@ tecniche del software non sostituiscono gli esiti attesi revisionati da una pers
 - **Evidenza:** [controlli operativi](../../operations/development-publication.md) e [specifica pubblica](../../../openspec/changes/define-toscana-alert-service/specs/public-alert-access/spec.md#requirement-manual-municipality-publication-in-development).
 - **Conseguenza:** in development dati consultabili possono accompagnare `public_state=pending` e `development_publication=true`; nessuna misura locale o colore regionale viene dedotto per colmare dati mancanti.
 - **Prossima verifica:** usare i controlli separati per la consultazione di sviluppo; completare le revisioni e le rivalutazioni registrate prima della pubblicazione verificata in produzione.
+
+### TOS-008 — La consultazione in development non completa la lettura delle mappe
+
+- **Data:** 2026-10-03. **Ultima verifica:** 2026-10-03, codice e diagnosi development in sola lettura; nessun nuovo fetch ufficiale.
+- **Ambito:** proiezione `cfr-criticality` con parser `cfr-html-v2` e dimensioni di qualità della query pubblica.
+- **Conoscenza:** confermato sul codice. **Intervento:** diagnosi registrata; nessuna nuova interpretazione grafica o accettazione applicata.
+- **Osservazione:** `ProjectRegionalHTML` espande la dichiarazione esplicita di assenza di criticità sulle date, i rischi e le zone riconosciuti con livello `unknown`. Le righe tabellari esplicite possono fornire livelli; i colori delle mappe restano fuori dalla proiezione. `quality` legge una valutazione di provenienza separata e restituisce `unresolved` se manca.
+- **Evidenza:** [proiezione HTML](../../../internal/backend/acquisition/regional_facts.go), [proiezione persistente](../../../internal/backend/domain/regional_projection.go), [qualità e copertura](../../../internal/backend/publicquery/store.go). Ricevute e risposte development: registro privato `SITUATION-20261003-01`.
+- **Conseguenza:** una risposta con quattordici combinazioni per due date e sette rischi non dimostra lettura dei colori; controlli recenti e pubblicazione manuale non colmano i livelli sconosciuti o le valutazioni di provenienza mancanti.
+- **Prossima verifica:** definire e validare separatamente la lettura delle evidenze grafiche e la rappresentazione della dichiarazione ufficiale; preservare validità e casi non supportati. Completare le valutazioni di provenienza con evidenza revisionata.
+- **Collegamenti:** TOS-005, TOS-007 e [CLN-007](comuni/050004-calcinaia.md#cln-007--estrazioni-conservate-senza-proiezione-comunale-nella-situazione).
