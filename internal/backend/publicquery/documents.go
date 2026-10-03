@@ -115,6 +115,10 @@ func (s *Store) documentVersion(ctx context.Context, versionID int64, qt QueryTi
 		return Document{}, err
 	}
 	value.Attachments, err = s.attachments(ctx, versionID)
+	if err != nil {
+		return Document{}, err
+	}
+	value.Verifications, err = s.verifications(ctx, "", "", versionID, qt)
 	return value, err
 }
 

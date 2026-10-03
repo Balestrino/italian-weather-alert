@@ -95,63 +95,67 @@ type Attachment struct {
 }
 
 type Document struct {
-	ID                  string       `json:"id"`
-	VersionID           string       `json:"version_id"`
-	SourceID            string       `json:"source_id"`
-	Issuer              *string      `json:"issuer"`
-	Publisher           string       `json:"publisher"`
-	Kind                string       `json:"kind"`
-	OfficialURL         string       `json:"official_url"`
-	CopyURL             *string      `json:"copy_url"`
-	SHA256              string       `json:"sha256"`
-	Publication         Temporal     `json:"publication"`
-	Modification        Temporal     `json:"modification"`
-	AcquiredAt          time.Time    `json:"acquired_at"`
-	InterpretedAt       *time.Time   `json:"interpreted_at"`
-	InterpretationRunID *string      `json:"interpretation_run_id"`
-	Quality             Quality      `json:"quality"`
-	Attachments         []Attachment `json:"attachments"`
+	Verifications       []Verification `json:"verifications,omitempty"`
+	ID                  string         `json:"id"`
+	VersionID           string         `json:"version_id"`
+	SourceID            string         `json:"source_id"`
+	Issuer              *string        `json:"issuer"`
+	Publisher           string         `json:"publisher"`
+	Kind                string         `json:"kind"`
+	OfficialURL         string         `json:"official_url"`
+	CopyURL             *string        `json:"copy_url"`
+	SHA256              string         `json:"sha256"`
+	Publication         Temporal       `json:"publication"`
+	Modification        Temporal       `json:"modification"`
+	AcquiredAt          time.Time      `json:"acquired_at"`
+	InterpretedAt       *time.Time     `json:"interpreted_at"`
+	InterpretationRunID *string        `json:"interpretation_run_id"`
+	Quality             Quality        `json:"quality"`
+	Attachments         []Attachment   `json:"attachments"`
 }
 
 type Measure struct {
-	ID                            string     `json:"id"`
-	RevisionID                    string     `json:"revision_id"`
-	MunicipalityISTAT             string     `json:"municipality_istat"`
-	Issuer                        *string    `json:"issuer"`
-	Action                        string     `json:"action"`
-	Place                         *string    `json:"place"`
-	TerritorialScope              string     `json:"territorial_scope"`
-	Validity                      Temporal   `json:"validity"`
-	Status                        string     `json:"status"`
-	Evidence                      []Evidence `json:"evidence"`
-	Quality                       Quality    `json:"quality"`
-	RelatedMeasureIDs             []string   `json:"related_measure_ids"`
-	RelationshipStatus            string     `json:"relationship_status"`
-	NewerUninterpretedDocumentIDs []string   `json:"newer_uninterpreted_document_ids"`
+	Verifications                 []Verification `json:"verifications,omitempty"`
+	ID                            string         `json:"id"`
+	RevisionID                    string         `json:"revision_id"`
+	MunicipalityISTAT             string         `json:"municipality_istat"`
+	Issuer                        *string        `json:"issuer"`
+	Action                        string         `json:"action"`
+	Place                         *string        `json:"place"`
+	TerritorialScope              string         `json:"territorial_scope"`
+	Validity                      Temporal       `json:"validity"`
+	Status                        string         `json:"status"`
+	Evidence                      []Evidence     `json:"evidence"`
+	Quality                       Quality        `json:"quality"`
+	RelatedMeasureIDs             []string       `json:"related_measure_ids"`
+	RelationshipStatus            string         `json:"relationship_status"`
+	NewerUninterpretedDocumentIDs []string       `json:"newer_uninterpreted_document_ids"`
 }
 
 type RegionalWarning struct {
-	ID                string     `json:"id"`
-	Product           string     `json:"product"`
-	Risk              string     `json:"risk"`
-	OfficialRiskLabel string     `json:"official_risk_label"`
-	Zone              string     `json:"zone"`
-	MappingVersion    string     `json:"mapping_version"`
-	Level             string     `json:"level"`
-	Validity          Temporal   `json:"validity"`
-	Status            string     `json:"status"`
-	Evidence          []Evidence `json:"evidence"`
-	Quality           Quality    `json:"quality"`
+	Verifications     []Verification `json:"verifications,omitempty"`
+	ID                string         `json:"id"`
+	Product           string         `json:"product"`
+	Risk              string         `json:"risk"`
+	OfficialRiskLabel string         `json:"official_risk_label"`
+	Zone              string         `json:"zone"`
+	MappingVersion    string         `json:"mapping_version"`
+	Level             string         `json:"level"`
+	Validity          Temporal       `json:"validity"`
+	Status            string         `json:"status"`
+	Evidence          []Evidence     `json:"evidence"`
+	Quality           Quality        `json:"quality"`
 }
 
 type OperationalPhase struct {
-	ID                string     `json:"id"`
-	MunicipalityISTAT string     `json:"municipality_istat"`
-	Authority         string     `json:"authority"`
-	Phase             string     `json:"phase"`
-	Validity          Temporal   `json:"validity"`
-	Evidence          []Evidence `json:"evidence"`
-	Quality           Quality    `json:"quality"`
+	Verifications     []Verification `json:"verifications,omitempty"`
+	ID                string         `json:"id"`
+	MunicipalityISTAT string         `json:"municipality_istat"`
+	Authority         string         `json:"authority"`
+	Phase             string         `json:"phase"`
+	Validity          Temporal       `json:"validity"`
+	Evidence          []Evidence     `json:"evidence"`
+	Quality           Quality        `json:"quality"`
 }
 
 type Coverage struct {

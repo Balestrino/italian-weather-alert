@@ -733,6 +733,8 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		contract := &registry.CittadinoInformatoContract{MunicipalityISTAT: "050004", MunicipalitySlug: "calcinaia", Publisher: "comune_calcinaia", Updates: true, PageSize: 1}
 		sections := []string{contract.BaseURL() + "aggiornamenti/"}
 		cfg := registry.Configuration{URL: contract.BaseURL(), Sections: sections, AccessMethod: registry.CittadinoInformatoAccess, Attribution: "synthetic", Policy: registry.Policy{Evidence: &proof, CollectionPermitted: true, RetentionPermitted: true}, CittadinoInformato: contract, Discovery: registry.Discovery{MaxPagesPerSection: 1, MaxDocuments: 5, BootstrapDays: 30}, Referral: &registry.Referral{Evidence: proof, Destination: contract.BaseURL(), Territory: "050004", ProductID: "municipal", Sections: sections, Context: "synthetic scoped referral"}}
+		cfg.Provenance = &proof
+		cfg.Policy.PublicationPermitted = true
 		if e := reg.CreateChannel(ctx, registry.Channel{ID: "verification-platform", PublisherID: "comune-calcinaia", Platform: "cittadino-informato", URL: contract.BaseURL(), External: true}); e != nil {
 			t.Fatal(e)
 		}
@@ -741,11 +743,11 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		}
 		makeVerified := func(requestID, action string) domain.VerificationReceipt {
 			t.Helper()
-			body := "Ordinanza sintetica 88 | " + action + " | Ponte Sintetico | fino a nuovo ordine"
+			body := "Ordinanza sintetica 88 | edizione 1 | " + action + " | Ponte Sintetico | fino a nuovo ordine"
 			url := "https://calcinaia.example/notices/verified-primary"
 			version := retain(requestID, "calcinaia-public", url, body, &issuer, metadata)
 			fields := map[string]domain.EvidenceSelection{}
-			for name, value := range map[string]string{"reference": "Ordinanza sintetica 88", "kind": action, "subject": "Ponte Sintetico", "validity": "fino a nuovo ordine"} {
+			for name, value := range map[string]string{"reference": "Ordinanza sintetica 88", "edition": "edizione 1", "kind": action, "subject": "Ponte Sintetico", "validity": "fino a nuovo ordine"} {
 				start := strings.Index(body, value)
 				fields[name] = domain.EvidenceSelection{ResourceURL: url, StartByte: start, EndByte: start + len(value), Locator: "synthetic primary " + name}
 			}
@@ -773,6 +775,80 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 			if len(relevant) != 1 || relevant[0].ID != receipt.DomainRecordID {
 				t.Fatal("public current/history projection missing or duplicated", receipt.ID, relevant)
 			}
+			verification := relevant[0].Verifications
+			if len(verification) != 1 || verification[0].ID != stringID(receipt.ID) || len(verification[0].Checks) != 3 {
+				t.Fatal("public verification crossed the knowledge boundary or lost channel roles", verification)
+			}
+			if verification[0].Checks[0].Outcome != "not_applicable" || verification[0].Checks[2].Outcome != "missing_evidence" {
+				t.Fatal("primary-only checks changed meaning", verification[0])
+			}
+			if !verification[0].Checks[1].EvidenceVisible || len(verification[0].Checks[1].Fields) == 0 {
+				t.Fatal("public primary field evidence missing", verification[0])
+			}
+			encoded, e := json.Marshal(verification)
+			if e != nil || strings.Contains(string(encoded), "request_id") || strings.Contains(string(encoded), "candidate_key") || strings.Contains(string(encoded), "not_republished") || strings.Contains(string(encoded), "verification-platform") {
+				t.Fatal("private request/check data exposed", string(encoded), e)
+			}
+			if hidden, e := store.forMunicipality("050026").verifications(ctx, "local_measure", receipt.DomainRecordID, 0, QueryTime{KnownAt: receipt.VerifiedAt}); e != nil || len(hidden) != 0 {
+				t.Fatal("unselected municipality received candidate evidence", hidden, e)
+			}
+			document, e := store.documentVersion(ctx, receipt.Candidate.VersionID, QueryTime{KnownAt: receipt.VerifiedAt, EvaluationTime: receipt.VerifiedAt})
+			if e != nil || len(document.Verifications) != 1 || document.Verifications[0].ID != stringID(receipt.ID) {
+				t.Fatal("document verification attribution missing", document, e)
+			}
+		}
+		platformURL := contract.APIBase() + "aggiornamenti/123?comune=calcinaia"
+		platformFields := map[string]string{"reference": "Ordinanza sintetica 88", "edition": "edizione 1", "kind": "riapertura", "subject": "Ponte Sintetico", "validity": "fino a nuovo ordine"}
+		platformBody, e := json.Marshal(platformFields)
+		if e != nil {
+			t.Fatal(e)
+		}
+		platformVersion, e := documentStore.Retain(ctx, documents.Acquisition{ID: "verified-platform-conflict", SourceID: "verification-platform", Configuration: 1, URL: platformURL, Resources: []documents.Resource{{URL: platformURL, Role: "original", Required: true, SourceID: "verification-platform", Configuration: 1, MediaType: "application/json", Bytes: platformBody}}})
+		if e != nil {
+			t.Fatal(e)
+		}
+		selections := map[string]domain.EvidenceSelection{}
+		for field, text := range platformFields {
+			selections[field] = domain.EvidenceSelection{ResourceURL: platformURL, JSONPointer: "/" + field, StartByte: 0, EndByte: len(text), Locator: "synthetic platform " + field}
+		}
+		primaryFields := map[string]domain.EvidenceSelection{}
+		for field, selected := range first.Candidate.Fields {
+			primaryFields[field] = selected.EvidenceSelection
+		}
+		at := time.Now().UTC()
+		conflict, e := domainStore.VerifyMultiSource(ctx, documentStore, domain.VerificationRequest{RequestID: "private-platform-conflict-request", CandidateKey: "private-platform-candidate", Kind: "local_measure", MunicipalityISTAT: "050004", Candidate: domain.VerificationEvidence{SourceID: "verification-platform", VersionID: platformVersion.ID, Fields: selections}, Checks: []domain.VerificationCheck{{Role: "regional", State: "not_applicable", Reason: "private local-only reason", CheckedAt: at}, {Role: "municipal", State: "available", Reason: "private counterpart lookup", CheckedAt: at, VerificationEvidence: domain.VerificationEvidence{SourceID: "calcinaia-public", VersionID: first.Candidate.VersionID, Fields: primaryFields}}}}, at)
+		if e != nil || conflict.Admitted || conflict.Outcome != "conflict" || conflict.PrimaryRecordID != first.DomainRecordID {
+			t.Fatal("conflicting republication overrode the primary", conflict, e)
+		}
+		if hidden, e := store.verifications(ctx, "", "", first.Candidate.VersionID, QueryTime{KnownAt: at}); e != nil || len(hidden) != 1 {
+			t.Fatal("unpublished candidate leaked through primary document", hidden, e)
+		}
+		// Even when its candidate is published, an unpublished counterpart must
+		// not disclose its field values, passages, hashes or operational reasons.
+		redacted, e := store.publicVerification(ctx, conflict, QueryTime{KnownAt: at})
+		if e != nil || redacted.Checks[2].EvidenceVisible || len(redacted.Checks[2].Fields) != 0 || redacted.Checks[2].SourceID != "" || redacted.Checks[2].Reason != "channel_evidence_not_public" {
+			t.Fatal("private counterpart evidence exposed", redacted, e)
+		}
+		acceptance := registry.Acceptance{Report: proof, PeriodStart: at.Add(-8 * 24 * time.Hour), PeriodEnd: at, Sections: sections, ExtractionVerified: true, UpdatesVerified: true, AttachmentsVerified: true, ScannedAttachmentsVerified: true, HistoryVerified: true, FailureBehaviorVerified: true, InterfacesEquivalent: true, CoverageStatus: "accepted_with_limitations", CoverageLimitations: []string{"synthetic fixture only"}}
+		acceptance.Report.ObservedAt = at
+		for _, e := range []error{reg.RecordPreview(ctx, "verification-platform", 1, "fixture", proof), reg.EnableCollection(ctx, "verification-platform", 1, "fixture"), reg.Accept(ctx, "verification-platform", 1, "fixture", acceptance)} {
+			if e != nil {
+				t.Fatal(e)
+			}
+		}
+		if _, e = reg.ReviewAcceptance(ctx, "verification-platform", 1, "fixture", acceptance.Report); e != nil {
+			t.Fatal(e)
+		}
+		if e = reg.EnablePublic(ctx, "verification-platform", 1, "fixture"); e != nil {
+			t.Fatal(e)
+		}
+		published, e := store.verifications(ctx, "", "", platformVersion.ID, QueryTime{KnownAt: at})
+		if e != nil || len(published) != 1 || published[0].Checks[2].Outcome != "conflict" || !published[0].Checks[2].EvidenceVisible || published[0].Checks[2].FromVersionID != stringID(platformVersion.ID) || published[0].Checks[2].ToVersionID != stringID(first.Candidate.VersionID) {
+			t.Fatal("published conflict lost primary direction/attribution", published, e)
+		}
+		platformDoc, e := store.documentVersion(ctx, platformVersion.ID, QueryTime{KnownAt: at, EvaluationTime: at})
+		if e != nil || platformDoc.CopyURL != nil || len(platformDoc.Verifications) != 1 {
+			t.Fatal("platform document lost link-only verification", platformDoc, e)
 		}
 	})
 

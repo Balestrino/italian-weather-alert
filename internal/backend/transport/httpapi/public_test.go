@@ -64,6 +64,11 @@ func (f *publicQueriesFake) Document(_ context.Context, query publicquery.Docume
 		return publicquery.DocumentResult{}, publicquery.ErrInvalidParameters
 	}
 	document := publicquery.Document{ID: "7", VersionID: "11", SourceID: "calcinaia", Publisher: "Comune di Calcinaia", Kind: "ordinance", OfficialURL: "https://example.test/7", SHA256: strings.Repeat("a", 64), Publication: publicquery.Temporal{Precision: "unknown"}, Modification: publicquery.Temporal{Precision: "unknown"}, AcquiredAt: time.Date(2026, 9, 15, 8, 0, 0, 0, time.UTC), Quality: fixtureQuality(), Attachments: []publicquery.Attachment{}}
+	document.Verifications = []publicquery.Verification{{ID: "17", Kind: "local_measure", MunicipalityISTAT: "050004", LogicVersion: "synthetic", VerifiedAt: time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC), CandidateRole: "municipal", Outcome: "corroborated", Admitted: true, ProjectionState: "primary_supported", Checks: []publicquery.VerificationCheck{
+		{Role: "regional", CheckedAt: time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC), Outcome: "not_applicable", Reason: "not_applicable", Fields: []publicquery.VerificationField{}},
+		{Role: "municipal", SourceID: "calcinaia", VersionID: "11", EvidenceVisible: true, Complete: true, CheckedAt: time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC), Outcome: "corroborated", Reason: "same_primary", Fields: []publicquery.VerificationField{{Field: "kind", Outcome: "corroborated", Reason: "same_value", Evidence: []publicquery.Evidence{}}}},
+		{Role: "platform", CheckedAt: time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC), Outcome: "missing_evidence", Reason: "missing_evidence", Fields: []publicquery.VerificationField{}},
+	}, Limitations: []string{"synthetic scope only"}}}
 	return publicquery.DocumentResult{Document: document, Versions: []publicquery.Document{document}, History: fixtureHistory()}, nil
 }
 

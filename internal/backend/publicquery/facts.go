@@ -139,6 +139,10 @@ func (s *Store) measure(ctx context.Context, id string, qt QueryTime) (Measure, 
 	if err == nil && len(value.NewerUninterpretedDocumentIDs) > 0 {
 		value.Quality.Interpretation.Limitations = append(value.Quality.Interpretation.Limitations, "newer potentially superseding document is not interpreted")
 	}
+	if err != nil {
+		return Measure{}, err
+	}
+	value.Verifications, err = s.forMunicipality(value.MunicipalityISTAT).verifications(ctx, "local_measure", value.ID, 0, qt)
 	return value, err
 }
 
@@ -298,6 +302,10 @@ func (s *Store) phases(ctx context.Context, municipality string, qt QueryTime) (
 		if err != nil {
 			return nil, err
 		}
+		item.value.Verifications, err = s.forMunicipality(item.value.MunicipalityISTAT).verifications(ctx, "operational_phase", item.value.ID, 0, qt)
+		if err != nil {
+			return nil, err
+		}
 		result = append(result, item.value)
 	}
 	return result, nil
@@ -422,6 +430,10 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
 		}
 		if item.value.MappingVersion == "unavailable" {
 			item.value.Quality.Interpretation.Limitations = append(item.value.Quality.Interpretation.Limitations, "no municipality-zone mapping was available at the knowledge boundary")
+		}
+		item.value.Verifications, err = s.forMunicipality(municipality).verifications(ctx, "regional_record", item.recordID, 0, qt)
+		if err != nil {
+			return nil, err
 		}
 		result = append(result, item.value)
 	}

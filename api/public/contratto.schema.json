@@ -426,6 +426,13 @@
             ],
             "additionalProperties": false
           }
+        },
+        "verifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Verification"
+          },
+          "maxItems": 100
         }
       },
       "required": [
@@ -533,6 +540,13 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "verifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Verification"
+          },
+          "maxItems": 100
         }
       },
       "required": [
@@ -623,6 +637,13 @@
         },
         "quality": {
           "$ref": "#/$defs/Quality"
+        },
+        "verifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Verification"
+          },
+          "maxItems": 100
         }
       },
       "required": [
@@ -732,6 +753,13 @@
         },
         "quality": {
           "$ref": "#/$defs/Quality"
+        },
+        "verifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Verification"
+          },
+          "maxItems": 100
         }
       },
       "required": [
@@ -1365,6 +1393,211 @@
           "additionalProperties": false
         }
       ]
+    },
+    "VerificationField": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "corroborated",
+            "missing_evidence",
+            "unavailable",
+            "non_comparable",
+            "not_applicable",
+            "conflict"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "candidate_value": {
+          "type": "string"
+        },
+        "compared_value": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          }
+        }
+      },
+      "required": [
+        "field",
+        "outcome",
+        "reason",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "VerificationCheck": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "version_id": {
+          "type": "string"
+        },
+        "authority_id": {
+          "type": "string"
+        },
+        "publisher_id": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "from_version_id": {
+          "type": "string"
+        },
+        "to_version_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "regional",
+            "municipal",
+            "platform"
+          ]
+        },
+        "configuration": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "evidence_visible": {
+          "type": "boolean"
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "corroborated",
+            "missing_evidence",
+            "unavailable",
+            "non_comparable",
+            "not_applicable",
+            "conflict"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VerificationField"
+          }
+        }
+      },
+      "required": [
+        "role",
+        "complete",
+        "evidence_visible",
+        "checked_at",
+        "outcome",
+        "reason",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "Verification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "municipality_istat": {
+          "type": "string"
+        },
+        "logic_version": {
+          "type": "string"
+        },
+        "projection_state": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "local_measure",
+            "operational_phase",
+            "regional_record"
+          ]
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "candidate_role": {
+          "type": "string",
+          "enum": [
+            "regional",
+            "municipal",
+            "platform"
+          ]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "corroborated",
+            "missing_evidence",
+            "unavailable",
+            "non_comparable",
+            "not_applicable",
+            "conflict"
+          ]
+        },
+        "admitted": {
+          "type": "boolean"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VerificationCheck"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "municipality_istat",
+        "logic_version",
+        "projection_state",
+        "kind",
+        "verified_at",
+        "candidate_role",
+        "outcome",
+        "admitted",
+        "checks",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "description": "Field-evidence comparison, independent of source acceptance; admission refers to the candidate. Private channel evidence is withheld. At most the latest 100 publishable receipts at the knowledge boundary are included, with explicit truncation limitations."
     }
   }
 }
