@@ -613,3 +613,17 @@ attributed to retained evidence. Both reassessed campaigns stay extended.
 This completes recovery verification, not completeness or acceptance: 156/164 tasks
 are complete and the eight original gates remain open. See
 [current interpretation results](../../../docs/operations/municipal-interpretation.md#esito-del-recupero-live).
+
+## 30. Observation corrections — 4 October 2026
+
+- [x] 30.1 Preserve independently enumerated prohibition places in a positive retained operative clause, including grouped provider output; verify literal evidence, temporal uncertainty, negative/context-only cases and versioned persistence without rewriting previous runs; preserve CFR maps when a bounded header-only curve lies wholly above dated panels, retaining strict rejection inside maps.
+- [x] 30.2 Add operator-authorized corrective campaign reviews with immutable links, actor/evidence/reason and same-source/kind/evidence scope; verify atomic rejection, correction chains, historical assessments and completion serialization without waiving observation, attachment, delay or source-acceptance gates.
+
+Task 9.3 remains open until the corrected ordinary worker and the original MVP
+campaign requirements pass with attributable comparisons and real paced checks.
+The earlier internal campaign's historical delays remain preserved.
+
+Tasks 30.1/30.2 pass unit/race, disposable PostgreSQL and historical-query checks.
+Retained original PDF comparisons verify all 364 fields in each CFR product.
+The checklist is now 158/166, with the eight original gates still open pending
+ordinary adoption, live completeness and the attributable campaign assessment.

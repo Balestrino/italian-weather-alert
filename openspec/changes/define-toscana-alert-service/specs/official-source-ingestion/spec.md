@@ -353,6 +353,12 @@ Source acceptance SHALL include attributable reviewed expected outputs for obser
 - **THEN** existing campaigns and requests without an explicit scope retain the four-product MVP requirements, prior assessments and immutable evidence
 - **AND** acceptance of one municipality does not establish full MVP or five-municipality coverage
 
+#### Scenario: A verified correction resolves a failed observation review
+- **WHEN** an operator records a new attributable review correcting the current failed or unresolved review for the same campaign, source, kind and retained version/check/case
+- **THEN** administration atomically appends the review and an immutable correction link with a reason and newer evidence, preserving every earlier review and saved assessment
+- **AND** reports retain the correction chain and count its effective leaf at the evidence cutoff, rejecting changed scope, branches and corrections after completion
+- **AND** correction does not waive seven complete 24-hour intervals, delay, required attachments, failure/event evidence, source regression or separate acceptance/public activation
+
 ### Requirement: Explicit reprocessing and interpretation suspension
 Each interpretation SHALL identify its model, instruction/configuration versions and evidence inputs. Model or processing changes SHALL be evaluated on retained cases before operator-selected reprocessing by source, period or failure status; such changes SHALL NOT automatically reprocess the entire history. Prior runs SHALL remain traceable within retention. Operators SHALL be able to suspend new interpretations for a source with a confirmed interpretation defect while collection continues, mark affected published results unreliable, and resume after correction, validation and explicit reprocessing. These controls SHALL NOT allow manual rewriting of extracted measures.
 

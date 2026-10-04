@@ -291,3 +291,13 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 - **Conseguenza:** supera il rinvio dell'adozione in TOS-015 per development, preservando limiti dei formati e controlli delle fonti. PBS, prove mancanti e accettazione restano pendenti.
 - **Prossima verifica:** osservare il percorso ordinario sui prodotti/casi dichiarati e completare ogni dossier reale prima dell'accettazione e dell'abilitazione indipendente.
 - **Collegamenti:** TOS-006, TOS-015 e TOS-016; task 9.3, 10.1, 11.5 e 27.4.
+
+### TOS-018 — Confronti degli originali e correzioni tracciate
+
+- **Data:** 2026-10-04.
+- **Ambito:** originali conservati CFR di criticità/vigilanza, tutte le 26 zone, sette rischi e due giornate per prodotto.
+- **Osservazione confermata:** il PDF di criticità include un simbolo curvo sopra le mappe che il lettore precedente rifiutava; nessuna forma interna ai pannelli viene ignorata.
+- **Correzione verificata:** esclusione solo se tutti i punti di controllo trasformati della curva sono strettamente sopra le mappe. Test sintetici rifiutano curve interne, attraversamenti e comandi sconosciuti.
+- **Confronto delegato:** 364 campi per prodotto confrontati con gli originali; criticità verde/applicabilità distinta, vigilanza quantità e assenza di simboli operativi senza nuovi colori di allerta.
+- **Evidenza:** materiali privati `TOSCANA-TRIAL-CLOSURE-20261004`; [stato](../../operations/toscana-readiness.md#correzioni-preparate-per-la-93).
+- **Prossima verifica:** adozione ordinaria e valutazione di campagna con audit correttivo; accettazione resta indipendente.

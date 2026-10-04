@@ -11,12 +11,25 @@ import (
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Store struct{ pool *pgxpool.Pool }
+type observationDB interface {
+	Begin(context.Context) (pgx.Tx, error)
+	Exec(context.Context, string, ...any) (pgconn.CommandTag, error)
+	Query(context.Context, string, ...any) (pgx.Rows, error)
+	QueryRow(context.Context, string, ...any) pgx.Row
+}
 
-func New(pool *pgxpool.Pool) *Store { return &Store{pool: pool} }
+type Store struct{ pool observationDB }
+
+func New(pool *pgxpool.Pool) *Store {
+	if pool == nil {
+		return &Store{}
+	}
+	return &Store{pool: pool}
+}
 
 func (s *Store) Start(ctx context.Context, request StartRequest) (Campaign, error) {
 	if s == nil || s.pool == nil || !validName(request.ID) || !validName(request.Actor) || request.StartedAt.IsZero() || request.StartedAt.After(time.Now().UTC()) || len(request.SourceIDs) == 0 || len(request.SourceIDs) > 32 {
@@ -109,7 +122,7 @@ func (s *Store) RecordReview(ctx context.Context, campaignID, actor string, revi
 	var started time.Time
 	var configuration int
 	err = tx.QueryRow(ctx, `SELECT c.started_at,s.configuration FROM observation_campaigns c
- JOIN observation_campaign_sources s ON s.campaign_id=c.id WHERE c.id=$1 AND s.source_id=$2`, campaignID, review.SourceID).Scan(&started, &configuration)
+ JOIN observation_campaign_sources s ON s.campaign_id=c.id WHERE c.id=$1 AND s.source_id=$2 FOR UPDATE OF c`, campaignID, review.SourceID).Scan(&started, &configuration)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Review{}, ErrNotFound
 	}
@@ -122,6 +135,27 @@ func (s *Store) RecordReview(ctx context.Context, campaignID, actor string, revi
 	}
 	if completed || review.Evidence.ObservedAt.Before(started) || review.Evidence.ObservedAt.After(time.Now().UTC()) {
 		return Review{}, ErrConflict
+	}
+	if review.Supersedes != "" {
+		var previous Review
+		var evidence []byte
+		var replaced bool
+		err = tx.QueryRow(ctx, `SELECT r.source_id,r.kind,r.status,r.check_id,r.version_id,COALESCE(r.case_id,''),r.evidence,
+ EXISTS(SELECT 1 FROM observation_review_corrections x WHERE x.campaign_id=r.campaign_id AND x.previous_id=r.id)
+ FROM observation_reviews r WHERE r.campaign_id=$1 AND r.id=$2`, campaignID, review.Supersedes).
+			Scan(&previous.SourceID, &previous.Kind, &previous.Status, &previous.CheckID, &previous.VersionID, &previous.CaseID, &evidence, &replaced)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return Review{}, ErrNotFound
+		}
+		if err != nil {
+			return Review{}, err
+		}
+		if json.Unmarshal(evidence, &previous.Evidence) != nil {
+			return Review{}, ErrInvalid
+		}
+		if replaced || previous.Status == "pass" || previous.SourceID != review.SourceID || previous.Kind != review.Kind || !sameReviewID(previous.CheckID, review.CheckID) || !sameReviewID(previous.VersionID, review.VersionID) || previous.CaseID != review.CaseID || !review.Evidence.ObservedAt.After(previous.Evidence.ObservedAt) {
+			return Review{}, ErrConflict
+		}
 	}
 	switch review.Kind {
 	case "original_comparison", "attachment_comparison":
@@ -165,6 +199,11 @@ func (s *Store) RecordReview(ctx context.Context, campaignID, actor string, revi
 	if tag.RowsAffected() == 0 {
 		return Review{}, ErrConflict
 	}
+	if review.Supersedes != "" {
+		if _, err = tx.Exec(ctx, `INSERT INTO observation_review_corrections(campaign_id,review_id,previous_id,reason) VALUES($1,$2,$3,$4)`, campaignID, review.ID, review.Supersedes, review.Correction); err != nil {
+			return Review{}, err
+		}
+	}
 	if err = tx.QueryRow(ctx, "SELECT recorded_at FROM observation_reviews WHERE campaign_id=$1 AND id=$2", campaignID, review.ID).Scan(&review.RecordedAt); err != nil {
 		return Review{}, err
 	}
@@ -180,14 +219,25 @@ func (s *Store) Assess(ctx context.Context, campaignID, actor string, through ti
 	if s == nil || s.pool == nil || !validName(campaignID) || !validName(actor) || through.IsZero() || through.After(now) || !validEvidence(evidence) || evidence.ObservedAt.Before(through) || evidence.ObservedAt.After(now) {
 		return Assessment{}, ErrInvalid
 	}
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return Assessment{}, err
+	}
+	defer tx.Rollback(ctx)
+	var locked bool
+	if err = tx.QueryRow(ctx, "SELECT true FROM observation_campaigns WHERE id=$1 FOR UPDATE", campaignID).Scan(&locked); errors.Is(err, pgx.ErrNoRows) {
+		return Assessment{}, ErrNotFound
+	} else if err != nil {
+		return Assessment{}, err
+	}
 	var completed bool
-	if err := s.pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM observation_assessments WHERE campaign_id=$1 AND status='complete')", campaignID).Scan(&completed); err != nil {
+	if err := tx.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM observation_assessments WHERE campaign_id=$1 AND status='complete')", campaignID).Scan(&completed); err != nil {
 		return Assessment{}, err
 	}
 	if completed {
 		return Assessment{}, ErrConflict
 	}
-	report, err := s.Report(ctx, campaignID, through.UTC())
+	report, err := (&Store{pool: tx}).Report(ctx, campaignID, through.UTC())
 	if err != nil {
 		return Assessment{}, err
 	}
@@ -195,9 +245,12 @@ func (s *Store) Assess(ctx context.Context, campaignID, actor string, through ti
 	reportBody, _ := json.Marshal(report)
 	var result Assessment
 	result.CampaignID, result.Actor, result.Through, result.Status, result.Evidence, result.Report = campaignID, actor, through.UTC(), report.Status, evidence, report
-	err = s.pool.QueryRow(ctx, `INSERT INTO observation_assessments(campaign_id,actor,through_at,status,evidence,report)
+	err = tx.QueryRow(ctx, `INSERT INTO observation_assessments(campaign_id,actor,through_at,status,evidence,report)
  VALUES($1,$2,$3,$4,$5,$6) RETURNING id,recorded_at`, campaignID, actor, result.Through, result.Status, evidenceBody, reportBody).Scan(&result.ID, &result.RecordedAt)
 	if err != nil {
+		return Assessment{}, err
+	}
+	if err = tx.Commit(ctx); err != nil {
 		return Assessment{}, err
 	}
 	result.RecordedAt = result.RecordedAt.UTC()
@@ -320,10 +373,27 @@ func (s *Store) sourceReport(ctx context.Context, campaign Campaign, source Sour
 	if err != nil {
 		return result, err
 	}
-	result.Reviews = reviews
+	eligible := map[string]bool{}
+	for _, review := range reviews {
+		if !review.Evidence.ObservedAt.After(through) {
+			eligible[review.ID] = true
+		}
+	}
+	for _, review := range reviews {
+		if !eligible[review.ID] {
+			continue
+		}
+		if !eligible[review.SupersededBy] {
+			review.SupersededBy = ""
+		}
+		result.Reviews = append(result.Reviews, review)
+	}
 	attachmentNA := 0
 	failureActual, failureRetained := 0, 0
-	for _, review := range reviews {
+	for _, review := range result.Reviews {
+		if review.SupersededBy != "" {
+			continue
+		}
 		if review.Status != "pass" {
 			result.Issues = append(result.Issues, "review_"+review.Status+":"+review.ID)
 			continue
@@ -467,8 +537,11 @@ func (s *Store) latestAssessment(ctx context.Context, campaignID string) (Assess
 }
 
 func (s *Store) reviews(ctx context.Context, campaignID, sourceID string) ([]Review, error) {
-	rows, err := s.pool.Query(ctx, `SELECT id,source_id,kind,status,check_id,version_id,COALESCE(case_id,''),evidence,notes,actor,recorded_at
- FROM observation_reviews WHERE campaign_id=$1 AND source_id=$2 ORDER BY recorded_at,id`, campaignID, sourceID)
+	rows, err := s.pool.Query(ctx, `SELECT r.id,r.source_id,r.kind,r.status,r.check_id,r.version_id,COALESCE(r.case_id,''),r.evidence,r.notes,r.actor,r.recorded_at,
+ COALESCE(incoming.previous_id,''),COALESCE(incoming.reason,''),COALESCE(outgoing.review_id,'')
+ FROM observation_reviews r LEFT JOIN observation_review_corrections incoming ON incoming.campaign_id=r.campaign_id AND incoming.review_id=r.id
+ LEFT JOIN observation_review_corrections outgoing ON outgoing.campaign_id=r.campaign_id AND outgoing.previous_id=r.id
+ WHERE r.campaign_id=$1 AND r.source_id=$2 ORDER BY r.recorded_at,r.id`, campaignID, sourceID)
 	if err != nil {
 		return nil, err
 	}
@@ -477,7 +550,7 @@ func (s *Store) reviews(ctx context.Context, campaignID, sourceID string) ([]Rev
 	for rows.Next() {
 		var review Review
 		var evidence []byte
-		if err = rows.Scan(&review.ID, &review.SourceID, &review.Kind, &review.Status, &review.CheckID, &review.VersionID, &review.CaseID, &evidence, &review.Notes, &review.Actor, &review.RecordedAt); err != nil {
+		if err = rows.Scan(&review.ID, &review.SourceID, &review.Kind, &review.Status, &review.CheckID, &review.VersionID, &review.CaseID, &evidence, &review.Notes, &review.Actor, &review.RecordedAt, &review.Supersedes, &review.Correction, &review.SupersededBy); err != nil {
 			return nil, err
 		}
 		if json.Unmarshal(evidence, &review.Evidence) != nil {
@@ -493,6 +566,9 @@ func validReview(review Review) bool {
 	if !validName(review.ID) || !validName(review.SourceID) || (review.Status != "pass" && review.Status != "fail" && review.Status != "unresolved") || !validEvidence(review.Evidence) || len(review.Notes) > 4000 {
 		return false
 	}
+	if review.SupersededBy != "" || review.Supersedes == review.ID || (review.Supersedes == "" && review.Correction != "") || (review.Supersedes != "" && (!validName(review.Supersedes) || strings.TrimSpace(review.Correction) == "" || len(review.Correction) > 4000)) {
+		return false
+	}
 	switch review.Kind {
 	case "original_comparison", "attachment_comparison":
 		return review.VersionID != nil && *review.VersionID > 0 && review.CheckID == nil && review.CaseID == ""
@@ -505,6 +581,10 @@ func validReview(review Review) bool {
 	default:
 		return false
 	}
+}
+
+func sameReviewID(a, b *int64) bool {
+	return a == nil && b == nil || a != nil && b != nil && *a == *b
 }
 
 func validEvidence(e registry.Evidence) bool {

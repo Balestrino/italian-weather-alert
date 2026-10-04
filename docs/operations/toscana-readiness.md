@@ -1,7 +1,7 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 156 task completati su 164. In questo giro sono verificati:
+ha 158 task completati su 166. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
@@ -79,3 +79,15 @@ invariato e verifiche riusate dichiarate, conserva e supera il successo del repl
 ulteriori recuperi richiedono una rivalutazione riuscita. Le due campagne rivalutate
 restano `extended`. Controlli delle fonti e dipendenze sono conservati, produzione
 ferma. Nessuno degli otto gate originari viene chiuso da questo passaggio.
+
+## Correzioni preparate per la 9.3
+
+I task 30.1/30.2 verificano estrazione v26 per i luoghi indipendenti dei divieti,
+sostituzione della sola interpretazione proiettata corrente della stessa versione
+e revisioni correttive con legami immutabili. Le valutazioni storiche conservano
+il precedente esito; durata, ritardi, allegati e controlli delle fonti restano gate.
+I confronti delegati sui due originali PDF CFR conservati verificano 364 campi
+per prodotto, maschere di applicabilità e quantità senza trasformarle in allerte.
+Un simbolo curvo sopra le mappe è escluso solo con hull interamente esterno;
+le forme non supportate nei pannelli continuano a bloccare la lettura.
+La chiusura 9.3 richiede ancora l’esito ordinario e la valutazione persistita.

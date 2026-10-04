@@ -42,6 +42,8 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
+CLN-023 prepara la correzione dei divieti e l’audit delle revisioni di campagna;
+la verifica sul worker ordinario resta distinta dai test e dal replay.
 CLN-022 verifica il recupero selettivo live con audit e conservazione dello storico.
 La riapertura e l’eccezione sono proiettate, ma il nuovo output omette tre ambiti
 di divieto del contratto revisionato. Consultare l’ultima regressione fallita;
@@ -145,6 +147,16 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-023 — Ambiti indipendenti e revisioni correttive
+
+- **Data:** 2026-10-04.
+- **Ambito:** clausola positiva completa dei divieti mantenuti, stessa versione primaria e campagna MVP.
+- **Osservazione confermata:** il provider può raggruppare più luoghi in un solo divieto; il replay conserva quattro ambiti letterali con v26.
+- **Correzione verificata:** integrazione delimitata dalle preposizioni ripetute, senza date di pagina; evidenze e tempi distinti esistenti conservati. La vista corrente sceglie l’ultima estrazione ordinaria proiettata della stessa versione; lo storico resta interrogabile.
+- **Audit:** revisioni correttive solo su fallimenti/irrisolti nello stesso ambito, con motivo, autore ed evidenza più recente. Link e valutazioni precedenti immutabili; catene ammesse, biforcazioni rifiutate.
+- **Evidenza:** test unit/race e PostgreSQL, replay privato `TOSCANA-TRIAL-CLOSURE-20261004`; [stato](../../../operations/toscana-readiness.md#correzioni-preparate-per-la-93).
+- **Prossima verifica:** adozione, risultato ordinario e valutazione della campagna; accettazione separata.
 
 ### CLN-022 — Recupero live riuscito e omissione distinta dal replay
 

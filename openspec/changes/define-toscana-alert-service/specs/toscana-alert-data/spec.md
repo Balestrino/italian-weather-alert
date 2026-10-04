@@ -4,6 +4,17 @@ Represent regional warnings and individual municipal measures with traceable geo
 
 ## ADDED Requirements
 
+### Requirement: Independent places in retained prohibitions
+An explicitly enumerated positive operative prohibition SHALL retain each independently stated place with literal field evidence, including when a provider groups the list into one candidate. Conjunctions within a place SHALL NOT create unsupported separate scopes. Local completion SHALL require a recognized retained operative clause owned by the extraction core and SHALL preserve temporal uncertainty and prior interpretation versions. Negative, conditional, quoted, heading-only, context-only and ambiguous exception lists SHALL NOT supply inferred prohibitions.
+
+#### Scenario: A partial reopening retains four prohibition places
+- **WHEN** a retained operative clause separately lists four places under one prohibition while reopening only one underpass
+- **THEN** the validated interpretation preserves four independently evidenced prohibitions alongside the reopening, closures and activation, without transferring reopening or page-update times
+
+#### Scenario: Reprocessing corrects a grouped measure
+- **WHEN** a newer complete ordinary extraction of the same retained version is projected with corrected independent subjects or places
+- **THEN** current queries use its measure set at the new knowledge boundary while previous interpretations remain visible in earlier historical views; unsuccessful, unprojected and evaluation results do not hide supported facts
+
 ### Requirement: Seven risks and three regional products
 The service SHALL cover minor-network hydrogeological/hydraulic risk, main-network hydraulic risk, strong thunderstorms, wind, coastal waves, snow and ice, preserving official labels. It SHALL distinguish regional meteorological vigilance, criticality/alert and monitoring products. Monitoring SHALL NOT automatically assign a new warning color. Green, yellow, orange, red, unknown and not applicable SHALL remain distinct. Fire, heat-health and avalanche products SHALL remain outside first-release coverage.
 
@@ -196,3 +207,8 @@ The service SHALL interpret a recognized retained vigilance PDF separately from 
 - **WHEN** HTML lists a zone under evaluation or the zone contains an unrecognized graphical mark
 - **THEN** the affected weather metadata is unresolved rather than asserting the phenomenon is absent
 - **AND** supported facts for other zones retain their own evidence assessment while source coverage reports aggregate limitations
+
+#### Scenario: Irrelevant PDF header curves preserve strict map interpretation
+- **WHEN** a retained criticality PDF has a cubic header symbol whose entire transformed control-point hull lies strictly above every dated risk panel
+- **THEN** the interpreter may exclude that symbol while reading the original maps and physical pages
+- **AND** unsupported, transformed or crossing curves inside map panels remain rejected; no inferred colors or source acceptance are introduced.

@@ -51,17 +51,20 @@ type Campaign struct {
 // observations must identify a persisted version or failed check. Retained
 // cases are allowed only for an event/failure absent during the live period.
 type Review struct {
-	ID         string            `json:"id"`
-	SourceID   string            `json:"source_id"`
-	Kind       string            `json:"kind"`
-	Status     string            `json:"status"`
-	CheckID    *int64            `json:"check_id,omitempty"`
-	VersionID  *int64            `json:"version_id,omitempty"`
-	CaseID     string            `json:"case_id,omitempty"`
-	Evidence   registry.Evidence `json:"evidence"`
-	Notes      string            `json:"notes,omitempty"`
-	Actor      string            `json:"actor,omitempty"`
-	RecordedAt time.Time         `json:"recorded_at,omitempty"`
+	ID           string            `json:"id"`
+	SourceID     string            `json:"source_id"`
+	Kind         string            `json:"kind"`
+	Status       string            `json:"status"`
+	CheckID      *int64            `json:"check_id,omitempty"`
+	VersionID    *int64            `json:"version_id,omitempty"`
+	CaseID       string            `json:"case_id,omitempty"`
+	Evidence     registry.Evidence `json:"evidence"`
+	Notes        string            `json:"notes,omitempty"`
+	Actor        string            `json:"actor,omitempty"`
+	RecordedAt   time.Time         `json:"recorded_at,omitempty"`
+	Supersedes   string            `json:"supersedes,omitempty"`
+	Correction   string            `json:"correction,omitempty"`
+	SupersededBy string            `json:"superseded_by,omitempty"`
 }
 
 type SourceReport struct {

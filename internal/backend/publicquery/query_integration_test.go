@@ -893,13 +893,16 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		if e = classification.NewStore(pool).Put(ctx, classification.Result{RunID: classRun.ID, DocumentVersionID: version.ID, Status: "classified", Relevant: &relevant, ReasonCode: "local_weather_measure", EvidenceQuote: "Chiusura del ponte sintetico", ContentSHA256: strings.Repeat("a", 64), ContentComplete: true, ProviderResponseID: "synthetic", ReturnedModel: "synthetic-model", CreatedAt: time.Now()}); e != nil {
 			t.Fatal(e)
 		}
-		put := func(key, workload string) int64 {
+		put := func(key, workload string, subjects ...string) int64 {
 			t.Helper()
 			run, e := processingStore.StartRun(ctx, processing.RunRequest{IdempotencyKey: key, Workload: workload, Stage: "extraction", ConfigurationVersionID: extractCatalog.ConfigurationVersionID, SourceID: &sourceID, DocumentVersionID: &version.ID, Subject: json.RawMessage(`{}`), CreatedAt: time.Now()})
 			if e != nil {
 				t.Fatal(e)
 			}
 			m := extraction.Measure{Ordinal: 1, Kind: "closure", Subject: "ponte sintetico", Place: stringPointer("Via Sintetica"), ValidUntil: stringPointer("fino a revoca"), IndeterminateFields: []string{"valid_from"}, Evidence: []extraction.Evidence{{Field: "kind", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "Chiusura"}, {Field: "subject", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "ponte sintetico"}, {Field: "place", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "Via Sintetica"}, {Field: "valid_until", ResourceURL: "https://calcinaia.example/projection/closure", Quote: "fino a revoca"}}}
+			if len(subjects) > 0 {
+				m.Subject = subjects[0]
+			}
 			if e = extraction.NewStore(pool).Put(ctx, extraction.Result{RunID: run.ID, DocumentVersionID: version.ID, ClassificationRunID: classRun.ID, Status: "extracted", ReasonCode: "measures_extracted", ContentSHA256: strings.Repeat("b", 64), ContentComplete: true, ProviderResponseID: "synthetic", ReturnedModel: "synthetic-model", CreatedAt: time.Now(), Measures: []extraction.Measure{m}}); e != nil {
 				t.Fatal(e)
 			}
@@ -948,6 +951,25 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		evaluationID := put("projection-evaluation", "evaluation")
 		if n, e := domainStore.ProjectMunicipalExtraction(ctx, evaluationID, time.Now()); e != nil || n != 0 {
 			t.Fatal("evaluation published facts", n, e)
+		}
+		replacement := put("projection-corrected-grouping", "reprocessing", "ponte")
+		q.QueryTime = QueryTime{}
+		unchanged, e := store.Search(ctx, q)
+		if e != nil || len(unchanged.Measures) != 1 || unchanged.Measures[0].Subject != "ponte sintetico" {
+			t.Fatal("unprojected/evaluation extraction hid known facts", unchanged, e)
+		}
+		previousKnowledge := time.Now().UTC()
+		if n, e := domainStore.ProjectMunicipalExtraction(ctx, replacement, time.Now()); e != nil || n != 1 {
+			t.Fatal("corrected primary projection failed", n, e)
+		}
+		corrected, e := store.Search(ctx, q)
+		if e != nil || len(corrected.Measures) != 1 || corrected.Measures[0].Subject != "ponte" {
+			t.Fatal("current query retained obsolete grouping", corrected, e)
+		}
+		q.QueryTime = QueryTime{KnownAt: previousKnowledge, EvaluationTime: previousKnowledge}
+		historical, e := store.Search(ctx, q)
+		if e != nil || len(historical.Measures) != 1 || historical.Measures[0].Subject != "ponte sintetico" {
+			t.Fatal("corrected grouping changed prior knowledge", historical, e)
 		}
 		if e = reg.SuspendInterpretation(ctx, sourceID, 1, "fixture", registry.Evidence{URL: "https://calcinaia.example/projection", Locator: "synthetic defect", ObservedAt: time.Now()}); e != nil {
 			t.Fatal(e)

@@ -225,6 +225,12 @@ func (s *Store) measures(ctx context.Context, municipality string, qt QueryTime)
 	rows, err := s.pool.Query(ctx, `SELECT m.id FROM domain_local_measures m JOIN retained_versions v ON v.id=m.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=m.source_id
 	 WHERE ($1='' OR m.municipality_istat=$1) AND v.first_acquired_at<=$2 AND m.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND `+s.visibilitySQL()+`
 	   AND domain_verification_record_current('local_measure',m.id,registry_interpretation_cutoff(s.id,$2))
+	   AND NOT EXISTS(SELECT 1 FROM domain_measure_bindings prior
+	     JOIN extraction_results replacement ON replacement.document_version_id=m.document_version_id
+	       AND replacement.run_id>prior.extraction_run_id AND replacement.status='extracted' AND replacement.content_complete
+	     JOIN domain_measure_bindings newer_binding ON newer_binding.extraction_run_id=replacement.run_id
+	     JOIN domain_local_measures newer ON newer.id=newer_binding.local_measure_id AND newer.source_id=m.source_id
+	     WHERE prior.local_measure_id=m.id AND newer.recorded_at<=registry_interpretation_cutoff(s.id,$2))
 	   AND COALESCE((SELECT state FROM domain_interpretation_events i WHERE i.local_measure_id=m.id AND i.recorded_at<=registry_interpretation_cutoff(s.id,$2) ORDER BY i.recorded_at DESC,i.id DESC LIMIT 1),'not_processed') IN ('supported','partial','unreliable')
 	 ORDER BY m.id`, municipality, qt.KnownAt)
 	if err != nil {

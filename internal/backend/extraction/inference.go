@@ -305,6 +305,7 @@ func parseCompactWindowV2(raw string, window Window) ([]Measure, error) {
 	measures = supplementExplicitOperativeMeasures(measures, window)
 	if !window.legacyLiteral {
 		measures = supplementRetainedClosures(measures, window)
+		measures = supplementRetainedProhibitions(measures, window)
 		measures = supplementRoadClearance(measures, window)
 		measures = supplementDirectiveClosures(measures, window)
 		measures = supplementNamedReopenings(measures, window)

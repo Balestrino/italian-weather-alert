@@ -626,3 +626,32 @@ Store the complete selection atomically before enqueueing; identical request
 retries resume enqueue gaps through the existing durable job identities.
 Private API writes and readback expose the audit; public interfaces expose no
 recovery controls. Source acceptance and remaining campaign reviews are separate.
+
+## Corrective observation reviews — 4 October 2026
+
+The operator authorizes corrective reviews to resolve a verified earlier failure
+without deleting evidence. Append a new review and an immutable correction link
+in one transaction, with a reason and the new review's actor/time/evidence. The
+previous review must belong to the same campaign, source, kind and exact retained
+version/check/case; only an unresolved or failed current review can be replaced.
+Reject self-links, branches, changed evidence scope and non-increasing evidence
+dates. Further corrections form a chain; each historical review remains readable.
+Reports count only the effective leaf at their evidence cutoff and keep superseded
+reviews visible. Saved assessments remain immutable. Serialize review insertion
+and assessment against the campaign so a completed campaign cannot receive a
+late concurrent correction. Completion retains duration, checked sections, delay,
+required-resource and failure/event criteria and grants no source acceptance.
+
+For the reviewed municipal omission, recognize a bounded positive retained clause
+with an explicitly enumerated prohibition and repeated locative prepositions.
+Preserve conjunctions inside one place, distinct literal places and typographic
+spelling. Bind each measure to the operative clause and its own subject/place;
+do not transfer page or reopening times. Normalize a grouped candidate only when
+its literal fields and kind evidence belong to that exact clause. Negative,
+quoted, conditional, heading-only, context-only or ambiguous exception lists
+remain on the ordinary interpretation path. Register a new extraction configuration;
+evaluate before selected reprocessing and preserve prior configurations/results.
+When a newer complete ordinary extraction of the same retained version has been
+projected, current municipal queries use its measures at that knowledge boundary,
+including corrected subject/place grouping. Older runs remain available in
+historical views; unsuccessful, unprojected or evaluation runs cannot hide them.

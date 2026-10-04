@@ -131,6 +131,124 @@ func TestCampaignDerivesSevenDayEvidenceAndRefusesPrematureCompletion(t *testing
 			}
 		}
 	}
+	t.Run("corrective reviews preserve failures and historical completion boundaries", func(t *testing.T) {
+		c, e := store.Start(ctx, StartRequest{ID: "corrective-trial", Actor: "operator", Scope: "municipality", StartedAt: started, SourceIDs: []string{"calcinaia"}})
+		if e != nil {
+			t.Fatal(e)
+		}
+		version := versions["calcinaia"]
+		oldEvidence := reviewed
+		oldEvidence.ObservedAt = through.Add(-20 * time.Minute)
+		old := Review{ID: "original-failed", SourceID: "calcinaia", Kind: "original_comparison", Status: "fail", VersionID: &version, Evidence: oldEvidence}
+		for _, r := range []Review{
+			old,
+			{ID: "attachment", SourceID: "calcinaia", Kind: "attachment_comparison", Status: "pass", VersionID: &version, Evidence: oldEvidence},
+			{ID: "failure", SourceID: "calcinaia", Kind: "failure_retained", Status: "pass", CaseID: "fixture-429", Evidence: oldEvidence},
+		} {
+			if _, e = store.RecordReview(ctx, c.ID, "delegated-assistant", r); e != nil {
+				t.Fatal(e)
+			}
+		}
+		failed, e := store.Assess(ctx, c.ID, "operator", oldEvidence.ObservedAt, oldEvidence)
+		if e != nil || failed.Status != "extended" {
+			t.Fatal("failed original completed trial", failed, e)
+		}
+		var retained []byte
+		if e = pool.QueryRow(ctx, "SELECT report FROM observation_assessments WHERE id=$1", failed.ID).Scan(&retained); e != nil {
+			t.Fatal(e)
+		}
+		candidate := old
+		candidate.ID, candidate.Status, candidate.Supersedes, candidate.Correction = "correction", "unresolved", old.ID, "Reviewed corrected output; remaining scope still unresolved"
+		candidate.Evidence.ObservedAt = through.Add(-10 * time.Minute)
+		for _, mutate := range []func(*Review){
+			func(r *Review) { r.Supersedes = r.ID },
+			func(r *Review) { r.Correction = "" },
+			func(r *Review) { r.SupersededBy = "invented" },
+			func(r *Review) { r.Supersedes = "missing" },
+			func(r *Review) { r.SourceID = "vigilance" },
+			func(r *Review) { r.Kind = "attachment_comparison" },
+			func(r *Review) { v := versions["vigilance"]; r.VersionID = &v },
+			func(r *Review) { r.Evidence.ObservedAt = oldEvidence.ObservedAt },
+		} {
+			bad := candidate
+			mutate(&bad)
+			if _, e = store.RecordReview(ctx, c.ID, "operator", bad); e == nil {
+				t.Fatal("invalid correction accepted", bad)
+			}
+		}
+		var count int
+		if e = pool.QueryRow(ctx, "SELECT count(*) FROM observation_reviews WHERE campaign_id=$1", c.ID).Scan(&count); e != nil || count != 3 {
+			t.Fatal("rejected correction was not atomic", count, e)
+		}
+		if _, e = store.RecordReview(ctx, c.ID, "delegated-assistant", candidate); e != nil {
+			t.Fatal(e)
+		}
+		branch := candidate
+		branch.ID = "branch"
+		if _, e = store.RecordReview(ctx, c.ID, "operator", branch); !errors.Is(e, ErrConflict) {
+			t.Fatal("correction branch accepted", e)
+		}
+		middle, e := store.Report(ctx, c.ID, candidate.Evidence.ObservedAt)
+		if e != nil || middle.Status != "extended" || !slicesContains(middle.Sources[0].Issues, "review_unresolved:correction") || slicesContains(middle.Sources[0].Issues, "review_fail:original-failed") {
+			t.Fatal("wrong effective review", middle, e)
+		}
+		final := candidate
+		final.ID, final.Status, final.Supersedes, final.Correction = "corrected-pass", "pass", candidate.ID, "Full same-scope comparison verified"
+		final.Evidence = reviewed
+		if _, e = store.RecordReview(ctx, c.ID, "delegated-assistant", final); e != nil {
+			t.Fatal(e)
+		}
+		history, e := store.Report(ctx, c.ID, oldEvidence.ObservedAt)
+		if e != nil || history.Status != "extended" || !slicesContains(history.Sources[0].Issues, "review_fail:original-failed") || len(history.Sources[0].Reviews) != 3 {
+			t.Fatal("future correction changed earlier evidence boundary", history, e)
+		}
+		current, e := store.Report(ctx, c.ID, through)
+		if e != nil || current.Status != "complete" || current.Sources[0].OriginalComparisons != 1 || len(current.Sources[0].Reviews) != 5 {
+			t.Fatal("corrective chain erased history or counted multiple originals", current, e)
+		}
+		for _, query := range []string{
+			"UPDATE observation_review_corrections SET reason='tampered' WHERE campaign_id='corrective-trial'",
+			"DELETE FROM observation_review_corrections WHERE campaign_id='corrective-trial'",
+			"UPDATE observation_reviews SET status='pass' WHERE campaign_id='corrective-trial' AND id='original-failed'",
+		} {
+			if _, e = pool.Exec(ctx, query); e == nil {
+				t.Fatal("immutable correction evidence changed")
+			}
+		}
+		// Assessment must work with one connection while holding its campaign lock.
+		configuration := pool.Config()
+		configuration.MaxConns = 1
+		one, e := pgxpool.NewWithConfig(ctx, configuration)
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer one.Close()
+		completed, e := New(one).Assess(ctx, c.ID, "operator", through, reviewed)
+		if e != nil || completed.Status != "complete" {
+			t.Fatal("single-connection serialized assessment failed", completed, e)
+		}
+		late := final
+		late.ID = "late"
+		if _, e = store.RecordReview(ctx, c.ID, "operator", late); !errors.Is(e, ErrConflict) {
+			t.Fatal("completed campaign accepted correction", e)
+		}
+		var after []byte
+		if e = pool.QueryRow(ctx, "SELECT report FROM observation_assessments WHERE id=$1", failed.ID).Scan(&after); e != nil {
+			t.Fatal(e)
+		}
+		if string(retained) != string(after) {
+			t.Fatal("previous saved assessment rewritten")
+		}
+		var all []Review
+		all, e = store.reviews(ctx, c.ID, "calcinaia")
+		if e != nil || all[0].Status != "fail" || all[0].SupersededBy != candidate.ID {
+			t.Fatal("original audit lost", all, e)
+		}
+		st, e := reg.State(ctx, "calcinaia")
+		if e != nil || st.Accepted || st.PublicEnabled {
+			t.Fatal("correction granted source acceptance", st, e)
+		}
+	})
 	premature, err := store.Assess(ctx, campaign.ID, "reviewer", started.Add(6*24*time.Hour), registry.Evidence{URL: reviewed.URL, Locator: "premature assessment", ObservedAt: through})
 	if err != nil || premature.Status != "running" || !slicesContains(premature.Report.Issues, "minimum_duration_not_reached") {
 		t.Fatalf("premature assessment: %#v %v", premature, err)

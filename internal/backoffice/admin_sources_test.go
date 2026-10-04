@@ -117,8 +117,13 @@ func TestAdminObservationRoutesUseClosedPayloads(t *testing.T) {
 	}
 	review := observation.Review{ID: "original", SourceID: "source", Kind: "original_comparison", Status: "pass", Evidence: registry.Evidence{URL: "https://evidence.example/review", Locator: "fixture", ObservedAt: at}}
 	post("/admin/observation-campaigns/trial/reviews", map[string]any{"actor": "reviewer", "review": review}, http.StatusOK)
+	review.ID, review.Supersedes, review.Correction = "corrected-original", "original-failed", "Verified same-scope correction"
+	corrected := post("/admin/observation-campaigns/trial/reviews", map[string]any{"actor": "delegated-assistant", "review": review}, http.StatusOK)
+	if !strings.Contains(corrected, `"supersedes":"original-failed"`) || !strings.Contains(corrected, `"actor":"delegated-assistant"`) {
+		t.Fatal("private correction audit lost", corrected)
+	}
 	post("/admin/observation-campaigns/trial/assess", map[string]any{"actor": "reviewer", "through": at, "evidence": review.Evidence}, http.StatusOK)
-	if store.starts != 1 || store.reviews != 1 || store.assessments != 1 {
+	if store.starts != 1 || store.reviews != 2 || store.assessments != 1 {
 		t.Fatalf("observation mutations not dispatched: %#v", store)
 	}
 	post("/admin/observation-campaigns", map[string]any{"id": "trial", "actor": "operator", "started_at": at, "source_ids": []string{"source"}, "complete": true}, http.StatusBadRequest)

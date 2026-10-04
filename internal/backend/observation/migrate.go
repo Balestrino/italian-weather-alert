@@ -17,6 +17,9 @@ var schema string
 //go:embed schema_scope.sql
 var scopeSchema string
 
+//go:embed schema_corrections.sql
+var correctionsSchema string
+
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -29,6 +32,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	for _, migration := range []struct{ name, body string }{
 		{"030_observational_trials", schema},
 		{"095_municipal_observation_scope", scopeSchema},
+		{"097_observation_review_corrections", correctionsSchema},
 	} {
 		hash := sha256.Sum256([]byte(migration.body))
 		checksum := hex.EncodeToString(hash[:])

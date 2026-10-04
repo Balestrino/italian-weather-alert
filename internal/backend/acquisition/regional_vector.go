@@ -206,6 +206,10 @@ type vectorPolygon struct {
 var vectorNumbers = regexp.MustCompile(`[-+]?(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?`)
 
 func vectorShapes(body []byte) ([]vectorPolygon, error) {
+	return vectorMapShapes(body, math.Inf(-1))
+}
+
+func vectorMapShapes(body []byte, firstMapY float64) ([]vectorPolygon, error) {
 	d := xml.NewDecoder(bytes.NewReader(body))
 	var out []vectorPolygon
 	for {
@@ -250,6 +254,12 @@ func vectorShapes(body []byte) ([]vectorPolygon, error) {
 			}
 		}
 		fields := strings.Fields(attrs["d"])
+		// A cubic header symbol is irrelevant only when every transformed
+		// control point lies strictly above all dated maps on this page.
+		// The convex hull bounds the entire curve; map curves remain rejected.
+		if headerCurveOutsideMaps(fields, m, firstMapY) {
+			continue
+		}
 		p := vectorPolygon{Fill: attrs["fill"], Stroke: attrs["stroke"]}
 		finish := func() {
 			if len(p.Points) > 1 && p.Points[0] == p.Points[len(p.Points)-1] {
@@ -290,6 +300,39 @@ func vectorShapes(body []byte) ([]vectorPolygon, error) {
 		return nil, ErrUnrecognizedContent
 	}
 	return out, nil
+}
+
+func headerCurveOutsideMaps(fields []string, matrix [6]float64, firstMapY float64) bool {
+	curve, points := false, 0
+	for i := 0; i < len(fields); {
+		command := fields[i]
+		i++
+		pairs := 0
+		switch command {
+		case "M", "L":
+			pairs = 1
+		case "C":
+			pairs, curve = 3, true
+		case "Z", "z":
+			continue
+		default:
+			return false
+		}
+		for j := 0; j < pairs; j++ {
+			if i+1 >= len(fields) {
+				return false
+			}
+			x, ex := strconv.ParseFloat(fields[i], 64)
+			y, ey := strconv.ParseFloat(fields[i+1], 64)
+			i += 2
+			mappedY := matrix[1]*x + matrix[3]*y + matrix[5]
+			if ex != nil || ey != nil || math.IsNaN(x) || math.IsInf(x, 0) || math.IsNaN(mappedY) || math.IsInf(mappedY, 0) || mappedY >= firstMapY {
+				return false
+			}
+			points++
+		}
+	}
+	return curve && points > 0
 }
 
 // Raster logos outside the map are harmless; a raster placed in its panels
@@ -525,7 +568,7 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 		if len(headings) == 0 {
 			continue
 		}
-		polygons, e := vectorPolygons(evidence.Pages[pageIndex+1])
+		polygons, e := vectorMapShapes(evidence.Pages[pageIndex+1], headings[0].Y)
 		if e != nil {
 			return out, e
 		}

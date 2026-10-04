@@ -169,6 +169,9 @@ func TestExtractionPersistsEvidenceAndExposesNewerUninterpretedVersion(t *testin
 		t.Helper()
 		adapter := &fakeAdapter{response: inference.Response{ID: "extract-" + key, Model: "qwen3.8-27b", Content: response, Usage: inference.Usage{InputTokens: int64Pointer(100), OutputTokens: int64Pointer(50)}}}
 		runner := &Runner{Manifests: classStore, ReuseSources: map[string]bool{"calcinaia-municipal": true}, Documents: retained, OCR: ocr.NewStore(pool), Classifications: classStore, Processing: process, Results: extractStore, Adapter: adapter, Model: "qwen3.8-27b", ConfigurationVersion: extractCatalog.ConfigurationVersionID, PriceVersion: extractCatalog.PriceVersionID, Now: func() time.Time { return now }}
+		if key == "partial-grouped" {
+			runner.ReuseSources = nil
+		}
 		job, enqueueErr := Enqueue(ctx, queue, inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, Payload{DocumentVersionID: version.ID, ClassificationRunID: classRun, Workload: "evaluation"}, now)
 		if enqueueErr != nil {
 			t.Fatal(enqueueErr)
@@ -290,6 +293,45 @@ func TestExtractionPersistsEvidenceAndExposesNewerUninterpretedVersion(t *testin
 				t.Fatalf("stored partial-update evidence lost: %#v", e)
 			}
 		}
+	}
+	var grouped map[string]any
+	if err = json.Unmarshal([]byte(partialResponse), &grouped); err != nil {
+		t.Fatal(err)
+	}
+	firstProhibition := grouped["measures"].([]any)[0].(map[string]any)
+	firstProhibition["subject"], firstProhibition["place"] = "attività nei parchi", nil
+	remaining := []any{firstProhibition}
+	for _, candidate := range grouped["measures"].([]any)[1:] {
+		if candidate.(map[string]any)["kind"] != "prohibition" {
+			remaining = append(remaining, candidate)
+		}
+	}
+	grouped["measures"] = remaining
+	body, err := json.Marshal(grouped)
+	if err != nil {
+		t.Fatal(err)
+	}
+	groupedStored := runExtraction(partial, classify(partial, "partial-grouped"), string(body), "partial-grouped")
+	if groupedStored.Status != "extracted" || len(groupedStored.Measures) != 7 {
+		t.Fatal("grouped provider response lost independent persisted restrictions", groupedStored)
+	}
+	places := map[string]bool{}
+	for _, m := range groupedStored.Measures {
+		if m.Kind == "prohibition" {
+			if m.Subject != "attività" || m.Place == nil || places[*m.Place] {
+				t.Fatal("grouped scope survived or place duplicated", m)
+			}
+			places[*m.Place] = true
+		}
+	}
+	if len(places) != 3 || !places["ciclopiste in riva d’Arno"] {
+		t.Fatal("prohibition field evidence did not round trip", places)
+	}
+	oldPartial, foundPartial, err := extractStore.Get(ctx, partialStored.RunID)
+	beforeJSON, _ := json.Marshal(partialStored)
+	afterJSON, _ := json.Marshal(oldPartial)
+	if err != nil || !foundPartial || string(beforeJSON) != string(afterJSON) {
+		t.Fatal("selected reevaluation rewrote prior extraction", err)
 	}
 	old, found, err := extractStore.Get(ctx, stored.RunID)
 	if err != nil || !found || old.Measures[0].Kind != "closure" || *old.Measures[0].ValidUntil != *stored.Measures[0].ValidUntil {

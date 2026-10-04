@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-04 [Changed] Preserve independent municipal prohibition scopes and historical projected interpretations; add immutable corrective observation reviews and bounded CFR header handling
 - 2026-10-04 [Changed] Verify selected archived municipal recovery in development, preserve historical results, and record the live completeness omission and extended Toscana campaigns.
 - 2026-10-04 [Added] Add audited exact-version recovery of archived interpretations, preserve historical guards and verify the unchanged municipal regression
 - 2026-10-04 [Fixed] Preserve partial municipal reopenings and original place spelling, with retained replay and persistence verification

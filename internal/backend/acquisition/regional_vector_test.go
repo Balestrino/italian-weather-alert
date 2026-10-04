@@ -179,3 +179,27 @@ func TestVectorBackgroundAndRasterCannotSupplyLevels(t *testing.T) {
 		t.Fatal("logo outside maps rejected", err)
 	}
 }
+
+func TestCriticalityHeaderCurvesCannotHideMapGeometry(t *testing.T) {
+	html, ev := vectorFixture()
+	header := `<path fill="rgb(100%, 100%, 100%)" fill-opacity="1" d="M 10 10 C 10 5 15 5 15 10 C 15 15 10 15 10 10 Z"/>`
+	ev.Pages[1] = []byte(strings.Replace(string(ev.Pages[1]), "<svg>", "<svg>"+header, 1))
+	p, err := ProjectCriticalityVector(html, "retained.pdf", ev)
+	if err != nil || len(p.Facts) != 364 {
+		t.Fatal("header curve discarded maps", len(p.Facts), err)
+	}
+	for _, modified := range []string{
+		strings.Replace(header, `d="`, `transform="matrix(1,0,0,1,0,50)" d="`, 1),
+		strings.Replace(header, "10 5 15 5", "10 70 15 5", 1),
+		strings.Replace(header, "C 10 5", "Q 10 5", 1),
+	} {
+		_, ev = vectorFixture()
+		ev.Pages[1] = []byte(strings.Replace(string(ev.Pages[1]), "<svg>", "<svg>"+modified, 1))
+		if _, err = ProjectCriticalityVector(html, "retained.pdf", ev); err == nil {
+			t.Fatal("unsupported curve inside map or unknown command accepted", modified)
+		}
+	}
+	if _, err := vectorShapes([]byte("<svg>" + header + "</svg>")); err == nil {
+		t.Fatal("generic shape parser became permissive")
+	}
+}
