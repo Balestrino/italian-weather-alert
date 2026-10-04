@@ -596,3 +596,9 @@ legacy behavior and earlier results; vet/build pass. See
 and CLN-020. Both live campaigns remain extended. Ordinary live adoption/reprocessing,
 same-contract evaluation and outstanding observations/reviews remain required;
 9.3/10.1 and the other six gates stay unchecked (153/161).
+
+## 29. Selected recovery of archived interpretations — 4 October 2026
+
+- [x] 29.1 Add private exact-version archive recovery bound to active source revision, retained evidence and latest passing regression, with immutable actor/time/evidence audit and idempotent enqueue resumption; preserve archives, previous jobs/results and ordinary guards.
+- [x] 29.2 Verify atomic rejection, selection identity, private API isolation and bounded classification/descendant admission using synthetic disposable PostgreSQL; preserve ordinary archival and territorial/provider/source behavior.
+- [ ] 29.3 Adopt the verified recovery in development, explicitly recover the reviewed Calcinaia reopening/exception versions, compare persisted results, historical boundaries and actual API/MCP, and reassess campaigns without granting source acceptance.

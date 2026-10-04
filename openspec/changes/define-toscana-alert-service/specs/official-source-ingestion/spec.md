@@ -356,6 +356,12 @@ Source acceptance SHALL include attributable reviewed expected outputs for obser
 ### Requirement: Explicit reprocessing and interpretation suspension
 Each interpretation SHALL identify its model, instruction/configuration versions and evidence inputs. Model or processing changes SHALL be evaluated on retained cases before operator-selected reprocessing by source, period or failure status; such changes SHALL NOT automatically reprocess the entire history. Prior runs SHALL remain traceable within retention. Operators SHALL be able to suspend new interpretations for a source with a confirmed interpretation defect while collection continues, mark affected published results unreliable, and resume after correction, validation and explicit reprocessing. These controls SHALL NOT allow manual rewriting of extracted measures.
 
+#### Scenario: Archived versions are explicitly selected for recovery
+- **WHEN** an operator names exact archived versions of one active source revision and a successful latest regression validating the correction
+- **THEN** private administration records an immutable recovery request with actor, time, evidence, regression and selected versions, preserving the original archives, jobs, attempts and interpretations
+- **AND** only the request's new reprocessing jobs and their validated descendants may cross the archive guard; ordinary acquisition, unrelated requests, territorial/provider restrictions and source-publication gates remain unchanged
+- **AND** retrying an identical request resumes missing enqueue work without duplicating jobs; changed selections under the same identity, foreign/incomplete evidence and failed or stale regressions are rejected atomically
+
 #### Scenario: A model configuration changes
 - **WHEN** an operator selects failed documents for reprocessing after evaluation
 - **THEN** only the selected scope is reprocessed, each new run is versioned, and previous results remain traceable

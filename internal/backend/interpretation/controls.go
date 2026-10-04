@@ -9,8 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/embedding"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/extraction"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/linking"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/jackc/pgx/v5"
 )
@@ -110,9 +114,11 @@ func (s *Scheduler) suspended(ctx context.Context, versionID int64, workload str
 func (s *Scheduler) Guard(next jobs.Handler) jobs.Handler {
 	return func(ctx context.Context, job jobs.Job) (jobs.Result, error) {
 		var input struct {
-			DocumentVersionID int64  `json:"document_version_id"`
-			ExtractionRunID   int64  `json:"extraction_run_id"`
-			Workload          string `json:"workload"`
+			DocumentVersionID   int64  `json:"document_version_id"`
+			ClassificationRunID int64  `json:"classification_run_id"`
+			ExtractionRunID     int64  `json:"extraction_run_id"`
+			SelectionID         string `json:"selection_id"`
+			Workload            string `json:"workload"`
 		}
 		if json.Unmarshal(job.Payload, &input) != nil {
 			return jobs.Result{}, scheduleFailure("interpretation_payload_invalid", false)
@@ -128,6 +134,22 @@ func (s *Scheduler) Guard(next jobs.Handler) jobs.Handler {
 		archived, archiveErr := s.Archived(ctx, input.DocumentVersionID)
 		if archiveErr != nil {
 			return jobs.Result{}, scheduleFailure("interpretation_archive_unavailable", true)
+		}
+		if archived && input.Workload == "reprocessing" {
+			selection := ""
+			var classificationRunID, extractionRunID int64
+			if job.Kind == classification.Kind {
+				selection = input.SelectionID
+			} else if job.Kind == extraction.Kind {
+				classificationRunID = input.ClassificationRunID
+			} else if job.Kind == embedding.Kind || job.Kind == linking.Kind {
+				extractionRunID = input.ExtractionRunID
+			}
+			allowed, err := s.archiveRecoveryAllowed(ctx, input.DocumentVersionID, selection, classificationRunID, extractionRunID)
+			if err != nil {
+				return jobs.Result{}, scheduleFailure("interpretation_archive_unavailable", true)
+			}
+			archived = !allowed
 		}
 		if archived {
 			return jobs.Result{Payload: json.RawMessage(`{"status":"interpretation_archived"}`)}, nil

@@ -22,6 +22,9 @@ var archiveSchema string
 //go:embed preflight_schema.sql
 var preflightSchema string
 
+//go:embed archive_recovery_schema.sql
+var archiveRecoverySchema string
+
 func Migrate(ctx context.Context, p *pgxpool.Pool) error {
 	tx, e := p.Begin(ctx)
 	if e != nil {
@@ -31,7 +34,7 @@ func Migrate(ctx context.Context, p *pgxpool.Pool) error {
 	if _, e = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(730021)"); e != nil {
 		return e
 	}
-	for _, migration := range []struct{ name, sql string }{{"013_interpretation_scheduling", schema}, {"029_reprocessing_evaluation", evaluationSchema}, {"058_pending_interpretation_archival", archiveSchema}, {"059_interpretation_preflight", preflightSchema}} {
+	for _, migration := range []struct{ name, sql string }{{"013_interpretation_scheduling", schema}, {"029_reprocessing_evaluation", evaluationSchema}, {"058_pending_interpretation_archival", archiveSchema}, {"059_interpretation_preflight", preflightSchema}, {"096_selected_archive_recovery", archiveRecoverySchema}} {
 		h := sha256.Sum256([]byte(migration.sql))
 		sum := hex.EncodeToString(h[:])
 		var old string

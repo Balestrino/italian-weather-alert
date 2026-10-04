@@ -11,6 +11,7 @@ import (
 )
 
 func adminLifecycleRoutes(mux *http.ServeMux, a AdminRuntime) {
+	adminArchiveRecoveryRoutes(mux, a)
 	adminRegressionRoutes(mux, a)
 	adminProcessingEvaluationRoutes(mux, a)
 	for _, action := range []string{"accept", "enable-public", "suspend-public", "suspend-interpretation", "resume-interpretation", "reprocess-interpretation"} {

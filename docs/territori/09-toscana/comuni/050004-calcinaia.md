@@ -125,8 +125,9 @@ conflitto agosto/settembre di un’altra comunicazione.
 CLN-020 supera il fallimento di merge della riapertura parziale di CLN-016 nel
 replay delle risposte conservate e nelle fixture sintetiche con PostgreSQL:
 grafia originale dei luoghi, riapertura, restrizioni e COC mantengono evidenze
-separate. Catalogo v25 verificato nel checkout; adozione, rielaborazione ordinaria
-live e rivalutazione dello stesso contratto di accettazione restano da eseguire.
+separate. Catalogo v25 adottato in development; rivalutazione dello stesso contratto
+verificata con 14/14 confronti. CLN-021 distingue il recupero selettivo delle
+versioni archiviate dalla prova ordinaria ancora da completare.
 La correttezza semantica dell'intero corpus resta da completare. Date in conflitto, termini condizionali senza
 inizio stabilito e ambiti territoriali mancanti rimangono indeterminati; una
 misura visibile non viene dichiarata automaticamente vigente oggi.
@@ -139,6 +140,15 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-021 — Recupero selettivo con audit delle interpretazioni archiviate
+
+- **Data e ultima verifica:** 2026-10-04; archivio e regressioni development, test sintetici e PostgreSQL isolato; nessun nuovo fetch delle fonti per questo intervento.
+- **Ambito e conoscenza:** `calcinaia-municipal`, casi conservati di riapertura ed eccezione. Il worker ordinario li esclude perché le versioni sono archiviate, anche se richieste dal reprocessing. La rivalutazione di CLN-020 passa 14/14 con lo stesso contratto, conservando il fallimento precedente e dichiarando il riuso delle risposte dei provider.
+- **Intervento:** l’operatore sceglie un recupero selettivo con audit. I task 29.1/29.2 implementano richiesta privata per versioni esatte, revisione attiva, evidenza conservata e ultime regressioni riuscite. Archivi, job, tentativi e risultati precedenti restano conservati; la deroga è limitata alla nuova selezione e ai discendenti validati.
+- **Verifica:** rifiuti atomici, retry e recupero da outage della coda, audit immutabile, classificazione/estrazione del runner, ammissione dei discendenti ed esclusione del lavoro ordinario. [Procedura](../../../operations/municipal-interpretation.md#recupero-selettivo-delle-versioni-archiviate); evidenza privata `CLN-CONTINUATION-20261004`.
+- **Prossima verifica:** adozione dell’estensione e recupero live 29.3, confronto dei risultati persistenti e delle viste storiche API/MCP. Le campagne restano da rivalutare; questo intervento non conclude 9.3/10.1 o l’accettazione.
+
 
 ### CLN-020 — Riapertura parziale e luoghi tipografici nel replay
 

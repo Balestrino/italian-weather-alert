@@ -612,3 +612,17 @@ the same. New cursors use processed-data collection paths. Earlier situation
 cursors with old collection positions fail explicitly with cursor_mismatch and
 require restarting; a retained dataset_version can render the same pinned domain
 knowledge in the new presentation. API/MCP share the same rendering and schemas.
+
+## Selected archive recovery — 4 October 2026
+
+The operator authorizes recovery of exact archived versions with an immutable
+audit. Keep `interpretation_archives` effective for automatic scheduling and
+ordinary work. Add independent recovery requests linked to exact reprocessing
+selections, the active source revision, retained acquisition and the latest
+passing regression. Only the new classification carrying that selection and
+its extraction/embedding/linking descendants may pass the archive guard.
+Do not delete archival rows, reset historical attempts or reuse old job payloads.
+Store the complete selection atomically before enqueueing; identical request
+retries resume enqueue gaps through the existing durable job identities.
+Private API writes and readback expose the audit; public interfaces expose no
+recovery controls. Source acceptance and remaining campaign reviews are separate.

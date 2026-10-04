@@ -1,7 +1,7 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 153 task completati su 161. In questo giro sono verificati:
+ha 155 task completati su 164. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
@@ -9,7 +9,7 @@ ha 153 task completati su 161. In questo giro sono verificati:
 | 11.5 | [Campagne indipendenti e quattro report pending](municipal-acceptance.md); stessi gate del pilota |
 | 13.8 | [Recupero provider verificato](acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026), OCR e pipeline ordinaria riusciti; fallimento di citazione preservato |
 
-Gli otto task seguenti restano aperti per gli esiti specifici mancanti:
+Gli otto gate originari seguenti restano aperti per gli esiti specifici mancanti:
 
 | Task | Condizione ancora da verificare |
 | --- | --- |
@@ -55,3 +55,16 @@ l'API privata rifiuta i quattro avvii municipali con prerequisiti irrisolti,
 senza nuove campagne o cambiamenti dei controlli delle fonti. Il registro
 operativo conserva immagine/configurazione precedenti e materiali per il rollback.
 L'adozione non conclude i task aperti sopra e la produzione resta ferma.
+
+## Seguito: regressione e recupero selettivo
+
+La correzione v25 è stata adottata in development con sei worker, dipendenze e
+controlli delle fonti conservati. API/MCP sulla stessa vista, runtime e smoke
+passano. Il confronto di completezza passa 14/14 con lo stesso contratto,
+conservando il fallimento precedente; si tratta di replay delle risposte
+conservate, distinto dalle nuove esecuzioni ordinarie.
+
+I task 29.1/29.2 implementano e verificano il recupero tracciato delle versioni
+archiviate scelto dall’operatore. La prova live 29.3 resta aperta finché la nuova
+revisione non viene adottata e i casi scelti confrontati. Nessuno degli otto gate
+originari viene chiuso da questo passaggio.

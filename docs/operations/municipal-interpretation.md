@@ -55,3 +55,60 @@ le aspettative, rielaborare esplicitamente i soli casi selezionati e confrontare
 risultati persistenti, storico e API/MCP. Completare anche confronti, prove di
 errore e ritardi ancora mancanti prima di chiudere 9.3/10.1. La revisione del
 software non conclude gli altri [gate operativi](toscana-readiness.md).
+
+## Recupero selettivo delle versioni archiviate
+
+Il seguito del 4 ottobre registra una rivalutazione riuscita dello stesso
+contratto di completezza: quattordici confronti, aspettative e corpus invariati,
+precedente fallimento conservato. Discovery e parser vengono rieseguiti; OCR,
+classificazione e linking usano risposte conservate, senza nuove chiamate.
+L’adozione di v25 è verificata in development. Il caso non archiviato del
+conflitto di date completa classificazione ed estrazione sul worker.
+
+I casi storici di riapertura ed eccezione sono invece archiviati. Su scelta
+esplicita dell’operatore i task 29.1/29.2 aggiungono un recupero per versioni esatte.
+La migrazione additiva `096_selected_archive_recovery` conserva il marker di
+archiviazione e aggiunge audit immutabile, fonte/revisione, attore, data,
+evidenza, regressione e selezioni. Richiede la revisione attiva, acquisizioni
+conservate complete e le ultime regressioni riuscite. Una richiesta non modifica
+risultati o tentativi precedenti e non abilita raccolta o pubblicazione.
+
+La sola nuova classificazione della selezione e le sue estrazioni/link derivati
+possono attraversare il guard di archiviazione. Il percorso ordinario, le altre
+richieste e gli altri documenti restano esclusi. Restano efficaci i controlli
+territoriali, le sospensioni e i gate dei provider. Il retry della stessa richiesta
+riprende enqueue mancanti senza duplicare i job; cambiare la selezione sotto lo
+stesso ID è un conflitto. Un errore dopo il salvataggio dell’audit si recupera
+ripetendo l’identico corpo, con identiche evidenze.
+
+Usare esclusivamente l’API amministrativa privata, con ID di versioni e
+regressione letti dall’ambiente interessato. Esempio sintetico:
+
+```http
+POST /admin/sources/example-municipal/archive-recoveries
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "selected-recovery-001",
+  "source_id": "example-municipal",
+  "revision": 1,
+  "actor": "operator",
+  "version_ids": [101, 102],
+  "regression_id": "reviewed-correction-001",
+  "evidence": {
+    "url": "https://municipality.example/review",
+    "locator": "Retained correction and same-contract evaluation",
+    "observed_at": "2026-10-04T10:00:00Z"
+  }
+}
+```
+
+`GET /admin/sources/{id}/archive-recoveries` restituisce l’audit; i job sono
+rileggibili dalle selezioni di reprocessing e dalle viste operative private.
+Non esiste un’operazione pubblica API/MCP corrispondente. Prove sintetiche con
+PostgreSQL verificano rifiuti atomici, regressioni fallite/superate, immutabilità,
+outage della coda e ripresa, classificazione/estrazione reali del runner e
+ammissione dei discendenti. Test race, backoffice, vet e build passano.
+L’adozione e il recupero live di questa estensione restano nel task 29.3;
+accettazione e campagne rimangono separate.

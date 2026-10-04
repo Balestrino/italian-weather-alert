@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 153 | 8 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 155 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -197,3 +197,10 @@ v25 settings. See [municipal interpretation](../docs/operations/municipal-interp
 This advances 9.3/10.1 without closing them: ordinary live adoption/reprocessing,
 same-contract evaluation and remaining campaign evidence are still required.
 The checklist remains 153/161 with eight open gates.
+
+The 4 October continuation persists a successful rerun of the same fourteen-check
+municipal completeness contract, preserving the previous failure and explicitly
+identifying retained provider responses. Tasks 29.1/29.2 add and verify exact-version
+archive recovery with immutable audit and bounded reprocessing/descendant admission;
+ordinary archive guards remain effective. Live recovery in 29.3 remains pending.
+See [municipal interpretation](../docs/operations/municipal-interpretation.md).
