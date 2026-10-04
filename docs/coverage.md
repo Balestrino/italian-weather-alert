@@ -58,6 +58,14 @@ prerequisites prevent a trial from starting; software verification does not
 establish acceptance or complete five-municipality coverage. The dated inventory
 below is preserved. See [municipal reports](operations/municipal-acceptance.md).
 
+**Subsequent development adoption — 4 October 2026:** the verified application
+revision, including retained CFR graphics and individual municipal campaign
+support, is now adopted in development. Runtime image/configuration checks and
+actual API/MCP saved-view equivalence pass; source acceptance/public controls are
+preserved. This software adoption does not complete the observational trial,
+municipal completeness or production readiness. See
+[adoption](operations/toscana-readiness.md#adozione-in-development).
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

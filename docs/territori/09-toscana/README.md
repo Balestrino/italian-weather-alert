@@ -54,7 +54,8 @@ la vigilanza conserva bande di pioggia media sull’area, cumulati distinti e si
 dei fenomeni, con livello d’allerta non applicabile. `not_depicted` descrive la
 grafica, senza attestare assenza di rischio. Risorse, simboli o associazioni non
 riconosciuti restano irrisolti. TOS-015 registra il collaudo del software e degli
-originali disponibili; adozione live e accettazione restano separate.
+originali disponibili; TOS-017 registra la successiva adozione in development,
+mentre l’accettazione resta separata.
 
 ## Regole ed eccezioni
 
@@ -278,3 +279,15 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 - **Conseguenza:** chiude i task di rendicontazione e predisposizione dei gate indipendenti; budget, collaudo reale, accettazione e copertura completa restano pendenti.
 - **Prossima verifica:** completare i confronti e le prove mancanti per ogni ambito, poi riesaminare report di accettazione e budget.
 - **Collegamenti:** TOS-006, LIV-008, PIS-003, PON-002 e CAS-007; task 9.3, 9.4, 10.1 e 11.5.
+
+
+### TOS-017 — Adozione development e confini del collaudo
+
+- **Data:** 2026-10-04. **Ultima verifica:** 2026-10-04, immagini/configurazioni runtime, API privata e client SDK API/MCP sulla stessa vista salvata.
+- **Ambito:** servizio development, scope delle campagne e software grafico CFR della revisione applicativa verificata; nessuna nuova attestazione di disponibilità o completezza delle fonti.
+- **Conoscenza:** confermato sul runtime. **Intervento:** adozione verificata, con materiali di rollback privati.
+- **Osservazione:** le applicazioni attive condividono l'immagine della revisione pulita. Le campagne precedenti conservano lo scope MVP; i quattro tentativi municipali restano rifiutati per prerequisiti irrisolti. Il confronto API/MCP usa una stessa vista salvata, senza dedurre livelli mancanti o accettazione dai controlli HTTP.
+- **Evidenza:** [adozione e controlli](../../operations/toscana-readiness.md#adozione-in-development), [gates municipali](../../operations/municipal-acceptance.md). Configurazioni, ricevute e confronti privati `REMAINING-TOSCANA-20261004`.
+- **Conseguenza:** supera il rinvio dell'adozione in TOS-015 per development, preservando limiti dei formati e controlli delle fonti. PBS, prove mancanti e accettazione restano pendenti.
+- **Prossima verifica:** osservare il percorso ordinario sui prodotti/casi dichiarati e completare ogni dossier reale prima dell'accettazione e dell'abilitazione indipendente.
+- **Collegamenti:** TOS-006, TOS-015 e TOS-016; task 9.3, 10.1, 11.5 e 27.4.

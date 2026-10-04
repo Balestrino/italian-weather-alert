@@ -570,3 +570,13 @@ remain disabled and untested here. See [provider recovery](../../../docs/operati
 The checklist now has 153/161 completed tasks and eight open tasks, summarized in
 [readiness](../../../docs/operations/toscana-readiness.md). Source acceptance,
 complete observational evidence and infrastructure readiness remain independent.
+
+
+The clean application revision was subsequently adopted in development across
+public/admin, all six existing worker replicas and the already active application
+backup service. Other containers/volumes and source controls were preserved;
+whole-VM PBS remains unverified. Runtime image/configuration checks, HTTP readiness,
+private municipal campaign rejection/legacy MVP readback and actual SDK API/MCP
+saved-view equivalence pass. See [development adoption](../../../docs/operations/toscana-readiness.md#adozione-in-development).
+This adoption also makes the retained CFR graphical implementation from 27.4
+available to the ordinary development path without granting source acceptance.

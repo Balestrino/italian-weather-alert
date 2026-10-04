@@ -78,3 +78,10 @@ dal chiamante. Queste prove non simulano giorni di osservazione reali.
 go test -race -tags=integration ./internal/backend/observation ./internal/backend/registry
 go test -race ./internal/backoffice
 ```
+
+
+La successiva adozione in development della revisione applicativa verificata
+rende disponibile lo scope anche nell'API privata. Lettura delle campagne MVP,
+quattro tentativi municipali rifiutati per prerequisiti, controlli di fonte
+preservati e confronto API/MCP effettivo sono verificati nel
+[registro di adozione](toscana-readiness.md#adozione-in-development).

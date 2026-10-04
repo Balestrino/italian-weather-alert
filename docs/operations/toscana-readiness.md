@@ -31,3 +31,20 @@ di accesso restano privati, riferimento `REMAINING-TOSCANA-20261004`.
 I test del software non autorizzano l'avvio della produzione. Il
 [coverage tracker](../coverage.md#region-09) conserva accettazione pendente e
 copertura municipale incompleta, indipendentemente dal conteggio dei task.
+
+
+## Adozione in development
+
+La revisione applicativa `c69a10e` è stata costruita dal checkout pulito e adottata
+in development dopo i controlli del software e le migrazioni. Public, admin, le
+sei repliche del worker e il backup già attivo ora condividono l'immagine;
+database, storage e crawler conservano i contenitori e i volumi esistenti.
+Il backup applicativo resta attivo finché la protezione PBS non è verificata.
+
+Passano la verifica delle immagini/configurazioni runtime, readiness HTTP,
+isolamento amministrativo e confronto effettivo API/MCP della situazione con
+client SDK sulla stessa vista salvata. Le due campagne storiche restano MVP e
+l'API privata rifiuta i quattro avvii municipali con prerequisiti irrisolti,
+senza nuove campagne o cambiamenti dei controlli delle fonti. Il registro
+operativo conserva immagine/configurazione precedenti e materiali per il rollback.
+L'adozione non conclude i task aperti sopra e la produzione resta ferma.

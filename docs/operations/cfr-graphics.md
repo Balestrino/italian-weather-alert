@@ -96,3 +96,13 @@ development services were not replaced, and source controls were not changed.
 Live image adoption/reprojection, campaign observation, municipal completeness
 and source acceptance remain separate. The [coverage tracker](../coverage.md)
 is the public source-status reference.
+
+
+## Adozione successiva in development — 4 ottobre 2026
+
+Il successivo [allineamento applicativo](toscana-readiness.md#adozione-in-development)
+adotta la revisione pulita che include questo software nel percorso ordinario
+development. Passano i controlli di immagine/configurazione, readiness e confronto
+API/MCP della situazione sulla stessa vista. La verifica del formato resta quella
+dei campioni conservati descritti sopra; l'adozione non certifica nuovi casi reali,
+confronti mancanti del trial o accettazione dei prodotti CFR.
