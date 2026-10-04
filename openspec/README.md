@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 150 | 11 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 153 | 8 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -165,3 +165,20 @@ upgrades and source limits. Changelog, public transports, release-note links and
 strict specification checks pass. See [v0.3.0 notes](../docs/releases/v0.3.0.md);
 software publication uses the exact-revision workflow gates independently of
 image publication, continuous source collection or production activation.
+
+
+The 4 October follow-up completes trial accounting (9.4) and independent municipal
+gates/reports (11.5): costs keep missing metrics and historical prices explicit;
+Livorno, Pisa, Pontedera and Cascina remain pending. Individual campaigns retain
+the pilot's observation requirements and preserve historical MVP campaigns.
+See [cost summaries](../docs/operations/trial-costs.md) and
+[municipal acceptance](../docs/operations/municipal-acceptance.md).
+The [PBS runbook](../docs/operations/pbs-recovery.md) is prepared; actual protection,
+alerts, restore and production readiness remain unverified.
+
+Task 13.8 is subsequently verified with restored authenticated provider access,
+controlled model probes, retained remote OCR and an ordinary municipal
+classification/extraction/linking pipeline. An invalid-quotation attempt remains
+failed; embeddings remain disabled and untested by this recovery. See
+[provider recovery](../docs/operations/acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026)
+and the [eight remaining gates](../docs/operations/toscana-readiness.md).

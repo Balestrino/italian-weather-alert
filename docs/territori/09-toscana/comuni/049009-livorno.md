@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "049009"
-ultima_revisione: "2026-10-02"
+ultima_revisione: "2026-10-04"
 ---
 
 # Livorno
@@ -22,6 +22,12 @@ Comune di Livorno, provincia di Livorno, ISTAT `049009`. Fonte IWA: `livorno-mun
 La [notizia comunale esaminata](https://www.comune.livorno.it/it/news/133640/allerta-arancio-per-forti-temporali-con-rischio-idrogeologico-e-idraulico-del-reticolo-minore) collega l'ordinanza n. 303 del 20 agosto 2026 nella sezione Allegati e una guida alla navigazione nel footer. I due PDF sono su domini Municipium distinti da quello della pagina. Consultazione documentale: 2026-10-02; il contenuto può cambiare.
 
 ## Guida operativa
+
+Il precollaudo del 2026-10-04 produce un report individuale **pending**,
+con valutazione, osservazione, accettazione e pubblicazione distinte. La
+[campagna municipale](../../../operations/municipal-acceptance.md) mantiene
+sette intervalli completi di 24 ore e le prove di originali, allegati ed errori.
+LIV-008 registra i prerequisiti; il report non certifica copertura completa.
 
 Distinguere gli allegati della notizia dai documenti generici del sito. Verificare ogni dominio esterno rispetto al riferimento ufficiale e ai vincoli di raccolta/riuso. Una risorsa `forbidden` può essere esclusa dal collector prima di qualsiasi richiesta HTTP: non prova un 403 o un file rimosso.
 
@@ -134,3 +140,15 @@ Le voci LIV-001–LIV-005 descrivono gli stati osservati nelle rispettive fasi d
 - **Evidenza:** [selettore e fallback](../../../../internal/backend/classification/html_body.go), [operazioni e risultati del trial](../../../operations/local-processing.md); originali, selezioni, token e ricevute restano nel registro privato.
 - **Conseguenza:** la riduzione del testo non autorizza nuovi download o una directory PDF di solo testo. PDF con immagini mantengono il fallback; significato dei grafici vettoriali e qualità dell’estrazione delle misure richiedono verifica separata.
 - **Prossima verifica:** ampliare casi pertinenti e non pertinenti, variazioni del layout e interpretazione downstream prima di una policy continuativa.
+
+
+### LIV-008 — Report individuale pendente e collaudo indipendente
+
+- **Data:** 2026-10-04. **Ultima verifica:** 2026-10-04, registro dell'ambiente, apertura della campagna e test sintetici con PostgreSQL isolato; nessuna nuova consultazione web della fonte.
+- **Ambito:** fonte municipale della scheda. Protezione Civile e allegati revisionati; copertura oltre la prima pagina e altri portali ancora da verificare.
+- **Conoscenza:** confermato per i prerequisiti e il comportamento del servizio. **Intervento:** percorso indipendente implementato e report pendente consegnato; accettazione non completata.
+- **Osservazione:** lo scope esplicito `municipality` valuta solo questa fonte senza richiedere i tre prodotti regionali. Non riduce durata, cadenza, confronti con originali/allegati o prove di errore. I prerequisiti irrisolti impediscono l'apertura della campagna; la raccolta eventualmente già attiva non li annulla.
+- **Evidenza:** [report e procedura](../../../operations/municipal-acceptance.md), [campagne](../../../../internal/backend/observation/store.go), [prove isolate](../../../../internal/backend/observation/observation_integration_test.go). Report completo, ricevuta del tentativo e stato dei controlli nell'archivio privato `ROLLOUT-GATES-20261004`.
+- **Conseguenza:** il report mantiene lo stato pending e i controlli esistenti; non estende il perimetro né dichiara copertura dei cinque comuni.
+- **Prossima verifica:** risolvere i prerequisiti dell'ambito, completare valutazione e osservazione, quindi accettare e abilitare separatamente la fonte verificata.
+- **Collegamenti:** LIV-006 e LIV-007; task 11.5 della [specifica Toscana](../../../../openspec/changes/define-toscana-alert-service/tasks.md).

@@ -23,6 +23,12 @@ func (s *Store) Start(ctx context.Context, request StartRequest) (Campaign, erro
 		return Campaign{}, ErrInvalid
 	}
 	request.StartedAt = request.StartedAt.UTC()
+	if request.Scope == "" {
+		request.Scope = "mvp"
+	}
+	if request.Scope != "mvp" && request.Scope != "municipality" || request.Scope == "municipality" && len(request.SourceIDs) != 1 {
+		return Campaign{}, ErrInvalid
+	}
 	seen := map[string]bool{}
 	for _, id := range request.SourceIDs {
 		if !validName(id) || seen[id] {
@@ -36,7 +42,7 @@ func (s *Store) Start(ctx context.Context, request StartRequest) (Campaign, erro
 		return Campaign{}, err
 	}
 	defer tx.Rollback(ctx)
-	tag, err := tx.Exec(ctx, "INSERT INTO observation_campaigns(id,actor,started_at) VALUES($1,$2,$3) ON CONFLICT DO NOTHING", request.ID, request.Actor, request.StartedAt)
+	tag, err := tx.Exec(ctx, "INSERT INTO observation_campaigns(id,actor,started_at,scope) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING", request.ID, request.Actor, request.StartedAt, request.Scope)
 	if err != nil {
 		return Campaign{}, err
 	}
@@ -65,10 +71,10 @@ func (s *Store) Start(ctx context.Context, request StartRequest) (Campaign, erro
 			return Campaign{}, ErrInvalid
 		}
 		if product == "municipal" {
-			if territory != "050004" {
+			if request.Scope == "mvp" && territory != "050004" || request.Scope == "municipality" && !plannedMunicipality(territory) {
 				return Campaign{}, ErrInvalid
 			}
-		} else if (product != "vigilance" && product != "criticality" && product != "monitoring") || territory != "Toscana" {
+		} else if request.Scope == "municipality" || (product != "vigilance" && product != "criticality" && product != "monitoring") || territory != "Toscana" {
 			return Campaign{}, ErrInvalid
 		}
 		sections, _ := json.Marshal(configuration.Sections)
@@ -81,6 +87,14 @@ func (s *Store) Start(ctx context.Context, request StartRequest) (Campaign, erro
 		return Campaign{}, err
 	}
 	return s.Get(ctx, request.ID)
+}
+
+func plannedMunicipality(istat string) bool {
+	switch istat {
+	case "050004", "049009", "050026", "050029", "050008":
+		return true
+	}
+	return false
 }
 
 func (s *Store) RecordReview(ctx context.Context, campaignID, actor string, review Review) (Review, error) {
@@ -202,7 +216,7 @@ func (s *Store) Report(ctx context.Context, campaignID string, through time.Time
 	if through.Before(campaign.StartedAt) {
 		return Report{}, ErrInvalid
 	}
-	report := Report{CampaignID: campaign.ID, StartedAt: campaign.StartedAt, Through: through, MinimumEndAt: campaign.MinimumEndAt}
+	report := Report{CampaignID: campaign.ID, Scope: campaign.Scope, StartedAt: campaign.StartedAt, Through: through, MinimumEndAt: campaign.MinimumEndAt}
 	products := map[string]bool{}
 	for _, source := range campaign.Sources {
 		products[source.Product] = true
@@ -215,7 +229,11 @@ func (s *Store) Report(ctx context.Context, campaignID string, through time.Time
 			report.Issues = append(report.Issues, source.SourceID+":"+issue)
 		}
 	}
-	for _, product := range []string{"vigilance", "criticality", "monitoring", "municipal"} {
+	requiredProducts := []string{"vigilance", "criticality", "monitoring", "municipal"}
+	if campaign.Scope == "municipality" {
+		requiredProducts = []string{"municipal"}
+	}
+	for _, product := range requiredProducts {
 		if !products[product] {
 			report.MissingProducts = append(report.MissingProducts, product)
 			report.Issues = append(report.Issues, "missing_product:"+product)
@@ -385,7 +403,7 @@ func (s *Store) List(ctx context.Context) ([]Campaign, error) {
 
 func (s *Store) campaign(ctx context.Context, id string, latest bool) (Campaign, error) {
 	var campaign Campaign
-	err := s.pool.QueryRow(ctx, "SELECT id,actor,started_at,created_at FROM observation_campaigns WHERE id=$1", id).Scan(&campaign.ID, &campaign.Actor, &campaign.StartedAt, &campaign.CreatedAt)
+	err := s.pool.QueryRow(ctx, "SELECT id,actor,scope,started_at,created_at FROM observation_campaigns WHERE id=$1", id).Scan(&campaign.ID, &campaign.Actor, &campaign.Scope, &campaign.StartedAt, &campaign.CreatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Campaign{}, ErrNotFound
 	}

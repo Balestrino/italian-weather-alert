@@ -199,3 +199,10 @@ For code rollback, restore the prior development image and settings and recreate
 the affected application services, retaining data volumes and additive records.
 Earlier local runs and remote failed attempts remain available for audit. No
 production deployment or public source activation is implied.
+
+
+Il recupero provider del 4 ottobre completa il task 13.8 e supera il blocco remoto
+conservato nelle prove precedenti: sonda autenticata, ripresa controllata, OCR
+remoto e pipeline ordinaria riusciti. Il fallback resta configurato e i risultati
+locali storici sono conservati. Gli embedding restano disabilitati e non sono
+certificati da questa verifica. Vedere [recupero provider](acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026).

@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050004"
-ultima_revisione: "2026-10-03"
+ultima_revisione: "2026-10-04"
 ---
 
 # Calcinaia
@@ -41,6 +41,11 @@ CFR originario per livelli regionali; non trasferire l'autorevolezza a tutti i
 contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
+
+Il recupero provider del 2026-10-04 verifica nuovamente OCR remoto e una pipeline
+ordinaria di Calcinaia, dopo ripresa controllata del blocco credenziale. Una
+citazione non valida rimane rifiutata e conservata. CLN-019 distingue questo
+recupero dall'accettazione della fonte e dal completamento della regressione.
 
 La vista API/MCP di situazione presenta ora `processed_data` e
 `source_summaries` (CLN-018): conclusioni e fatti separati dalle sintesi
@@ -310,3 +315,15 @@ Il criterio documentale di chiusura di questa voce è superato da CLN-012; le os
 - **Conoscenza:** comportamento confermato nel perimetro provato. **Intervento:** presentazione applicata e verificata, task 28; raccolta e accettazione restano distinte.
 - **Osservazione ed evidenza:** conclusioni, quattordici fatti regionali e sette misure comunali documentate, riferimenti deduplicati e tre sintesi; la piattaforma senza dati pubblicabili è dichiarata separatamente. Il backlog comunale produce un limite di completezza anziché centinaia di righe e ulteriori pagine. [Contratto e limiti](../../../backend/public-api-mcp.md#situation-response), [verifica development](../../../operations/development-publication.md#situazione-sintetica--3-ottobre-2026); registro privato `CLN-SUMMARY-20261003-01`.
 - **Conseguenza e prossima verifica:** consultare i fatti per rischio/validità e gli endpoint documentali per dettagli; non considerare confermate in vigore le misure con date non determinabili e non trasformare l'assenza dei dati della piattaforma in assenza di avvisi. Accettazione, completezza municipale e raccolta continuativa rimangono da verificare.
+
+
+### CLN-019 — Recupero del provider e pipeline ordinaria verificati
+
+- **Data:** 2026-10-04. **Ultima verifica:** 2026-10-04, sonda autenticata, gate e ledger, risultati OCR e pipeline dei worker; nessuna nuova ricerca web della fonte.
+- **Ambito:** originale e risorsa del job OCR storico revisionato e un avviso meteo comunale già conservato, nel solo perimetro della fonte `calcinaia-municipal`.
+- **Conoscenza:** confermato sulle esecuzioni delimitate. **Intervento:** ripresa provider applicata e verificata; accettazione non completata.
+- **Osservazione:** il rilancio storico già riuscito tramite fallback resta idempotente. Un canary selezionato completa il precedente run OCR remoto fallito; un altro caso ordinario completa classificazione, estrazione e linking senza nuovi rifiuti provider. Il primo caso di classificazione fallisce per citazione non conforme e rimane tale.
+- **Evidenza:** [procedura e verifica](../../../operations/acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026); originali, pagine, job, tentativi e ricevute private `PROVIDER-RECOVERY-20261004`.
+- **Conseguenza:** rimuove il blocco quota osservato nel periodo precedente, senza trasformare una citazione errata in prova valida o cambiare i controlli della fonte. Embedding e copertura integrale non sono certificati dal recupero.
+- **Prossima verifica:** completare regressione e osservazione con confronti attribuibili, conservando i fallimenti e verificando l'accesso del provider nel tempo.
+- **Collegamenti:** CLN-005, CLN-017 e CLN-018; task 13.8, 9.3 e 10.1.

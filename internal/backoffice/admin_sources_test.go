@@ -27,7 +27,7 @@ type adminObservationFake struct{ starts, reviews, assessments int }
 
 func (f *adminObservationFake) Start(_ context.Context, request observation.StartRequest) (observation.Campaign, error) {
 	f.starts++
-	return observation.Campaign{ID: request.ID, StartedAt: request.StartedAt}, nil
+	return observation.Campaign{ID: request.ID, Scope: request.Scope, StartedAt: request.StartedAt}, nil
 }
 func (f *adminObservationFake) RecordReview(_ context.Context, campaign, actor string, review observation.Review) (observation.Review, error) {
 	f.reviews++
@@ -111,7 +111,10 @@ func TestAdminObservationRoutesUseClosedPayloads(t *testing.T) {
 		}
 		return response.Body.String()
 	}
-	post("/admin/observation-campaigns", observation.StartRequest{ID: "trial", Actor: "operator", StartedAt: at, SourceIDs: []string{"source"}}, http.StatusOK)
+	started := post("/admin/observation-campaigns", observation.StartRequest{ID: "trial", Scope: "municipality", Actor: "operator", StartedAt: at, SourceIDs: []string{"source"}}, http.StatusOK)
+	if !strings.Contains(started, `"scope":"municipality"`) {
+		t.Fatal("explicit municipal scope lost in admin dispatch", started)
+	}
 	review := observation.Review{ID: "original", SourceID: "source", Kind: "original_comparison", Status: "pass", Evidence: registry.Evidence{URL: "https://evidence.example/review", Locator: "fixture", ObservedAt: at}}
 	post("/admin/observation-campaigns/trial/reviews", map[string]any{"actor": "reviewer", "review": review}, http.StatusOK)
 	post("/admin/observation-campaigns/trial/assess", map[string]any{"actor": "reviewer", "through": at, "evidence": review.Evidence}, http.StatusOK)

@@ -89,3 +89,30 @@ healthy while interpretation waits for the provider.
 
 Production activation, source acceptance and longer observation gates remain
 separate from development recovery.
+
+### Verifica del recupero provider — 4 ottobre 2026
+
+Il task 13.8 è verificato con una sonda Qwen autenticata, ripresa privata dello
+scope credenziale e una sola sonda di recupero ammessa per modello. La credenziale
+esistente è tornata utilizzabile; nessun credito, piano o nuovo secret è stato
+dedotto dalla risposta. I gate Qwen/OCR e quello globale risultano chiusi dopo
+le chiamate riuscite. Gli embedding restano disabilitati e non sono collaudati
+da questa verifica.
+
+Il job OCR originariamente fallito era già stato rilanciato e completato dal
+fallback locale il 1 ottobre. La ripetizione dello stesso comando di rilancio è
+idempotente: conserva quel successo e gli errori precedenti. Un canary selezionato
+sullo stesso documento e sulla stessa risorsa ha poi completato il run OCR remoto
+prima fallito, con pagine e ricevute persistite; il limite del canary era un solo
+tentativo. Non è stato riscritto lo stato del job storico.
+
+Un primo caso ordinario ha prodotto chiamate valide ma una citazione non conforme,
+rifiutata dalla validazione. Il fallimento rimane registrato e non costituisce un
+nuovo rifiuto quota. Un secondo caso municipale ha completato classificazione,
+estrazione e linking tramite i worker ordinari, con chiamate remote riuscite e
+senza nuovi rifiuti. Questa verifica delimitata completa il recupero del provider;
+non certifica tutte le interpretazioni o la suite di accettazione.
+
+Sonde, comandi/ricevute di ripresa e rilancio, canary, risultati OCR, tentativi,
+ledger e stato finale sono nell'archivio privato `PROVIDER-RECOVERY-20261004`.
+I servizi esistenti e i controlli di fonte/pubblicazione sono stati preservati.

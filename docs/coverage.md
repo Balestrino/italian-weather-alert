@@ -50,6 +50,14 @@ in the tested formats, without live adoption, source acceptance or public enable
 Municipal completeness and expiry remain open. See
 [TOS-015](territori/09-toscana/README.md#tos-015--grafica-cfr-per-tutte-le-zone-dei-campioni-conservati).
 
+**Subsequent municipal rollout gates — 4 October 2026:** Livorno, Pisa,
+Pontedera and Cascina each have a pending report with independent evaluation,
+observation and public-activation gates. Explicit individual municipal campaigns
+retain the seven-day and original/attachment/failure requirements. Unresolved
+prerequisites prevent a trial from starting; software verification does not
+establish acceptance or complete five-municipality coverage. The dated inventory
+below is preserved. See [municipal reports](operations/municipal-acceptance.md).
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

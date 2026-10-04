@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-04 [Changed] Add independent municipal observation gates and pending reports, summarize trial costs, verify provider recovery and prepare the PBS runbook
 - 2026-10-04 [Fixed] Complete retained CFR criticality and vigilance graphics with product-specific weather metadata, applicability, PDF evidence and preserved history
 ## 0.3.0 - 2026-10-03
 

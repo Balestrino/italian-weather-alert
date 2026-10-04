@@ -343,6 +343,16 @@ Source acceptance SHALL include attributable reviewed expected outputs for obser
 - **WHEN** expected-source comparison detects the omission during acceptance
 - **THEN** the affected source cannot be publicly activated until the omission is corrected and the relevant evaluation passes
 
+#### Scenario: A subsequent municipality has its own observation campaign
+- **WHEN** an operator explicitly selects the municipality scope for one planned Toscana municipal source
+- **THEN** the campaign requires that source's verified active collection prerequisites, seven complete 24-hour intervals, original/attachment comparisons and failure/event evidence independently of regional products
+- **AND** an incomplete evaluation, unresolved prerequisite or insufficient observation produces a pending report without granting acceptance or public activation
+
+#### Scenario: A historical MVP campaign is upgraded
+- **WHEN** individual municipal campaign support is added to an existing installation
+- **THEN** existing campaigns and requests without an explicit scope retain the four-product MVP requirements, prior assessments and immutable evidence
+- **AND** acceptance of one municipality does not establish full MVP or five-municipality coverage
+
 ### Requirement: Explicit reprocessing and interpretation suspension
 Each interpretation SHALL identify its model, instruction/configuration versions and evidence inputs. Model or processing changes SHALL be evaluated on retained cases before operator-selected reprocessing by source, period or failure status; such changes SHALL NOT automatically reprocess the entire history. Prior runs SHALL remain traceable within retention. Operators SHALL be able to suspend new interpretations for a source with a confirmed interpretation defect while collection continues, mark affected published results unreliable, and resume after correction, validation and explicit reprocessing. These controls SHALL NOT allow manual rewriting of extracted measures.
 
@@ -364,6 +374,10 @@ Local-only administration SHALL expose source/configuration status, failed jobs,
 #### Scenario: An external provider omits token usage
 - **WHEN** a processing response lacks usage fields
 - **THEN** the run records usage as unavailable, retains other measurable charges/timing, and totals disclose the missing accounting
+
+#### Scenario: Trial cost summaries have incomplete billing evidence
+- **WHEN** campaign summaries contain known processing subtotals but missing infrastructure measurements or unverified historical prices
+- **THEN** the summaries report those unknowns explicitly, preserve pricing history, separate overlapping campaigns and do not propose an operating budget until the completeness gate passes
 
 ### Requirement: Email incident notifications
 The service SHALL support private SMTP/recipient configuration and send administrative email for source delay thresholds, exhausted processing attempts and backup failures reported by the selected backup system or its notification integration. It SHALL group repeated errors, support configurable reminder intervals and send recovery notifications. Transient errors SHALL remain visible internally without requiring immediate email.

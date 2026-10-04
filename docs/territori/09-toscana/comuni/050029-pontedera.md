@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050029"
-ultima_revisione: "2026-10-02"
+ultima_revisione: "2026-10-04"
 ---
 
 # Pontedera
@@ -20,6 +20,12 @@ Comune di Pontedera, provincia di Pisa, ISTAT `050029`. Fonte candidata IWA: `po
 | Unione Valdera e portali degli atti | Fonti da investigare separatamente | Referral nel sito comunale; competenza, perimetro, accesso e riuso da verificare |
 
 ## Guida operativa
+
+Il precollaudo del 2026-10-04 produce un report individuale **pending**,
+con valutazione, osservazione, accettazione e pubblicazione distinte. La
+[campagna municipale](../../../operations/municipal-acceptance.md) mantiene
+sette intervalli completi di 24 ore e le prove di originali, allegati ed errori.
+PON-002 registra i prerequisiti; il report non certifica copertura completa.
 
 Verificare regione, comune, fonte e worker come passaggi distinti. L'abilitazione del comune non avvia la raccolta di una fonte disattivata. Lo stato live si legge nel registro dell'ambiente; una preview storica nel coverage tracker non sostituisce un nuovo controllo programmato.
 
@@ -49,3 +55,15 @@ Acquisizione programmata corrente, paginazione, altri canali, allegati e atti or
 - **Conseguenza:** nei ricontrolli distinguere fonti attive, disattivate e controlli falliti; la preview storica rimane separata.
 - **Prossima verifica:** quando la raccolta sarà abilitata, verificare un nuovo giro programmato, originali conservati e limiti di paginazione prima del trial.
 - **Collegamenti:** task 11.3 e 11.5 del [servizio Toscana](../../../../openspec/changes/define-toscana-alert-service/tasks.md); ulteriori issue e modifiche non disponibili.
+
+
+### PON-002 — Report individuale pendente e collaudo indipendente
+
+- **Data:** 2026-10-04. **Ultima verifica:** 2026-10-04, registro dell'ambiente, apertura della campagna e test sintetici con PostgreSQL isolato; nessuna nuova consultazione web della fonte.
+- **Ambito:** fonte municipale della scheda. Avvisi dichiarati; contratto attivo, preview e raccolta sono prerequisiti oltre a paginazione e documenti.
+- **Conoscenza:** confermato per i prerequisiti e il comportamento del servizio. **Intervento:** percorso indipendente implementato e report pendente consegnato; accettazione non completata.
+- **Osservazione:** lo scope esplicito `municipality` valuta solo questa fonte senza richiedere i tre prodotti regionali. Non riduce durata, cadenza, confronti con originali/allegati o prove di errore. I prerequisiti irrisolti impediscono l'apertura della campagna; la raccolta eventualmente già attiva non li annulla.
+- **Evidenza:** [report e procedura](../../../operations/municipal-acceptance.md), [campagne](../../../../internal/backend/observation/store.go), [prove isolate](../../../../internal/backend/observation/observation_integration_test.go). Report completo, ricevuta del tentativo e stato dei controlli nell'archivio privato `ROLLOUT-GATES-20261004`.
+- **Conseguenza:** il report mantiene lo stato pending e i controlli esistenti; non estende il perimetro né dichiara copertura dei cinque comuni.
+- **Prossima verifica:** risolvere i prerequisiti dell'ambito, completare valutazione e osservazione, quindi accettare e abilitare separatamente la fonte verificata.
+- **Collegamenti:** PON-001; task 11.5 della [specifica Toscana](../../../../openspec/changes/define-toscana-alert-service/tasks.md).

@@ -22,6 +22,12 @@ Gli identificativi aiutano a riconoscere le fonti nel registro dell'ambiente; no
 
 ## Guida operativa
 
+Il [consuntivo delle campagne](../../operations/trial-costs.md) distingue costi
+noti, metriche mancanti e prezzi non verificati per il periodo. I quattro comuni
+successivi hanno [report individuali pending](../../operations/municipal-acceptance.md)
+e campagne indipendenti con gli stessi criteri del pilota. TOS-016 registra la
+verifica del percorso; non completa osservazione o accettazione delle fonti.
+
 Verificare separatamente pagina, risorse grafiche e versione stampabile richieste dal contratto del prodotto. Conservare emissione, validità e acquisizione come informazioni distinte. Il [parser regionale](../../../internal/backend/acquisition/regional.go) richiede contenuto riconoscibile e una espressione di emissione, salvo lo stato esplicito di assenza di evento del monitoraggio.
 
 Consultare lo [stato dei controlli](../../../internal/backend/acquisition/schedule.go) per distinguere raggiungibilità, completezza, ritardo e pubblicazione attesa. `publication_state=missing` significa che la pubblicazione attesa non è stata osservata secondo la configurazione; non dimostra da solo che il CFR non abbia pubblicato. Controllare cadenza configurata, data osservata e parsing prima di attribuire il problema alla fonte.
@@ -260,3 +266,15 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 - **Conoscenza:** requisito confermato. **Intervento:** pianificato; confronto persistente da implementare.
 - **Osservazione ed evidenza:** il [nuovo requisito](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md#requirement-scoped-cittadino-informato-acquisition-and-primary-verification) conserva origine CFR e confronto per prodotto, rischio, zona, emissione e validità. Dati non comparabili e fonte primaria indisponibile restano distinti da conflitti.
 - **Conseguenza e prossima verifica:** la piattaforma non colma per inferenza i colori CFR `unknown`; implementare e collaudare i confronti nei task 26, mantenendo separati misure locali, condizioni di riuso e accettazione. Vedere [CLN-010](comuni/050004-calcinaia.md#cln-010--canale-aggiuntivo-pianificato-con-riscontro-primario).
+
+
+### TOS-016 — Consuntivo e report municipali senza accettazione implicita
+
+- **Data:** 2026-10-04. **Ultima verifica:** 2026-10-04, report privati, registro e test sintetici/PostgreSQL; nessuna nuova attestazione sulla disponibilità dei siti.
+- **Ambito:** due campagne MVP esistenti e quattro comuni successivi: Livorno, Pisa, Pontedera e Cascina.
+- **Conoscenza:** confermato sul servizio e sui report. **Intervento:** scope municipale implementato, consuntivi e report individuali pending consegnati.
+- **Osservazione:** le campagne precedenti restano MVP e incomplete. Le nuove campagne per singolo comune mantengono durata e prove, mentre condizioni irrisolte impediscono l'avvio. Il consuntivo distingue i subtotali noti dalle metriche indisponibili; un listino corrente non verifica retroattivamente i prezzi storici.
+- **Evidenza:** [collaudo municipale](../../operations/municipal-acceptance.md), [consuntivo](../../operations/trial-costs.md), [migrazione e vincoli](../../../internal/backend/observation/migrate.go). Rapporti, ricevute e manifest negli archivi privati `ROLLOUT-GATES-20261004` e `TRIAL-COSTS-20261004`.
+- **Conseguenza:** chiude i task di rendicontazione e predisposizione dei gate indipendenti; budget, collaudo reale, accettazione e copertura completa restano pendenti.
+- **Prossima verifica:** completare i confronti e le prove mancanti per ogni ambito, poi riesaminare report di accettazione e budget.
+- **Collegamenti:** TOS-006, LIV-008, PIS-003, PON-002 e CAS-007; task 9.3, 9.4, 10.1 e 11.5.

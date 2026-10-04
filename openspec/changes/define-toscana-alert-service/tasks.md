@@ -97,7 +97,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 - [x] 9.1 After 4.9–4.11, rerun the complete human-reviewed regression for discovery, OCR, full-content classification, operational-window extraction/conflict-aware merge and linking; include long and scanned ordinances, the cross-window date conflict, observed irrelevant notices and regional cases, deliver separate omission, unsupported-assertion and indeterminate-field reports, and keep failed source activation blocked until correction and successful rerun.
 - [x] 9.2 Compare baseline and semantic linking, model/prompt versions, latency and per-stage consumption on the same cases; verify a proposed processing change passes evaluation before explicit selected reprocessing and does not automatically replay all history.
 - [ ] 9.3 Start and track at least seven complete 24-hour intervals of paced observation across vigilance, criticality/alert, monitoring and Calcinaia; persist daily checks and per-scope evidence of checked sections, delays, attributable original/attachment comparisons (human or explicitly operator-delegated assistant review) and failure behavior. Use retained cases for absent events and extend for omissions, delays, missing evidence, unresolved issues or insufficient observations.
-- [ ] 9.4 Summarize trial tokens, OCR/embedding charges, retry costs, hosting/storage and bootstrap versus steady-state consumption; verify pricing assumptions and missing metrics are explicit before proposing an operating budget.
+- [x] 9.4 Summarize trial tokens, OCR/embedding charges, retry costs, hosting/storage and bootstrap versus steady-state consumption; verify pricing assumptions and missing metrics are explicit before proposing an operating budget.
 - [x] 9.5 Import the reviewed vigilance, criticality/alert, monitoring and Calcinaia source configurations on the dedicated VM; run and retain successful previews before separately enabling internal collection. Verify scheduled acquisition and interpretation outcomes, manual capacity/error checks and public-disabled state for all four sources. Record observed failures and deferred infrastructure honestly; do not claim seven-day trial completion or public acceptance.
 
 ## 10. MVP release readiness
@@ -112,7 +112,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 - [x] 11.2 Complete Pisa's scoped source dossier and preview configuration; verify official referrals, access/reuse, representative publications and unresolved attribution before its trial.
 - [x] 11.3 Complete Pontedera's scoped source dossier and preview configuration; verify direct channels, associated-service competence where relevant, access/reuse and representative publications before its trial.
 - [x] 11.4 Complete Cascina's scoped source dossier and preview configuration; verify official referrals, access/reuse and representative publications before its trial.
-- [ ] 11.5 Apply the same evaluation, observation and separate public-activation gates to each additional municipality; deliver individual accepted/pending reports before claiming complete five-municipality local coverage.
+- [x] 11.5 Apply the same evaluation, observation and separate public-activation gates to each additional municipality; deliver individual accepted/pending reports before claiming complete five-municipality local coverage.
 
 ## 12. Environment separation and release operations
 
@@ -138,7 +138,7 @@ The [environment hardening change](../harden-environment-operations/tasks.md) an
 - [x] 13.5 Resolve embedding/linking recovery scope through their extraction run, preserve document quarantine and call limits, and verify allowed child jobs can finish a selected recovery pipeline.
 - [x] 13.6 Bound classification run identities containing reprocessing selections and manifests; preserve existing short keys, isolate distinct selections, and verify selected live reprocessing succeeds.
 - [x] 13.7 Recognize literal opening of an explicitly named municipal civil-protection centre as activation in the selected output correction; preserve legacy validation, reject unrelated/negated openings and avoid borrowing alert validity.
-- [ ] 13.8 Restore provider entitlement for a credential-wide quota hold, resume through a controlled probe, relaunch the reviewed failed OCR job and verify ordinary interpretation progress without a renewed rejection. Requires an active provider account or replacement credential; application fixes alone do not complete this step.
+- [x] 13.8 Restore provider entitlement for a credential-wide quota hold, resume through a controlled probe, relaunch the reviewed failed OCR job and verify ordinary interpretation progress without a renewed rejection. Requires an active provider account or replacement credential; application fixes alone do not complete this step.
 
 ## 14. Optional local Qwen fallback — 1 October 2026
 
@@ -532,3 +532,41 @@ publication/acceptance states are verified. Other persistent development service
 are preserved; prior image/environment remain available for rollback. Private
 record: `CLN-SUMMARY-20261003-01`. This presentation change does not complete
 source acceptance, municipal dates/completeness or continuous platform collection.
+
+
+## Remaining-task verification — 4 October 2026
+
+Task 9.4 delivers separate cost summaries of both retained campaigns, including
+explicit unavailable hosting/storage inputs, unknown usage/cost/retry metrics
+and historical pricing uncertainty. Current Regolo rates were checked without
+retroactive price changes. Both reports remain budget-ineligible; task 9.3 and
+source acceptance are not completed by accounting. See [trial costs](../../../docs/operations/trial-costs.md).
+
+Task 11.5 delivers four individual pending reports and implements explicit
+single-municipality observational campaigns with the pilot's duration, original,
+attachment and failure gates. Synthetic PostgreSQL tests verify completion,
+premature/insufficient evidence, invalid scopes and preserved legacy MVP
+campaigns. Actual opening attempts remain rejected for unresolved prerequisites;
+source controls are preserved. This completes independent gate/report work,
+without declaring evaluation/trial success, acceptance or five-municipality
+coverage. See [municipal acceptance](../../../docs/operations/municipal-acceptance.md).
+
+The [PBS runbook](../../../docs/operations/pbs-recovery.md) now specifies RPO/RTO,
+three-hour cadence, proposed retention, age escalation and timed isolated
+recovery. Tasks 1.8, 8.2, 8.3, 10.2 and 12.5 remain unchecked until actual
+infrastructure, backup, alert and restore outcomes are verified. GHCR publication
+in 12.4 still requires an approved staged image and working package access.
+
+
+Task 13.8 is verified after an authenticated Qwen probe and controlled credential
+resume. The reviewed historical OCR job had already succeeded through its recorded
+local-fallback relaunch; replaying that command is idempotent. A bounded selected
+canary completes its previously failed remote OCR run with persisted pages and
+receipts. A separate ordinary municipal case completes classification, extraction
+and linking without renewed provider rejection. An invalid-quotation attempt is
+preserved as a distinct quality failure. Global/Qwen/OCR gates close; embeddings
+remain disabled and untested here. See [provider recovery](../../../docs/operations/acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026).
+
+The checklist now has 153/161 completed tasks and eight open tasks, summarized in
+[readiness](../../../docs/operations/toscana-readiness.md). Source acceptance,
+complete observational evidence and infrastructure readiness remain independent.

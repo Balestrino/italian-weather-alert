@@ -20,6 +20,7 @@ const MinimumDuration = 7 * 24 * time.Hour
 type StartRequest struct {
 	ID        string    `json:"id"`
 	Actor     string    `json:"actor"`
+	Scope     string    `json:"scope,omitempty"`
 	StartedAt time.Time `json:"started_at"`
 	SourceIDs []string  `json:"source_ids"`
 }
@@ -37,6 +38,7 @@ type Source struct {
 type Campaign struct {
 	ID           string      `json:"id"`
 	Actor        string      `json:"actor"`
+	Scope        string      `json:"scope"`
 	StartedAt    time.Time   `json:"started_at"`
 	MinimumEndAt time.Time   `json:"minimum_end_at"`
 	CreatedAt    time.Time   `json:"created_at"`
@@ -84,6 +86,7 @@ type SourceReport struct {
 
 type Report struct {
 	CampaignID      string         `json:"campaign_id"`
+	Scope           string         `json:"scope"`
 	StartedAt       time.Time      `json:"started_at"`
 	Through         time.Time      `json:"through"`
 	MinimumEndAt    time.Time      `json:"minimum_end_at"`

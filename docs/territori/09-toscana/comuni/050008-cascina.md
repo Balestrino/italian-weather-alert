@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050008"
-ultima_revisione: "2026-10-02"
+ultima_revisione: "2026-10-04"
 ---
 
 # Cascina
@@ -22,6 +22,12 @@ Comune di Cascina, provincia di Pisa, ISTAT `050008`. Fonte IWA: `cascina-munici
 La prima consultazione web del 2026-10-02 non aveva restituito il contenuto dell'archivio. La successiva consultazione dello stesso giorno ha restituito gli Avvisi e la [notizia Allerta arancione, aperto il COC](https://www.comune.cascina.pi.it/it/news/119346/allerta-arancione-aperto-il-coc). Quest'ultima collega nel footer un Piano di miglioramento in PDF su un host S3 esterno. La nuova osservazione supera il limite della prima consultazione, senza dimostrare disponibilità continua del crawler.
 
 ## Guida operativa
+
+Il precollaudo del 2026-10-04 produce un report individuale **pending**,
+con valutazione, osservazione, accettazione e pubblicazione distinte. La
+[campagna municipale](../../../operations/municipal-acceptance.md) mantiene
+sette intervalli completi di 24 ore e le prove di originali, allegati ed errori.
+CAS-007 registra i prerequisiti; il report non certifica copertura completa.
 
 Verificare raggiungibilità, riconoscimento dei contenuti e completezza come passaggi distinti. Se Crawl4AI segnala anti-bot, confrontare risposta, stato HTTP e contenuto nel registro privato. Una preview storica non esclude un blocco successivo. Rispettare retry e vincoli della fonte; rivalutare il normale accesso prima di cambiare configurazione.
 
@@ -128,3 +134,15 @@ CAS-005 non risolve blocchi o entitlement del provider: un documento nuovo e non
 - **Evidenza:** [selettore e fallback](../../../../internal/backend/classification/html_body.go), [operazioni e risultati del trial](../../../operations/local-processing.md); originali, selezioni, token e ricevute restano nel registro privato.
 - **Conseguenza:** la riduzione del testo non autorizza nuovi download o una directory PDF di solo testo. PDF con immagini mantengono il fallback; significato dei grafici vettoriali e qualità dell’estrazione delle misure richiedono verifica separata.
 - **Prossima verifica:** ampliare casi pertinenti e non pertinenti, variazioni del layout e interpretazione downstream prima di una policy continuativa.
+
+
+### CAS-007 — Report individuale pendente e collaudo indipendente
+
+- **Data:** 2026-10-04. **Ultima verifica:** 2026-10-04, registro dell'ambiente, apertura della campagna e test sintetici con PostgreSQL isolato; nessuna nuova consultazione web della fonte.
+- **Ambito:** fonte municipale della scheda. Avvisi e categoria storica; continuità, paginazione, atti e allegati sono ancora da collaudare.
+- **Conoscenza:** confermato per i prerequisiti e il comportamento del servizio. **Intervento:** percorso indipendente implementato e report pendente consegnato; accettazione non completata.
+- **Osservazione:** lo scope esplicito `municipality` valuta solo questa fonte senza richiedere i tre prodotti regionali. Non riduce durata, cadenza, confronti con originali/allegati o prove di errore. I prerequisiti irrisolti impediscono l'apertura della campagna; la raccolta eventualmente già attiva non li annulla.
+- **Evidenza:** [report e procedura](../../../operations/municipal-acceptance.md), [campagne](../../../../internal/backend/observation/store.go), [prove isolate](../../../../internal/backend/observation/observation_integration_test.go). Report completo, ricevuta del tentativo e stato dei controlli nell'archivio privato `ROLLOUT-GATES-20261004`.
+- **Conseguenza:** il report mantiene lo stato pending e i controlli esistenti; non estende il perimetro né dichiara copertura dei cinque comuni.
+- **Prossima verifica:** risolvere i prerequisiti dell'ambito, completare valutazione e osservazione, quindi accettare e abilitare separatamente la fonte verificata.
+- **Collegamenti:** CAS-004, CAS-005 e CAS-006; task 11.5 della [specifica Toscana](../../../../openspec/changes/define-toscana-alert-service/tasks.md).

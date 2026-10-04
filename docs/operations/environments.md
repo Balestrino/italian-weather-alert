@@ -200,3 +200,12 @@ The check verifies runtime project/port/mount identity before stopping anything,
 Generate separate credentials for fresh projects. New files use mode `0644` inside a host directory with mode `0700`, independent of umask, so the container users can read their bind-mounted secrets. Existing credentials and custom permissions are preserved. A private provider key must be readable by its container UID (65532 for the application); repair its mode/ACL deliberately rather than regenerating it. Runtime checks test mounted-file readability without printing values.
 
 Never point development and staging to the same database or RustFS storage. If staging needs a private representative copy, transfer PostgreSQL and RustFS together from a consistent point, and keep both background services stopped, provider keys absent and notifications disabled before using it. The compatibility migration deliberately preserves configured local-source eligibility, so it is not a copied-data safeguard. Disable copied regions and review municipality/source choices through the panel or environment-scoped CLI before any controlled worker activation. Code promotion does not copy data or activate sources. Keep private files, operational evidence and unpublished captures outside commits.
+
+
+## Verifica dei punti Toscana — 4 ottobre 2026
+
+Lo [stato dei punti aperti](toscana-readiness.md) distingue collaudi software,
+consuntivi, report municipali e recupero provider dalle prove infrastrutturali.
+Il [runbook PBS](pbs-recovery.md) registra RPO 6 ore, RTO 1 ora, cadenza iniziale
+3 ore, retention proposta e controllo esterno dell'età. Configurazione,
+consegna degli allarmi e ripristino reale restano da verificare.

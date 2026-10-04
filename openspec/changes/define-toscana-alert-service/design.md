@@ -102,6 +102,16 @@ Build attributable reviewed expected outputs for real Calcinaia notices, irrelev
 
 ### 7. Modular Go service and durable storage
 
+For task 11.5, campaign scope is persisted separately: omitted scope and legacy
+campaigns remain `mvp`, requiring the four pilot products. Explicit `municipality`
+requires one municipal source from the five planned Toscana municipalities and
+removes only the regional-product requirement for that individual report. All
+active collection prerequisites, observation duration, daily checks, gaps,
+original/attachment comparisons and failure/event cases remain unchanged.
+An additive migration preserves the original schema checksum and append-only
+campaigns/assessments. Individual pending reports preserve unresolved scope
+prerequisites; starting a campaign never grants acceptance/public enablement.
+
 Use one modular Go application with background worker processes for collection and interpretation; API/MCP requests only read prepared data. PostgreSQL stores the domain model, configuration history, interpretation runs and a durable job queue with status, attempts and errors. Workers recover incomplete jobs after restart and use idempotent processing to avoid duplicate versions or public effects. This keeps scheduling and records in one persistence system; SQLite and an additional queue service are not the selected MVP design.
 
 Store original HTML, necessary page resources, PDFs and scan images in RustFS through S3, with hashes and object references in PostgreSQL. RustFS remains internal to the service VM. A service setting, disabled by software default, controls public copy access through the application; the initial deployment enables eligible CFR/Regione Toscana copies and direct Calcinaia copies only where the recorded source policy permits them. Cittadino Informato and albo pretorio remain link-only. Official links remain present. Database/object writes, cleanup and backup must preserve referential consistency.
@@ -157,6 +167,19 @@ Ordinary source outages preserve the last acquired information with freshness li
 Measure before setting an operating budget. Track each attempt by document/version, stage, model, input/output/cache tokens where reported, elapsed time, retries and estimated cost with pricing provenance. Missing provider usage is unknown, not zero. Separate bootstrap from steady-state collection, OCR charges, optional embeddings, hosting, storage and future local compute. Present totals and per-stage/provider breakdowns in administration.
 
 Email is the initial notification channel, using an existing SMTP relay and operational mailbox whose details remain private deployment configuration. Notify on source delay thresholds, exhausted processing attempts and backup failures exposed by the selected backup system or notification integration, group repeated errors into an incident, send reminders at a configurable interval and a recovery message after restoration. Transient errors remain visible in the dashboard. Telegram and other channels are future extensions.
+
+Task 9.4 reports each campaign separately at a fixed knowledge boundary; overlapping
+campaigns are not summed. Preserve unknown attempts and unavailable hosting/storage
+inputs as audited revisions. Current pricing checks do not supply historical
+effective dates or account entitlement, and local inference without a provider
+charge still needs attributed hosting costs. Completed accounting with explicit
+unknowns does not complete observation or satisfy the budget completeness gate.
+The operational procedure is [trial costs](../../../docs/operations/trial-costs.md).
+
+The [PBS runbook](../../../docs/operations/pbs-recovery.md) records the six-hour
+data-loss and one-hour recovery targets, three-hour initial cadence, proposed
+retention and external age monitoring. Actual schedule adoption, backup,
+notification delivery and timed isolated restore remain separate readiness proofs.
 
 Protect the entire shared VM with Proxmox Backup Server on a physically separate host. This covers the three projects' PostgreSQL/RustFS volumes and the configuration required to restart them; the production application-level object-storage backup worker remains disabled while PBS is active. A host outage affects all three environments. PBS schedule and retention are deployment settings to record before readiness. Before public activation, restore a PBS backup into an isolated environment and verify startup, evidence references, retained versions and truthful updating state. Backup failures must remain visible to operators through PBS monitoring or its notification integration.
 

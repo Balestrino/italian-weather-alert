@@ -5,6 +5,7 @@ package observation
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -157,6 +158,110 @@ func TestCampaignDerivesSevenDayEvidenceAndRefusesPrematureCompletion(t *testing
 	if _, err = pool.Exec(ctx, "UPDATE observation_campaigns SET actor='tampered' WHERE id=$1", campaign.ID); err == nil {
 		t.Fatal("append-only campaign was mutable")
 	}
+	t.Run("individual planned municipality campaigns retain the same gates", func(t *testing.T) {
+		for _, istat := range []string{"049009", "050026", "050029", "050008", "048017"} {
+			id := "municipality-" + istat
+			configuration := registry.Configuration{
+				URL: "https://calcinaia.example/" + id, Sections: []string{"https://calcinaia.example/" + id}, AccessMethod: "fixture", Attribution: "synthetic municipality",
+				Provenance: &evidence, Policy: registry.Policy{Evidence: &evidence, CollectionPermitted: true, RetentionPermitted: true}, CheckSeconds: 600, DelaySeconds: 1800,
+			}
+			for _, e := range []error{
+				reg.CreateSource(ctx, registry.Source{ID: id, AuthorityID: "calcinaia", ChannelID: "calcinaia", ProductID: "municipal", Territory: istat}, configuration, "fixture"),
+				reg.RecordPreview(ctx, id, 1, "fixture", evidence),
+				reg.EnableCollection(ctx, id, 1, "fixture"),
+			} {
+				if e != nil {
+					t.Fatal(e)
+				}
+			}
+			request := StartRequest{ID: id, Scope: "municipality", Actor: "operator", StartedAt: started, SourceIDs: []string{id}}
+			c, e := store.Start(ctx, request)
+			if istat == "048017" {
+				if !errors.Is(e, ErrInvalid) {
+					t.Fatal("unplanned municipality admitted", e)
+				}
+				continue
+			}
+			if e != nil || c.Scope != "municipality" || len(c.Sources) != 1 || c.Sources[0].Territory != istat {
+				t.Fatal("municipality scope lost", c, e)
+			}
+			report, e := store.Report(ctx, c.ID, through)
+			if e != nil || report.Status != "extended" || len(report.MissingProducts) != 0 || !slicesContains(report.Sources[0].Issues, "no_persisted_checks") || !slicesContains(report.Sources[0].Issues, "original_comparison_missing") {
+				t.Fatal("missing municipal evidence passed or regional products required", report, e)
+			}
+			if _, e = pool.Exec(ctx, `INSERT INTO acquisition_checks(source_id,configuration,worker_id,started_at,finished_at,reachable,content_recognized,complete,listing_count,document_count,check_state,publication_state)
+ SELECT $1,1,'paced-fixture',point,point+interval '1 second',true,true,true,1,1,'complete_unchanged','not_expected'
+ FROM generate_series($2::timestamptz,$3::timestamptz-interval '1 second',interval '10 minutes') point`, id, started, through); e != nil {
+				t.Fatal(e)
+			}
+			for _, review := range []Review{
+				{ID: "attachment-scope", SourceID: id, Kind: "attachment_not_applicable", Status: "pass", Evidence: reviewed},
+				{ID: "failure", SourceID: id, Kind: "failure_retained", Status: "pass", CaseID: "synthetic-http-429", Evidence: reviewed},
+				{ID: "event", SourceID: id, Kind: "absent_event_retained", Status: "pass", CaseID: "synthetic-event", Evidence: reviewed},
+			} {
+				if _, e = store.RecordReview(ctx, c.ID, "fixture-reviewer", review); e != nil {
+					t.Fatal(e)
+				}
+			}
+			report, e = store.Report(ctx, c.ID, through)
+			if e != nil || report.Status != "extended" || !slicesContains(report.Sources[0].Issues, "original_comparison_missing") {
+				t.Fatal("elapsed time and retained controls replaced original comparison", report, e)
+			}
+			var document, version int64
+			if e = pool.QueryRow(ctx, "INSERT INTO retained_documents(source_id,official_url) VALUES($1,$2) RETURNING id", id, configuration.URL).Scan(&document); e != nil {
+				t.Fatal(e)
+			}
+			hash := fmt.Sprintf("%064s", istat)
+			if e = pool.QueryRow(ctx, `INSERT INTO retained_versions(document_id,content_hash,first_acquired_at,complete,metadata)
+ VALUES($1,$2,$3,true,'{}') RETURNING id`, document, hash, started.Add(time.Hour)).Scan(&version); e != nil {
+				t.Fatal(e)
+			}
+			if _, e = pool.Exec(ctx, "INSERT INTO retained_objects(hash,object_key,byte_size) VALUES($1,$2,10)", hash, "objects/"+hash); e != nil {
+				t.Fatal(e)
+			}
+			for _, role := range []string{"original", "attachment"} {
+				if _, e = pool.Exec(ctx, `INSERT INTO retained_resources(version_id,url,role,required,source_id,configuration,media_type,object_hash,missing)
+ VALUES($1,$2,$3,true,$4,1,'application/pdf',$5,'')`, version, configuration.URL+"/"+role, role, id, hash); e != nil {
+					t.Fatal(e)
+				}
+			}
+			if _, e = store.RecordReview(ctx, c.ID, "fixture-reviewer", Review{ID: "original", SourceID: id, Kind: "original_comparison", Status: "pass", VersionID: &version, Evidence: reviewed}); e != nil {
+				t.Fatal(e)
+			}
+			report, e = store.Report(ctx, c.ID, through)
+			if e != nil || report.Status != "extended" || !slicesContains(report.Sources[0].Issues, "attachment_comparison_missing") {
+				t.Fatal("attachment-not-applicable bypassed a required scanned attachment", report, e)
+			}
+			if _, e = store.RecordReview(ctx, c.ID, "fixture-reviewer", Review{ID: "attachment", SourceID: id, Kind: "attachment_comparison", Status: "pass", VersionID: &version, Evidence: reviewed}); e != nil {
+				t.Fatal(e)
+			}
+			report, e = store.Report(ctx, c.ID, started.Add(6*24*time.Hour))
+			if e != nil || report.Status != "running" || !slicesContains(report.Issues, "minimum_duration_not_reached") {
+				t.Fatal("municipal evidence bypassed seven complete days", report, e)
+			}
+			assessment, e := store.Assess(ctx, c.ID, "fixture-reviewer", through, reviewed)
+			if e != nil || assessment.Status != "complete" || len(assessment.Report.Sources) != 1 || len(assessment.Report.MissingProducts) != 0 {
+				t.Fatal("complete individual municipal evidence failed", assessment, e)
+			}
+			request.ID, request.Scope = id+"-implicit", ""
+			if _, e = store.Start(ctx, request); !errors.Is(e, ErrInvalid) {
+				t.Fatal("additional municipality weakened implicit MVP scope", e)
+			}
+			st, e := reg.State(ctx, id)
+			if e != nil || st.Accepted || st.PublicEnabled {
+				t.Fatal("campaign granted acceptance or public activation", st, e)
+			}
+		}
+		for _, request := range []StartRequest{
+			{ID: "regional-in-municipality", Scope: "municipality", Actor: "operator", StartedAt: started, SourceIDs: []string{"vigilance"}},
+			{ID: "multiple-in-municipality", Scope: "municipality", Actor: "operator", StartedAt: started, SourceIDs: []string{"municipality-049009", "municipality-050026"}},
+			{ID: "invalid-scope", Scope: "invented", Actor: "operator", StartedAt: started, SourceIDs: []string{"calcinaia"}},
+		} {
+			if _, e := store.Start(ctx, request); !errors.Is(e, ErrInvalid) {
+				t.Fatal("unsupported campaign scope admitted", request.Scope, e)
+			}
+		}
+	})
 	t.Run("review unchanged original under a later acquisition configuration", func(t *testing.T) {
 		v, err := reg.Version(ctx, "monitoring", 1)
 		if err != nil {
@@ -195,6 +300,38 @@ func TestCampaignDerivesSevenDayEvidenceAndRefusesPrematureCompletion(t *testing
 			t.Fatalf("finalized matching acquisition was rejected: %v", err)
 		}
 	})
+}
+
+func TestScopeMigrationPreservesLegacyCampaigns(t *testing.T) {
+	ctx := context.Background()
+	pool := observationTestDB(t)
+	for _, migrate := range []func(context.Context, *pgxpool.Pool) error{registry.Migrate, documents.Migrate, acquisition.Migrate} {
+		if err := migrate(ctx, pool); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := pool.Exec(ctx, schema); err != nil {
+		t.Fatal(err)
+	}
+	checksum := sha256.Sum256([]byte(schema))
+	if _, err := pool.Exec(ctx, "INSERT INTO iwa_migrations(name,checksum) VALUES('030_observational_trials',$1)", hex.EncodeToString(checksum[:])); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := pool.Exec(ctx, "INSERT INTO observation_campaigns(id,actor,started_at) VALUES('legacy','operator',clock_timestamp())"); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		if err := Migrate(ctx, pool); err != nil {
+			t.Fatal(err)
+		}
+	}
+	campaign, err := New(pool).Get(ctx, "legacy")
+	if err != nil || campaign.Scope != "mvp" {
+		t.Fatal("legacy campaign reinterpreted or upgrade failed", campaign, err)
+	}
+	if _, err := pool.Exec(ctx, "UPDATE observation_campaigns SET scope='municipality' WHERE id='legacy'"); err == nil {
+		t.Fatal("immutable legacy campaign scope could be changed")
+	}
 }
 
 func slicesContains(values []string, expected string) bool {
