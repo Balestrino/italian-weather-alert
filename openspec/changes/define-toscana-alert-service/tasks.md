@@ -673,7 +673,7 @@ The checklist is now 160/166 complete, with six operational/release tasks open.
 
 - [x] 31.1 Publish a dated channel/window coverage matrix from current active configuration and effective intervals, complete typed/general listing traversal, retained-resource inventory and one consistent paginated API view. Distinguish discovery, recent-window acquisition, supported interpretation, additional channels and acceptance; preserve private captures and prior sample results. Verify territorial guidance, local links, runtime/readiness and strict specifications without source/job/public-control mutations.
 - [ ] 31.2 Diagnose the exact recent quotation failures and indeterminate required-content result; implement only evidence-backed corrections, verify positive/negative redistributable cases and bounded ordinary reprocessing, and compare supported API/MCP results and unchanged history. Do not repair invented citations, manually classify notices or claim the earlier 14-check sample covers the current pending documents.
-- [ ] 31.3 Adopt separately scoped Calcinaia platform acquisition and automatic primary-counterpart discovery/comparisons after successful full-scope preview and required-dependency checks. Verify effective cadence, retry/failure handling, immutable receipts for new/changed evidence and independent municipal/CFR collection; retain diagnostic-only candidates and uncompleted wider scopes.
+- [x] 31.3 Adopt separately scoped Calcinaia platform acquisition and automatic primary-counterpart discovery/comparisons after successful full-scope preview and required-dependency checks. Verify effective cadence, retry/failure handling, immutable receipts for new/changed evidence and independent municipal/CFR collection; retain diagnostic-only candidates and uncompleted wider scopes.
 - [ ] 31.4 Inventory necessary explicitly referenced municipal/albo acts and verify bounded acquisition/interpretation of their exact editions and resources. Resolve affected dates only from authoritative clarifying evidence; record inaccessible acts or absent clarification and preserve indeterminate validity when the source cannot establish it.
 - [ ] 31.5 Reassess each actual source dossier against the verified declared scope and current ordinary results, keeping real/reused/synthetic evidence explicit. Record source acceptance and its report review only when prerequisites pass; keep accepted limitations partial and preserve separate public/release controls and independent CFR evidence conditions.
 
@@ -704,3 +704,24 @@ Retained primary evidence remains readable after interpretation archival, while
 archived platform candidates are excluded from automatic execution. Integration
 checks also separate historical query boundaries at PostgreSQL microsecond
 precision; two adjacent Go clock reads are not a reliable before/after fixture.
+
+
+**31.3 completed — 4 October 2026:** the clean `8545385` application revision
+is adopted by the ordinary development services and six workers. The separately
+registered Calcinaia platform revision 1 passes the full selected display window
+from 4 September: 36 notices, one listing, two risk responses and 16 required
+municipal PDFs; all 39 versions and 55 resources pass hash-verified storage
+readback. Two independently scheduled complete checks verify the effective
+600-second cadence and 1,800-second delay threshold without spurious versions.
+Automatic comparisons run every minute and preserve 50 initial diagnostic
+receipts: 24 missing-evidence and 26 non-comparable outcomes. Synthetic failure,
+retry, conflict, changed-version and recovery checks are explicitly attributed.
+Six actual SDK API/MCP comparisons cover current situation, saved view, previous
+primary knowledge, another municipality, document receipts and source coverage;
+original-copy access returns 403. The publication-scope change expires earlier
+views with 410 according to the existing contract, without changing primary
+history. Original source controls/configurations, dependencies and frontend are
+preserved; production remains stopped. Ordinary quotation failures remain
+rejected and source acceptance stays pending. See [ordinary adoption](../../../docs/operations/cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026).
+The checklist is now 162/171 complete, with three source-continuation tasks and
+six operational/release tasks open; deferred backup/restore checks remain mandatory.

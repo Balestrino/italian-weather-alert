@@ -86,6 +86,16 @@ No source acceptance or ordinary public enablement changed, and full MVP readine
 is not claimed. The dated inventory remains unchanged. See
 [MVP acceptance review](operations/mvp-acceptance-review.md).
 
+**Subsequent ordinary platform adoption — 4 October 2026:** Calcinaia's separately
+scoped Cittadino Informato source is enabled in development after full preview
+and hash-verified readback of all required originals/PDFs. Two ordinary scheduled
+checks verify the effective 600-second cadence; automatic municipal/CFR
+comparisons preserve diagnostic receipts for missing evidence or comparability.
+Actual API/MCP checks verify attribution, source coverage and municipal isolation.
+Quotation failures in ordinary interpretation remain rejected. This completes
+31.3 without source acceptance, ordinary public enablement or production activation;
+the original source-status rows below remain pending. See [ordinary adoption](operations/cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026).
+
 ## Data and verification
 
 **Subsequent Calcinaia scope audit — 4 October 2026:** the live three-section

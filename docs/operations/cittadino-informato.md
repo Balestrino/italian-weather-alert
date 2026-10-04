@@ -23,6 +23,7 @@ Comuni o canali, e revisioni che rimuovono il contratto da questo canale.
 | `page_size` | Elementi per pagina, da 1 a 100 |
 | `updates_since` | Eventuale filtro assoluto `YYYY-MM-DD` sulla data di visualizzazione |
 | `attachment_paths` | Eventuali percorsi PDF consentiti, sullo stesso dominio e delimitati esplicitamente |
+| `external_attachments` | Directory PDF su origini HTTPS revisionate, con referral e policy per ciascuna dipendenza |
 
 Il referral deve indicare evidenza, destinazione, sezioni, prodotto e ISTAT dello
 stesso Comune. `policy.evidence` registra la scelta dell’operatore e il suo
@@ -341,5 +342,60 @@ referral/identità, finestra di discovery e tutti gli allegati, poi eseguire un 
 completo. Registrare attivazione esplicita, intervalli effettivi e lista delle fonti
 nelle configurazioni dei runner. Controllare acquisizioni ordinarie ripetute,
 originali e ricevute, errori/backoff, isolamento dei comuni e API/MCP. Non riutilizzare
-un trial separato come prova della raccolta ordinaria. L'implementazione verificata
-precede l'adozione live; evidenze private `CIN-CONTINUOUS-20261004`.
+un trial separato come prova della raccolta ordinaria. L'adozione descritta sotto usa questi stessi controlli; evidenze private
+`CIN-CONTINUOUS-20261004`.
+
+
+## Adozione ordinaria verificata — 4 ottobre 2026
+
+La sorgente `calcinaia-cittadino-informato`, revisione 1, è registrata e abilitata
+nel development ordinario dopo preview completo. Il perimetro comprende 36 avvisi
+nella finestra API di visualizzazione dal `2026-09-04`, una risposta elenco e i
+rischi oggi/domani: 39 originali/versioni, 55 risorse obbligatorie, 16 PDF. Tutte
+le risorse sono state rilette dallo storage tramite il normale verificatore di
+hash e dimensione, senza dipendenze mancanti. La directory esterna revisionata
+è `https://www.comune.calcinaia.pi.it/sites/default/files/`; non consente una
+discovery autonoma né download da altre origini. Il filtro assoluto resta distinto
+dalla finestra di pubblicazione e dalla validità delle misure.
+
+La cadenza effettiva della raccolta è 600 secondi, con soglia di ritardo 1.800
+secondi; i confronti vengono eseguiti ogni minuto senza provider. Due controlli ordinari
+completi hanno acquisito ciascuno 38 documenti e un elenco; il secondo è partito
+600,22 secondi dopo la fine del primo, senza nuove versioni spurie. Le prime 50
+ricevute ordinarie sono diagnostiche: 24 `missing_evidence` e 26 `non_comparable`,
+inclusi i rilanci regionali senza metadati CFR espliciti. Non sono cinquanta
+misure corroborate: conservano la ricerca delle controparti, i motivi e gli
+originali/versioni consultati. Le estrazioni ordinarie successive possono
+produrre nuove ricevute; nessun risultato di classificazione con citazioni
+invalide viene riparato a mano o considerato valido. Gli errori di citazione
+osservati rimangono un limite dell'interpretazione, distinto dalla raccolta.
+Al termine dei due passaggi, 33 dei 38 job di classificazione sono falliti per
+`classification_output_quotation` e cinque sono riusciti; tutti i 16 job OCR
+sono riusciti. Questi conteggi non certificano misure o avvisi meteo corroborati.
+
+I test sintetici PostgreSQL/race verificano idempotenza, nuova versione primaria,
+conflitto confrontabile, indisponibilità, recupero e gate disabilitati; il
+recupero conserva anche il ritorno a uno stato precedente. Gli originali primari
+archiviati restano consultabili come evidenza; i candidati piattaforma archiviati
+sono esclusi dall'esecuzione. Queste prove di errore sono sintetiche, senza
+manomettere le fonti reali. Le prove di acquisizione verificano retry/backoff e
+recupero delle dipendenze; le query pubbliche rispettano i confini storici alla
+precisione di PostgreSQL.
+
+Sei confronti effettivi con client SDK verificano API/MCP della situazione,
+isolamento municipale, vista corrente salvata, fatti primari al precedente
+confine di conoscenza, ricevute del documento e copertura della sorgente. La vista di situazione mostra il canale `available`,
+mentre l'altro Comune verificato resta `not_collected`. Aggiungere/attivare una
+sorgente cambia la revisione del perimetro development: le viste precedenti
+rispondono `410` secondo il contratto, senza riscrivere i fatti storici. Le copie
+restano link-only: il download dell’originale restituisce `403` e `copy_url`
+è nullo. Accettazione, abilitazione pubblica ordinaria e produzione
+sono indipendenti.
+
+La revisione applicativa pulita `8545385` è adottata su public/admin, sei worker
+e backup applicativo. Readiness, controllo delle immagini e smoke non distruttivo
+passano; database, storage, crawler e frontend esistenti sono preservati. Le
+configurazioni delle primarie municipale/CFR mantengono i rispettivi perimetri e
+intervalli; non dipendono dalla raccolta piattaforma. Evidenze operative,
+configurazione precedente e rollback restano privati in `CIN-CONTINUOUS-20261004`.
+La verifica del backup/ripristino reale rimane rinviata su richiesta dell'operatore.

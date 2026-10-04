@@ -1,10 +1,11 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 161 task completati su 171 dopo l'audit di copertura di Calcinaia. In questo giro sono verificati:
+ha 162 task completati su 171 dopo l'adozione ordinaria di Cittadino Informato a Calcinaia. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
+| 31.3 | [Raccolta e confronti ordinari](cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026): due controlli alla cadenza effettiva, risorse integre, ricevute diagnostiche e sei confronti API/MCP; accettazione pending |
 | 31.1 | [Matrice corrente](calcinaia-coverage.md), traversal delle sezioni/elenco generale e vista API paginata; interpretazioni recenti pendenti distinte dai 14/14 del campione |
 | 10.1 | [Quattro dossier revisionati](mvp-acceptance-review.md), 22 confronti API/MCP e gate indipendenti verificati; accettazione reale pending |
 | 9.4 | [Consuntivi separati](trial-costs.md), metriche indisponibili e prezzi storici non verificati espliciti; budget pendente |
@@ -15,8 +16,9 @@ ha 161 task completati su 171 dopo l'audit di copertura di Calcinaia. In questo 
 
 I sei gate operativi e di rilascio seguenti restano aperti per gli esiti specifici mancanti:
 
-Si aggiungono quattro task di fonte 31.2–31.5: correzione delle interpretazioni
-recenti, confronto continuativo della piattaforma, atti richiamati e accettazione.
+Restano tre task di fonte, 31.2, 31.4 e 31.5: correzione delle interpretazioni
+recenti, atti richiamati e accettazione. La raccolta piattaforma è attiva nel
+perimetro development verificato; gli errori ordinari di citazione restano rifiutati.
 L'operatore ha richiesto di rinviare backup e ripristino in questa sessione:
 8.2/8.3 e le condizioni dipendenti restano obbligatori prima della produzione.
 

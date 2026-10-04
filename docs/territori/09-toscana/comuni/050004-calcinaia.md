@@ -16,14 +16,14 @@ Comune di Calcinaia, provincia di Pisa, ISTAT `050004`. Fonte IWA: `calcinaia-mu
 | Fonte | Ruolo | Riferimento e limiti |
 | --- | --- | --- |
 | Sito comunale | Primaria | [Notizie](https://www.comune.calcinaia.pi.it/tipi-di-notizia/notizie), [Avvisi](https://www.comune.calcinaia.pi.it/tipi-di-notizia/avvisi), [Comunicati](https://www.comune.calcinaia.pi.it/tipi-di-notizia/comunicati); sezioni da verificare nella configurazione |
-| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03; acquisizione e verificatore implementati, percorso development verificato da CLN-015, adozione programmata separata |
+| Cittadino Informato | Canale riconosciuto dal Comune; acquisizione/discovery aggiuntiva con verifica primaria nel piano IWA | [Pagina Calcinaia](https://cittadinoinformato.it/calcinaia/), collegata dalla homepage comunale; riconoscimento verificato il 2026-10-03; acquisizione e verificatore implementati, percorso development verificato da CLN-015, adozione programmata verificata da CLN-029 nel solo development |
 | Albo pretorio | Atti di supporto | Cercare gli atti citati nelle notizie primarie; il riferimento al singolo atto va verificato |
 
 La mappa consolida la [specifica di acquisizione](../../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md). La sezione Notizie è stata consultata il 2026-10-02; ciò non verifica tutte le altre sezioni o i canali secondari.
 
 Cittadino Informato, già previsto come sentinella di confronto, è incluso dalla
 decisione CLN-010 come canale aggiuntivo di acquisizione/discovery con verifica
-primaria. Il nuovo piano non certifica un controllo periodico attivo. CLN-008 distingue il ruolo
+primaria. Il piano è ora seguito dall’attivazione periodica in development documentata da CLN-029. CLN-008 distingue il ruolo
 documentato dall'acquisizione configurata: verificare una fonte/sezione dedicata
 e ricevute recenti prima di dichiarare il confronto automatico operativo. La
 limitazione storica CLN-008 rinviava l’acquisizione alla revisione delle condizioni
@@ -42,9 +42,11 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
-CLN-028 registra l'implementazione del confronto periodico autorizzato per
-Calcinaia. Prima dell'adozione occorrono preview completo, dipendenze necessarie
-e controlli ordinari; la conferma tecnica resta distinta dall'accettazione.
+CLN-029 verifica configurazione attiva e confronti periodici di Cittadino
+Informato nel development ordinario: 36 avvisi nella finestra di visualizzazione
+selezionata dal 4 settembre, rischi oggi/domani e 16 PDF comunali collegati.
+Raccolta ogni 600 secondi e confronti ogni minuto; ricevute diagnostiche e
+interpretazioni fallite restano esplicite. L'accettazione è ancora pending.
 
 
 CLN-027 aggiunge la [matrice di copertura corrente](../../../operations/calcinaia-coverage.md):
@@ -443,3 +445,14 @@ Il criterio documentale di chiusura di questa voce è superato da CLN-012; le os
 - **Evidenza:** [revisione MVP](../../../operations/mvp-acceptance-review.md), dossier e manifest privati `TOSCANA-ACCEPTANCE-101-20261004`.
 - **Conseguenza:** conclusa la revisione 10.1, con accettazione reale pending e controlli delle fonti conservati. Le motivazioni storiche di configurazione non reintroducono il prerequisito documentale superato da CLN-012.
 - **Prossima verifica:** registrare l'eventuale accettazione del perimetro revisionato con tutti i limiti; completare indipendentemente i gate operativi e di rilascio prima dell'attivazione pubblica ordinaria.
+
+
+### CLN-029 — Canale Cittadino Informato attivo con confronti continuativi
+
+- **Data:** 2026-10-04, solo development e ISTAT `050004`.
+- **Ambito confermato:** fonte distinta, revisione 1; filtro API assoluto di visualizzazione dal `2026-09-04`, 36 avvisi, elenco e rischi oggi/domani. Gli allegati PDF sono selezionati esclusivamente sul dominio municipale nella directory revisionata.
+- **Comportamento verificato:** preview completo, attivazione ordinaria, cadenza effettiva 600/1.800 secondi e confronti ogni minuto. Rilettura integra di 39 originali/versioni e 55 risorse, inclusi 16 PDF; ricevute immutabili su stato nuovo o modificato, senza proiettare candidati diagnostici.
+- **Interfacce e isolamento:** API/MCP equivalenti sulla stessa vista; canale disponibile per Calcinaia e non raccolto per l'altro Comune verificato. Il cambio del perimetro invalida le viste precedenti come previsto dal contratto; i fatti primari al precedente confine di conoscenza restano invariati. Nessuna copia pubblica autorizzata.
+- **Limiti osservati:** controparti mancanti o prive di edizione esplicita e metadati CFR mancanti impediscono corroborazione. I fallimenti di citazione nell'interpretazione ordinaria sono rifiutati; la raccolta completa non li risolve né completa la 31.2.
+- **Evidenza:** [adozione](../../../operations/cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026), materiali privati `CIN-CONTINUOUS-20261004`. Primaria municipale e CFR mantengono raccolta/configurazioni indipendenti; produzione ferma, accettazione e abilitazione pubblica ordinaria separate.
+- **Prossima verifica:** correzioni sostenute da evidenza, controparti ed esatta edizione degli atti, dossier e controlli dei gate rimanenti.

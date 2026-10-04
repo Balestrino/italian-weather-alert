@@ -7,8 +7,10 @@ with primary municipal/CFR verification and independent primary collection. Task
 license/legal-basis documentation gate with a working multi-source verification
 system: implement acquisition and persistent comparisons in 26.3/26.4, then close
 26.2 from a bounded development run, now verified with ten persisted receipts.
-The later 26.5 evaluation and bounded 26.6 development trial are verified; scheduled adoption remains separate. The decision activates
-no platform collector and does not complete source acceptance. See
+The later 26.5 evaluation and bounded 26.6 development trial are verified. The
+planning decision itself activated no collector; the subsequent 31.3 adoption
+now verifies ordinary Calcinaia platform collection and automatic comparisons
+in development. Source acceptance remains separate. See
 [platform guidance](../docs/fonti/piattaforme/cittadino-informato.md).
 
 A subsequent bounded manual review identifies Calcinaia's exposed REST index,
@@ -35,7 +37,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 161 | 10 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 162 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -239,3 +241,15 @@ successful regression or establish semantic completeness. Four scoped follow-up
 tasks cover ordinary correction, continuous platform comparisons, referenced acts
 and source acceptance. The checklist is 161/171, with ten tasks open. Operator-
 deferred backup/restore verification remains a production requirement.
+
+
+The subsequent Calcinaia adoption (31.3) enables the separately scoped platform
+source after full preview and hash-verified dependency readback. Two ordinary
+scheduled checks verify the 600-second cadence; automatic comparisons revisit
+retained municipal/CFR evidence every minute without new provider calls or
+domain admission. Fifty initial receipts remain diagnostic, with missing acts,
+editions or CFR metadata explicit. Six actual SDK API/MCP comparisons verify
+availability, attribution, historical primary facts and municipal isolation.
+Ordinary quotation failures remain rejected; broader interpretation, referenced
+acts and acceptance are open. See [the adoption record](../docs/operations/cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026).
+The checklist is now 162/171 with nine tasks open; production remains stopped.

@@ -1,6 +1,6 @@
 ---
 tipo: "piattaforma"
-ultima_revisione: "2026-10-03"
+ultima_revisione: "2026-10-04"
 ---
 
 # Cittadino Informato
@@ -23,8 +23,12 @@ Il [coverage tracker](../../coverage.md) resta il riferimento per l'accettazione
 
 ## Guida operativa
 
-CIN-013 aggiunge il worker periodico e gli allegati comunali esterni delimitati.
-La verifica software precede il preview completo e l'attivazione ordinaria;
+CIN-014 registra l'attivazione ordinaria di Calcinaia in development dopo il
+preview completo: avvisi con filtro di visualizzazione dal 4 settembre, rischi
+oggi/domani e PDF comunali collegati nel percorso revisionato. Raccolta ogni
+600 secondi, soglia 1.800 secondi, confronti ogni minuto; accettazione pending.
+Le ricevute distinguono riscontro mancante e non comparabilità; errori di citazione
+dell'interpretazione ordinaria restano rifiutati. Perimetri primari indipendenti;
 consultare la [procedura continuativa](../../operations/cittadino-informato.md#raccolta-e-confronti-continuativi--task-313).
 
 
@@ -231,3 +235,13 @@ Il criterio documentale di chiusura di questa voce è superato da CIN-006; le os
 - **Conoscenza e intervento:** comportamento confermato; presentazione verificata dal task 28.
 - **Osservazione ed evidenza:** identità del canale ricavata dalla piattaforma configurata, senza deduzione dal nome della fonte. Una fonte configurata ma senza dati pubblicabili è indisponibile; senza canale nella vista la sintesi è `not_collected`. Nessuna importazione dei risultati privati del trial o conferma implicita dei candidati. [CLN-018](../../territori/09-toscana/comuni/050004-calcinaia.md#cln-018--situazione-apimcp-centrata-su-conclusioni-e-fonti).
 - **Conseguenza e prossima verifica:** rendere esplicita l'assenza dei dati operativi; raccolta continuativa, riscontro dei contenuti e accettazione restano separati.
+
+
+### CIN-014 — Configurazione ordinaria e confronti periodici di Calcinaia
+
+- **Data:** 2026-10-04; ambiente development, solo Calcinaia `050004`.
+- **Osservazione confermata:** sorgente distinta `calcinaia-cittadino-informato`, revisione 1, raccolta abilitata dopo preview completo di 36 avvisi, un elenco e due risposte rischi. I 39 originali/versioni e le 55 risorse obbligatorie, inclusi 16 PDF, sono completi e riletti con verifica degli hash.
+- **Comportamento verificato:** worker periodico con ricevute automatiche, confronto degli originali primari conservati e controlli indipendenti delle tre fonti. Raccolta effettiva 600 secondi, soglia di ritardo 1.800 secondi; confronti ogni minuto.
+- **Limiti:** filtro assoluto sulla visualizzazione dal `2026-09-04`, nessuna copertura storica universale; identità/edizioni locali non stabilite e metadati CFR mancanti rimangono diagnostici. Errori di citazione impediscono alcune interpretazioni ordinarie; una raccolta completa non certifica correttezza semantica o fonte accettata.
+- **Evidenza:** `CIN-CONTINUOUS-20261004`, [adozione e verifiche](../../operations/cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026); originali, configurazioni e audit operativi privati.
+- **Prossima verifica:** seguire i risultati ordinari e le controparti, correggere soltanto difetti sostenuti da evidenza e verificare l'accettazione nel coverage tracker.
