@@ -102,7 +102,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 
 ## 10. MVP release readiness
 
-- [ ] 10.1 Review separate acceptance reports for vigilance, criticality/alert, monitoring and Calcinaia across API/MCP, seven risks, scanned attachments, history and operational failure states; verify each accepted scope can be enabled independently, partial coverage is never described as complete and full MVP readiness requires all four scopes.
+- [x] 10.1 Review separate acceptance reports for vigilance, criticality/alert, monitoring and Calcinaia across API/MCP, seven risks, scanned attachments, history and operational failure states; verify each accepted scope can be enabled independently, partial coverage is never described as complete and full MVP readiness requires all four scopes.
 - [ ] 10.2 Verify production on the shared VM behind the existing HTTPS reverse proxy, sole trusted `X-Forwarded-For` hop, private administration through SSH tunnel or configured tailnet-only Tailscale Serve, external model endpoints, existing SMTP path, independent environment resources, concurrent-load capacity thresholds, PBS backup/isolated restore after host failure and rollback procedures; deliver a readiness record before any separately authorized deployment.
 - [x] 10.3 Support the operator-requested direct private Tailscale Serve dashboard: validate one explicit HTTPS tailnet origin, preserve local access and cross-site/Host protections, keep loopback backend/public isolation, test and verify the running Serve endpoint, and document access/rollback. This does not complete overall deployment readiness in 10.2.
 
@@ -650,3 +650,21 @@ immutable. Sources, dependencies, six workers and stopped production are preserv
 See [observational trial](../../../docs/operations/observational-trial.md).
 The checklist is now 159/166 complete, with seven original gates still open;
 9.3 does not complete 10.1, source acceptance or production activation.
+
+
+**10.1 completed — 4 October 2026:** four source-scoped acceptance dossiers are
+reviewed, with evidence references, configured sections, evaluated period and
+explicit real/retained/synthetic limitations. Twenty-two actual SDK API/MCP
+comparisons cover five operation groups, seven risk filters, per-source coverage
+and pre-startup history. OCR provenance/persistence and unavailable transport
+states pass; earlier pagination, original comparisons and failure exercises are
+explicitly attributed as retained evidence. A disposable PostgreSQL test verifies
+all four independent activation/suspension paths, rejection of missing evidence,
+partial status for missing or limited scopes and full status only for four fully
+accepted scopes. This completes the specified report review and gate verification;
+it does not record positive source acceptance. All four real dossiers remain
+pending, with positive vigilance cases and an operational monitoring bulletin
+still required for their stated semantic acceptance. Source controls and actual
+MVP readiness remain unchanged; production stays stopped. See
+[MVP acceptance review](../../../docs/operations/mvp-acceptance-review.md).
+The checklist is now 160/166 complete, with six operational/release tasks open.

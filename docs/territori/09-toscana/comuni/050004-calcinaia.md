@@ -45,7 +45,8 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 CLN-025 verifica la correzione sul worker ordinario e la chiusura osservativa
 9.3: quattro ambiti indipendenti, riapertura ed eccezioni conservate, regression
 pass con stesso contratto e audit immutabile. I fallimenti CLN-022/CLN-024 restano
-storici; 10.1 e accettazione sono indipendenti.
+storici. CLN-026 verifica la revisione 10.1 e i gate; accettazione e
+completezza oltre il perimetro dichiarato restano distinte.
 
 Il recupero provider del 2026-10-04 verifica nuovamente OCR remoto e una pipeline
 ordinaria di Calcinaia, dopo ripresa controllata del blocco credenziale. Una
@@ -391,3 +392,14 @@ Il criterio documentale di chiusura di questa voce è superato da CLN-012; le os
 - **Campagna:** valutazione MVP `complete` dopo 239,94 ore, nove intervalli completi di 24 ore. La campagna interna mantiene i ritardi storici; controlli delle fonti e produzione sono conservati.
 - **Conseguenza:** chiusura 9.3, senza accettazione o completamento 10.1.
 - **Prossima verifica:** [sette gate rimanenti](../../../operations/toscana-readiness.md), in particolare collaudo 10.1.
+
+
+### CLN-026 — Revisione del dossier e limiti del collaudo
+
+- **Data e ultima verifica:** 2026-10-04, cinque gruppi API/MCP in development, evidenze conservate e test sintetici OCR/lifecycle; nessuna nuova ricerca del sito comunale.
+- **Ambito:** Calcinaia `050004`, tre sezioni dichiarate e periodo della campagna MVP; conservati i risultati e fallimenti precedenti.
+- **Comportamento verificato:** copertura e dettaglio documentale API/MCP equivalenti, storico precedente all'avvio esplicitamente incompleto; gate indipendenti dei quattro ambiti su PostgreSQL isolato. I confronti di paginazione, interpretazione e originali della 9.3 restano attribuiti come riusati.
+- **Limiti:** ordinanza raster come simulazione dichiarata; canary remoto di due pagine su allegato non meteo come prova del provider, non accuratezza di tutte le scansioni. Date conflittuali e validità indeterminata conservate; tre sezioni non certificano tutto il Comune né raccolta continuativa dei canali aggiuntivi.
+- **Evidenza:** [revisione MVP](../../../operations/mvp-acceptance-review.md), dossier e manifest privati `TOSCANA-ACCEPTANCE-101-20261004`.
+- **Conseguenza:** conclusa la revisione 10.1, con accettazione reale pending e controlli delle fonti conservati. Le motivazioni storiche di configurazione non reintroducono il prerequisito documentale superato da CLN-012.
+- **Prossima verifica:** registrare l'eventuale accettazione del perimetro revisionato con tutti i limiti; completare indipendentemente i gate operativi e di rilascio prima dell'attivazione pubblica ordinaria.

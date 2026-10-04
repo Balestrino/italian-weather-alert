@@ -370,3 +370,123 @@ func TestRegistryPostgres(t *testing.T) {
 	}
 	t.Log("real PostgreSQL: migration replay/concurrency, pending scopes, referral bounds, immutable versions, separate activation, CAS and restart persistence passed")
 }
+
+// Synthetic release controls: no acceptance or activation of a live source.
+func TestFourMVPScopesEnableIndependentlyAndKeepPartialCoverage(t *testing.T) {
+	ctx := context.Background()
+	pool, _ := testDB(t)
+	s := New(pool)
+	must := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	must(Migrate(ctx, pool))
+	must(s.CreateAuthority(ctx, Authority{"synthetic-mvp", "Synthetic authority", "https://comune.example"}))
+	must(s.CreateChannel(ctx, Channel{"synthetic-direct", "synthetic-mvp", "direct", "https://comune.example", false}))
+	products := []string{"vigilance", "criticality", "monitoring", "municipal"}
+	sources := []string{"synthetic-vigilance", "synthetic-criticality", "synthetic-monitoring", "synthetic-calcinaia"}
+	configs := make([]Configuration, 4)
+	for i, product := range products {
+		c := fixtureConfig()
+		c.URL = "https://comune.example/" + product
+		c.Sections = []string{c.URL}
+		c.Limitations = nil
+		configs[i] = c
+		territory := "Toscana"
+		if product == "municipal" {
+			territory = "050004"
+		}
+		must(s.CreateSource(ctx, Source{sources[i], "synthetic-mvp", "synthetic-direct", product, territory}, c, "synthetic-operator"))
+		must(s.RecordPreview(ctx, sources[i], 1, "synthetic-operator", Evidence{URL: c.URL, Locator: "synthetic successful preview", ObservedAt: time.Now().UTC()}))
+		must(s.EnableCollection(ctx, sources[i], 1, "synthetic-operator"))
+		if err := s.EnablePublic(ctx, sources[i], 1, "synthetic-operator"); !errors.Is(err, ErrPrerequisite) {
+			t.Fatalf("unaccepted scope enabled: %s %v", product, err)
+		}
+	}
+	readiness, err := s.ReleaseReadiness(ctx)
+	must(err)
+	if readiness.Status != "pending" {
+		t.Fatal(readiness)
+	}
+	for i, id := range sources {
+		a := acceptance(configs[i])
+		a.CoverageStatus = "accepted_declared_scope"
+		a.CoverageLimitations = nil
+		if products[i] != "municipal" {
+			a.RiskCoverage = append([]string(nil), ToscanaRisks...)
+		}
+		if i == 0 {
+			// Missing risk/scanning/history/failure evidence cannot be called accepted.
+			for _, field := range []string{"risk", "scan", "history", "failure", "interfaces"} {
+				bad := a
+				switch field {
+				case "risk":
+					bad.RiskCoverage = bad.RiskCoverage[:6]
+				case "scan":
+					bad.ScannedAttachmentsVerified = false
+				case "history":
+					bad.HistoryVerified = false
+				case "failure":
+					bad.FailureBehaviorVerified = false
+				case "interfaces":
+					bad.InterfacesEquivalent = false
+				}
+				if err := s.Accept(ctx, id, 1, "synthetic-reviewer", bad); !errors.Is(err, ErrInvalid) {
+					t.Fatalf("missing %s accepted: %v", field, err)
+				}
+			}
+		}
+		if i == 3 {
+			a.CoverageStatus = "accepted_with_limitations"
+			a.CoverageLimitations = []string{"Only the declared synthetic municipal sections"}
+		}
+		must(s.Accept(ctx, id, 1, "synthetic-reviewer", a))
+		if err := s.EnablePublic(ctx, id, 1, "synthetic-operator"); !errors.Is(err, ErrPrerequisite) {
+			t.Fatalf("unreviewed acceptance enabled: %v", err)
+		}
+		reviewAcceptance(t, s, ctx, id, 1)
+		st, err := s.State(ctx, id)
+		must(err)
+		if st.PublicEnabled {
+			t.Fatal("review enabled source implicitly", id)
+		}
+		must(s.EnablePublic(ctx, id, 1, "synthetic-operator"))
+		for j, other := range sources {
+			st, err := s.State(ctx, other)
+			must(err)
+			if st.PublicEnabled != (j <= i) {
+				t.Fatalf("independent activation changed %s: %#v", other, st)
+			}
+		}
+		readiness, err = s.ReleaseReadiness(ctx)
+		must(err)
+		if readiness.Status != "partial" || len(readiness.Scopes) != 4 {
+			t.Fatal("incomplete or limited MVP reported ready", readiness)
+		}
+	}
+	// All four accepted does not erase the municipal coverage limitation.
+	if readiness.Scopes[3].Status != "accepted_with_limitations" {
+		t.Fatal(readiness)
+	}
+	full := acceptance(configs[3])
+	full.CoverageStatus = "accepted_declared_scope"
+	full.CoverageLimitations = nil
+	must(s.Accept(ctx, sources[3], 1, "synthetic-reviewer", full))
+	reviewAcceptance(t, s, ctx, sources[3], 1)
+	readiness, err = s.ReleaseReadiness(ctx)
+	must(err)
+	if readiness.Status != "ready" {
+		t.Fatal("four fully reviewed scopes not ready", readiness)
+	}
+	// Suspension is source-scoped and cannot erase collection or other publications.
+	must(s.Disable(ctx, sources[1], 1, "synthetic-operator", true))
+	for i, id := range sources {
+		st, err := s.State(ctx, id)
+		must(err)
+		if !st.CollectionEnabled || st.PublicEnabled != (i != 1) {
+			t.Fatalf("source-scoped suspension changed unrelated state: %#v", st)
+		}
+	}
+}

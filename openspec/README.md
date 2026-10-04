@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 159 | 7 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 160 | 6 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -219,3 +219,14 @@ contract and actual API/MCP/history checks; original failures and archives remai
 The Toscana checklist is now 159/166, with seven open gates. Source acceptance,
 10.1 and production readiness remain separate. See
 [observational trial](../docs/operations/observational-trial.md).
+
+
+Task 10.1 subsequently completes review of four separately scoped pending
+acceptance dossiers and verification of API/MCP, risk, scan, history, failure and
+independent source controls. Real evidence, reused checks and synthetic controls
+remain distinguishable. Missing or limited scopes cannot yield full MVP status;
+positive vigilance cases and a real operational monitoring bulletin remain
+explicit acceptance conditions. Source acceptance/public controls are unchanged.
+The checklist is now 160/166 with six operational/release tasks open; this count
+does not imply accepted sources or production readiness. See
+[MVP acceptance review](../docs/operations/mvp-acceptance-review.md).

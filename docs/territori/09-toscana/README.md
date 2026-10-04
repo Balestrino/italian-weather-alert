@@ -25,7 +25,8 @@ Gli identificativi aiutano a riconoscere le fonti nel registro dell'ambiente; no
 TOS-019 verifica la chiusura della campagna MVP 9.3 sui quattro ambiti: confronti
 originali/allegati corretti con audit, cadenza e ritardi documentati e prove di
 errore/evento assente attribuite. La campagna interna precedente conserva i suoi
-ritardi; 10.1 e accettazione restano separati.
+ritardi. TOS-020 verifica la revisione 10.1 e i gate indipendenti;
+l’accettazione reale resta pendente, con limiti per prodotto espliciti.
 
 
 Il [consuntivo delle campagne](../../operations/trial-costs.md) distingue costi
@@ -317,3 +318,14 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 - **Evidenza:** [rapporto osservativo](../../operations/observational-trial.md#esito-verificato-del-4-ottobre-2026), materiali privati `TOSCANA-TRIAL-CLOSURE-20261004`; CLN-025 per worker e API/MCP.
 - **Conseguenza:** chiusura della sola 9.3. La campagna interna resta `extended` per ritardi storici; controlli delle fonti e produzione non vengono abilitati dalla valutazione.
 - **Prossima verifica:** collaudo 10.1 e gate operativi; accettazione resta nel [coverage tracker](../../coverage.md#region-09).
+
+
+### TOS-020 — Quattro dossier revisionati e gate indipendenti
+
+- **Data e ultima verifica:** 2026-10-04, query API/MCP effettive in development, evidenze conservate e test sintetici con PostgreSQL isolato; nessuna nuova ricerca web dei canali.
+- **Ambito:** vigilanza, criticità/allerta, monitoraggio CFR e Calcinaia, sezioni e periodo dichiarati nei quattro dossier.
+- **Comportamento verificato:** ventidue confronti API/MCP, sette filtri di rischio, storico e stati di errore; test OCR con riferimenti per pagina. Accettazione/revisione/abilitazione separate e sospensione indipendente; copertura mancante o limitata non produce MVP completo.
+- **Limiti confermati:** casi positivi reali di vento/mareggiate/neve/ghiaccio della vigilanza ancora da confrontare; esempio normativo di monitoraggio distinto da bollettino operativo. Altri controlli positivi, scansioni e guasti simulati restano etichettati; forme grafiche non supportate mantengono incertezza.
+- **Evidenza:** [revisione MVP](../../operations/mvp-acceptance-review.md), quattro dossier e manifest privati `TOSCANA-ACCEPTANCE-101-20261004`; CLN-026 per il perimetro municipale.
+- **Conseguenza:** task 10.1 concluso come revisione e verifica dei gate. Tutti i dossier reali restano pending; nessuna accettazione, abilitazione ordinaria o readiness di produzione deriva dalla chiusura.
+- **Prossima verifica:** chiudere le condizioni semantiche del singolo dossier prima dell'accettazione; verificare separatamente i sei gate operativi/di rilascio.

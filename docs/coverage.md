@@ -77,6 +77,15 @@ internal-campaign delays remain immutable. This completes observational evidence
 without granting source acceptance, public enablement or production readiness.
 The original inventory remains unchanged. See [observational trial](operations/observational-trial.md).
 
+**Subsequent acceptance-report review — 4 October 2026:** task 10.1 reviews four
+separate dossiers and verifies API/MCP, seven risk filters, scans, history,
+failure states and independent lifecycle controls. All real dossiers remain
+pending; missing positive vigilance cases and an operational monitoring bulletin
+remain explicit. Synthetic controls and reused observations are labelled.
+No source acceptance or ordinary public enablement changed, and full MVP readiness
+is not claimed. The dated inventory remains unchanged. See
+[MVP acceptance review](operations/mvp-acceptance-review.md).
+
 ## Data and verification
 
 - Municipalities: [ISTAT-derived national registry](nazionale/registri/comuni-italia.csv), captured 15 September 2026; 7,894 municipalities in 20 regions. [Official ISTAT registry](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/) and [reuse terms](https://www.istat.it/dati/open-data/). IWA selected and normalized the registry fields; see [attribution](../THIRD_PARTY_NOTICES.md).

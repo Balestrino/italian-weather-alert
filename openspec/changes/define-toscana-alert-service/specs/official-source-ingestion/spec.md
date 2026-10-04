@@ -33,6 +33,16 @@ The service SHALL report sources as not yet verified until official provenance, 
 - **WHEN** regional products are accepted but a planned municipal channel has unresolved acceptance evidence
 - **THEN** regional data remains available, that local scope is not yet verified, and complete initial local coverage is not claimed
 
+#### Scenario: A four-scope acceptance review retains pending outcomes
+- **WHEN** the operator reviews separate vigilance, criticality/alert, monitoring and Calcinaia dossiers with unresolved acceptance evidence
+- **THEN** each report retains its evidence scope and pending outcome without recording positive acceptance or enabling public access
+- **AND** real observations, reused evidence and synthetic controls remain distinguishable
+
+#### Scenario: MVP source activation and coverage are independent
+- **WHEN** a source has an accepted reviewed report and the operator explicitly enables or suspends its public access
+- **THEN** the action affects that source alone and preserves collection and unrelated publication states
+- **AND** missing or accepted-with-limitations scopes retain partial MVP coverage; full MVP readiness requires all four fully accepted scopes
+
 ### Requirement: Product-specific regional acceptance
 The service SHALL record acceptance independently for vigilance, criticality/alert and monitoring, including operational channel, format and necessary graphical resources, access and product-specific reuse evidence, documented cadence and extraction evaluation. A historical example or normative template SHALL NOT establish operational availability. An unverified product SHALL remain explicitly unavailable in coverage results without preventing independently accepted and publicly enabled products from being returned. Partial availability SHALL NOT be described as completion of the three-product Toscana MVP.
 

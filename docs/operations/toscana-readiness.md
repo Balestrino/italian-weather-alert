@@ -1,24 +1,24 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 159 task completati su 166. In questo giro sono verificati:
+ha 160 task completati su 166. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
+| 10.1 | [Quattro dossier revisionati](mvp-acceptance-review.md), 22 confronti API/MCP e gate indipendenti verificati; accettazione reale pending |
 | 9.4 | [Consuntivi separati](trial-costs.md), metriche indisponibili e prezzi storici non verificati espliciti; budget pendente |
 | 11.5 | [Campagne indipendenti e quattro report pending](municipal-acceptance.md); stessi gate del pilota |
 | 13.8 | [Recupero provider verificato](acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026), OCR e pipeline ordinaria riusciti; fallimento di citazione preservato |
 | 9.3 e 30.1/30.2 | [Campagna MVP complete con audit correttivo](observational-trial.md#esito-verificato-del-4-ottobre-2026); durata, quattro ambiti, confronti e prove attribuiti |
 | 29.1–29.3 | [Recupero selettivo con audit](municipal-interpretation.md#esito-del-recupero-live), test e worker ordinari verificati; omissione live e campagne extended nell’esito iniziale, superato dalla chiusura 9.3 |
 
-I sette gate originari seguenti restano aperti per gli esiti specifici mancanti:
+I sei gate operativi e di rilascio seguenti restano aperti per gli esiti specifici mancanti:
 
 | Task | Condizione ancora da verificare |
 | --- | --- |
 | 1.8 | Dimensionamento previsto della VM, SMTP/mailbox, PBS e telemetria continuativa delle soglie |
 | 8.2 | Backup PBS whole-VM off-host, piano adottato e allarme effettivamente consegnato |
 | 8.3 | Ripristino PBS in target isolato con dati/originali, configurazioni e recupero job |
-| 10.1 | Collaudo reale dei quattro ambiti MVP, sette rischi/API-MCP/scansioni/storico/errori; accettazione e abilitazione separate |
 | 10.2 | Readiness operativa della produzione, capacità concorrente, proxy/SMTP/provider, recupero host e rollback |
 | 12.4 | Immagine approvata su revisione pulita, staging verificato, accesso GHCR operativo, pubblicazione e pull del digest |
 | 12.5 | Piano PBS ora documentato; backup, allarmi e ripristino cronometrato reali prima di attestare RPO/RTO |
@@ -119,3 +119,20 @@ Runtime, smoke, test unit/race e PostgreSQL passano. Archivi, job e risultati
 precedenti, controlli delle fonti e dipendenze sono conservati; produzione ferma.
 La 9.3 è chiusa, 10.1 e gli altri sei gate restano aperti. I paragrafi precedenti
 conservano gli esiti intermedi datati, superati da questa valutazione.
+
+
+## Chiusura della revisione 10.1
+
+I [quattro dossier](mvp-acceptance-review.md) distinguono evidenze operative,
+originali conservati, verifiche riusate e fixture sintetiche. Passano ventidue
+confronti API/MCP effettivi e test OCR, storico, indisponibilità e lifecycle dei
+quattro ambiti su PostgreSQL isolato. Accettazione, revisione del report e
+abilitazione sono indipendenti; ambiti mancanti o limitati mantengono `partial`.
+
+La 10.1 conclude questa revisione e verifica dei gate. I quattro dossier reali
+restano `pending`: casi positivi di vigilanza e bollettino operativo di monitoraggio
+restano condizioni esplicite per la relativa accettazione semantica. Anche dopo
+160/166 task, le fonti non sono accettate e l'MVP reale non è dichiarato pronto.
+L'accettazione di un perimetro limitato deve conservarne i limiti. I sei task
+sopra restano aperti e la produzione resta ferma. Gli esiti intermedi dei
+paragrafi precedenti sono conservati come cronologia.

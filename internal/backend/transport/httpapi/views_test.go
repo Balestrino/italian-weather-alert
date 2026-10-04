@@ -163,6 +163,26 @@ func TestViewStorageFailuresAreUnavailable(t *testing.T) {
 	views := &memoryViewStore{createErr: errors.New("storage down")}
 	runtime := PublicRuntime{Limits: PublicLimits{Allowance: 20, Window: time.Minute, MaxPageSize: 10}, Views: views, ViewLifetime: 30 * time.Minute, CursorKey: []byte(strings.Repeat("k", 32))}
 	handler := handlerWithRuntime(nil, func() time.Time { return clock }, runtime, queries)
+	testServer := httptest.NewServer(handler)
+	defer testServer.Close()
+	client := mcp.NewClient(&mcp.Implementation{Name: "iwa-unavailability-review", Version: "1.0.0"}, nil)
+	session, err := client.Connect(t.Context(), &mcp.StreamableClientTransport{Endpoint: testServer.URL + "/mcp", HTTPClient: testServer.Client(), DisableStandaloneSSE: true}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	checkMCPUnavailable := func(arguments map[string]any) {
+		t.Helper()
+		result, err := session.CallTool(t.Context(), &mcp.CallToolParams{Name: "get_source_coverage", Arguments: arguments})
+		if err != nil || !result.IsError {
+			t.Fatalf("MCP storage failure reported as data: %#v %v", result, err)
+		}
+		value := jsonValue(t, result.StructuredContent).(map[string]any)
+		failure, ok := value["error"].(map[string]any)
+		if !ok || failure["code"] != "service_unavailable" || value["data"] != nil {
+			t.Fatalf("MCP storage failure became an all-clear: %#v", value)
+		}
+	}
 	request := httptest.NewRequest(http.MethodGet, "/v1/sources/coverage?municipality_istat=050004&page_size=1&evaluation_time=2026-09-17T12%3A00%3A00Z&known_at=2026-09-17T11%3A30%3A00Z", nil)
 	request.RemoteAddr = "192.0.2.1:1000"
 	response := httptest.NewRecorder()
@@ -170,6 +190,7 @@ func TestViewStorageFailuresAreUnavailable(t *testing.T) {
 	if response.Code != http.StatusServiceUnavailable || !strings.Contains(response.Body.String(), "service_unavailable") {
 		t.Fatalf("create failure became data: %d %s", response.Code, response.Body.String())
 	}
+	checkMCPUnavailable(map[string]any{"municipality_istat": "050004", "page_size": 1, "evaluation_time": "2026-09-17T12:00:00Z", "known_at": "2026-09-17T11:30:00Z"})
 
 	views.createErr = nil
 	response = httptest.NewRecorder()
@@ -189,6 +210,7 @@ func TestViewStorageFailuresAreUnavailable(t *testing.T) {
 	if response.Code != http.StatusServiceUnavailable || !strings.Contains(response.Body.String(), "service_unavailable") {
 		t.Fatalf("load failure became empty data: %d %s", response.Code, response.Body.String())
 	}
+	checkMCPUnavailable(map[string]any{"dataset_version": created.Meta.DatasetVersion})
 }
 
 func TestCompoundAndDocumentPaginationPositions(t *testing.T) {

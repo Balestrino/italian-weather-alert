@@ -660,3 +660,22 @@ Extraction v27 excludes a closure supported only by the retrospective subordinat
 clause in a complete core-owned reopening sentence. It retains independent
 closure evidence, without copying prior closure times into reopening validity.
 The v26 ordinary failure remains a separate immutable regression record.
+
+
+## MVP acceptance report review — 4 October 2026
+
+Keep a separately reviewed dossier for each configured MVP source, identifying
+revision, sections, period, original/evidence references and unresolved conditions.
+Record actual API/MCP checks separately from reused historical evidence and
+synthetic scan/failure/lifecycle controls. Report review can have a pending
+acceptance outcome; it must not create an acceptance event or activate a source.
+The four reviewed real dossiers remain pending, including missing positive
+vigilance cases and a real operational monitoring bulletin. Normative examples
+and transport/provider success cannot replace those semantic observations.
+
+Verify lifecycle controls on isolated synthetic sources with PostgreSQL: reject
+missing acceptance dimensions, require a reviewed accepted report before explicit
+public enablement, enable/suspend each source independently, and retain partial
+readiness for missing or limited scopes. Four fully accepted scopes are required
+for full MVP readiness. Infrastructure and explicit production activation remain
+separate. See [review results](../../../docs/operations/mvp-acceptance-review.md).
