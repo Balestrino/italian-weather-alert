@@ -40,6 +40,16 @@ This resolves the current A4 unknown levels within the tested scope. Other label
 placements, vigilance graphics, municipal completeness and expiry remain separate
 work; source acceptance stays pending. See [TOS-014](territori/09-toscana/README.md#tos-014--criticità-della-zona-a4-determinata-dai-poligoni-pdf).
 
+**Subsequent retained graphics verification — 4 October 2026:** task 27.4
+verifies product-specific criticality/vigilance interpretation for all 26 zones
+and seven risks in four retained samples, with separate applicability, rainfall
+bands/cumulative periods, weather symbols, page attribution and knowledge history.
+Positive wind/sea/snow/ice controls are synthetic; additional real cases remain
+acceptance evidence to collect. This supersedes the graphical software gap above
+in the tested formats, without live adoption, source acceptance or public enablement.
+Municipal completeness and expiry remain open. See
+[TOS-015](territori/09-toscana/README.md#tos-015--grafica-cfr-per-tutte-le-zone-dei-campioni-conservati).
+
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
 ## Data and verification

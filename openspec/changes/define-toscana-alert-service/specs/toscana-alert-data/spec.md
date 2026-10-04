@@ -157,7 +157,7 @@ The worker SHALL support multiple immutable fallback configuration revisions wit
 
 
 ### Requirement: Evidence-bound criticality map interpretation
-The service SHALL derive daily zone/risk levels from the retained criticality PDF's labelled filled vector polygons when its issuance matches the retained HTML and the complete seven-risk, two-day, 26-zone map set is recognized. It SHALL attribute each fact to the exact PDF URL and page. Green, yellow, orange and red SHALL follow recognized polygon fills. A white outlined polygon SHALL indicate non-applicability only for the main-river/coastal product masks; background whitespace SHALL NOT establish a level. Missing labels/polygons, overlapping shapes, unsupported colors and unsupported layouts SHALL remain unresolved. Explicit HTML alert rows SHALL retain their precise validity intervals and SHALL NOT be replaced by whole-day effective intervals.
+The service SHALL derive daily zone/risk levels from the retained criticality PDF's labelled filled vector polygons when its issuance matches the retained HTML and the complete seven-risk, two-day, 26-zone map set is recognized. It SHALL attribute each fact to the exact PDF URL and physical page, including editions with preceding adoption/scenario pages. Green, yellow, orange and red SHALL follow recognized polygon fills. A white zone polygon SHALL indicate non-applicability only for the main-river/coastal product masks; background whitespace SHALL NOT establish a level. Separately rendered irregular zone fills MAY be recognized; standalone anonymous rectangles SHALL NOT substitute for zone outlines. Reviewed A6/island label offsets MAY use bounded typographic distance and an unambiguous separated outline; arbitrary nearest-zone inference SHALL NOT be used. Missing labels/polygons, overlapping shapes, unsupported colors, raster maps and unsupported layouts SHALL remain unresolved. Map dates SHALL match the issuance day and next day. Explicit HTML alert rows SHALL retain their precise validity intervals and SHALL NOT be replaced by whole-day effective intervals.
 
 #### Scenario: Applicable and excluded risks in a complete daily map set
 - **WHEN** the retained matching PDF contains an unambiguous green polygon around the municipality's zone label for six risks and an outlined white polygon in the coastal-risk mask
@@ -173,3 +173,21 @@ The service SHALL derive daily zone/risk levels from the retained criticality PD
 - **WHEN** an explicit table defines an afternoon alert interval and matching daily maps show its color
 - **THEN** the interval remains the supported validity and repeated daily copies do not duplicate it
 - **AND** a conflicting table/map color is rejected
+
+#### Scenario: A historical edition includes leading non-map pages
+- **WHEN** the matching issuance and complete labelled maps follow adoption or scenario pages
+- **THEN** those preceding pages are not treated as risk maps and evidence retains the original physical map page
+- **AND** a failed SVG font rendering may be retried through bounded local vector-PDF font normalization, without accepting partial failed output
+
+### Requirement: Product-specific vigilance graphics
+The service SHALL interpret a recognized retained vigilance PDF separately from criticality colors, matching the HTML issuance and both daily map dates. It SHALL require all 26 zones in each of the two rainfall panels, the distinct cumulative panel and the two other-phenomena panels. All seven risk categories SHALL remain represented, with vigilance warning levels `not_applicable` and optional weather metadata. Rainfall SHALL use literal bands from that PDF's eight-band legend, in millimetres averaged over the area; the cumulative band and literal cumulative period SHALL remain separate from daily validity. The two hydrological risk categories MAY share the rainfall observation without inventing hydrological alert levels. Thunderstorms, wind, coastal waves, snow and ice SHALL use that document's labelled graphical symbols. `depicted`, `not_depicted` and `unresolved` SHALL remain distinct; lack of a symbol SHALL NOT establish absence of risk. Explicit HTML phenomenon/zone evaluation SHALL remain distinct from a graphical weather value. Unrecognized marks, missing required resources, edition/date conflicts and unsupported graphics SHALL disclose uncertainty or retain the supported HTML fallback. New projections SHALL preserve older records and become visible only at their actual service-knowledge time.
+
+#### Scenario: Daily rainfall differs from the cumulative panel
+- **WHEN** daily panels show different rainfall bands and the third panel shows a cumulative band
+- **THEN** API/MCP preserve both daily bands, the separate cumulative band, its literal period, unit and area-average scope
+- **AND** neither rainfall white nor a weather symbol supplies a criticality color
+
+#### Scenario: A phenomenon is listed but its graphical symbol is unsupported
+- **WHEN** HTML lists a zone under evaluation or the zone contains an unrecognized graphical mark
+- **THEN** the affected weather metadata is unresolved rather than asserting the phenomenon is absent
+- **AND** supported facts for other zones retain their own evidence assessment while source coverage reports aggregate limitations

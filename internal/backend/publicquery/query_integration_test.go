@@ -30,6 +30,7 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/backend/publicview"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/territory"
+	"github.com/Balestrino/italian-weather-alert/internal/testfixtures/cfrgraphics"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -956,6 +957,91 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		}
 	})
 
+	t.Run("CFR graphics preserve weather and prior knowledge", func(t *testing.T) {
+		if e := domain.MigrateTerritories(ctx, pool); e != nil {
+			t.Fatal(e)
+		}
+		if e := domainStore.BackfillToscana(ctx); e != nil {
+			t.Fatal(e)
+		}
+		sourceID, url := "vigilance-graphics", "https://regione.example/cfr/vigilance-graphics"
+		createSource(registry.Source{ID: sourceID, AuthorityID: "regione-toscana", ChannelID: "cfr", ProductID: "vigilance", Territory: "Toscana"}, url, false)
+		html, bbox, pages := cfrgraphics.Vigilance()
+		reader := graphicsFixtureReader{acquisition.VectorEvidence{BBox: bbox, Pages: pages}}
+		version, e := documentStore.Retain(ctx, documents.Acquisition{ID: "vigilance-graphics-version", SourceID: sourceID, Configuration: 1, URL: url, Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{
+			{URL: url, Role: "original", Required: true, SourceID: sourceID, Configuration: 1, MediaType: "text/html", Bytes: html},
+			{URL: url + ".pdf", Role: "resource", Required: true, SourceID: sourceID, Configuration: 1, MediaType: "application/pdf", Bytes: []byte("%PDF-synthetic-reader-fixture")},
+		}})
+		if e != nil {
+			t.Fatal(e)
+		}
+		// Preserve one legacy table-only projection to verify the knowledge boundary.
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_regional_projections(document_version_id,logic_version,source_id,product,status,statement,limitations) VALUES($1,'cfr-vector-v3',$2,'vigilance','partial','legacy table only','[]')`, version.ID, sourceID); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_regional_records(id,document_version_id,source_id,product,originating_authority_id,publisher_id,platform,municipal_republication,projection_logic,evidence_locator) VALUES('legacy-vigilance',$1,$2,'vigilance','regione-toscana','regione-toscana','CFR',false,'cfr-vector-v3','legacy HTML')`, version.ID, sourceID); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_regional_facts(regional_record_id,product,ordinal,risk,official_risk_label,zone,level) VALUES('legacy-vigilance','vigilance',1,'wind','Vento','A4','not_applicable')`); e != nil {
+			t.Fatal(e)
+		}
+		before := time.Now().UTC()
+		for i := 0; i < 2; i++ {
+			report, e := domainStore.ProjectCFRWithReader(ctx, documentStore, version.ID, reader)
+			if e != nil || report.Facts != 364 || len(report.Limitations) != 0 {
+				t.Fatal("graphics projection", report, e)
+			}
+		}
+		query := SearchQuery{Kind: "regional", SourceID: sourceID, Zone: "A4"}
+		found, e := store.Search(ctx, query)
+		if e != nil || len(found.Regional) != 14 {
+			t.Fatal("replacement projection missing or duplicated", len(found.Regional), e)
+		}
+		for _, f := range found.Regional {
+			if f.Weather == nil || f.Level != "not_applicable" || len(f.Evidence) != 1 || f.Evidence[0].SourceURL != url+".pdf" || f.Evidence[0].Page == nil || *f.Evidence[0].Page != 1 {
+				t.Fatal("persisted weather/evidence lost", f)
+			}
+			if f.Weather.Phenomenon == "rainfall" && f.Weather.TotalRainfallBand != "40 - 60" {
+				t.Fatal("rainfall cumulative meaning lost", f.Weather)
+			}
+		}
+		query.QueryTime = QueryTime{KnownAt: before, EvaluationTime: before}
+		past, e := store.Search(ctx, query)
+		if e != nil || len(past.Regional) != 1 || past.Regional[0].Weather != nil || !strings.HasPrefix(past.Regional[0].ID, "legacy-vigilance") {
+			t.Fatal("past knowledge rewritten", past, e)
+		}
+		var count int
+		if e = pool.QueryRow(ctx, `SELECT count(*) FROM domain_regional_records WHERE document_version_id=$1`, version.ID).Scan(&count); e != nil || count != 365 {
+			t.Fatal("immutable history deleted or duplicated", count, e)
+		}
+		coverage, e := store.Coverage(ctx, CoverageQuery{SourceID: sourceID})
+		if e != nil || len(coverage.Sources) != 1 || coverage.Sources[0].Quality.Interpretation.State != "supported" {
+			t.Fatal("complete graphical interpretation reported partial", coverage, e)
+		}
+		// Incomplete required evidence cannot enter the vector reader/projection.
+		incomplete, e := documentStore.Retain(ctx, documents.Acquisition{ID: "vigilance-graphics-incomplete", SourceID: sourceID, Configuration: 1, URL: url, Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{
+			{URL: url, Role: "original", Required: true, SourceID: sourceID, Configuration: 1, MediaType: "text/html", Bytes: html},
+			{URL: url + ".pdf", Role: "resource", Required: true, SourceID: sourceID, Configuration: 1, Missing: "unavailable"},
+		}})
+		if e != nil {
+			t.Fatal(e)
+		}
+		report, e := domainStore.ProjectCFRWithReader(ctx, documentStore, incomplete.ID, reader)
+		if e != nil || report.Status != "unsupported" || report.Facts != 0 {
+			t.Fatal("incomplete PDF evidence projected", report, e)
+		}
+		query.QueryTime = QueryTime{}
+		found, e = store.Search(ctx, query)
+		if e != nil || len(found.Regional) != 14 || !strings.Contains(strings.Join(found.Regional[0].Quality.Interpretation.Limitations, " "), "newer retained bulletin") {
+			t.Fatal("preceding state or failure warning lost", len(found.Regional), e)
+		}
+	})
 }
 
 func stringPointer(value string) *string { return &value }
+
+type graphicsFixtureReader struct{ evidence acquisition.VectorEvidence }
+
+func (r graphicsFixtureReader) Read(context.Context, []byte) (acquisition.VectorEvidence, error) {
+	return r.evidence, nil
+}

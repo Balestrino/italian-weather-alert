@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 149 | 12 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 150 | 11 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -142,6 +142,15 @@ attribution, historical preservation and actual HTTPS API/MCP equivalence. No
 regional level remains unknown for A4 in that verified response. Other unsupported
 label positions and vigilance graphics remain part of 27.4; municipal temporal
 conflicts and source acceptance are not completed by this correction.
+
+Task 27.4 is subsequently verified on 4 October: product-specific criticality
+and vigilance graphics cover all 26 zones and seven risks in four retained
+samples. Applicability, daily/cumulative rainfall, symbols, PDF physical pages,
+knowledge history and API/MCP weather metadata have retained/synthetic/disposable
+verification. Positive wind/sea/snow/ice cases are synthetic; further real cases
+remain acceptance evidence. This supersedes the graphical software gap above in
+the recognized formats, without replacing live services or accepting sources.
+See [CFR graphics](../docs/operations/cfr-graphics.md).
 
 Tasks 28.1–28.3 replace the raw municipality situation presentation with processed
 conclusions and separate regional, municipal and Cittadino Informato summaries.

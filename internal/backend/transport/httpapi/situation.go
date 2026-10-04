@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/publicquery"
 )
 
@@ -31,23 +32,24 @@ type processedSituation struct {
 	References        []situationReference `json:"references"`
 }
 type situationFact struct {
-	ID               string            `json:"id"`
-	Product          string            `json:"product,omitempty"`
-	Risk             string            `json:"risk,omitempty"`
-	RiskLabel        string            `json:"risk_label,omitempty"`
-	Zone             string            `json:"zone,omitempty"`
-	Level            string            `json:"level,omitempty"`
-	Action           string            `json:"action,omitempty"`
-	Subject          string            `json:"subject,omitempty"`
-	Place            *string           `json:"place,omitempty"`
-	TerritorialScope string            `json:"territorial_scope,omitempty"`
-	Authority        string            `json:"authority,omitempty"`
-	Phase            string            `json:"phase,omitempty"`
-	Status           string            `json:"status"`
-	Reliability      string            `json:"reliability"`
-	Validity         situationValidity `json:"validity"`
-	Limitations      []string          `json:"limitations,omitempty"`
-	ReferenceIDs     []string          `json:"reference_ids"`
+	Weather          *acquisition.VigilanceWeather `json:"weather,omitempty"`
+	ID               string                        `json:"id"`
+	Product          string                        `json:"product,omitempty"`
+	Risk             string                        `json:"risk,omitempty"`
+	RiskLabel        string                        `json:"risk_label,omitempty"`
+	Zone             string                        `json:"zone,omitempty"`
+	Level            string                        `json:"level,omitempty"`
+	Action           string                        `json:"action,omitempty"`
+	Subject          string                        `json:"subject,omitempty"`
+	Place            *string                       `json:"place,omitempty"`
+	TerritorialScope string                        `json:"territorial_scope,omitempty"`
+	Authority        string                        `json:"authority,omitempty"`
+	Phase            string                        `json:"phase,omitempty"`
+	Status           string                        `json:"status"`
+	Reliability      string                        `json:"reliability"`
+	Validity         situationValidity             `json:"validity"`
+	Limitations      []string                      `json:"limitations,omitempty"`
+	ReferenceIDs     []string                      `json:"reference_ids"`
 }
 type situationValidity struct {
 	Precision  string     `json:"precision"`
@@ -134,6 +136,7 @@ func summarizeSituation(value publicquery.Situation) situationData {
 	for _, r := range value.RegionalProducts {
 		f := makeFact(r.ID, r.Status, r.Validity, r.Quality, r.Evidence)
 		f.Product, f.Risk, f.RiskLabel, f.Zone, f.Level = r.Product, r.Risk, r.OfficialRiskLabel, r.Zone, r.Level
+		f.Weather = r.Weather
 		result.ProcessedData.RegionalAlerts = append(result.ProcessedData.RegionalAlerts, f)
 	}
 	active, undetermined := 0, 0

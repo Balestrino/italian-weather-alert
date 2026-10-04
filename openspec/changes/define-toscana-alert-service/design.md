@@ -511,6 +511,37 @@ unambiguously supported zone's fact is assessed separately. This verifies the
 current Calcinaia criticality scope, not all label placements, vigilance graphics,
 municipal expiry or source acceptance.
 
+## Complete retained CFR graphics — 4 October 2026
+
+Task 27.4 extends the preceding bounded interpreter to every labelled zone in the
+recognized retained products. `cfr-graphics-v4` is an independent append-only
+projection revision. Identify map headings by their following two-day row, match
+issuance anywhere in the original PDF and require issuance-day/next-day maps.
+Accept separately rendered irregular fills and only reviewed, tightly bounded A6/I
+label offsets with an unambiguous outline; anonymous rectangles and arbitrary
+nearest-zone choices are insufficient. Retain excluded river/coastal masks.
+
+Vigilance uses its own five panels, dates, eight rainfall bands and labelled
+symbol legend. Carry optional weather metadata through the existing evidence
+locator into shared search and situation facts: daily rainfall band, separate
+cumulative band/period, millimetres, area-average scope, graphical status and HTML
+evaluation membership. Rainfall represents both hydrological risk categories;
+vigilance never acquires criticality colors. An absent symbol means not depicted,
+never absence of risk. Unknown marks or listed-but-unrecognized phenomena remain
+unresolved. Raster maps, changed legends and unsupported geometry fall back to
+supported HTML evidence. Aggregate source limitations do not invalidate otherwise
+supported zone facts; interpretation support does not confer source acceptance.
+
+Bound Poppler operations and add substitute fonts. If direct SVG rendering fails,
+discard its output, render a local single-page vector PDF and retry SVG while
+preserving the original physical page. No remote resource or model call is used.
+Validate two retained criticality and two vigilance samples, separately identify
+the historical non-green PDF's reviewed HTML transcription, and retain private
+hashes/results. Synthetic controls cover positive symbols for all weather
+categories; real positive wind/sea/snow/ice cases remain acceptance evidence to
+collect. Disposable PostgreSQL and API/MCP tests verify history, idempotence,
+missing-resource fallback and metadata. Live adoption remains separate.
+
 ## Concise situation presentation — 3 October 2026
 
 Keep the shared domain query and immutable complete snapshots. At delivery, refresh

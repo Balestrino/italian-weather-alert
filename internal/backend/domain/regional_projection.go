@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const RegionalProjectionLogic = "cfr-vector-v3"
+const RegionalProjectionLogic = "cfr-graphics-v4"
 
 type RegionalDocuments interface {
 	Version(context.Context, int64) (documents.Version, error)
@@ -73,7 +73,7 @@ func (s *Store) ProjectCFRWithReader(ctx context.Context, docs RegionalDocuments
 		return out, err
 	}
 	projection, parseErr := acquisition.ProjectRegionalHTML(product, body)
-	if product == "criticality" && version.Complete {
+	if (product == "criticality" || product == "vigilance") && version.Complete {
 		for _, resource := range version.Resources {
 			if resource.SourceID == source && resource.Required && resource.Missing == "" && resource.MediaType == "application/pdf" {
 				pdf, e := docs.Read(ctx, id, resource.URL)
@@ -82,8 +82,12 @@ func (s *Store) ProjectCFRWithReader(ctx context.Context, docs RegionalDocuments
 					evidence, e = reader.Read(ctx, pdf)
 					if e == nil {
 						var maps acquisition.RegionalProjection
-						maps, e = acquisition.ProjectCriticalityVector(body, resource.URL, evidence)
-						if e == nil && parseErr == nil {
+						if product == "criticality" {
+							maps, e = acquisition.ProjectCriticalityVector(body, resource.URL, evidence)
+						} else {
+							maps, e = acquisition.ProjectVigilanceVector(body, resource.URL, evidence)
+						}
+						if product == "criticality" && e == nil && parseErr == nil {
 							maps, e = acquisition.MergeCriticalityMaps(maps, projection)
 						}
 						if e == nil {
@@ -137,12 +141,16 @@ func (s *Store) ProjectCFRWithReader(ctx context.Context, docs RegionalDocuments
 		return out, err
 	}
 	if tag.RowsAffected() == 0 {
+		err = tx.QueryRow(ctx, `SELECT status,statement,limitations,(SELECT count(*) FROM domain_regional_records WHERE document_version_id=$1 AND projection_logic=$2) FROM domain_regional_projections WHERE document_version_id=$1 AND logic_version=$2`, id, RegionalProjectionLogic).Scan(&out.Status, &out.Statement, &out.Limitations, &out.Facts)
+		if err != nil {
+			return out, err
+		}
 		return out, tx.Commit(ctx)
 	}
 	at := time.Now().UTC()
 	for n, f := range projection.Facts {
 		if f.EvidenceURL != "" {
-			raw, _ := json.Marshal(map[string]any{"source_url": f.EvidenceURL, "page": f.Page, "locator": f.Locator})
+			raw, _ := json.Marshal(map[string]any{"source_url": f.EvidenceURL, "page": f.Page, "locator": f.Locator, "weather": f.Weather})
 			f.Locator = string(raw)
 		}
 		key := fmt.Sprintf("%s:%d:%d", RegionalProjectionLogic, id, n+1)

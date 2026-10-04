@@ -1,7 +1,7 @@
 ---
 tipo: "regione"
 codice_regione: "09"
-ultima_revisione: "2026-10-03"
+ultima_revisione: "2026-10-04"
 ---
 
 # Toscana
@@ -42,6 +42,14 @@ La scelta è revocabile e distinta dalla raccolta e dall’accettazione delle fo
 Gli stati pendenti e i livelli non verificati restano espliciti; staging e produzione
 mantengono i requisiti della specifica. Vedere TOS-007.
 
+La [lettura grafica CFR](../../operations/cfr-graphics.md) usa i PDF conservati e
+la stessa edizione HTML. La criticità legge livelli e maschere di applicabilità;
+la vigilanza conserva bande di pioggia media sull’area, cumulati distinti e simboli
+dei fenomeni, con livello d’allerta non applicabile. `not_depicted` descrive la
+grafica, senza attestare assenza di rischio. Risorse, simboli o associazioni non
+riconosciuti restano irrisolti. TOS-015 registra il collaudo del software e degli
+originali disponibili; adozione live e accettazione restano separate.
+
 ## Regole ed eccezioni
 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
@@ -50,6 +58,7 @@ mantengono i requisiti della specifica. Vedere TOS-007.
 | TOS-002 | Stato del controllo | Completezza della raccolta e pubblicazione attesa sono dimensioni separate | Applicato nello store dei controlli |
 | TOS-003 | Formati CFR con policy locale esplicita | Pertinenza positiva da formato rigorosamente riconosciuto; risorse complete ed evidenza letterale obbligatorie, fallback sui casi non riconosciuti | Implementato; TOS-004 aggiunge replay e trial limitato |
 | TOS-004 | Originali CFR conservati e trial development | Tabella di vigilanza senza zone pertinente solo dopo parsing rigoroso e titolo letterale; nessun all-clear desunto | Replay e classificazioni persistite verificati; rollout continuativo separato |
+| TOS-015 | Mappe CFR conservate | Edizione/date concordanti, 26 zone e sette rischi; vigilanza distinta dai colori di criticità, cumulati distinti dai giorni | Verificato sui quattro campioni conservati e controlli sintetici; accettazione pending |
 
 Non derivare colori delle mappe dal testo circostante. Le pubblicazioni comunali che rilanciano un bollettino non costituiscono automaticamente una nuova allerta o una misura locale.
 
@@ -73,19 +82,19 @@ quando i colori delle mappe non sono verificati. Vedere TOS-005.
 
 ## Problemi aperti
 
-TOS-014 supera la lacuna di TOS-008 per la criticità corrente di Calcinaia:
-`cfr-vector-v3` legge i poligoni colorati del PDF conservato, li associa alle
-sigle di zona e alle intestazioni rischio/giorno, e cita le pagine. L’edizione
-PDF deve coincidere con l’emissione HTML; la sola dichiarazione `NESSUNA` non
-produce colori. Le aree escluse nei prodotti reticolo principale/mareggiate
-restano distinte dal verde. Gli intervalli espliciti della tabella prevalgono
-sulla sola precisione giornaliera della mappa.
+TOS-015 estende il collaudo di TOS-014 alle 26 zone e ai sette rischi dei prodotti
+conservati: `cfr-graphics-v4` risolve i posizionamenti revisionati A6/I e i
+riempimenti separati, interpreta la vigilanza con le proprie legende e preserva
+lo storico. Le maschere reticolo principale/mareggiate restano distinte dal verde;
+gli intervalli precisi HTML prevalgono sulla mappa giornaliera. La sola
+dichiarazione `NESSUNA` non produce colori.
 
-La lettura resta incompleta dove una sigla non si trova dentro un unico poligono
-supportato; lo stato della fonte conserva questi limiti, mentre i fatti sostenuti
-per altre zone hanno una valutazione propria. Restano aperte la copertura di tutti
-i posizionamenti delle sigle, la grafica della vigilanza e l’accettazione. Le
-valutazioni di provenienza di TOS-013 restano distinte da queste verifiche.
+Restano da acquisire per l’accettazione ulteriori casi reali positivi di
+vento/mare/neve/ghiaccio, verificati qui come controlli sintetici. Nuove legende,
+mappe raster, geometrie non supportate e sigle ambigue restano irrisolte o usano
+il fallback HTML sostenuto. Il collaudo non certifica tutti i formati futuri, la
+completezza delle misure comunali o l’accettazione. Le valutazioni di provenienza
+di TOS-013 restano distinte; questo intervento non modifica servizi o controlli live.
 
 Accettazione formale e osservazione dei prodotti rimangono quelle indicate nel coverage tracker e nei [task del servizio Toscana](../../../openspec/changes/define-toscana-alert-service/tasks.md). Verificare sul canale operativo il monitoraggio e i casi senza evento. In presenza di `missing`, verificare il percorso che alimenta la data della pubblicazione: gli esiti per ambiente appartengono all'archivio privato.
 
@@ -107,6 +116,14 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-015 — Grafica CFR per tutte le zone dei campioni conservati
+
+- **Data e ultima verifica:** 2026-10-04; replay di due PDF di criticità e due di vigilanza conservati, controlli sintetici, PostgreSQL isolato e API/MCP con client reale.
+- **Ambito e conoscenza:** comportamento verificato per 26 zone, sette rischi e due giorni in ciascun campione. Il PDF storico con criticità gialla include pagine preliminari; il suo HTML è una trascrizione revisionata della tabella, non una nuova acquisizione. La vigilanza reale comprende temporali presenti e un’edizione senza simboli; i casi positivi degli altri quattro fenomeni sono sintetici.
+- **Osservazione ed evidenza:** la versione precedente perdeva riempimenti separati, sigle A6/I al margine e mappe dopo pagine narrative. Il renderer SVG fallisce su un’edizione storica; una normalizzazione vettoriale locale dei font consente la lettura conservando la pagina fisica. [Parser](../../../internal/backend/acquisition/regional_vector.go), [vigilanza](../../../internal/backend/acquisition/regional_vigilance_vector.go), [prove sintetiche](../../../internal/backend/acquisition/regional_vigilance_vector_test.go) e [procedura](../../operations/cfr-graphics.md). Originali, hash e confronto per zona/rischio/giorno restano privati: `CFR-GRAPHICS-20261004-01`.
+- **Intervento e verifica:** interpretazione con legende del prodotto, periodi giornalieri/cumulati separati e maschere di applicabilità; 364 valori determinati per campione, inclusi i valori gialli del campione storico. Proiezione append-only, idempotenza, fallback su risorse mancanti e metadati weather equivalenti API/MCP verificati. Nessun nuovo colore deriva dalla vigilanza.
+- **Limiti e prossima verifica:** completa il task software 27.4 nei formati riconosciuti e supera la lacuna grafica registrata in TOS-008/TOS-014 per il campione. Servono adozione live distinta, casi reali aggiuntivi e collaudo della campagna prima dell’accettazione; nessuna raccolta o pubblicazione viene abilitata.
 
 ### TOS-014 — Criticità della zona A4 determinata dai poligoni PDF
 

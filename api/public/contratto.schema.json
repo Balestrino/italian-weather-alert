@@ -648,6 +648,9 @@
             "$ref": "#/$defs/Verification"
           },
           "maxItems": 100
+        },
+        "weather": {
+          "$ref": "#/$defs/VigilanceWeather"
         }
       },
       "required": [
@@ -1739,6 +1742,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "weather": {
+          "$ref": "#/$defs/VigilanceWeather"
         }
       },
       "required": [
@@ -1879,6 +1885,55 @@
         "regional",
         "municipal",
         "cittadino_informato"
+      ],
+      "additionalProperties": false
+    },
+    "VigilanceWeather": {
+      "type": "object",
+      "description": "Meteorology depicted in the retained vigilance PDF; never an alert color or assurance of absence of risk.",
+      "properties": {
+        "phenomenon": {
+          "type": "string",
+          "enum": [
+            "rainfall",
+            "thunderstorms",
+            "wind",
+            "coastal_waves",
+            "snow",
+            "ice"
+          ]
+        },
+        "graphical_status": {
+          "type": "string",
+          "enum": [
+            "depicted",
+            "not_depicted",
+            "unresolved"
+          ]
+        },
+        "under_evaluation": {
+          "type": "boolean"
+        },
+        "rainfall_band": {
+          "type": "string"
+        },
+        "total_rainfall_band": {
+          "type": "string"
+        },
+        "total_period": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "amount_scope": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "phenomenon",
+        "graphical_status",
+        "under_evaluation"
       ],
       "additionalProperties": false
     }

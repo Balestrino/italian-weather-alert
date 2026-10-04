@@ -431,7 +431,7 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 					if status == "unsupported" {
 						interpretation.State = "failed"
 					}
-					if status == "no_event" {
+					if status == "no_event" || status == "partial" && len(limits) == 0 {
 						interpretation.State = "supported"
 					}
 					interpretation.Limitations = append(interpretation.Limitations, limits...)

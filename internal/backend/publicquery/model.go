@@ -6,6 +6,8 @@ package publicquery
 import (
 	"errors"
 	"time"
+
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
 )
 
 var (
@@ -134,18 +136,19 @@ type Measure struct {
 }
 
 type RegionalWarning struct {
-	Verifications     []Verification `json:"verifications,omitempty"`
-	ID                string         `json:"id"`
-	Product           string         `json:"product"`
-	Risk              string         `json:"risk"`
-	OfficialRiskLabel string         `json:"official_risk_label"`
-	Zone              string         `json:"zone"`
-	MappingVersion    string         `json:"mapping_version"`
-	Level             string         `json:"level"`
-	Validity          Temporal       `json:"validity"`
-	Status            string         `json:"status"`
-	Evidence          []Evidence     `json:"evidence"`
-	Quality           Quality        `json:"quality"`
+	Weather           *acquisition.VigilanceWeather `json:"weather,omitempty"`
+	Verifications     []Verification                `json:"verifications,omitempty"`
+	ID                string                        `json:"id"`
+	Product           string                        `json:"product"`
+	Risk              string                        `json:"risk"`
+	OfficialRiskLabel string                        `json:"official_risk_label"`
+	Zone              string                        `json:"zone"`
+	MappingVersion    string                        `json:"mapping_version"`
+	Level             string                        `json:"level"`
+	Validity          Temporal                      `json:"validity"`
+	Status            string                        `json:"status"`
+	Evidence          []Evidence                    `json:"evidence"`
+	Quality           Quality                       `json:"quality"`
 }
 
 type OperationalPhase struct {

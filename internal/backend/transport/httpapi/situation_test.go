@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/publicquery"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -106,6 +107,9 @@ func (q *summaryQueries) MunicipalitySituation(context.Context, publicquery.Situ
 func TestSituationSummaryAPIAndMCPPinnedPagination(t *testing.T) {
 	clock := time.Date(2026, 9, 17, 12, 0, 30, 0, time.UTC)
 	queries := &summaryQueries{publicQueriesFake: &publicQueriesFake{}, value: summaryFixture()}
+	queries.value.RegionalProducts[0].Product = "vigilance"
+	queries.value.RegionalProducts[0].Level = "not_applicable"
+	queries.value.RegionalProducts[0].Weather = &acquisition.VigilanceWeather{Phenomenon: "rainfall", GraphicalStatus: "depicted", RainfallBand: "0 - 10", TotalRainfallBand: "10 - 20", Unit: "mm", AmountScope: "area_average", TotalPeriod: "TOTALE: dalle 12 di oggi alle 24 di domani"}
 	runtime := PublicRuntime{Limits: PublicLimits{Allowance: 120, Window: time.Minute, MaxPageSize: 100}, Views: &memoryViewStore{}, ViewLifetime: 30 * time.Minute, CursorKey: []byte(strings.Repeat("k", 32))}
 	server := httptest.NewServer(handlerWithRuntime(nil, func() time.Time { return clock }, runtime, queries))
 	defer server.Close()
@@ -132,8 +136,11 @@ func TestSituationSummaryAPIAndMCPPinnedPagination(t *testing.T) {
 	}
 	var data situationData
 	json.Unmarshal(raw, &data)
-	if len(data.ProcessedData.RegionalAlerts) != 1 || first.Meta.NextCursor == nil || !strings.Contains(data.ProcessedData.Summary, "6 livelli verdi") {
+	if len(data.ProcessedData.RegionalAlerts) != 1 || first.Meta.NextCursor == nil || !strings.Contains(data.ProcessedData.Summary, "5 livelli verdi") {
 		t.Fatal("summary computed from only first page", data)
+	}
+	if weather := data.ProcessedData.RegionalAlerts[0].Weather; weather == nil || weather.RainfallBand != "0 - 10" || weather.TotalRainfallBand != "10 - 20" {
+		t.Fatal("vigilance amounts lost in situation", weather)
 	}
 	client := mcp.NewClient(&mcp.Implementation{Name: "summary-test", Version: "1"}, nil)
 	session, err := client.Connect(t.Context(), &mcp.StreamableClientTransport{Endpoint: server.URL + "/mcp", HTTPClient: server.Client(), DisableStandaloneSSE: true}, nil)
@@ -150,7 +157,7 @@ func TestSituationSummaryAPIAndMCPPinnedPagination(t *testing.T) {
 	second := get("/v1/municipalities/050004/situation?cursor=" + url.QueryEscape(*first.Meta.NextCursor))
 	raw, _ = json.Marshal(second.Data)
 	json.Unmarshal(raw, &data)
-	if data.ProcessedData.RegionalAlerts[0].ID != "1" || data.SourceSummaries.Regional.Products[0].Status != "delayed" || !strings.Contains(data.ProcessedData.Summary, "6 livelli verdi") {
+	if data.ProcessedData.RegionalAlerts[0].ID != "1" || data.SourceSummaries.Regional.Products[0].Status != "delayed" || !strings.Contains(data.ProcessedData.Summary, "5 livelli verdi") {
 		t.Fatal("snapshot or freshness lost", data)
 	}
 	cursor := second.Meta.NextCursor

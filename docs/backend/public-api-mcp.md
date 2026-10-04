@@ -150,6 +150,16 @@ An `undetermined` measure is documented but cannot be confirmed in force. Region
 `not_applicable` remains distinct from green and unknown. Conclusions describe
 prepared evidence and never generate conduct advice.
 
+Supported vigilance facts in both regional search and `processed_data.regional_alerts`
+can carry optional `weather`: `phenomenon`, `graphical_status` (`depicted`,
+`not_depicted`, `unresolved`) and `under_evaluation` from the HTML table. Rainfall
+also carries literal `rainfall_band`, `total_rainfall_band`, `total_period`,
+`unit: "mm"` and `amount_scope: "area_average"`. The total describes the PDF's
+cumulative period rather than the daily validity. Both hydrological risk categories
+share the rainfall observation. Vigilance warning levels stay `not_applicable`;
+`not_depicted` never establishes absence of risk. Older projections can omit
+`weather`. See [graphical interpretation and verification](../operations/cfr-graphics.md).
+
 Each source summary states its contents and data availability; individual
 products preserve check timestamps and `coverage_status`. `available` identifies
 fresh available acquisitions, not complete interpretation or accepted coverage.

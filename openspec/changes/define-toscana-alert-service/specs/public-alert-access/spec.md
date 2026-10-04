@@ -41,6 +41,11 @@ Equivalent API and MCP queries against the same data version and evaluation time
 - **WHEN** a client requests information outside the available historical bounds
 - **THEN** the response reports that limitation rather than an apparently complete empty result
 
+#### Scenario: Retained vigilance maps contain weather observations
+- **WHEN** a supported vigilance projection is visible at the requested service-knowledge boundary
+- **THEN** regional search and situation facts expose the same optional weather metadata in API/MCP, including graphical status, HTML evaluation membership and distinct daily/cumulative rainfall bands
+- **AND** PDF/page provenance and earlier weather-free projections remain available at their original knowledge boundaries
+
 ### Requirement: Citizen-facing evidence and official instructions
 Municipal-status results SHALL give relevant local provisions priority while keeping regional products distinct and available. Structured MCP results SHALL carry authority, supporting document/link, territory, risk or measure, documented validity, last complete check and uncertainty next to the affected information. The service SHALL expose official instructions with attribution and SHALL NOT generate independent safety judgments, invent emergency advice or claim to issue official warnings. Acquired external text SHALL be treated as data rather than executable instructions. These guarantees SHALL apply to service output and SHALL NOT be represented as control over an external assistant's final wording.
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"os"
 	"os/exec"
 	"regexp"
 	"sort"
@@ -18,8 +19,9 @@ import (
 // VectorEvidence is produced from the same retained PDF, never from an external
 // map URL. Text coordinates identify zones; closed filled paths supply colors.
 type VectorEvidence struct {
-	BBox  []byte
-	Pages map[int][]byte
+	BBox        []byte
+	Pages       map[int][]byte
+	PageMethods map[int]string
 }
 type VectorPDFReader interface {
 	Read(context.Context, []byte) (VectorEvidence, error)
@@ -29,20 +31,25 @@ type PopplerVectorReader struct{}
 func (PopplerVectorReader) Read(ctx context.Context, body []byte) (VectorEvidence, error) {
 	ctx, cancel := context.WithTimeout(ctx, 45*time.Second)
 	defer cancel()
-	out := VectorEvidence{Pages: map[int][]byte{}}
+	out := VectorEvidence{Pages: map[int][]byte{}, PageMethods: map[int]string{}}
 	if len(body) > 32<<20 || !bytes.HasPrefix(body, []byte("%PDF-")) {
 		return out, ErrUnrecognizedContent
 	}
-	run := func(name string, args ...string) ([]byte, error) {
+	cache, err := os.MkdirTemp("", "iwa-vector-fonts-")
+	if err != nil {
+		return out, err
+	}
+	defer os.RemoveAll(cache)
+	run := func(input []byte, name string, args ...string) ([]byte, error) {
 		cmd := exec.CommandContext(ctx, name, args...)
-		cmd.Stdin = bytes.NewReader(body)
+		cmd.Stdin = bytes.NewReader(input)
+		cmd.Env = append(os.Environ(), "XDG_CACHE_HOME="+cache, "LC_ALL=C")
 		var w boundedVectorOutput
 		cmd.Stdout = &w
 		err := cmd.Run()
 		return w.Bytes(), err
 	}
-	var err error
-	out.BBox, err = run("pdftotext", "-bbox", "-", "-")
+	out.BBox, err = run(body, "pdftotext", "-bbox", "-", "-")
 	if err != nil {
 		return out, err
 	}
@@ -51,12 +58,24 @@ func (PopplerVectorReader) Read(ctx context.Context, body []byte) (VectorEvidenc
 		return out, ErrUnrecognizedContent
 	}
 	for i, p := range pages {
-		if len(vectorHeadings(p)) == 0 {
+		if len(vectorMapHeadings(p)) == 0 && !vectorVigilancePage(p) {
 			continue
 		}
-		out.Pages[i+1], err = run("pdftocairo", "-svg", "-f", strconv.Itoa(i+1), "-l", strconv.Itoa(i+1), "-", "-")
+		out.Pages[i+1], err = run(body, "pdftocairo", "-svg", "-f", strconv.Itoa(i+1), "-l", strconv.Itoa(i+1), "-", "-")
+		out.PageMethods[i+1] = "direct retained PDF vector rendering"
 		if err != nil {
-			return out, err
+			// Some retained TCPDF editions trigger Cairo's SVG font-cache failure.
+			// A bounded local vector-PDF rendering embeds substitute fonts before
+			// converting that single page. Never accept partial crashed SVG output.
+			pagePDF, e := run(body, "pdftocairo", "-pdf", "-f", strconv.Itoa(i+1), "-l", strconv.Itoa(i+1), "-", "-")
+			if e != nil {
+				return out, e
+			}
+			out.Pages[i+1], err = run(pagePDF, "pdftocairo", "-svg", "-f", "1", "-l", "1", "-", "-")
+			if err != nil {
+				return out, err
+			}
+			out.PageMethods[i+1] = "local single-page vector PDF font normalization, then SVG rendering; original physical page retained"
 		}
 	}
 	return out, nil
@@ -157,15 +176,36 @@ func vectorHeadings(p vectorPage) []vectorHeading {
 	return out
 }
 
+// Risk names can also occur in scenario prose before the graphical pages.
+// A map heading must have its own following two-day row, within its section.
+func vectorMapHeadings(p vectorPage) []vectorHeading {
+	headings := vectorHeadings(p)
+	var maps []vectorHeading
+	for i, h := range headings {
+		end := p.Height
+		if i+1 < len(headings) {
+			end = headings[i+1].Y
+		}
+		for _, line := range vectorLines(p) {
+			if line.Y > h.Y && line.Y < end && len(italianDate.FindAllString(vectorLineText(line), -1)) == 2 {
+				maps = append(maps, h)
+				break
+			}
+		}
+	}
+	return maps
+}
+
 type vectorPoint struct{ X, Y float64 }
 type vectorPolygon struct {
 	Points []vectorPoint
 	Fill   string
+	Stroke string
 }
 
 var vectorNumbers = regexp.MustCompile(`[-+]?(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?`)
 
-func vectorPolygons(body []byte) ([]vectorPolygon, error) {
+func vectorShapes(body []byte) ([]vectorPolygon, error) {
 	d := xml.NewDecoder(bytes.NewReader(body))
 	var out []vectorPolygon
 	for {
@@ -184,36 +224,54 @@ func vectorPolygons(body []byte) ([]vectorPolygon, error) {
 		for _, a := range e.Attr {
 			attrs[a.Name.Local] = a.Value
 		}
-		if e.Name.Local == "g" && attrs["transform"] != "" {
+		if e.Name.Local == "g" && (attrs["transform"] != "" || attrs["opacity"] != "" && attrs["opacity"] != "1") {
 			return nil, ErrUnrecognizedContent
 		}
-		if e.Name.Local != "path" || attrs["stroke"] != "rgb(0%, 0%, 0%)" || attrs["fill"] == "none" || attrs["fill"] == "" || attrs["fill-opacity"] != "1" {
+		if e.Name.Local != "path" || attrs["fill"] == "none" || attrs["fill"] == "" {
 			continue
 		}
-		if !strings.HasPrefix(attrs["transform"], "matrix(") {
+		if attrs["fill-opacity"] != "1" || attrs["opacity"] != "" && attrs["opacity"] != "1" {
 			return nil, ErrUnrecognizedContent
 		}
-		ns := vectorNumbers.FindAllString(attrs["transform"], -1)
-		if len(ns) != 6 {
+		if attrs["transform"] != "" && !strings.HasPrefix(attrs["transform"], "matrix(") {
 			return nil, ErrUnrecognizedContent
 		}
-		var m [6]float64
-		for i, n := range ns {
-			m[i], err = strconv.ParseFloat(n, 64)
-			if err != nil {
-				return nil, err
+		m := [6]float64{1, 0, 0, 1, 0, 0}
+		if attrs["transform"] != "" {
+			ns := vectorNumbers.FindAllString(attrs["transform"], -1)
+			if len(ns) != 6 {
+				return nil, ErrUnrecognizedContent
+			}
+			for i, n := range ns {
+				m[i], err = strconv.ParseFloat(n, 64)
+				if err != nil || math.IsInf(m[i], 0) || math.IsNaN(m[i]) {
+					return nil, ErrUnrecognizedContent
+				}
 			}
 		}
 		fields := strings.Fields(attrs["d"])
-		p := vectorPolygon{Fill: attrs["fill"]}
+		p := vectorPolygon{Fill: attrs["fill"], Stroke: attrs["stroke"]}
+		finish := func() {
+			if len(p.Points) > 1 && p.Points[0] == p.Points[len(p.Points)-1] {
+				p.Points = p.Points[:len(p.Points)-1]
+			}
+			if len(p.Points) > 2 {
+				out = append(out, p)
+			}
+			p = vectorPolygon{Fill: attrs["fill"], Stroke: attrs["stroke"]}
+		}
 		for i := 0; i < len(fields); {
 			command := fields[i]
 			i++
 			if command == "Z" || command == "z" {
+				finish()
 				continue
 			}
 			if command != "M" && command != "L" {
 				return nil, ErrUnrecognizedContent
+			}
+			if command == "M" {
+				finish()
 			}
 			if i+1 >= len(fields) {
 				return nil, ErrUnrecognizedContent
@@ -221,19 +279,182 @@ func vectorPolygons(body []byte) ([]vectorPolygon, error) {
 			x, e1 := strconv.ParseFloat(fields[i], 64)
 			y, e2 := strconv.ParseFloat(fields[i+1], 64)
 			i += 2
-			if e1 != nil || e2 != nil {
+			if e1 != nil || e2 != nil || math.IsInf(x, 0) || math.IsInf(y, 0) || math.IsNaN(x) || math.IsNaN(y) {
 				return nil, ErrUnrecognizedContent
 			}
 			p.Points = append(p.Points, vectorPoint{m[0]*x + m[2]*y + m[4], m[1]*x + m[3]*y + m[5]})
 		}
-		if len(p.Points) > 2 {
-			out = append(out, p)
-		}
+		finish()
 	}
 	if len(out) == 0 {
 		return nil, ErrUnrecognizedContent
 	}
 	return out, nil
+}
+
+// Raster logos outside the map are harmless; a raster placed in its panels
+// makes graphical interpretation unsupported. Resolve Poppler's image uses
+// without reading the embedded image bytes.
+func vectorRasterRects(body []byte) ([]vectorPolygon, error) {
+	d := xml.NewDecoder(bytes.NewReader(body))
+	images := map[string]vectorPolygon{}
+	var uses []map[string]string
+	var out []vectorPolygon
+	definitions := 0
+	for {
+		tok, err := d.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		if end, ok := tok.(xml.EndElement); ok && end.Name.Local == "defs" {
+			definitions--
+		}
+		e, ok := tok.(xml.StartElement)
+		if !ok {
+			continue
+		}
+		if e.Name.Local == "defs" {
+			definitions++
+		}
+		a := map[string]string{}
+		for _, attr := range e.Attr {
+			a[attr.Name.Local] = attr.Value
+		}
+		if e.Name.Local == "use" {
+			uses = append(uses, a)
+		}
+		if e.Name.Local != "image" {
+			continue
+		}
+		var values [4]float64
+		for i, key := range []string{"x", "y", "width", "height"} {
+			if a[key] == "" && i < 2 {
+				continue
+			}
+			values[i], err = strconv.ParseFloat(a[key], 64)
+			if err != nil || math.IsNaN(values[i]) || math.IsInf(values[i], 0) {
+				return nil, ErrUnrecognizedContent
+			}
+		}
+		if values[2] <= 0 || values[3] <= 0 || a["transform"] != "" {
+			return nil, ErrUnrecognizedContent
+		}
+		x, y, width, height := values[0], values[1], values[2], values[3]
+		p := vectorPolygon{Points: []vectorPoint{{x, y}, {x + width, y}, {x + width, y + height}, {x, y + height}}}
+		if definitions > 0 {
+			images[a["id"]] = p
+		} else {
+			out = append(out, p)
+		}
+	}
+	for _, a := range uses {
+		p, found := images[strings.TrimPrefix(a["href"], "#")]
+		if !found {
+			continue
+		}
+		if a["x"] != "" || a["y"] != "" || !strings.HasPrefix(a["transform"], "matrix(") {
+			return nil, ErrUnrecognizedContent
+		}
+		numbers := vectorNumbers.FindAllString(a["transform"], -1)
+		if len(numbers) != 6 {
+			return nil, ErrUnrecognizedContent
+		}
+		var m [6]float64
+		for i, number := range numbers {
+			m[i], _ = strconv.ParseFloat(number, 64)
+			if math.IsNaN(m[i]) || math.IsInf(m[i], 0) {
+				return nil, ErrUnrecognizedContent
+			}
+		}
+		for i, q := range p.Points {
+			p.Points[i] = vectorPoint{m[0]*q.X + m[2]*q.Y + m[4], m[1]*q.X + m[3]*q.Y + m[5]}
+		}
+		out = append(out, p)
+	}
+	return out, nil
+}
+
+func vectorPolygons(body []byte) ([]vectorPolygon, error) {
+	shapes, err := vectorShapes(body)
+	if err != nil {
+		return nil, err
+	}
+	var polygons []vectorPolygon
+	for _, p := range shapes {
+		// Poppler may emit a zone's fill in page coordinates and its outline
+		// separately. Keep those fills; geographical association is checked at
+		// the label, inside a complete dated map panel, never at the legend.
+		if p.Stroke == "rgb(0%, 0%, 0%)" || p.Stroke == "" {
+			polygons = append(polygons, p)
+		}
+	}
+	return polygons, nil
+}
+
+func vectorZonePolygons(polygons []vectorPolygon) []vectorPolygon {
+	var zones []vectorPolygon
+	for _, p := range polygons {
+		// A standalone rectangular fill may be the page background or legend,
+		// not an outlined zone. CFR's separately filled L outline is irregular.
+		if p.Stroke == "rgb(0%, 0%, 0%)" || p.Stroke == "" && len(p.Points) > 4 {
+			zones = append(zones, p)
+		}
+	}
+	return zones
+}
+
+// Prefer an unambiguous label center. The reviewed CFR A6 and island labels can
+// sit just outside their outline: a bounded typographic offset is permitted only
+// for those labels and only with a clearly separated nearest outline. This is
+// not a general geographical nearest-zone fallback.
+func vectorLabelPolygon(polygons []vectorPolygon, w vectorWord) (vectorPolygon, bool) {
+	q := vectorPoint{(w.XMin + w.XMax) / 2, (w.YMin + w.YMax) / 2}
+	var matches []int
+	for i, p := range polygons {
+		if vectorContains(p, q) {
+			matches = append(matches, i)
+		}
+	}
+	if len(matches) == 1 {
+		return polygons[matches[0]], true
+	}
+	if len(matches) != 0 || (w.Text != "A6" && w.Text != "I") {
+		return vectorPolygon{}, false
+	}
+	best, second, index := math.Inf(1), math.Inf(1), -1
+	for i, p := range polygons {
+		d := vectorDistance(p, q)
+		if d < best {
+			second, best, index = best, d, i
+		} else if d < second {
+			second = d
+		}
+	}
+	limit := (w.YMax - w.YMin) * 0.6
+	if w.Text == "A6" {
+		limit *= 0.1
+	}
+	if index >= 0 && best <= limit && second-best > (w.YMax-w.YMin)*0.3 {
+		return polygons[index], true
+	}
+	return vectorPolygon{}, false
+}
+
+func vectorDistance(p vectorPolygon, q vectorPoint) float64 {
+	best := math.Inf(1)
+	for i, a := range p.Points {
+		b := p.Points[(i+1)%len(p.Points)]
+		dx, dy := b.X-a.X, b.Y-a.Y
+		t := 0.0
+		if dx*dx+dy*dy > 0 {
+			t = math.Max(0, math.Min(1, ((q.X-a.X)*dx+(q.Y-a.Y)*dy)/(dx*dx+dy*dy)))
+		}
+		best = math.Min(best, math.Hypot(q.X-a.X-t*dx, q.Y-a.Y-t*dy))
+	}
+	return best
 }
 func vectorContains(p vectorPolygon, q vectorPoint) bool {
 	inside := false
@@ -291,11 +512,7 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 		return out, err
 	}
 	// Match the edition, including issuance time, before combining HTML and PDF.
-	var first []string
-	for _, w := range pages[0].Words {
-		first = append(first, w.Text)
-	}
-	if !strings.Contains(strings.Join(first, " "), obs.IssuanceExpression) {
+	if !vectorEdition(pages, obs.IssuanceExpression) {
 		return out, fmt.Errorf("PDF/HTML issuance mismatch")
 	}
 	seen := map[string]bool{}
@@ -304,11 +521,16 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 	panels := map[string]int{}
 	unresolved := 0
 	for pageIndex, p := range pages {
-		headings := vectorHeadings(p)
+		headings := vectorMapHeadings(p)
 		if len(headings) == 0 {
 			continue
 		}
 		polygons, e := vectorPolygons(evidence.Pages[pageIndex+1])
+		if e != nil {
+			return out, e
+		}
+		polygons = vectorZonePolygons(polygons)
+		rasters, e := vectorRasterRects(evidence.Pages[pageIndex+1])
 		if e != nil {
 			return out, e
 		}
@@ -328,6 +550,12 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 			if dateLine == nil {
 				return out, fmt.Errorf("risk map dates missing")
 			}
+			for _, raster := range rasters {
+				_, y0, _, y1 := vectorBounds(raster)
+				if y1 > dateLine.Y && y0 < end {
+					return out, fmt.Errorf("unsupported raster inside criticality map")
+				}
+			}
 			var dates [2]*time.Time
 			var expressions [2]string
 			for side := 0; side < 2; side++ {
@@ -341,6 +569,10 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 				dates[side], e = parseRegionalDay(expressions[side])
 				if e != nil {
 					return out, e
+				}
+				issuanceDay, issuanceErr := parseRegionalDay(obs.IssuanceExpression)
+				if issuanceErr != nil || !dates[side].Equal(issuanceDay.AddDate(0, 0, side)) {
+					return out, fmt.Errorf("criticality map validity does not match its edition")
 				}
 				riskDays[fmt.Sprintf("%d:%s", h.Risk, dates[side].Format(time.DateOnly))] = true
 				days[dates[side].Format(time.DateOnly)] = true
@@ -359,17 +591,9 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 				}
 				seen[key] = true
 				panels[fmt.Sprintf("%d:%s", h.Risk, dates[side].Format(time.DateOnly))]++
-				point := vectorPoint{(w.XMin + w.XMax) / 2, (w.YMin + w.YMax) / 2}
 				level := "unknown"
-				matches := 0
-				for _, polygon := range polygons {
-					if vectorContains(polygon, point) {
-						matches++
-						level = vectorColor(polygon.Fill, h.Risk)
-					}
-				}
-				if matches != 1 {
-					level = "unknown"
+				if polygon, ok := vectorLabelPolygon(polygons, w); ok {
+					level = vectorColor(polygon.Fill, h.Risk)
 				}
 				if obs.TextSaysNoCriticality && (level == "yellow" || level == "orange" || level == "red") {
 					return out, fmt.Errorf("map conflicts with no-criticality statement")
@@ -377,7 +601,7 @@ func ProjectCriticalityVector(htmlBody []byte, pdfURL string, evidence VectorEvi
 				if level == "unknown" {
 					unresolved++
 				}
-				out.Facts = append(out.Facts, RegionalFact{Risk: riskIDs[h.Risk], Label: criticalityRiskLabels[h.Risk], Zone: w.Text, Level: level, Original: expressions[side], Precision: "date", Date: dates[side], Locator: fmt.Sprintf("Retained PDF labelled zone %s; filled vector polygon; risk/day heading", w.Text), EvidenceURL: pdfURL, Page: pageIndex + 1})
+				out.Facts = append(out.Facts, RegionalFact{Risk: riskIDs[h.Risk], Label: criticalityRiskLabels[h.Risk], Zone: w.Text, Level: level, Original: expressions[side], Precision: "date", Date: dates[side], Locator: fmt.Sprintf("Retained PDF labelled zone %s; filled vector polygon; risk/day heading; %s", w.Text, evidence.PageMethods[pageIndex+1]), EvidenceURL: pdfURL, Page: pageIndex + 1})
 			}
 		}
 	}

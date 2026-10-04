@@ -115,3 +115,67 @@ func TestVectorMapsKeepExplicitAlertIntervals(t *testing.T) {
 		t.Fatal("explicit map/table conflict accepted")
 	}
 }
+
+func TestVectorSeparatedFillAndScopedOutsideLabels(t *testing.T) {
+	shapes, err := vectorPolygons([]byte(`<svg><path fill="rgb(60%, 80%, 20%)" fill-opacity="1" d="M 0 0 L 20 0 L 20 20 L 0 20 Z"/></svg>`))
+	if err != nil || len(shapes) != 1 {
+		t.Fatal("separated fill discarded", shapes, err)
+	}
+	for _, tc := range []struct {
+		label      string
+		xmin, ymin float64
+		want       bool
+	}{
+		{"L", 5, 5, true}, {"A6", -2.1, 5, true}, {"I", 5, -5, true},
+		{"L", 5, -5, false}, {"I", 5, -20, false},
+	} {
+		_, ok := vectorLabelPolygon(shapes, vectorWord{XMin: tc.xmin, XMax: tc.xmin + 4, YMin: tc.ymin, YMax: tc.ymin + 6, Text: tc.label})
+		if ok != tc.want {
+			t.Fatalf("unsupported offset %s: %v", tc.label, ok)
+		}
+	}
+	_, ok := vectorLabelPolygon(append(shapes, shapes[0]), vectorWord{XMin: 5, XMax: 9, YMin: 5, YMax: 11, Text: "A6"})
+	if ok {
+		t.Fatal("overlapping shapes accepted")
+	}
+	parts, err := vectorPolygons([]byte(`<svg><path fill="rgb(60%, 80%, 20%)" stroke="rgb(0%, 0%, 0%)" fill-opacity="1" transform="matrix(2,0,0,2,10,20)" d="M 0 0 L 2 0 L 2 2 L 0 2 Z M 5 0 L 7 0 L 7 2 L 5 2 Z"/></svg>`))
+	if err != nil || len(parts) != 2 || vectorContains(parts[0], vectorPoint{18, 22}) || !vectorContains(parts[1], vectorPoint{22, 22}) {
+		t.Fatal("compound paths or affine coordinates conflated", parts, err)
+	}
+}
+
+func TestVectorHistoricalPrefaceAndNonGreenMaps(t *testing.T) {
+	html, ev := vectorFixture()
+	html = []byte(strings.Replace(string(html), "Criticità previste: NESSUNA", "", 1))
+	page := strings.TrimSuffix(strings.TrimPrefix(string(ev.BBox), "<doc>"), "</doc>")
+	ev.BBox = []byte(`<doc><page width="600" height="800"><word xMin="10" yMin="10" xMax="30" yMax="20">Idraulico reticolo principale</word></page>` + page + `</doc>`)
+	ev.Pages[2] = []byte(strings.Replace(string(ev.Pages[1]), `fill="rgb(60%, 80%, 20%)"`, `fill="rgb(100%, 100%, 0%)"`, 1))
+	delete(ev.Pages, 1)
+	p, err := ProjectCriticalityVector(html, "print", ev)
+	if err != nil || len(p.Facts) != 364 || p.Facts[0].Level != "yellow" || p.Facts[0].Page != 2 {
+		t.Fatal("preface mistaken for map or original physical page lost", err)
+	}
+	ev.BBox = []byte(strings.Replace(string(ev.BBox), "Domenica, 04", "Domenica, 05", 1))
+	if _, err := ProjectCriticalityVector(html, "print", ev); err == nil {
+		t.Fatal("unrelated map date accepted")
+	}
+}
+
+func TestVectorBackgroundAndRasterCannotSupplyLevels(t *testing.T) {
+	html, ev := vectorFixture()
+	// A page background cannot substitute for a missing outlined map zone.
+	ev.Pages[1] = []byte(strings.Replace(string(ev.Pages[1]), `stroke="rgb(0%, 0%, 0%)"`, `stroke=""`, 1))
+	p, err := ProjectCriticalityVector(html, "print", ev)
+	if err != nil || p.Facts[0].Level != "unknown" {
+		t.Fatal("standalone rectangle supplied a zone", err)
+	}
+	_, ev = vectorFixture()
+	ev.Pages[1] = []byte(strings.Replace(string(ev.Pages[1]), `<svg>`, `<svg><defs><image id="raster" width="10" height="10"/></defs><use href="#raster" transform="matrix(1,0,0,1,20,80)"/>`, 1))
+	if _, err := ProjectCriticalityVector(html, "print", ev); err == nil {
+		t.Fatal("raster inside map ignored")
+	}
+	ev.Pages[1] = []byte(strings.Replace(string(ev.Pages[1]), "1,20,80)", "1,20,0)", 1))
+	if _, err := ProjectCriticalityVector(html, "print", ev); err != nil {
+		t.Fatal("logo outside maps rejected", err)
+	}
+}

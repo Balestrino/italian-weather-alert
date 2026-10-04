@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-04 [Fixed] Complete retained CFR criticality and vigilance graphics with product-specific weather metadata, applicability, PDF evidence and preserved history
 ## 0.3.0 - 2026-10-03
 
 - 2026-10-03 [Changed] Prepare the 0.3.0 release with aligned API/MCP metadata, situation consumer migration notes, source verification upgrades and exact-revision promotion checks.

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -414,16 +415,24 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
 			return nil, evidenceErr
 		}
 		var pdfEvidence struct {
-			SourceURL string `json:"source_url"`
-			Page      int    `json:"page"`
-			Locator   string `json:"locator"`
+			SourceURL string                        `json:"source_url"`
+			Page      int                           `json:"page"`
+			Locator   string                        `json:"locator"`
+			Weather   *acquisition.VigilanceWeather `json:"weather"`
 		}
 		if json.Unmarshal([]byte(item.locator), &pdfEvidence) == nil && pdfEvidence.SourceURL != "" && pdfEvidence.Page > 0 {
 			evidence.SourceURL = pdfEvidence.SourceURL
 			evidence.Page = &pdfEvidence.Page
 			evidence.Locator = &pdfEvidence.Locator
+			item.value.Weather = pdfEvidence.Weather
 			if item.value.Level != "unknown" {
 				item.limitations = slices.DeleteFunc(item.limitations, func(v string) bool { return strings.HasPrefix(v, "Unresolved map labels:") })
+			}
+			if item.value.Weather != nil {
+				item.limitations = slices.DeleteFunc(item.limitations, func(v string) bool { return strings.HasPrefix(v, "Unresolved vigilance graphics:") })
+				if item.value.Weather.GraphicalStatus == "unresolved" {
+					item.limitations = append(item.limitations, "Vigilance graphics are unresolved for this zone/phenomenon/day; no weather value or absence is inferred.")
+				}
 			}
 		}
 		item.value.Evidence = []Evidence{evidence}
