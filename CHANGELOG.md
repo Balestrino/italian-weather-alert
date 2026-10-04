@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-04 [Changed] Update Cittadino Informato findings to distinguish isolated trials from ordinary scheduled collection
 - 2026-10-04 [Changed] Document the verified Calcinaia coverage matrix, pending interpretations and scoped operational follow-up
 - 2026-10-04 [Changed] Complete Toscana MVP acceptance-report review and verify independent four-scope gates, API/MCP failure parity and explicit pending source limitations.
 - 2026-10-04 [Changed] Complete Toscana observation task 9.3 with a persisted four-product campaign assessment, audited corrections, unchanged regression contract and preserved historical failures

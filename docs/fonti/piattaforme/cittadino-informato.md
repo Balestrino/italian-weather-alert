@@ -23,6 +23,15 @@ Il [coverage tracker](../../coverage.md) resta il riferimento per l'accettazione
 
 ## Guida operativa
 
+CIN-012 registra il nuovo audit di Calcinaia: identità e referral osservati,
+elenco delimitato dalle date di visualizzazione verificato, ma nessuna fonte
+della piattaforma registrata nel development ordinario ispezionato. La
+[matrice corrente](../../operations/calcinaia-coverage.md) separa questa lacuna
+dai fallimenti di interpretazione della primaria. Una vecchia motivazione
+documentale nella configurazione live non reintroduce il prerequisito superato;
+per attestare continuità servono configurazione applicata, controlli recenti
+e ricevute automatiche, con dipendenze e controparti effettivamente verificate.
+
 La [vista di situazione API/MCP](../../backend/public-api-mcp.md#situation-response)
 include una sintesi separata `cittadino_informato`. `not_collected` significa che
 la vista non dispone di acquisizioni pubblicabili del canale: non significa che
@@ -105,6 +114,15 @@ non costituisce da sola discovery delle controparti o accettazione semantica.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-012 — Audit di Calcinaia e raccolta ordinaria non registrata
+
+- **Data e ultima verifica:** 2026-10-04, homepage ufficiale, identità REST e lista aggiornamenti della piattaforma, registro development in sola lettura.
+- **Ambito:** solo Calcinaia `050004`; lista con pubblicatore `comune_calcinaia`, cento elementi massimi per pagina e filtro di visualizzazione dal 4 settembre 2026. Nessun riconoscimento o attivazione di altri comuni.
+- **Osservazione confermata:** identità e referral concordano; la lista espone 36 comunicazioni su una pagina. Le date di visualizzazione non certificano la pubblicazione o validità degli avvisi. Nel registro ordinario ispezionato non è presente una fonte Cittadino Informato; le precedenti prove isolate non dimostrano acquisizione e confronti continuativi.
+- **Intervento:** audit verificato, nessuna modifica dei controlli live. Pubblicata la [matrice di copertura](../../operations/calcinaia-coverage.md); il task 31.3 mantiene adozione programmata, discovery delle controparti, dipendenze e ricevute fra le verifiche aperte. La motivazione documentale storica nella configurazione primaria è superata dal piano 26.2, non da un'abilitazione implicita.
+- **Evidenza:** referral dalla [homepage comunale](https://www.comune.calcinaia.pi.it/), [canale riconosciuto](https://cittadinoinformato.it/calcinaia/), registro privato `CLN-COVERAGE-20261004` con risposte e manifest; vedi CLN-027 nella guida comunale.
+- **Prossima verifica:** configurazione delimitata, preview completo con dipendenze, raccolta cadenzata e confronti persistenti di nuove versioni. Copertura, accettazione, validità e pubblicazione rimangono distinte.
 
 ### CIN-010 — Confronti revisionati e attribuzione pubblica verificati
 
