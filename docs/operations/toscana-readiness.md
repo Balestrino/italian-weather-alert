@@ -1,13 +1,14 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 155 task completati su 164. In questo giro sono verificati:
+ha 156 task completati su 164. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
 | 9.4 | [Consuntivi separati](trial-costs.md), metriche indisponibili e prezzi storici non verificati espliciti; budget pendente |
 | 11.5 | [Campagne indipendenti e quattro report pending](municipal-acceptance.md); stessi gate del pilota |
 | 13.8 | [Recupero provider verificato](acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026), OCR e pipeline ordinaria riusciti; fallimento di citazione preservato |
+| 29.1–29.3 | [Recupero selettivo con audit](municipal-interpretation.md#esito-del-recupero-live), test e worker ordinari verificati; omissione live registrata e campagne ancora extended |
 
 Gli otto gate originari seguenti restano aperti per gli esiti specifici mancanti:
 
@@ -37,14 +38,15 @@ copertura municipale incompleta, indipendentemente dal conteggio dei task.
 
 La successiva [correzione della riapertura parziale](municipal-interpretation.md)
 supera il fallimento del merge nel replay conservato e nelle fixture sintetiche
-con PostgreSQL. È verificata nel checkout, con catalogo di estrazione v25;
-adozione e rielaborazione ordinaria live di questa correzione restano da eseguire.
+con PostgreSQL, con catalogo di estrazione v25. Il seguito descritto sotto verifica
+anche adozione e rielaborazione ordinaria selettiva, con un limite di completezza
+distinto dal problema del merge.
 La lettura aggiornata delle due campagne conserva `extended`. I task 9.3 e 10.1
 rimangono aperti anche dopo questo avanzamento.
 
 La revisione applicativa `c69a10e` è stata costruita dal checkout pulito e adottata
 in development dopo i controlli del software e le migrazioni. Public, admin, le
-sei repliche del worker e il backup già attivo ora condividono l'immagine;
+sei repliche del worker e il backup già attivo condividevano l'immagine;
 database, storage e crawler conservano i contenitori e i volumi esistenti.
 Il backup applicativo resta attivo finché la protezione PBS non è verificata.
 
@@ -64,7 +66,16 @@ passano. Il confronto di completezza passa 14/14 con lo stesso contratto,
 conservando il fallimento precedente; si tratta di replay delle risposte
 conservate, distinto dalle nuove esecuzioni ordinarie.
 
-I task 29.1/29.2 implementano e verificano il recupero tracciato delle versioni
-archiviate scelto dall’operatore. La prova live 29.3 resta aperta finché la nuova
-revisione non viene adottata e i casi scelti confrontati. Nessuno degli otto gate
-originari viene chiuso da questo passaggio.
+I task 29.1–29.3 implementano e verificano il recupero tracciato delle versioni
+archiviate scelto dall’operatore. La revisione pulita `74acab8` e la migrazione
+additiva sono adottate su public/admin, sei worker e backup applicativo.
+Classificazione, estrazione e linking dei due casi scelti riescono; retry, audit,
+archivi, risultati precedenti, viste salvate e confini di conoscenza sono verificati.
+API/MCP coincidono anche sulle pagine successive e i dati restano nel Comune.
+
+Il nuovo output conserva riapertura ed eccezione, ma un solo ambito di divieto
+invece dei quattro revisionati. La nuova regressione fallita, con contratto
+invariato e verifiche riusate dichiarate, conserva e supera il successo del replay;
+ulteriori recuperi richiedono una rivalutazione riuscita. Le due campagne rivalutate
+restano `extended`. Controlli delle fonti e dipendenze sono conservati, produzione
+ferma. Nessuno degli otto gate originari viene chiuso da questo passaggio.

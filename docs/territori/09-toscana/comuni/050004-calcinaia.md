@@ -42,6 +42,11 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
+CLN-022 verifica il recupero selettivo live con audit e conservazione dello storico.
+La riapertura e l’eccezione sono proiettate, ma il nuovo output omette tre ambiti
+di divieto del contratto revisionato. Consultare l’ultima regressione fallita;
+il replay riuscito non attesta completezza del worker né chiude le campagne.
+
 Il recupero provider del 2026-10-04 verifica nuovamente OCR remoto e una pipeline
 ordinaria di Calcinaia, dopo ripresa controllata del blocco credenziale. Una
 citazione non valida rimane rifiutata e conservata. CLN-019 distingue questo
@@ -141,13 +146,21 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-022 — Recupero live riuscito e omissione distinta dal replay
+
+- **Data e ultima verifica:** 2026-10-04; worker development, PostgreSQL, API/MCP con client SDK e rivalutazione delle due campagne. Nessun nuovo fetch delle fonti richiesto dal recupero; nuove inferenze sui testi conservati.
+- **Ambito e conoscenza:** due versioni selezionate di `calcinaia-municipal`, riapertura parziale ed eccezione delle strade. Classificazione, estrazione e linking completati; audit idempotente, marker e risultati precedenti invariati. La nuova estrazione conserva un solo ambito di divieto invece dei quattro revisionati: tre omissioni confermate nel perimetro del confronto.
+- **Intervento verificato:** adozione della revisione pulita e migrazione additiva; storico e viste salvate conservati, riapertura con citazione e tempi indeterminati, eccezione distinta, API/MCP equivalenti anche in paginazione, isolamento da Cascina. Registrata una regressione fallita con lo stesso contratto e controlli riusati attribuiti, conservando il successo del replay e i fallimenti precedenti.
+- **Evidenza:** [esito operativo](../../../operations/municipal-interpretation.md#esito-del-recupero-live), task 29.3 e registro privato `CLN-CONTINUATION-20261004`. Le campagne rivalutate restano `extended`; controlli delle fonti conservati e produzione ferma.
+- **Prossima verifica:** correggere e rivalutare la completezza dei distinti ambiti nella nuova risposta; completare confronti degli originali/allegati, prove di errore e ritardi delle campagne. Nessuna accettazione o chiusura di 9.3/10.1.
+
 ### CLN-021 — Recupero selettivo con audit delle interpretazioni archiviate
 
 - **Data e ultima verifica:** 2026-10-04; archivio e regressioni development, test sintetici e PostgreSQL isolato; nessun nuovo fetch delle fonti per questo intervento.
 - **Ambito e conoscenza:** `calcinaia-municipal`, casi conservati di riapertura ed eccezione. Il worker ordinario li esclude perché le versioni sono archiviate, anche se richieste dal reprocessing. La rivalutazione di CLN-020 passa 14/14 con lo stesso contratto, conservando il fallimento precedente e dichiarando il riuso delle risposte dei provider.
 - **Intervento:** l’operatore sceglie un recupero selettivo con audit. I task 29.1/29.2 implementano richiesta privata per versioni esatte, revisione attiva, evidenza conservata e ultime regressioni riuscite. Archivi, job, tentativi e risultati precedenti restano conservati; la deroga è limitata alla nuova selezione e ai discendenti validati.
 - **Verifica:** rifiuti atomici, retry e recupero da outage della coda, audit immutabile, classificazione/estrazione del runner, ammissione dei discendenti ed esclusione del lavoro ordinario. [Procedura](../../../operations/municipal-interpretation.md#recupero-selettivo-delle-versioni-archiviate); evidenza privata `CLN-CONTINUATION-20261004`.
-- **Prossima verifica:** adozione dell’estensione e recupero live 29.3, confronto dei risultati persistenti e delle viste storiche API/MCP. Le campagne restano da rivalutare; questo intervento non conclude 9.3/10.1 o l’accettazione.
+- **Seguito:** CLN-022 verifica adozione, recupero live 29.3, risultati persistenti, viste storiche API/MCP e rivalutazione delle campagne; registra l’omissione della nuova risposta. Questo intervento non conclude 9.3/10.1 o l’accettazione.
 
 
 ### CLN-020 — Riapertura parziale e luoghi tipografici nel replay

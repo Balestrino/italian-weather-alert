@@ -601,4 +601,15 @@ same-contract evaluation and outstanding observations/reviews remain required;
 
 - [x] 29.1 Add private exact-version archive recovery bound to active source revision, retained evidence and latest passing regression, with immutable actor/time/evidence audit and idempotent enqueue resumption; preserve archives, previous jobs/results and ordinary guards.
 - [x] 29.2 Verify atomic rejection, selection identity, private API isolation and bounded classification/descendant admission using synthetic disposable PostgreSQL; preserve ordinary archival and territorial/provider/source behavior.
-- [ ] 29.3 Adopt the verified recovery in development, explicitly recover the reviewed Calcinaia reopening/exception versions, compare persisted results, historical boundaries and actual API/MCP, and reassess campaigns without granting source acceptance.
+- [x] 29.3 Adopt the verified recovery in development, explicitly recover the reviewed Calcinaia reopening/exception versions, compare persisted results, historical boundaries and actual API/MCP, and reassess campaigns without granting source acceptance.
+
+Task 29.3 verifies development adoption, additive migration, selected ordinary
+classification/extraction/linking, immutable historical results and archive markers,
+API/MCP saved views, knowledge boundaries, pagination and municipality isolation.
+The new provider output preserves the reopening and road exception but omits three
+independent prohibition scopes. A failed same-contract regression supersedes the
+retained-response success without deleting it; unrepeated checks remain explicitly
+attributed to retained evidence. Both reassessed campaigns stay extended.
+This completes recovery verification, not completeness or acceptance: 156/164 tasks
+are complete and the eight original gates remain open. See
+[current interpretation results](../../../docs/operations/municipal-interpretation.md#esito-del-recupero-live).

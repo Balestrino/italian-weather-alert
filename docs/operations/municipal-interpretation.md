@@ -49,10 +49,9 @@ per entrambi i provider; prompt, selezione delle fonti e cataloghi precedenti
 sono conservati. Il cambio di catalogo non rielabora automaticamente lo storico.
 
 Le due campagne lette in development restano `extended`; i report persistenti
-precedenti non sono stati sostituiti dal replay locale. Per proseguire occorre
-adottare la revisione verificata, rivalutare lo stesso contratto senza indebolire
-le aspettative, rielaborare esplicitamente i soli casi selezionati e confrontare
-risultati persistenti, storico e API/MCP. Completare anche confronti, prove di
+precedenti non sono stati sostituiti dal replay locale. Il seguito descritto sotto
+verifica adozione, stesso contratto e recupero esplicito dei casi selezionati con
+confronto persistente, storico e API/MCP. Restano da completare confronti, prove di
 errore e ritardi ancora mancanti prima di chiudere 9.3/10.1. La revisione del
 software non conclude gli altri [gate operativi](toscana-readiness.md).
 
@@ -110,5 +109,41 @@ Non esiste un’operazione pubblica API/MCP corrispondente. Prove sintetiche con
 PostgreSQL verificano rifiuti atomici, regressioni fallite/superate, immutabilità,
 outage della coda e ripresa, classificazione/estrazione reali del runner e
 ammissione dei discendenti. Test race, backoffice, vet e build passano.
-L’adozione e il recupero live di questa estensione restano nel task 29.3;
+Il task 29.3 verifica l’adozione e il recupero live descritti sotto;
 accettazione e campagne rimangono separate.
+
+## Esito del recupero live
+
+La revisione pulita `74acab8` è adottata in development su public/admin, sei worker
+e backup applicativo, con la migrazione additiva eseguita esplicitamente tramite
+`scripts/compose-env.sh development run --rm --no-deps --pull never admin migrate`.
+Dipendenze, volumi e controlli delle fonti sono conservati; produzione ferma.
+Il registro privato `CLN-CONTINUATION-20261004` conserva immagine/configurazione
+precedenti, dump, richiesta esatta e ricevute per verifica e recupero.
+
+I due casi archiviati selezionati completano classificazione, estrazione e linking
+sul worker ordinario. La stessa richiesta ripetuta restituisce audit e data
+identici senza duplicare i job. Marker di archivio, vecchi job, run e risultati
+sono riletti e confrontati senza modifiche. La riapertura è sostenuta dalla propria
+citazione e conserva i tempi indeterminati; l’aggiornamento delle strade rimane
+separato dalla chiusura del sottopasso in via Maremmana.
+
+API e MCP effettivi, con client SDK, restituiscono gli stessi fatti sulla stessa
+vista salvata. La verifica comprende confine di conoscenza anteriore al recupero,
+vista precedente immutata, proiezione dei nuovi fatti, isolamento da Cascina e
+quattordici pagine da due elementi senza duplicazioni o omissioni.
+
+Il nuovo output della riapertura conserva una riapertura, due chiusure, un divieto,
+un’attivazione del COC e un aggiornamento generico. Il contratto revisionato richiede
+quattro distinti ambiti di divieto: tre sono omessi. Questa nuova risposta del
+provider non riproduce la completezza del replay 14/14. La regressione persistente
+successiva registra l’omissione con corpus e aspettative invariati, distinguendo
+i quattro nuovi confronti worker dagli altri dieci controlli conservati.
+Il successo del replay e i fallimenti precedenti rimangono consultabili.
+L’ultima regressione fallita impedisce nuovi recuperi e l’accettazione finché una
+rivalutazione corretta dello stesso contratto non riesce.
+
+Entrambe le campagne sono rivalutate e restano `extended`: confronti degli
+originali, allegati, prove di errore e alcuni ritardi rimangono irrisolti nei
+rispettivi report. Il recupero selettivo è verificato; la completezza municipale,
+9.3/10.1 e gli altri sei gate operativi restano aperti.

@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 155 | 9 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 156 | 8 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -202,5 +202,10 @@ The 4 October continuation persists a successful rerun of the same fourteen-chec
 municipal completeness contract, preserving the previous failure and explicitly
 identifying retained provider responses. Tasks 29.1/29.2 add and verify exact-version
 archive recovery with immutable audit and bounded reprocessing/descendant admission;
-ordinary archive guards remain effective. Live recovery in 29.3 remains pending.
+ordinary archive guards remain effective. Task 29.3 subsequently verifies development
+adoption, selected ordinary workers, preserved archives/results and knowledge
+boundaries, actual API/MCP, pagination and municipality isolation. The fresh
+extraction preserves reopening/exception but omits three independent prohibition
+scopes: a failed same-contract regression preserves and supersedes the replay
+success. Both reassessed campaigns remain extended; eight original gates stay open.
 See [municipal interpretation](../docs/operations/municipal-interpretation.md).
