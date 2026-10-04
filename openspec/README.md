@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 158 | 8 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 159 | 7 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -209,3 +209,13 @@ extraction preserves reopening/exception but omits three independent prohibition
 scopes: a failed same-contract regression preserves and supersedes the replay
 success. Both reassessed campaigns remain extended; eight original gates stay open.
 See [municipal interpretation](../docs/operations/municipal-interpretation.md).
+
+Task 9.3 is subsequently verified by an immutable `complete` MVP assessment:
+239.94 paced hours, all four products, daily section-scoped checks, attributable
+original/attachment corrections and explicitly labelled real/retained failure and
+absent-event evidence. The earlier internal campaign keeps its historical delay
+breaches. Extraction v27 and selected ordinary reprocessing pass the same reviewed
+contract and actual API/MCP/history checks; original failures and archives remain.
+The Toscana checklist is now 159/166, with seven open gates. Source acceptance,
+10.1 and production readiness remain separate. See
+[observational trial](../docs/operations/observational-trial.md).

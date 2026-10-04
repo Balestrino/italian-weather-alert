@@ -42,12 +42,10 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
-CLN-023 prepara la correzione dei divieti e l’audit delle revisioni di campagna;
-la verifica sul worker ordinario resta distinta dai test e dal replay.
-CLN-022 verifica il recupero selettivo live con audit e conservazione dello storico.
-La riapertura e l’eccezione sono proiettate, ma il nuovo output omette tre ambiti
-di divieto del contratto revisionato. Consultare l’ultima regressione fallita;
-il replay riuscito non attesta completezza del worker né chiude le campagne.
+CLN-025 verifica la correzione sul worker ordinario e la chiusura osservativa
+9.3: quattro ambiti indipendenti, riapertura ed eccezioni conservate, regression
+pass con stesso contratto e audit immutabile. I fallimenti CLN-022/CLN-024 restano
+storici; 10.1 e accettazione sono indipendenti.
 
 Il recupero provider del 2026-10-04 verifica nuovamente OCR remoto e una pipeline
 ordinaria di Calcinaia, dopo ripresa controllata del blocco credenziale. Una
@@ -383,3 +381,13 @@ Il criterio documentale di chiusura di questa voce è superato da CLN-012; le os
 - **Correzione verificata:** v27 esclude solo la chiusura sostenuta dall’inciso nella frase di riapertura, conservando chiusure con evidenze operative indipendenti. Test di proprietà del core e tempi passano.
 - **Evidenza:** registro privato `TOSCANA-TRIAL-CLOSURE-20261004`; [stato](../../../operations/toscana-readiness.md).
 - **Prossima verifica:** nuovo risultato ordinario e valutazione della campagna.
+
+### CLN-025 — Esito ordinario corretto e campagna completa
+
+- **Data:** 2026-10-04.
+- **Ambito:** recupero selettivo del caso primario conservato, worker ordinario v27 e campagna MVP.
+- **Comportamento verificato:** una riapertura, due chiusure mantenute, quattro divieti con luoghi letterali distinti e COC attivo; nessun inciso retrospettivo o tempo di pagina trasferito.
+- **Evidenza:** contratto invariato 14/14 con verifiche riusate attribuite; confronto effettivo API/MCP, paginazione, isolamento e confini storici. Revisioni correttive e precedenti risultati/archivi conservati, materiali privati `TOSCANA-TRIAL-CLOSURE-20261004`.
+- **Campagna:** valutazione MVP `complete` dopo 239,94 ore, nove intervalli completi di 24 ore. La campagna interna mantiene i ritardi storici; controlli delle fonti e produzione sono conservati.
+- **Conseguenza:** chiusura 9.3, senza accettazione o completamento 10.1.
+- **Prossima verifica:** [sette gate rimanenti](../../../operations/toscana-readiness.md), in particolare collaudo 10.1.

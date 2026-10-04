@@ -68,6 +68,15 @@ municipal completeness or production readiness. See
 
 The CAP column lists every municipality-level postcode in the retained Garda Informatica dataset. A municipality may have several CAPs and a CAP may belong to more than one municipality. A CAP does not identify an alert zone or guarantee an address-level match. Leading zeroes are significant.
 
+**Subsequent observation completion — 4 October 2026:** task 9.3 now has a
+persisted complete MVP assessment covering all three CFR products and Calcinaia,
+with 239.94 paced hours, attributable original/attachment corrections and labelled
+actual/retained failure and absent-event evidence. Ordinary corrected municipal
+reprocessing and the unchanged completeness contract pass; earlier failures and
+internal-campaign delays remain immutable. This completes observational evidence,
+without granting source acceptance, public enablement or production readiness.
+The original inventory remains unchanged. See [observational trial](operations/observational-trial.md).
+
 ## Data and verification
 
 - Municipalities: [ISTAT-derived national registry](nazionale/registri/comuni-italia.csv), captured 15 September 2026; 7,894 municipalities in 20 regions. [Official ISTAT registry](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/) and [reuse terms](https://www.istat.it/dati/open-data/). IWA selected and normalized the registry fields; see [attribution](../THIRD_PARTY_NOTICES.md).

@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-04 [Changed] Complete Toscana observation task 9.3 with a persisted four-product campaign assessment, audited corrections, unchanged regression contract and preserved historical failures
 - 2026-10-04 [Fixed] Exclude retrospective closure clauses from completed municipal reopenings while preserving independently evidenced restrictions and prior failed regressions
 - 2026-10-04 [Changed] Preserve independent municipal prohibition scopes and historical projected interpretations; add immutable corrective observation reviews and bounded CFR header handling
 - 2026-10-04 [Changed] Verify selected archived municipal recovery in development, preserve historical results, and record the live completeness omission and extended Toscana campaigns.

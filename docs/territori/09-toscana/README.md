@@ -22,6 +22,12 @@ Gli identificativi aiutano a riconoscere le fonti nel registro dell'ambiente; no
 
 ## Guida operativa
 
+TOS-019 verifica la chiusura della campagna MVP 9.3 sui quattro ambiti: confronti
+originali/allegati corretti con audit, cadenza e ritardi documentati e prove di
+errore/evento assente attribuite. La campagna interna precedente conserva i suoi
+ritardi; 10.1 e accettazione restano separati.
+
+
 Il [consuntivo delle campagne](../../operations/trial-costs.md) distingue costi
 noti, metriche mancanti e prezzi non verificati per il periodo. I quattro comuni
 successivi hanno [report individuali pending](../../operations/municipal-acceptance.md)
@@ -301,3 +307,13 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 - **Confronto delegato:** 364 campi per prodotto confrontati con gli originali; criticità verde/applicabilità distinta, vigilanza quantità e assenza di simboli operativi senza nuovi colori di allerta.
 - **Evidenza:** materiali privati `TOSCANA-TRIAL-CLOSURE-20261004`; [stato](../../operations/toscana-readiness.md#correzioni-preparate-per-la-93).
 - **Prossima verifica:** adozione ordinaria e valutazione di campagna con audit correttivo; accettazione resta indipendente.
+
+### TOS-019 — Campagna MVP completa con audit correttivo
+
+- **Data:** 2026-10-04.
+- **Ambito:** vigilanza, criticità/allerta, monitoraggio CFR e Calcinaia, sezioni/configurazioni della campagna MVP iniziata il 24 settembre.
+- **Comportamento verificato:** valutazione persistita `complete`, 239,94 ore e nove intervalli completi di 24 ore; undici date locali per fonte. Tutti i ritardi entro 10.800 secondi, nessuna risorsa richiesta mancante.
+- **Confronti:** due originali grafici verificati su 364 campi ciascuno, monitoraggio senza evento con caso conservato, allegati/non-applicabilità e guasti reali/sintetici distinguibili. Correzioni, motivi e delega conservano revisioni e valutazioni precedenti.
+- **Evidenza:** [rapporto osservativo](../../operations/observational-trial.md#esito-verificato-del-4-ottobre-2026), materiali privati `TOSCANA-TRIAL-CLOSURE-20261004`; CLN-025 per worker e API/MCP.
+- **Conseguenza:** chiusura della sola 9.3. La campagna interna resta `extended` per ritardi storici; controlli delle fonti e produzione non vengono abilitati dalla valutazione.
+- **Prossima verifica:** collaudo 10.1 e gate operativi; accettazione resta nel [coverage tracker](../../coverage.md#region-09).

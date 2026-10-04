@@ -3,7 +3,8 @@
 Verifica del 4 ottobre 2026, avanzamento dei task 9.3 e 10.1 della
 [checklist Toscana](../../openspec/changes/define-toscana-alert-service/tasks.md).
 La correzione del software supera il fallimento di merge del caso conservato;
-campagne, accettazione e verifica del percorso ordinario live restano pendenti.
+la successiva [chiusura della campagna 9.3](observational-trial.md) verifica il
+percorso ordinario corretto; accettazione e 10.1 restano separati.
 
 ## Causa e correzione
 
@@ -147,3 +148,20 @@ Entrambe le campagne sono rivalutate e restano `extended`: confronti degli
 originali, allegati, prove di errore e alcuni ritardi rimangono irrisolti nei
 rispettivi report. Il recupero selettivo è verificato; la completezza municipale,
 9.3/10.1 e gli altri sei gate operativi restano aperti.
+
+## Correzione ordinaria v27 e chiusura della 9.3
+
+Il seguito conserva gli esiti intermedi sopra e supera la loro omissione: v26
+recupera quattro divieti ma aggiunge una chiusura dall’inciso retrospettivo. Il
+fallimento viene registrato; v27 esclude il solo inciso, preservando clausole
+operative indipendenti. Il nuovo worker ordinario produce una riapertura, due
+chiusure mantenute, quattro divieti distinti e COC attivo. Nessuna data di pagina,
+allerta o precedente chiusura viene trasferita alla riapertura.
+
+Il contratto invariato passa 14/14, con riscontri riusati attribuiti e nuovo caso
+selezionato fresco. API/MCP, paginazione, ambito municipale, viste salvate e limiti
+storici passano; vecchi archivi, job e risultati restano immutati. La vista corrente
+sceglie l’ultima interpretazione ordinaria proiettata della stessa versione.
+La [valutazione MVP completa](observational-trial.md#esito-verificato-del-4-ottobre-2026)
+chiude 9.3 con revisioni correttive tracciate, senza cancellare l’altra campagna
+`extended` o completare 10.1, accettazione e produzione.

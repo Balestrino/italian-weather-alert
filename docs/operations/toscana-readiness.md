@@ -1,23 +1,23 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 158 task completati su 166. In questo giro sono verificati:
+ha 159 task completati su 166. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
 | 9.4 | [Consuntivi separati](trial-costs.md), metriche indisponibili e prezzi storici non verificati espliciti; budget pendente |
 | 11.5 | [Campagne indipendenti e quattro report pending](municipal-acceptance.md); stessi gate del pilota |
 | 13.8 | [Recupero provider verificato](acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026), OCR e pipeline ordinaria riusciti; fallimento di citazione preservato |
-| 29.1–29.3 | [Recupero selettivo con audit](municipal-interpretation.md#esito-del-recupero-live), test e worker ordinari verificati; omissione live registrata e campagne ancora extended |
+| 9.3 e 30.1/30.2 | [Campagna MVP complete con audit correttivo](observational-trial.md#esito-verificato-del-4-ottobre-2026); durata, quattro ambiti, confronti e prove attribuiti |
+| 29.1–29.3 | [Recupero selettivo con audit](municipal-interpretation.md#esito-del-recupero-live), test e worker ordinari verificati; omissione live e campagne extended nell’esito iniziale, superato dalla chiusura 9.3 |
 
-Gli otto gate originari seguenti restano aperti per gli esiti specifici mancanti:
+I sette gate originari seguenti restano aperti per gli esiti specifici mancanti:
 
 | Task | Condizione ancora da verificare |
 | --- | --- |
 | 1.8 | Dimensionamento previsto della VM, SMTP/mailbox, PBS e telemetria continuativa delle soglie |
 | 8.2 | Backup PBS whole-VM off-host, piano adottato e allarme effettivamente consegnato |
 | 8.3 | Ripristino PBS in target isolato con dati/originali, configurazioni e recupero job |
-| 9.3 | Campagne esistenti ancora extended: confronti/prove mancanti o falliti e ritardi; tempo trascorso sufficiente non equivale a completamento |
 | 10.1 | Collaudo reale dei quattro ambiti MVP, sette rischi/API-MCP/scansioni/storico/errori; accettazione e abilitazione separate |
 | 10.2 | Readiness operativa della produzione, capacità concorrente, proxy/SMTP/provider, recupero host e rollback |
 | 12.4 | Immagine approvata su revisione pulita, staging verificato, accesso GHCR operativo, pubblicazione e pull del digest |
@@ -97,3 +97,25 @@ chiusura ricavata dall’inciso sullo stato precedente alla riapertura. Il nuovo
 fallimento dello stesso contratto rimane nel registro. V27 verifica l’esclusione
 del solo inciso retrospettivo, conservando clausole di chiusura indipendenti;
 la prova ordinaria resta necessaria prima della chiusura 9.3 (CLN-024).
+
+## Chiusura della 9.3
+
+La [campagna MVP](observational-trial.md#esito-verificato-del-4-ottobre-2026)
+ha una valutazione persistita `complete`: 239,94 ore, nove intervalli completi di
+24 ore e undici date locali osservate su tutti e quattro gli ambiti. Confronti
+originali/allegati, prove di errore e caso di evento assente sono attribuiti;
+i ritardi sono entro i limiti originari e nessuna risorsa richiesta manca.
+Le revisioni correttive e lo storico sono immutabili. La campagna interna precedente
+resta `extended` per i ritardi storici; questi non sono stati condonati.
+
+La revisione pulita `ce941ed` (estrazione v27) è adottata in development su
+public/admin, sei worker e backup applicativo. Il nuovo recupero ordinario conserva
+una riapertura, due chiusure mantenute, quattro divieti distinti e COC attivo,
+escludendo l’inciso di chiusura precedente. La regressione passa 14/14 con contratto
+immutato e riuso dichiarato; i fallimenti v25/v26 restano registrati. API/MCP
+coincidono anche con paginazione, e viste/limiti storici conservano i vecchi fatti.
+
+Runtime, smoke, test unit/race e PostgreSQL passano. Archivi, job e risultati
+precedenti, controlli delle fonti e dipendenze sono conservati; produzione ferma.
+La 9.3 è chiusa, 10.1 e gli altri sei gate restano aperti. I paragrafi precedenti
+conservano gli esiti intermedi datati, superati da questa valutazione.

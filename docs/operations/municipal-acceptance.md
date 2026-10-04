@@ -85,3 +85,7 @@ rende disponibile lo scope anche nell'API privata. Lettura delle campagne MVP,
 quattro tentativi municipali rifiutati per prerequisiti, controlli di fonte
 preservati e confronto API/MCP effettivo sono verificati nel
 [registro di adozione](toscana-readiness.md#adozione-in-development).
+
+La successiva [campagna MVP completa](observational-trial.md) chiude la 9.3 del
+pilota dopo correzioni con audit e riscontri ordinari. Questa valutazione non
+completa i quattro dossier municipali indipendenti o l’accettazione delle fonti.

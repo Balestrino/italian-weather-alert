@@ -96,7 +96,7 @@ The original checkboxes reflect the private project task list on 30 September 20
 
 - [x] 9.1 After 4.9–4.11, rerun the complete human-reviewed regression for discovery, OCR, full-content classification, operational-window extraction/conflict-aware merge and linking; include long and scanned ordinances, the cross-window date conflict, observed irrelevant notices and regional cases, deliver separate omission, unsupported-assertion and indeterminate-field reports, and keep failed source activation blocked until correction and successful rerun.
 - [x] 9.2 Compare baseline and semantic linking, model/prompt versions, latency and per-stage consumption on the same cases; verify a proposed processing change passes evaluation before explicit selected reprocessing and does not automatically replay all history.
-- [ ] 9.3 Start and track at least seven complete 24-hour intervals of paced observation across vigilance, criticality/alert, monitoring and Calcinaia; persist daily checks and per-scope evidence of checked sections, delays, attributable original/attachment comparisons (human or explicitly operator-delegated assistant review) and failure behavior. Use retained cases for absent events and extend for omissions, delays, missing evidence, unresolved issues or insufficient observations.
+- [x] 9.3 Start and track at least seven complete 24-hour intervals of paced observation across vigilance, criticality/alert, monitoring and Calcinaia; persist daily checks and per-scope evidence of checked sections, delays, attributable original/attachment comparisons (human or explicitly operator-delegated assistant review) and failure behavior. Use retained cases for absent events and extend for omissions, delays, missing evidence, unresolved issues or insufficient observations.
 - [x] 9.4 Summarize trial tokens, OCR/embedding charges, retry costs, hosting/storage and bootstrap versus steady-state consumption; verify pricing assumptions and missing metrics are explicit before proposing an operating budget.
 - [x] 9.5 Import the reviewed vigilance, criticality/alert, monitoring and Calcinaia source configurations on the dedicated VM; run and retain successful previews before separately enabling internal collection. Verify scheduled acquisition and interpretation outcomes, manual capacity/error checks and public-disabled state for all four sources. Record observed failures and deferred infrastructure honestly; do not claim seven-day trial completion or public acceptance.
 
@@ -627,3 +627,26 @@ Tasks 30.1/30.2 pass unit/race, disposable PostgreSQL and historical-query check
 Retained original PDF comparisons verify all 364 fields in each CFR product.
 The checklist is now 158/166, with the eight original gates still open pending
 ordinary adoption, live completeness and the attributable campaign assessment.
+
+**9.3 completed — 4 October 2026:** the existing MVP projection campaign has a
+persisted `complete` assessment after 239.94 observed hours (nine complete 24-hour
+intervals), with eleven local calendar dates for each of the four products.
+Source/configuration/sections, daily persisted checks and maximum gaps are retained;
+all gaps are below the original 10,800-second campaign limit and no required
+resource is missing. Delegated original/attachment corrections preserve preceding
+failed/unresolved reviews and assessment snapshots. Municipal actual failures and
+explicitly retained synthetic regional failure controls are attributable; absent
+monitoring events use the retained event case, with attachment non-applicability
+explicitly reviewed. Original internal-campaign delay breaches stay `extended`.
+
+The clean `ce941ed` development revision supplies extraction v27. The fresh selected
+ordinary worker confirms one reopening, two retained closures, four independent
+literal prohibition scopes and COC activation, with no retrospective closure or
+borrowed page/alert times. The same 14-check contract passes with reused checks
+individually labelled; this is not fourteen fresh model calls. Actual API/MCP,
+pagination, previous saved views, knowledge boundaries and municipality isolation
+pass. Original archives/jobs/results and the intervening v26 failure remain
+immutable. Sources, dependencies, six workers and stopped production are preserved.
+See [observational trial](../../../docs/operations/observational-trial.md).
+The checklist is now 159/166 complete, with seven original gates still open;
+9.3 does not complete 10.1, source acceptance or production activation.
