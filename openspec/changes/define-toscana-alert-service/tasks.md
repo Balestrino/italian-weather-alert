@@ -668,3 +668,25 @@ still required for their stated semantic acceptance. Source controls and actual
 MVP readiness remain unchanged; production stays stopped. See
 [MVP acceptance review](../../../docs/operations/mvp-acceptance-review.md).
 The checklist is now 160/166 complete, with six operational/release tasks open.
+
+## 31. Calcinaia coverage continuation — 4 October 2026
+
+- [x] 31.1 Publish a dated channel/window coverage matrix from current active configuration and effective intervals, complete typed/general listing traversal, retained-resource inventory and one consistent paginated API view. Distinguish discovery, recent-window acquisition, supported interpretation, additional channels and acceptance; preserve private captures and prior sample results. Verify territorial guidance, local links, runtime/readiness and strict specifications without source/job/public-control mutations.
+- [ ] 31.2 Diagnose the exact recent quotation failures and indeterminate required-content result; implement only evidence-backed corrections, verify positive/negative redistributable cases and bounded ordinary reprocessing, and compare supported API/MCP results and unchanged history. Do not repair invented citations, manually classify notices or claim the earlier 14-check sample covers the current pending documents.
+- [ ] 31.3 Adopt separately scoped Calcinaia platform acquisition and automatic primary-counterpart discovery/comparisons after successful full-scope preview and required-dependency checks. Verify effective cadence, retry/failure handling, immutable receipts for new/changed evidence and independent municipal/CFR collection; retain diagnostic-only candidates and uncompleted wider scopes.
+- [ ] 31.4 Inventory necessary explicitly referenced municipal/albo acts and verify bounded acquisition/interpretation of their exact editions and resources. Resolve affected dates only from authoritative clarifying evidence; record inaccessible acts or absent clarification and preserve indeterminate validity when the source cannot establish it.
+- [ ] 31.5 Reassess each actual source dossier against the verified declared scope and current ordinary results, keeping real/reused/synthetic evidence explicit. Record source acceptance and its report review only when prerequisites pass; keep accepted limitations partial and preserve separate public/release controls and independent CFR evidence conditions.
+
+The 31.1 audit verifies 286 tracked declared-section URLs and 57 complete recent
+originals. The same saved API view exposes 43 supported recent interpretations
+and 14 pending; thirteen quotation failures and one required-content result
+remain open. The general listing adds no notice in the evaluated recent window.
+No ordinary platform source is registered in the inspected development environment.
+See [the matrix](../../../docs/operations/calcinaia-coverage.md).
+
+The operator requests deferring real backup/restore verification in this session.
+Tasks 8.2, 8.3 and their dependent requirements in 1.8, 10.2 and 12.5 remain
+unchecked and mandatory before production readiness. This is a work-order
+deferral, not acceptance of an unprotected production environment. The checklist
+is now 161/171 complete, with four source-continuation tasks and the six existing
+operational/release tasks open.

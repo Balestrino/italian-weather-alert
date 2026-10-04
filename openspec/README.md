@@ -35,7 +35,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 160 | 6 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 161 | 10 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -230,3 +230,12 @@ explicit acceptance conditions. Source acceptance/public controls are unchanged.
 The checklist is now 160/166 with six operational/release tasks open; this count
 does not imply accepted sources or production readiness. See
 [MVP acceptance review](../docs/operations/mvp-acceptance-review.md).
+
+The subsequent read-only Calcinaia audit (31.1) publishes a
+[channel/window matrix](../docs/operations/calcinaia-coverage.md): all 57 recent
+declared-section notices have complete originals, while 14 still lack supported
+ordinary interpretation. These failures do not invalidate the previous sample's
+successful regression or establish semantic completeness. Four scoped follow-up
+tasks cover ordinary correction, continuous platform comparisons, referenced acts
+and source acceptance. The checklist is 161/171, with ten tasks open. Operator-
+deferred backup/restore verification remains a production requirement.

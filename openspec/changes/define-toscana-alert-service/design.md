@@ -1,5 +1,28 @@
 ## Context
 
+### Calcinaia coverage continuation — 4 October 2026
+
+Use the source-scoped [matrix](../../../docs/operations/calcinaia-coverage.md)
+to separate listing traversal, recent-window retention, required resources,
+ordinary interpretation, additional-channel comparisons and acceptance. Bind
+each audit to the observed active configuration, effective intervals, evaluated
+publication/display-date windows and one consistent API view. Preserve original
+captures and operational identifiers privately. A successful retained sample
+regression cannot close failures of other recent documents.
+
+The current read-only audit finds 57/57 recent typed-section notices retained
+complete, with 43 supported interpretations and 14 pending. Follow up invalid
+quotations through exact captured request/response evidence and bounded ordinary
+reprocessing; neither an irrelevant-looking title nor queue success supplies a
+validated classification. Inspect required OCR content separately. Record new
+interpretations append-only and preserve original failures and knowledge bounds.
+Platform cadence and counterpart discovery require their own acquisition and
+receipt evidence; the historical license-documentation exclusion in the primary
+configuration is superseded, not proof of activation. Retrieve only necessary
+explicitly referenced acts from the albo. Temporal uncertainty stays explicit
+without authoritative clarification. Operator-deferred backup/restore work keeps
+the production gates open; source work does not silently waive those gates.
+
 ### Cascina corrections — 2 October 2026
 
 Use the source-revision layout `2 Jan 2006` for the observed unpadded Italian

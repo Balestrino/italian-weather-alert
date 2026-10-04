@@ -26,6 +26,14 @@ The operator authorizes an internal MVP on the current dedicated VM (8 vCPU, app
 
 ## Capabilities
 
+The 4 October scope audit materializes a Calcinaia channel/window matrix and
+identifies remaining recent interpretation failures independently of the completed
+sample regression. Continue with bounded ordinary correction/reprocessing,
+scheduled platform acquisition and primary comparisons, necessary referenced
+acts and explicit source acceptance. Preserve truthful temporal uncertainty.
+The operator subsequently defers backup/restore verification; production
+requirements remain effective. See [the matrix](../../../docs/operations/calcinaia-coverage.md).
+
 ### New Capabilities
 
 - `official-source-ingestion`: Configured official channels, collection, attachments/OCR, source lifecycle, evaluation, internal administration and operational monitoring.

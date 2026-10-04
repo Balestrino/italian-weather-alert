@@ -88,6 +88,17 @@ is not claimed. The dated inventory remains unchanged. See
 
 ## Data and verification
 
+**Subsequent Calcinaia scope audit — 4 October 2026:** the live three-section
+traversal and separately traversed general listing identify no additional
+general-only notice in the evaluated recent listing-date window. All 57 recent
+typed-section notices have complete retained originals, but 14 remain without
+supported public-view interpretation: quotation failures and an indeterminate
+required-content result remain distinct from the earlier successful 14-check
+regression. No ordinary platform source is registered in the inspected development
+environment. Source acceptance, public enablement and production status are unchanged.
+Backup/restore verification is deferred at the operator's request, not completed
+or waived. See the [scope matrix](operations/calcinaia-coverage.md).
+
 - Municipalities: [ISTAT-derived national registry](nazionale/registri/comuni-italia.csv), captured 15 September 2026; 7,894 municipalities in 20 regions. [Official ISTAT registry](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/) and [reuse terms](https://www.istat.it/dati/open-data/). IWA selected and normalized the registry fields; see [attribution](../THIRD_PARTY_NOTICES.md).
 - CAPs: [Garda Informatica archive](prerequisiti-mvp/evidenze/cap-garda-2026-09-11.zip), version 11 September 2026, MIT-licensed according to its included README; 8,456 municipality–CAP pairs. [Publisher page](https://www.gardainformatica.it/database-comuni-italiani/). The CAP data are not an official ISTAT or Poste Italiane postcode registry.
 - Join checks for this document: every ISTAT municipality has at least one CAP in this archive; all identifiers, municipality names and region codes match the ISTAT-derived registry; every CAP is five digits; the archive’s two CAP tables agree. These checks do **not** verify each postal assignment or its effective date outside the previously reviewed Tuscany scope.

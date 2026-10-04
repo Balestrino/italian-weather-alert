@@ -1,10 +1,11 @@
 # Stato dei punti Toscana — 4 ottobre 2026
 
 La [checklist](../../openspec/changes/define-toscana-alert-service/tasks.md)
-ha 160 task completati su 166. In questo giro sono verificati:
+ha 161 task completati su 171 dopo l'audit di copertura di Calcinaia. In questo giro sono verificati:
 
 | Task | Risultato |
 | --- | --- |
+| 31.1 | [Matrice corrente](calcinaia-coverage.md), traversal delle sezioni/elenco generale e vista API paginata; interpretazioni recenti pendenti distinte dai 14/14 del campione |
 | 10.1 | [Quattro dossier revisionati](mvp-acceptance-review.md), 22 confronti API/MCP e gate indipendenti verificati; accettazione reale pending |
 | 9.4 | [Consuntivi separati](trial-costs.md), metriche indisponibili e prezzi storici non verificati espliciti; budget pendente |
 | 11.5 | [Campagne indipendenti e quattro report pending](municipal-acceptance.md); stessi gate del pilota |
@@ -13,6 +14,11 @@ ha 160 task completati su 166. In questo giro sono verificati:
 | 29.1–29.3 | [Recupero selettivo con audit](municipal-interpretation.md#esito-del-recupero-live), test e worker ordinari verificati; omissione live e campagne extended nell’esito iniziale, superato dalla chiusura 9.3 |
 
 I sei gate operativi e di rilascio seguenti restano aperti per gli esiti specifici mancanti:
+
+Si aggiungono quattro task di fonte 31.2–31.5: correzione delle interpretazioni
+recenti, confronto continuativo della piattaforma, atti richiamati e accettazione.
+L'operatore ha richiesto di rinviare backup e ripristino in questa sessione:
+8.2/8.3 e le condizioni dipendenti restano obbligatori prima della produzione.
 
 | Task | Condizione ancora da verificare |
 | --- | --- |

@@ -42,6 +42,14 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
+CLN-027 aggiunge la [matrice di copertura corrente](../../../operations/calcinaia-coverage.md):
+il confronto live trova tutti gli avvisi della finestra recente acquisiti, ma
+quattordici ancora senza interpretazione disponibile nella vista API. Tredici
+fallimenti di citazione e un risultato indeterminato restano distinti dal
+contratto revisionato 14/14 di CLN-025. Consultare configurazione, intervalli
+effettivi, ultimi originali e risultati; il successo del campione non chiude
+la completezza semantica della finestra o la raccolta continuativa della piattaforma.
+
 CLN-025 verifica la correzione sul worker ordinario e la chiusura osservativa
 9.3: quattro ambiti indipendenti, riapertura ed eccezioni conservate, regression
 pass con stesso contratto e audit immutabile. I fallimenti CLN-022/CLN-024 restano
@@ -111,6 +119,14 @@ non applicabile a una misura locale; non è richiesto un accordo unanime di tre 
 
 ## Problemi aperti
 
+La matrice CLN-027 circoscrive il lavoro successivo: interpretazioni recenti
+pendenti, confronto continuativo del canale aggiuntivo, atti richiamati e
+accettazione per fonte. La motivazione di esclusione della piattaforma per
+termini di riuso nella configurazione live è storica e superata dal piano
+CLN-012; la raccolta ordinaria della piattaforma non è però registrata
+nell'ambiente ispezionato. Revisionare questo limite con evidenze e preview,
+senza cambiare retroattivamente configurazioni, campagne o accettazione.
+
 CLN-017 supera la lacuna di integrazione del worker descritta da CLN-007:
 l’estrazione primaria completa ora alimenta le misure del dominio con legami alle
 evidenze, validità letterale e confine di conoscenza. Gli aggiornamenti collegati
@@ -146,6 +162,16 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-027 — Matrice live e interpretazioni recenti ancora pendenti
+
+- **Data e ultima verifica:** 2026-10-04; elenchi ufficiali HTTP, configurazione e intervalli effettivi development, PostgreSQL e quattro pagine API sulla stessa vista salvata.
+- **Ambito:** sezioni Notizie/Avvisi/Comunicati, confronto separato con `/novita`, finestra delle date di elenco 2026-09-04–2026-10-04; API della piattaforma con diverso filtro sulle date di visualizzazione.
+- **Osservazione confermata:** quattordici pagine delle tre sezioni espongono 286 URL, tutti nel tracker. I 57 avvisi recenti hanno originali completi; 43 risultano `supported`, quattordici `not_processed`. Tredici job falliscono per citazioni non valide; un risultato indeterminato conserva contenuto richiesto incompleto. I 799 URL aggiuntivi dell'elenco generale non appartengono alla finestra recente osservata. Gli otto URL delle sezioni senza originale sono più vecchi della finestra e senza eccezioni attive nel tracker; non sono omissioni recenti dimostrate.
+- **Canale aggiuntivo:** referral e identità API Calcinaia confermati, 36 comunicazioni nel filtro di visualizzazione esaminato. Nessuna fonte della piattaforma registrata nel development ordinario; la vecchia motivazione documentale di esclusione resta nella configurazione primaria ma non reintroduce il gate superato da CLN-012.
+- **Intervento:** audit in sola lettura verificato; pubblicata la [matrice con criteri di chiusura](../../../operations/calcinaia-coverage.md) e aggiunti i task 31.1–31.5. Nessuna fonte, interpretazione, job o accettazione modificata. Backup/ripristino rinviati su richiesta dell'operatore, con requisiti di produzione conservati.
+- **Evidenza:** registro privato `CLN-COVERAGE-20261004`, con originali degli elenchi, inventari, risposte e manifest. Readiness/runtime development verificati; nessun nuovo confronto MCP, readback degli oggetti o revisione semantica dell'intero corpus attribuito a questo audit.
+- **Prossima verifica:** correzione delimitata delle citazioni/contenuti e nuove esecuzioni ordinarie, ricerca delle controparti della piattaforma, atti necessari e accettazione. Il precedente 14/14 rimane valido nel suo corpus; non certifica questi quattordici documenti recenti pendenti.
 
 ### CLN-023 — Ambiti indipendenti e revisioni correttive
 

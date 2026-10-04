@@ -65,6 +65,11 @@ Municipal acceptance SHALL identify configured channels and sections, evaluated 
 - **WHEN** traversal finds all known sample notices for the evaluated period
 - **THEN** coverage reports the evaluated channels, sections, period and remaining limitations without claiming that every municipal publication is collected
 
+#### Scenario: Recent originals are complete but interpretations remain pending
+- **WHEN** a source-scoped audit finds every recent declared-section notice retained complete but some lack supported ordinary classification or projection
+- **THEN** its dated coverage matrix records acquisition and interpretation separately, identifying the active revision, effective intervals, listing-date window and consistent interface view
+- **AND** a previously successful sample regression or succeeded job does not close these document-specific failures; correction preserves original attempts and service-knowledge history
+
 #### Scenario: The secondary platform omits a municipal notice
 - **WHEN** the Calcinaia website publishes a pertinent notice that is absent from Cittadino Informato
 - **THEN** the service collects the primary notice, records the secondary-platform omission as diagnostic evidence and does not reduce the authority of the municipal publication
