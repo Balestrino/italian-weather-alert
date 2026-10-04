@@ -91,3 +91,9 @@ per prodotto, maschere di applicabilità e quantità senza trasformarle in aller
 Un simbolo curvo sopra le mappe è escluso solo con hull interamente esterno;
 le forme non supportate nei pannelli continuano a bloccare la lettura.
 La chiusura 9.3 richiede ancora l’esito ordinario e la valutazione persistita.
+
+Il primo recupero ordinario v26 conserva i quattro divieti, ma aggiunge una
+chiusura ricavata dall’inciso sullo stato precedente alla riapertura. Il nuovo
+fallimento dello stesso contratto rimane nel registro. V27 verifica l’esclusione
+del solo inciso retrospettivo, conservando clausole di chiusura indipendenti;
+la prova ordinaria resta necessaria prima della chiusura 9.3 (CLN-024).

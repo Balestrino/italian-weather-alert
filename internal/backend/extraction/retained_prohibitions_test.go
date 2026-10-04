@@ -84,3 +84,21 @@ func TestRetainedProhibitionListPreservesExistingDistinctTimes(t *testing.T) {
 		t.Fatal("existing temporal evidence overwritten", got)
 	}
 }
+
+func TestCompletedReopeningDoesNotProjectRetrospectiveClosure(t *testing.T) {
+	text := "Il sottopasso di via Sintetica, chiuso nella serata di ieri per la presenza di acqua, è stato riaperto alla circolazione."
+	w := Window{Ordinal: 1, Text: text, ResourceURL: "https://example.test/notice", CoreEndByte: len(text)}
+	prior := []Measure{{Ordinal: 1, Kind: "closure", Subject: "sottopasso di via Sintetica", Evidence: []Evidence{{Field: "kind", Quote: text}}, TemporalCandidates: []TemporalCandidate{{Field: "valid_until", OriginalExpression: "nella serata di ieri"}}}}
+	got := supplementNamedReopenings(prior, w)
+	if len(got) != 1 || got[0].Kind != "reopening" || got[0].ValidFrom != nil || got[0].ValidUntil != nil || len(got[0].TemporalCandidates) != 0 {
+		t.Fatal("retrospective closure became restriction or dated reopening", got)
+	}
+	prior[0].Evidence = append(prior[0].Evidence, Evidence{Field: "kind", Quote: "Resta la chiusura al pubblico per il tratto pedonale"})
+	if got = supplementNamedReopenings(prior, w); len(got) != 2 || got[0].Kind != "closure" {
+		t.Fatal("independent closure erased", got)
+	}
+	w.CoreStartByte = len("Il sottopasso")
+	if got = supplementNamedReopenings(prior[:1], w); len(got) != 1 || got[0].Kind != "closure" {
+		t.Fatal("context-only reopening changed closure", got)
+	}
+}

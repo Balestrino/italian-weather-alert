@@ -20,6 +20,29 @@ func supplementNamedReopenings(measures []Measure, window Window) []Measure {
 		if reopeningInsideQuotation(window.Text[:match[2]]) || uncertainReopeningSubject.MatchString(subject) || !window.ownsOperativeQuote(quote) || len(operativeEvidenceOutsideHeading([]Evidence{{Quote: quote}}, window)) == 0 {
 			continue
 		}
+		// The closure in this completed-reopening sentence is retrospective
+		// context. Preserve separately evidenced closures, but never turn this
+		// subordinate clause or its previous time into a current restriction.
+		kept := make([]Measure, 0, len(measures))
+		for _, m := range measures {
+			retrospective, independent := false, false
+			if m.Kind == "closure" && strings.EqualFold(m.Subject, subject) {
+				for _, e := range m.Evidence {
+					if e.Field != "kind" || !kindSupportedByEvidence("closure", []Evidence{e}) {
+						continue
+					}
+					if strings.Contains(e.Quote, quote) || strings.Contains(quote, e.Quote) {
+						retrospective = true
+					} else {
+						independent = true
+					}
+				}
+			}
+			if !retrospective || independent {
+				kept = append(kept, m)
+			}
+		}
+		measures = kept
 		present := false
 		for index := range measures {
 			m := &measures[index]
@@ -52,6 +75,9 @@ func supplementNamedReopenings(measures []Measure, window Window) []Measure {
 		m := Measure{Ordinal: len(measures) + 1, Kind: "reopening", Subject: subject, Evidence: []Evidence{kind, support}}
 		m.IndeterminateFields = indeterminateFields(m)
 		measures = append(measures, m)
+	}
+	for i := range measures {
+		measures[i].Ordinal = i + 1
 	}
 	return measures
 }

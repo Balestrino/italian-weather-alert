@@ -655,3 +655,8 @@ When a newer complete ordinary extraction of the same retained version has been
 projected, current municipal queries use its measures at that knowledge boundary,
 including corrected subject/place grouping. Older runs remain available in
 historical views; unsuccessful, unprojected or evaluation runs cannot hide them.
+
+Extraction v27 excludes a closure supported only by the retrospective subordinate
+clause in a complete core-owned reopening sentence. It retains independent
+closure evidence, without copying prior closure times into reopening validity.
+The v26 ordinary failure remains a separate immutable regression record.

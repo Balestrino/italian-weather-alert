@@ -212,3 +212,8 @@ The service SHALL interpret a recognized retained vigilance PDF separately from 
 - **WHEN** a retained criticality PDF has a cubic header symbol whose entire transformed control-point hull lies strictly above every dated risk panel
 - **THEN** the interpreter may exclude that symbol while reading the original maps and physical pages
 - **AND** unsupported, transformed or crossing curves inside map panels remain rejected; no inferred colors or source acceptance are introduced.
+
+#### Scenario: Retrospective closure in a completed reopening
+- **WHEN** a completed circulation-reopening sentence mentions a previous closure in a subordinate clause
+- **THEN** that clause alone MUST NOT create an additional current closure or an end time from the previous-closure expression
+- **AND** closures independently evidenced by other operative clauses remain separate.

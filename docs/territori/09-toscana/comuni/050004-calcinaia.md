@@ -374,3 +374,12 @@ Il criterio documentale di chiusura di questa voce è superato da CLN-012; le os
 - **Conseguenza:** rimuove il blocco quota osservato nel periodo precedente, senza trasformare una citazione errata in prova valida o cambiare i controlli della fonte. Embedding e copertura integrale non sono certificati dal recupero.
 - **Prossima verifica:** completare regressione e osservazione con confronti attribuibili, conservando i fallimenti e verificando l'accesso del provider nel tempo.
 - **Collegamenti:** CLN-005, CLN-017 e CLN-018; task 13.8, 9.3 e 10.1.
+
+### CLN-024 — Inciso di chiusura precedente nella riapertura
+
+- **Data:** 2026-10-04.
+- **Ambito:** riapertura completata del sottopasso nel caso conservato.
+- **Osservazione confermata:** il worker v26 recupera quattro divieti ma produce anche una chiusura dall’inciso retrospettivo, con tempo di fine non sostenuto. La regressione fallita resta nel registro.
+- **Correzione verificata:** v27 esclude solo la chiusura sostenuta dall’inciso nella frase di riapertura, conservando chiusure con evidenze operative indipendenti. Test di proprietà del core e tempi passano.
+- **Evidenza:** registro privato `TOSCANA-TRIAL-CLOSURE-20261004`; [stato](../../../operations/toscana-readiness.md).
+- **Prossima verifica:** nuovo risultato ordinario e valutazione della campagna.
