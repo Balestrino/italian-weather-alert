@@ -55,6 +55,11 @@ Each structured measure SHALL identify its supported action, affected place or s
 - **WHEN** an update reports roads cleared but explicitly states that one underpass remains closed
 - **THEN** the service does not infer that the underpass has reopened from the general statement
 
+#### Scenario: Partial reopening and typographic place spelling
+- **WHEN** a completed circulation reopening names one subject while other closures and place-specific prohibitions remain, and the model uses a straight apostrophe for a retained typographic apostrophe
+- **THEN** contiguous canonical matching retains the original place spelling before scope validation and merging, preserving each supported restriction independently
+- **AND** a recognized standalone, core-owned positive reopening sentence supplies only that subject's reopening, without transferring its earlier closure time or the page update time; negated, conditional, prospective, quoted and heading-only statements do not supply a reopening
+
 ### Requirement: Separate temporal meanings
 The service SHALL retain original time expressions and distinguish publication, source modification, event time, operational validity, page expiry, platform dates and acquisition time. Each temporal candidate SHALL retain its meaning and evidence independently of the resolved field. Determinable instants SHALL be represented in UTC; date-only values SHALL remain dates. Europe/Rome SHALL be assumed only when justified by the source, with the assumption recorded. Unknown precision, timezone ambiguity and conditional validity SHALL remain explicit. It SHALL distinguish current, future already-issued, expired, cancelled, superseded and undetermined information. Publication time SHALL NOT be substituted for an unspecified event time; page or platform dates SHALL NOT automatically determine operational validity.
 

@@ -271,4 +271,28 @@ func TestExtractionPersistsEvidenceAndExposesNewerUninterpretedVersion(t *testin
 	if err != nil || !found || visibility.DocumentVersionID != third.ID || visibility.RunID != 0 || visibility.Status != "uninterpreted" || visibility.ReasonCode != "not_processed" || visibility.InterpretedAt != nil {
 		t.Fatalf("unprocessed acquired revision was hidden: %#v %v", visibility, err)
 	}
+
+	text, partialResponse := partialReopeningFixture()
+	partial := retain("extract-partial-reopening", text)
+	partialStored := runExtraction(partial, classify(partial, "partial"), partialResponse, "partial")
+	if partialStored.Status != "extracted" || len(partialStored.Measures) != 7 {
+		t.Fatalf("partial reopening did not survive durable extraction: %#v", partialStored)
+	}
+	for _, m := range partialStored.Measures {
+		if m.Kind == "prohibition" && (m.Place == nil || !strings.Contains(text, *m.Place)) {
+			t.Fatalf("stored literal place lost: %#v", m)
+		}
+		if m.Kind == "reopening" && (m.ValidFrom != nil || m.ValidUntil != nil || len(m.TemporalCandidates) != 0) {
+			t.Fatalf("stored reopening inherited old closure time: %#v", m)
+		}
+		for _, e := range m.Evidence {
+			if e.ResourceURL != url || e.SegmentOrdinal != 1 || !strings.Contains(text, e.Quote) {
+				t.Fatalf("stored partial-update evidence lost: %#v", e)
+			}
+		}
+	}
+	old, found, err := extractStore.Get(ctx, stored.RunID)
+	if err != nil || !found || old.Measures[0].Kind != "closure" || *old.Measures[0].ValidUntil != *stored.Measures[0].ValidUntil {
+		t.Fatalf("new reopening rewrote earlier extraction: %#v %v", old, err)
+	}
 }

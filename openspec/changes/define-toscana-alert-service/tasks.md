@@ -580,3 +580,19 @@ private municipal campaign rejection/legacy MVP readback and actual SDK API/MCP
 saved-view equivalence pass. See [development adoption](../../../docs/operations/toscana-readiness.md#adozione-in-development).
 This adoption also makes the retained CFR graphical implementation from 27.4
 available to the ordinary development path without granting source acceptance.
+
+**9.3/10.1 progress — 4 October 2026:** the retained partial-reopening response
+reproduces a place-spelling loss before merge: straight/typographic apostrophes
+made one supported prohibition's place unknown. Extraction v25 preserves the
+contiguous original spelling before scope validation, retaining the merge conflict
+guard. A bounded positive, core-owned circulation-reopening formula supplies the
+explicit reopening and excludes earlier closure/page times, uncertain statements,
+quoted/heading-only content and context-only predicates. The retained replay now
+preserves one reopening, two closures, four prohibitions and COC activation, plus
+the other cases' temporal conflict and road-clearance exception. No new model calls.
+Synthetic/race and disposable PostgreSQL checks verify evidence round trips,
+legacy behavior and earlier results; vet/build pass. See
+[municipal interpretation](../../../docs/operations/municipal-interpretation.md)
+and CLN-020. Both live campaigns remain extended. Ordinary live adoption/reprocessing,
+same-contract evaluation and outstanding observations/reviews remain required;
+9.3/10.1 and the other six gates stay unchecked (153/161).

@@ -188,3 +188,12 @@ existing application backup service to the clean verified revision. Runtime imag
 checks, HTTP isolation, private campaign gates and actual API/MCP saved-view
 comparisons pass. Source controls and other containers/volumes are preserved;
 production stays stopped. See [adoption and remaining gates](../docs/operations/toscana-readiness.md#adozione-in-development).
+
+The subsequent 4 October retained-response verification corrects the partial
+municipal reopening merge: original typographic place spelling and a bounded
+explicit reopening preserve independent restrictions and undetermined times.
+Synthetic/race and disposable PostgreSQL checks pass with immutable extraction
+v25 settings. See [municipal interpretation](../docs/operations/municipal-interpretation.md).
+This advances 9.3/10.1 without closing them: ordinary live adoption/reprocessing,
+same-contract evaluation and remaining campaign evidence are still required.
+The checklist remains 153/161 with eight open gates.

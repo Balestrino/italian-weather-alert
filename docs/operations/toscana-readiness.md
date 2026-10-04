@@ -35,6 +35,13 @@ copertura municipale incompleta, indipendentemente dal conteggio dei task.
 
 ## Adozione in development
 
+La successiva [correzione della riapertura parziale](municipal-interpretation.md)
+supera il fallimento del merge nel replay conservato e nelle fixture sintetiche
+con PostgreSQL. È verificata nel checkout, con catalogo di estrazione v25;
+adozione e rielaborazione ordinaria live di questa correzione restano da eseguire.
+La lettura aggiornata delle due campagne conserva `extended`. I task 9.3 e 10.1
+rimangono aperti anche dopo questo avanzamento.
+
 La revisione applicativa `c69a10e` è stata costruita dal checkout pulito e adottata
 in development dopo i controlli del software e le migrazioni. Public, admin, le
 sei repliche del worker e il backup già attivo ora condividono l'immagine;

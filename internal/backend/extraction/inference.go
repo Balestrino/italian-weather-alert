@@ -307,6 +307,7 @@ func parseCompactWindowV2(raw string, window Window) ([]Measure, error) {
 		measures = supplementRetainedClosures(measures, window)
 		measures = supplementRoadClearance(measures, window)
 		measures = supplementDirectiveClosures(measures, window)
+		measures = supplementNamedReopenings(measures, window)
 	}
 	if len(decoded.Measures) > 0 && len(measures) == 0 && headingOnly != len(decoded.Measures) {
 		return nil, ErrEvidence
@@ -775,6 +776,11 @@ func expandCompactMeasureV2(ordinal int, candidate compactWireMeasureV2, window 
 		if ok {
 			evidence = append(evidence, contextual)
 			selectedByField["place"] = append(selectedByField["place"], contextual)
+			if !window.legacyLiteral {
+				// Scope validation must use the retained spelling as the evidence
+				// table does, including reviewed apostrophe presentation changes.
+				place = &contextual.Quote
+			}
 		} else {
 			place = nil
 			evidence = evidenceWithoutField(evidence, "place")

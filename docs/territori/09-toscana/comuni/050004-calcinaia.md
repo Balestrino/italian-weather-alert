@@ -122,8 +122,12 @@ Questa verifica regionale non risolve automaticamente la validità delle singole
 misure comunali: un atto diverso per data/oggetto non chiarisce per inferenza il
 conflitto agosto/settembre di un’altra comunicazione.
 
-Restano da completare la correttezza semantica delle estrazioni e il merge della
-riapertura parziale di CLN-016. Date in conflitto, termini condizionali senza
+CLN-020 supera il fallimento di merge della riapertura parziale di CLN-016 nel
+replay delle risposte conservate e nelle fixture sintetiche con PostgreSQL:
+grafia originale dei luoghi, riapertura, restrizioni e COC mantengono evidenze
+separate. Catalogo v25 verificato nel checkout; adozione, rielaborazione ordinaria
+live e rivalutazione dello stesso contratto di accettazione restano da eseguire.
+La correttezza semantica dell'intero corpus resta da completare. Date in conflitto, termini condizionali senza
 inizio stabilito e ambiti territoriali mancanti rimangono indeterminati; una
 misura visibile non viene dichiarata automaticamente vigente oggi.
 
@@ -135,6 +139,14 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-020 — Riapertura parziale e luoghi tipografici nel replay
+
+- **Data e ultima verifica:** 2026-10-04; risposte e testo del caso conservato, senza nuovo fetch o chiamate ai modelli.
+- **Ambito e conoscenza:** `calcinaia-municipal`, comunicazione primaria di monitoraggio del territorio; confermata la perdita del luogo per differenza di apostrofo fra valore del modello e citazione canonica. Il successivo conflitto noto/sconosciuto bloccava il merge completo. Il modello usava inoltre un aggiornamento generico per la riapertura esplicita.
+- **Intervento:** applicato nel checkout e verificato nel replay/parser e con fixture sintetiche PostgreSQL. La grafia contigua originale viene conservata prima del controllo dell'ambito; una formula positiva delimitata di riapertura già avvenuta conserva il proprio soggetto e la citazione. Tempi della precedente chiusura o della pagina non datano la riapertura. Catalogo di estrazione v25/logica v20, con percorso legacy preservato.
+- **Verifica:** una riapertura, due chiusure, quattro divieti e un'attivazione del COC; conflitto temporale dell'altro caso ed eccezione delle strade liberate conservati. Prove negative per negazioni, ipotesi, futuro, citazioni, intestazioni e solo contesto. Evidenza privata `CLN-PARTIAL-REOPEN-20261004`; [procedura e limiti](../../../operations/municipal-interpretation.md).
+- **Prossima verifica:** adozione e rielaborazione selezionata del percorso ordinario, confronto persistente/API-MCP e rivalutazione delle campagne. Supera il fallimento tecnico riportato da CLN-016 nel perimetro del replay; non dichiara risolta la completezza del corpus, non sostituisce i report live e non conclude 9.3/10.1 o l'accettazione.
 
 ### CLN-017 — Integrazione ordinaria delle misure verificata in development
 

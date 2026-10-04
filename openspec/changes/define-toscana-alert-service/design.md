@@ -300,6 +300,26 @@ restart/deadlock observations; preserve private rollback evidence and document
 `--scale worker=4` as the return to the previous count. The existing lock protocol
 and source/provider controls apply to all six replicas.
 
+## Partial municipal reopening recovery — 4 October 2026
+
+The retained local replay fails because a canonicalized evidence quote preserves
+`d’Arno` while its place still uses `d'Arno`. Return the contiguous retained place
+spelling from contextual validation before list-scope checks; keep the existing
+known/null-place merge conflict guard. Complete only recognized standalone,
+core-owned sentences asserting that a named road/underpass/bridge/tunnel has been
+reopened to circulation. Rebind a matching generic update to that explicit
+predicate, or supplement the missing reopening, with literal evidence. The
+recognized sentence has no reopening time: a parenthetical earlier closure or
+page timestamp does not supply one. Reject uncertain subjects, quoted/conditional
+statements and ordinance headings. Preserve the legacy parsing route.
+
+Register immutable extraction configuration v25 with logic v20 for remote and
+local models, partitioning manifests/reuse from prior interpretations without
+changing the prompts or automatically replaying history. Synthetic parser and
+durable PostgreSQL cases plus the retained-response replay verify this correction;
+ordinary live reprocessing and campaign/acceptance reassessment remain separate.
+See [municipal interpretation](../../../docs/operations/municipal-interpretation.md).
+
 ## Territorial source knowledge guides
 
 Maintain a human-readable knowledge base under `docs/territori/`, with region directories keyed by two-digit codes and municipality files keyed by six-digit ISTAT identity. Create files when research begins. Each guide puts current source maps, operational rules and open problems before its dated discovery register. A shared template records stable finding IDs, scope, evidence dates, knowledge status and intervention status independently. Subsequent entries reference superseded findings without deleting them.
