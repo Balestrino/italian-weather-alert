@@ -126,6 +126,10 @@ func TestAutomaticVerificationRevisitsPrimaryAndPreservesHistory(t *testing.T) {
 	automaticExtraction(f, "platform", c, text, "chiusura")
 	p, ptext := automaticRetain(f, "municipal", "act", "chiusura")
 	automaticExtraction(f, "municipal", p, ptext, "chiusura")
+	// Archiving interpretation does not revoke retained primary evidence.
+	if _, err := f.pool.Exec(f.ctx, "INSERT INTO interpretation_archives(document_version_id,archived_at,cutoff,actor) VALUES($1,$2,$2,'fixture')", p.ID, time.Now()); err != nil {
+		t.Fatal(err)
+	}
 	w := VerificationWorker{Store: f.store, Documents: f.docs}
 	run := func(want int) {
 		t.Helper()
@@ -173,6 +177,13 @@ func TestAutomaticVerificationRevisitsPrimaryAndPreservesHistory(t *testing.T) {
 	if err := f.pool.QueryRow(f.ctx, "SELECT count(*) FROM domain_local_measures").Scan(&measures); err != nil || measures != 0 {
 		t.Fatal("comparison projected candidates", measures, err)
 	}
+	if _, err := f.pool.Exec(f.ctx, "INSERT INTO interpretation_archives(document_version_id,archived_at,cutoff,actor) VALUES($1,$2,$2,'fixture')", c.ID, time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.pool.Exec(f.ctx, "UPDATE acquisition_source_status SET last_error_code='synthetic_unavailable',last_error_at=$1 WHERE source_id='municipal'", time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	run(0)
 	if err := registry.New(f.pool).Disable(f.ctx, "platform", 2, "fixture", false); err != nil {
 		t.Fatal(err)
 	}

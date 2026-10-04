@@ -203,8 +203,8 @@ func (w *VerificationWorker) sources(ctx context.Context, at time.Time) ([]verif
 func (w *VerificationWorker) documents(ctx context.Context, source verificationSourceState, at time.Time) ([]verificationDocument, error) {
 	rows, err := w.Store.pool.Query(ctx, `SELECT d.official_url,a.version_id,COALESCE((SELECT e.run_id FROM extraction_results e JOIN processing_runs p ON p.id=e.run_id WHERE e.document_version_id=a.version_id AND e.created_at<=$3 AND p.workload<>'evaluation' AND e.status='extracted' AND e.content_complete ORDER BY e.created_at DESC,e.run_id DESC LIMIT 1),0)
  FROM retained_documents d JOIN LATERAL (SELECT version_id FROM retained_acquisitions WHERE document_id=d.id AND configuration=$2 AND version_id IS NOT NULL AND acquired_at<=$3 ORDER BY acquired_at DESC,id DESC LIMIT 1) a ON true
- WHERE d.source_id=$1 AND NOT EXISTS(SELECT 1 FROM interpretation_archives WHERE document_version_id=a.version_id)
- ORDER BY d.id LIMIT 10001`, source.ID, source.Revision, at)
+ WHERE d.source_id=$1 AND (NOT $4 OR NOT EXISTS(SELECT 1 FROM interpretation_archives WHERE document_version_id=a.version_id))
+ ORDER BY d.id LIMIT 10001`, source.ID, source.Revision, at, source.Configuration.CittadinoInformato != nil)
 	if err != nil {
 		return nil, err
 	}

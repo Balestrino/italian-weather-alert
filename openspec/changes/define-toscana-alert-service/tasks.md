@@ -699,3 +699,8 @@ literal editions and display-date uncertainty; acquisition tests verify external
 preview/retention boundaries. Live full-scope preview and scheduled development
 adoption remain necessary before checking task 31.3. Private work record:
 `CIN-CONTINUOUS-20261004`.
+
+Retained primary evidence remains readable after interpretation archival, while
+archived platform candidates are excluded from automatic execution. Integration
+checks also separate historical query boundaries at PostgreSQL microsecond
+precision; two adjacent Go clock reads are not a reliable before/after fixture.

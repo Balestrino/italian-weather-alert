@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-04 [Fixed] Preserve archived primary evidence in automatic comparisons and make historical-query test boundaries deterministic
 - 2026-10-04 [Added] Add ordinary Cittadino Informato comparison workers and reviewed external PDF dependency scopes
 - 2026-10-04 [Changed] Update Cittadino Informato findings to distinguish isolated trials from ordinary scheduled collection
 - 2026-10-04 [Changed] Document the verified Calcinaia coverage matrix, pending interpretations and scoped operational follow-up

@@ -958,8 +958,10 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		if e != nil || len(unchanged.Measures) != 1 || unchanged.Measures[0].Subject != "ponte sintetico" {
 			t.Fatal("unprojected/evaluation extraction hid known facts", unchanged, e)
 		}
-		previousKnowledge := time.Now().UTC()
-		if n, e := domainStore.ProjectMunicipalExtraction(ctx, replacement, time.Now()); e != nil || n != 1 {
+		// PostgreSQL timestamps have microsecond precision. Consecutive Go clock
+		// reads can otherwise collapse the before/after knowledge boundary.
+		previousKnowledge := time.Now().UTC().Truncate(time.Microsecond)
+		if n, e := domainStore.ProjectMunicipalExtraction(ctx, replacement, previousKnowledge.Add(time.Microsecond)); e != nil || n != 1 {
 			t.Fatal("corrected primary projection failed", n, e)
 		}
 		corrected, e := store.Search(ctx, q)
