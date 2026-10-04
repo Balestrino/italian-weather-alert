@@ -702,3 +702,34 @@ public enablement, enable/suspend each source independently, and retain partial
 readiness for missing or limited scopes. Four fully accepted scopes are required
 for full MVP readiness. Infrastructure and explicit production activation remain
 separate. See [review results](../../../docs/operations/mvp-acceptance-review.md).
+
+## Continuous platform comparison — 4 October 2026
+
+Task 31.3 connects a periodic verification worker to each ordinary worker runtime.
+PostgreSQL session advisory ownership serializes replicas; cancellation releases
+ownership. Read only latest acquisitions under active source configurations and
+complete ordinary extraction/OCR evidence, with explicit document limits. Respect
+collection, interpretation suspension, municipality and regional execution gates.
+A disabled primary remains an unavailable named check rather than disappearing.
+
+Shared resources, exact notice titles and complete body containment discover
+counterparts within independently collected source scopes. They do not establish
+semantic identity. Only a unique explicit act-number/date clause in the measure's
+owned evidence establishes local edition; source publication/display dates do not.
+Platform risk scalars retain their own colors/risk labels, without inferring CFR
+product, zone, issuance or validity from today/tomorrow or bulletin-display dates.
+Unknown identities and unsupported primary fields remain non-comparable.
+
+Persist comparison-only receipts through the existing evidence validator, leaving
+ordinary primary projection authoritative. This mode prevents an incomplete subset
+of selected fields from creating a duplicate or temporally poorer primary measure.
+Keep consecutive identical states idempotent; a return to an earlier semantic state
+following failure/revision appends a new receipt tied to the previous receipt ID.
+No retrospective deletion, majority vote, model bypass or source acceptance follows.
+
+The platform contract adds separately reviewed external PDF directory scopes with
+referral/policy evidence. Permit encoded official filenames only after checking the
+decoded canonical path, rejecting encoded separators, traversal, query/fragment,
+other origins and scope-changing redirects. Validate PDFs before retention. Source
+configuration, full-window preview, cadence and live adoption remain separately
+verified operational steps; the earlier failed wider scope stays in the history.

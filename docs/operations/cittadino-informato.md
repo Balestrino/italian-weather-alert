@@ -309,3 +309,37 @@ senza cancellarlo con i tredici confronti passati. L’interpretazione grafica C
 e la proiezione generica CLN-007 restano aperte. Gli esiti di revisione mancanti
 non vengono sostituiti da attestazioni positive. Il
 [coverage tracker](../coverage.md) conserva lo stato pending per fonte.
+
+## Raccolta e confronti continuativi — task 31.3
+
+Il worker ordinario include un controllo periodico delle fonti piattaforma abilitate,
+con interrogazione degli originali già conservati dalle primarie. Rispetta i gate di
+fonte, sospensione interpretativa e territorio; PostgreSQL serializza le repliche.
+Le richieste pubbliche non avviano raccolta o inferenza.
+
+Il controllo individua controparti tramite risorsa condivisa, titolo esatto o corpo
+completo. Consulta versioni, estrazioni ordinarie e OCR completo; l'identità dell'atto
+richiede una clausola esplicita numero/data nella stessa evidenza della misura.
+Non usa date di elenco, pubblicazione o visualizzazione come edizioni. I rischi
+conservano i valori espliciti della piattaforma; emissione, zona e validità CFR
+mancanti impediscono un confronto dichiarato equivalente anche se i colori coincidono.
+
+Le ricevute automatiche usano `comparison_only`: conservano fatti selezionati,
+fonti/versioni, motivi, tempi e risultati senza modificare le proiezioni primarie.
+Stati consecutivi identici non duplicano ricevute; cambiamenti, indisponibilità e
+recuperi conservano ogni transizione, anche quando ritorna un hash già osservato.
+Le copie piattaforma restano link-only e l'accettazione rimane indipendente.
+
+`cittadino_informato.external_attachments` dichiara le directory PDF esterne con
+origine HTTPS, referral e policy separata di raccolta/conservazione. I nomi codificati
+sono ammessi entro il percorso canonico; traversal, separatori codificati, altre
+origini e redirect fuori confine sono rifiutati. I PDF passano il parser reale prima
+della conservazione. Preview e collector applicano gli stessi controlli.
+
+Prima di attivare una fonte, conservare stato e revisione di rollback, verificare
+referral/identità, finestra di discovery e tutti gli allegati, poi eseguire un preview
+completo. Registrare attivazione esplicita, intervalli effettivi e lista delle fonti
+nelle configurazioni dei runner. Controllare acquisizioni ordinarie ripetute,
+originali e ricevute, errori/backoff, isolamento dei comuni e API/MCP. Non riutilizzare
+un trial separato come prova della raccolta ordinaria. L'implementazione verificata
+precede l'adozione live; evidenze private `CIN-CONTINUOUS-20261004`.

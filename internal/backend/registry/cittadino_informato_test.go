@@ -74,3 +74,33 @@ func TestCittadinoInformatoResourceOwnership(t *testing.T) {
 		}
 	}
 }
+
+func TestCittadinoInformatoExternalDependencies(t *testing.T) {
+	c := cittadinoConfigurationFixture()
+	e := *c.Policy.Evidence
+	c.CittadinoInformato.ExternalAttachments = []AttachmentScope{{Origin: "https://municipal.example", PathPrefix: "/sites/default/files/", Referral: e, Policy: Policy{Evidence: &e, CollectionPermitted: true, RetentionPermitted: true, Conditions: "Synthetic reviewed linked PDFs; link-only"}}}
+	if !c.valid() {
+		t.Fatal("reviewed external dependency rejected")
+	}
+	for target, want := range map[string]bool{
+		"https://municipal.example/sites/default/files/2026-10/atto%20sintetico.pdf": true,
+		"https://municipal.example/sites/default/files/2026-10/atto%C3%A0.pdf":       true,
+		"https://municipal.example/sites/default/files/../other/atto.pdf":            false,
+		"https://municipal.example/sites/default/files/%2e%2e/atto.pdf":              false,
+		"https://municipal.example/sites/default/files/x%2f..%2fatto.pdf":            false,
+		"https://municipal.example/sites/default/files/x%5catto.pdf":                 false,
+		"https://municipal.example/sites/default/files/atto.pdf?foreign=1":           false,
+		"https://municipal.example/sites/default/files/atto.html":                    false,
+		"https://municipal.example/other/atto.pdf":                                   false,
+		"https://other.example/sites/default/files/atto.pdf":                         false,
+		"http://municipal.example/sites/default/files/atto.pdf":                      false,
+	} {
+		if c.CittadinoInformato.AllowsAttachment(target) != want {
+			t.Fatalf("dependency boundary %s", target)
+		}
+	}
+	c.CittadinoInformato.ExternalAttachments[0].Policy.CopiesPermitted = true
+	if c.valid() {
+		t.Fatal("external platform copies accepted")
+	}
+}

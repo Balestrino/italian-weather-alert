@@ -44,6 +44,7 @@ type VerificationCheck struct {
 }
 
 type VerificationRequest struct {
+	ComparisonOnly    bool                 `json:"comparison_only,omitempty"`
 	RequestID         string               `json:"request_id"`
 	CandidateKey      string               `json:"candidate_key"`
 	Kind              string               `json:"kind"` // local_measure, operational_phase, regional_record
@@ -250,7 +251,7 @@ func normalizedField(name, raw string) string {
 	aliases := map[string]map[string]string{
 		"kind":    {"chiusura": "closure", "riapertura": "reopening", "restrizione": "restriction", "divieto": "prohibition", "sospensione": "suspension", "attivazione": "activation", "disattivazione": "deactivation", "aggiornamento operativo": "operational_update", "osservazione": "observation"},
 		"level":   {"verde": "green", "giallo": "yellow", "arancione": "orange", "rosso": "red", "sconosciuto": "unknown", "non applicabile": "not_applicable"},
-		"risk":    {"vento": "wind", "temporali forti": "thunderstorms", "mareggiate": "coastal_waves", "neve": "snow", "ghiaccio": "ice", "rischio idrogeologico-idraulico del reticolo minore": "minor_network_hydro", "rischio idraulico del reticolo principale": "main_network_hydraulic"},
+		"risk":    {"vento": "wind", "temporali": "thunderstorms", "temporali forti": "thunderstorms", "mare": "coastal_waves", "mareggiate": "coastal_waves", "neve": "snow", "ghiaccio": "ice", "idrogeologico": "minor_network_hydro", "idraulico": "main_network_hydraulic", "rischio idrogeologico-idraulico del reticolo minore": "minor_network_hydro", "rischio idraulico del reticolo principale": "main_network_hydraulic"},
 		"product": {"vigilanza": "vigilance", "criticità": "criticality", "monitoraggio": "monitoring"},
 	}
 	if canonical, ok := aliases[name][value]; ok {

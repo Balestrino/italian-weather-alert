@@ -23,6 +23,11 @@ Il [coverage tracker](../../coverage.md) resta il riferimento per l'accettazione
 
 ## Guida operativa
 
+CIN-013 aggiunge il worker periodico e gli allegati comunali esterni delimitati.
+La verifica software precede il preview completo e l'attivazione ordinaria;
+consultare la [procedura continuativa](../../operations/cittadino-informato.md#raccolta-e-confronti-continuativi--task-313).
+
+
 CIN-012 registra il nuovo audit di Calcinaia: identità e referral osservati,
 elenco delimitato dalle date di visualizzazione verificato, ma nessuna fonte
 della piattaforma registrata nel development ordinario ispezionato. La
@@ -114,6 +119,15 @@ non costituisce da sola discovery delle controparti o accettazione semantica.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-013 — Percorso periodico e dipendenze esterne
+
+- **Data:** 2026-10-04; implementazione e verifiche sintetiche PostgreSQL/race.
+- **Ambito:** fonti piattaforma esplicitamente selezionate, primarie conservate indipendenti e allegati PDF con origine/directory revisionate.
+- **Intervento:** worker ordinario con ricerca delle controparti, ricevute immutabili e confronto separato dalla proiezione; recuperi e ritorni di versione preservano lo storico. Il contratto consente nomi PDF codificati entro il perimetro esterno verificato.
+- **Limiti:** titoli/risorse condivise identificano controparti da consultare, senza dimostrare edizione, emissione o validità. Nessuna acquisizione live continuativa attestata dalla sola implementazione.
+- **Evidenza e prossima verifica:** `CIN-CONTINUOUS-20261004`; completare preview della finestra più ampia e osservare controlli ordinari/ricevute prima di chiudere 31.3. Copie link-only e accettazione separate.
+
 
 ### CIN-012 — Audit di Calcinaia e raccolta ordinaria non registrata
 

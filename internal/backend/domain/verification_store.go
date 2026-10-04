@@ -205,7 +205,7 @@ func (s *Store) VerifyMultiSource(ctx context.Context, docs RegionalDocuments, r
 	if candidate.Role == primaryRole(request.Kind) {
 		out.Admitted = candidate.Complete && admitsFields(request.Kind, primary, candidate)
 	}
-	if primary.VersionID > 0 && primary.Complete && primary.Outcome != "unavailable" {
+	if primary.VersionID > 0 && primary.Complete && primary.Outcome != "unavailable" && !request.ComparisonOnly {
 		out.PrimaryRecordID, out.ProjectionState, err = s.projectVerificationPrimary(ctx, tx, request.Kind, request.MunicipalityISTAT, primary.ChannelEvidence, at.UTC())
 		if err != nil {
 			return out, err

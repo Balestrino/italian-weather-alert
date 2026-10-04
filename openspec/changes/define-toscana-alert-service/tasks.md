@@ -690,3 +690,12 @@ unchecked and mandatory before production readiness. This is a work-order
 deferral, not acceptance of an unprotected production environment. The checklist
 is now 161/171 complete, with four source-continuation tasks and the six existing
 operational/release tasks open.
+
+**31.3 implementation — 4 October 2026:** ordinary worker orchestration, retained
+counterpart discovery, comparison-only receipts and reviewed external platform
+PDF scopes are implemented. Synthetic PostgreSQL/race checks cover unchanged and
+changed evidence, comparable conflicts, failure/recovery history, disabled scopes,
+literal editions and display-date uncertainty; acquisition tests verify external
+preview/retention boundaries. Live full-scope preview and scheduled development
+adoption remain necessary before checking task 31.3. Private work record:
+`CIN-CONTINUOUS-20261004`.

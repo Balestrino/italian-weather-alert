@@ -156,6 +156,16 @@ Task 26.2 SHALL remain open until a bounded development run exercises the acquis
 - **WHEN** a field selector does not belong to the retained source/version/resource or references an incomplete or absent OCR page
 - **THEN** the verifier rejects the unbound field instead of accepting a caller-supplied value or inventing a passage
 
+#### Scenario: Ordinary workers continuously compare retained platform candidates
+- **WHEN** a separately configured recognized platform source is collection-enabled in an enabled municipality
+- **THEN** ordinary workers periodically discover counterparts within independently retained active municipal/CFR sources and persist comparison receipts outside public requests
+- **AND** a unique shared resource, exact title or full-body match identifies evidence to inspect without proving act edition, regional issuance or validity; missing, ambiguous, delayed or unavailable evidence remains diagnostic
+- **AND** unchanged consecutive evidence reuses its receipt, while changes and returns after failures preserve append-only knowledge history; periodic comparison-only requests do not create or revise domain measures
+
+#### Scenario: A reviewed platform notice links an external municipal PDF
+- **WHEN** its source revision declares the exact HTTPS origin, canonical directory, referral and collection/retention policy for that linked PDF
+- **THEN** preview and ordinary collection retain the validated PDF with encoded filenames allowed inside the boundary; path escapes, unreviewed origins and redirects outside the boundary remain forbidden and platform copies stay link-only
+
 ### Requirement: Retained acquisition and versions
 The service SHALL retain original document bytes where permitted, source URL, acquisition time, hash, available publication/update metadata and interpretation version. It SHALL detect changes at stable URLs, preserve prior versions within retention, and avoid duplicate versions for unchanged content. An unchanged successful check SHALL NOT change publication time. Required linked resources SHALL be included or explicitly reported missing.
 

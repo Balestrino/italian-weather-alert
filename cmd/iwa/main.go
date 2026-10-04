@@ -773,7 +773,7 @@ func run() bool {
 			return false
 		}
 		workerCtx, workerCancel := context.WithCancel(ctx)
-		workerCount := 3
+		workerCount := 4
 		if dailyReportWorker != nil {
 			workerCount++
 		}
@@ -804,6 +804,8 @@ func run() bool {
 		startWorker("documents", documentWorker.Run)
 		startWorker("acquisition", checkWorker.Run)
 		startWorker("inference", inferenceWorker.Run)
+		verificationWorker := &domain.VerificationWorker{Store: domain.New(pool), Documents: retained, Interval: time.Minute}
+		startWorker("verification", verificationWorker.Run)
 		slog.Info("workers started", "queues", "documents,acquisition,inference")
 		first := <-workerErrors
 		report(first)

@@ -189,4 +189,37 @@ func TestCittadinoInformatoPersistenceAndScope(t *testing.T) {
 	if unrecovered != 0 {
 		t.Fatal("unavailable tracking stayed stale")
 	}
+
+	// External dependencies use the same preview, scheduled retention and
+	// missing/invalid-PDF guards, including encoded official filenames.
+	proof := *cfg.Policy.Evidence
+	cfg.CittadinoInformato.ExternalAttachments = []registry.AttachmentScope{{Origin: "https://municipal.example", PathPrefix: "/acts/", Referral: proof, Policy: registry.Policy{Evidence: &proof, CollectionPermitted: true, RetentionPermitted: true, Conditions: "Synthetic linked act; link-only"}}}
+	revision, err = reg.AppendConfiguration(ctx, source.ID, revision, cfg, "fixture")
+	must(err)
+	const external = "https://municipal.example/acts/ordinanza%20sintetica.pdf"
+	page = crawler.pages[raw]
+	must(json.Unmarshal(page.HTML, &notice))
+	notice.Content += `<a href="` + external + `">Atto esterno</a>`
+	page.HTML, err = json.Marshal(notice)
+	must(err)
+	crawler.pages[raw] = page
+	crawler.pages[external] = Page{URL: external, StatusCode: 200, MediaType: "application/pdf", HTML: syntheticPDF()}
+	if _, err := engine.Preview(ctx, source.ID, revision, "fixture"); err != nil {
+		t.Fatal("external preview", err)
+	}
+	now = now.Add(time.Minute)
+	if out := engine.Check(ctx, source.ID, revision, now); !out.Complete {
+		t.Fatalf("external collection: %#v", out)
+	}
+	var externalVersion int64
+	must(pool.QueryRow(ctx, "SELECT last_version_id FROM acquisition_targets WHERE source_id=$1 AND url=$2", source.ID, raw).Scan(&externalVersion))
+	bytes, err := retained.Read(ctx, externalVersion, external)
+	must(err)
+	if string(bytes) != string(syntheticPDF()) {
+		t.Fatal("external original changed")
+	}
+	foreign := documents.Acquisition{ID: "unreviewed-external", SourceID: source.ID, Configuration: revision, URL: raw, Resources: []documents.Resource{{URL: raw, Role: "original", Required: true, SourceID: source.ID, Configuration: revision, MediaType: "application/json", Bytes: page.HTML}, {URL: "https://other.example/acts/ordinanza.pdf", Role: "attachment", SourceID: source.ID, Configuration: revision, MediaType: "application/pdf", Bytes: syntheticPDF()}}}
+	if _, err := retained.Retain(ctx, foreign); err != documents.ErrPolicy {
+		t.Fatalf("unreviewed dependency retained: %v", err)
+	}
 }

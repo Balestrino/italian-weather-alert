@@ -42,6 +42,11 @@ contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
 
+CLN-028 registra l'implementazione del confronto periodico autorizzato per
+Calcinaia. Prima dell'adozione occorrono preview completo, dipendenze necessarie
+e controlli ordinari; la conferma tecnica resta distinta dall'accettazione.
+
+
 CLN-027 aggiunge la [matrice di copertura corrente](../../../operations/calcinaia-coverage.md):
 il confronto live trova tutti gli avvisi della finestra recente acquisiti, ma
 quattordici ancora senza interpretazione disponibile nella vista API. Tredici
@@ -162,6 +167,15 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-028 — Preparazione della raccolta ordinaria della piattaforma
+
+- **Data:** 2026-10-04, decisione dell'operatore, codice e prove sintetiche.
+- **Ambito:** Calcinaia `050004`; fonte piattaforma distinta dalla primaria, finestra di visualizzazione dal 4 settembre e rischi oggi/domani.
+- **Osservazione:** il nuovo controllo diretto della piattaforma trova allegati PDF sul percorso comunale `/sites/default/files/`, inclusi gli atti già mancanti nel perimetro più ampio. Le dipendenze richiedono un permesso esterno delimitato e validazione, non un filtro più stretto che le eviti.
+- **Intervento:** worker periodico, controparti conservate e ricevute di confronto implementati; test sintetici verificano confini, edizioni letterali, conflitti, recuperi e storico. Attivazione ordinaria ancora da verificare.
+- **Evidenza e prossima verifica:** `CIN-CONTINUOUS-20261004`; completare preview e adozione, verificare intervalli effettivi e ricevute reali. Non accettare le fonti né risolvere date comunali per inferenza.
+
 
 ### CLN-027 — Matrice live e interpretazioni recenti ancora pendenti
 

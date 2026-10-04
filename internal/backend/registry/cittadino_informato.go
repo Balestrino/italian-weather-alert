@@ -2,6 +2,7 @@ package registry
 
 import (
 	"net/url"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -11,14 +12,15 @@ import (
 // CittadinoInformatoContract is an explicit municipality-scoped opt-in. The
 // operator's recorded choice is acquisition policy evidence, not a license.
 type CittadinoInformatoContract struct {
-	MunicipalityISTAT string   `json:"municipality_istat"`
-	MunicipalitySlug  string   `json:"municipality_slug"`
-	Publisher         string   `json:"publisher"`
-	Updates           bool     `json:"updates"`
-	Risks             bool     `json:"risks"`
-	PageSize          int      `json:"page_size"`
-	UpdatesSince      string   `json:"updates_since,omitempty"` // Explicit API display-date filter, not operative validity.
-	AttachmentPaths   []string `json:"attachment_paths,omitempty"`
+	MunicipalityISTAT   string            `json:"municipality_istat"`
+	MunicipalitySlug    string            `json:"municipality_slug"`
+	Publisher           string            `json:"publisher"`
+	Updates             bool              `json:"updates"`
+	Risks               bool              `json:"risks"`
+	PageSize            int               `json:"page_size"`
+	UpdatesSince        string            `json:"updates_since,omitempty"` // Explicit API display-date filter, not operative validity.
+	AttachmentPaths     []string          `json:"attachment_paths,omitempty"`
+	ExternalAttachments []AttachmentScope `json:"external_attachments,omitempty"`
 }
 
 const CittadinoInformatoAccess = "cittadino-informato-api"
@@ -61,6 +63,14 @@ func (p *CittadinoInformatoContract) Valid(c Configuration) bool {
 		return false
 	}
 	seen := map[string]bool{}
+	if !(&AttachmentPolicy{External: p.ExternalAttachments}).Valid() {
+		return false
+	}
+	for _, scope := range p.ExternalAttachments {
+		if scope.Origin == "https://cittadinoinformato.it" || scope.Policy.CopiesPermitted {
+			return false
+		}
+	}
 	for _, path := range p.AttachmentPaths {
 		// Shared uploads require an explicit subdirectory; another municipality's
 		// directory is never a dependency permission for this source.
@@ -75,7 +85,15 @@ func (p *CittadinoInformatoContract) Valid(c Configuration) bool {
 
 func (p *CittadinoInformatoContract) AllowsAttachment(raw string) bool {
 	u, err := url.Parse(raw)
-	if err != nil || u.Scheme != "https" || u.Host != "cittadinoinformato.it" || u.User != nil || u.Fragment != "" || u.RawQuery != "" || u.Path != u.EscapedPath() || strings.Contains(u.Path, "..") {
+	if err != nil || u.Scheme != "https" || u.User != nil || u.Fragment != "" || u.RawQuery != "" || u.ForceQuery || strings.ContainsAny(u.Path, "\\%\x00\r\n") || path.Clean(u.Path) != u.Path || strings.Contains(strings.ToLower(u.EscapedPath()), "%2f") || strings.Contains(strings.ToLower(u.EscapedPath()), "%5c") || !strings.HasSuffix(strings.ToLower(u.Path), ".pdf") {
+		return false
+	}
+	for _, scope := range p.ExternalAttachments {
+		if scope.Origin == u.Scheme+"://"+u.Host && strings.HasPrefix(u.Path, scope.PathPrefix) && (&AttachmentPolicy{External: []AttachmentScope{scope}}).Valid() && !scope.Policy.CopiesPermitted {
+			return true
+		}
+	}
+	if u.Host != "cittadinoinformato.it" || u.Path != u.EscapedPath() || strings.Contains(u.Path, "..") {
 		return false
 	}
 	for _, prefix := range p.AttachmentPaths {
