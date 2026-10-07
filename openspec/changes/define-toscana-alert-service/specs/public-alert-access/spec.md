@@ -4,6 +4,13 @@ Provide developers and citizens using assistants with equivalent free API and MC
 
 ## ADDED Requirements
 
+### Requirement: Current alert summary agrees with detailed facts
+Situation summaries SHALL identify supported non-green current criticality levels and their risk/zone scope even when overall interpretation is partial. Reliability limitations SHALL NOT turn a supported orange or yellow value into an unknown level. Future and expired intervals SHALL remain distinct from current warnings in API and MCP.
+
+#### Scenario: Orange is supported by partial HTML projection
+- **WHEN** the current detailed criticality fact is orange with a supported explicit interval and other graphical values remain unresolved
+- **THEN** the summary states the orange alert and the remaining partial coverage separately, with the same evidence and temporal boundary in API and MCP
+
 ### Requirement: Public access without registration
 The first release SHALL provide a documented read-only public JSON API and remote MCP access without payment, registration or a required API key. Both interfaces SHALL support municipality/zone discovery, warning and measure search, document details and versions, retained history, and source coverage and updating information. They SHALL expose only regional and recognized local public products; internal DPC comparisons and monitoring administration SHALL NOT appear as public warning records or public administrative operations.
 
@@ -162,3 +169,15 @@ freshness, interpretation and source acceptance SHALL remain distinguishable.
 #### Scenario: Many documents await interpretation
 - **WHEN** the pinned municipal situation contains many pending notices
 - **THEN** the municipal source summary reports incomplete interpretation; situation pages contain only structured facts, and full-scope conclusions/source summaries stay consistent across API/MCP pages while check freshness changes truthfully at delivery
+
+#### Scenario: Complete situation query exceeds ten seconds
+
+- **WHEN** constructing a complete saved situation takes more than ten seconds but less than the bounded 30-second HTTP write budget
+- **THEN** the transport returns the complete paginated response rather than closing the connection without a response
+- **AND** request-read and header limits remain bounded independently
+- **AND** API/MCP saved-view and historical evidence semantics are unchanged
+
+#### Scenario: A partial projection supports an elevated precise interval
+- **WHEN** a current regional fact supports an elevated alert despite unrelated unresolved projection entries
+- **THEN** the summary names its risk, color and zone with the supported interval in its recorded timezone
+- **AND** fact reliability and unsupported entries remain explicit across all pages

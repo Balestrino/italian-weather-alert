@@ -293,7 +293,9 @@ func TestExpectedPublicationStatesStayDistinct(t *testing.T) {
 	if err != nil || changedClaim.SourceID != "expected" {
 		t.Fatalf("claim changed source: claim=%#v err=%v", changedClaim, err)
 	}
-	publication := base.Add(-10 * time.Minute)
+	// An edition issued shortly before the expected instant still belongs to
+	// this cycle, and its actual timestamp must remain unchanged in storage.
+	publication := base.Add(-10*time.Minute - 30*time.Second)
 	changedFinished := changedClaim.StartedAt.Add(time.Second)
 	if err = store.Finish(ctx, changedClaim, CheckOutcome{SourceID: "expected", Configuration: 1, StartedAt: changedClaim.StartedAt, FinishedAt: changedFinished, Reachable: true, ContentRecognized: true, Complete: true, NewDocuments: 1, PublicationObservedAt: &publication}); err != nil {
 		t.Fatal(err)

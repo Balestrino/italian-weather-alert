@@ -61,7 +61,8 @@ func TestSituationConclusionsAndMissingChannel(t *testing.T) {
 		t.Fatal("unknown collapsed into green")
 	}
 	s.RegionalProducts[0].Level = "orange"
-	if !strings.Contains(summarizeSituation(s).ProcessedData.Summary, "gialli, arancioni o rossi") {
+	s.RegionalProducts[0].Quality.Interpretation.State = "partial"
+	if !strings.Contains(summarizeSituation(s).ProcessedData.Summary, "livello arancione") {
 		t.Fatal("elevated level lost")
 	}
 	s.RegionalProducts[0].Status = "future"
@@ -172,5 +173,23 @@ func TestSituationSummaryAPIAndMCPPinnedPagination(t *testing.T) {
 	}
 	if pages != 7 {
 		t.Fatal("risks omitted", pages)
+	}
+}
+
+func TestPartialOrangeSummaryPreservesRiskZoneAndRomeIntervals(t *testing.T) {
+	value := summaryFixture()
+	start := time.Date(2026, 10, 7, 15, 0, 0, 0, time.UTC)
+	end := start.Add(24 * time.Hour)
+	zone := "Europe/Rome"
+	warning := &value.RegionalProducts[0]
+	warning.Level = "orange"
+	warning.OfficialRiskLabel = "Temporali"
+	warning.Quality.Interpretation.State = "partial"
+	warning.Validity = publicquery.Temporal{Precision: "interval", Instant: &start, EndInstant: &end, Timezone: &zone}
+	summary := summarizeSituation(value).ProcessedData.Summary
+	for _, want := range []string{"Temporali: livello arancione nella zona A4", "dal 07/10/2026 17:00 al 08/10/2026 17:00 (Europe/Rome)"} {
+		if !strings.Contains(summary, want) {
+			t.Fatalf("supported interval missing: %q", summary)
+		}
 	}
 }

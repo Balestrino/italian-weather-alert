@@ -4,6 +4,20 @@ Represent regional warnings and individual municipal measures with traceable geo
 
 ## ADDED Requirements
 
+### Requirement: Precise intervals and daily criticality peaks
+The service SHALL preserve every supported explicit criticality interval when a daily map reports the day's highest level. It SHALL compare that peak with all applicable intervals, reject contradictory overlapping intervals and genuine map/table inconsistencies, and SHALL NOT extend an afternoon warning to midnight. A corrected projection SHALL append a new logic version and preserve earlier knowledge.
+
+#### Scenario: Yellow orange and yellow occur in succession
+- **WHEN** the same zone/risk has successive yellow, orange and yellow intervals and its daily map reports orange
+- **THEN** all three precise intervals remain available and the daily peak does not cause a false conflict or discard unrelated map facts
+
+### Requirement: Explicit municipal activation time
+The service SHALL distinguish start linkages from end expressions for a civil-protection activation. A yearless operative date MAY use attributable matching publication-year context only when calendar and weekday checks agree; original phrases and the assumption SHALL remain inspectable. An unstated end SHALL remain unknown.
+
+#### Scenario: COC opens at the start of the alert
+- **WHEN** the operative statement explicitly opens the COC at a named day/month and local time in conjunction with the beginning of an alert
+- **THEN** that phrase supports the activation start, never its end, and the regional alert's closing time is not transferred to the COC
+
 ### Requirement: Independent places in retained prohibitions
 An explicitly enumerated positive operative prohibition SHALL retain each independently stated place with literal field evidence, including when a provider groups the list into one candidate. Conjunctions within a place SHALL NOT create unsupported separate scopes. Local completion SHALL require a recognized retained operative clause owned by the extraction core and SHALL preserve temporal uncertainty and prior interpretation versions. Negative, conditional, quoted, heading-only, context-only and ambiguous exception lists SHALL NOT supply inferred prohibitions.
 
@@ -217,3 +231,10 @@ The service SHALL interpret a recognized retained vigilance PDF separately from 
 - **WHEN** a completed circulation-reopening sentence mentions a previous closure in a subordinate clause
 - **THEN** that clause alone MUST NOT create an additional current closure or an end time from the previous-closure expression
 - **AND** closures independently evidenced by other operative clauses remain separate.
+
+#### Scenario: Daily vigilance band is supported but cumulative fill is ambiguous
+
+- **WHEN** a daily fill matches this edition's labelled rainfall legend but the cumulative fill does not
+- **THEN** the daily graphical status remains depicted and its literal band is preserved
+- **AND** total_graphical_status is unresolved and no cumulative band is guessed
+- **AND** aggregate limitations identify daily, cumulative and symbol uncertainties separately

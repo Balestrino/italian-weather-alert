@@ -60,7 +60,9 @@ func Reply(w http.ResponseWriter, code int, v any) {
 
 // Serve owns the listener and drains in-flight requests on cancellation.
 func Serve(ctx context.Context, ln net.Listener, handler http.Handler) error {
-	srv := &http.Server{Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 10 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 16}
+	// A complete saved situation can exceed ten seconds while gathering retained
+	// evidence. Give the response a bounded budget separate from request reads.
+	srv := &http.Server{Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 16}
 	done := make(chan error, 1)
 	go func() { done <- srv.Serve(ln) }()
 	select {

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const RegionalProjectionLogic = "cfr-graphics-v4"
+const RegionalProjectionLogic = "cfr-graphics-v5"
 
 type RegionalDocuments interface {
 	Version(context.Context, int64) (documents.Version, error)

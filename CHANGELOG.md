@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-07 [Changed] Plan latest-source repairs and correct CFR intraday projections, publication accounting, vigilance diagnostics and bounded API responses
 - 2026-10-04 [Changed] Adopt scoped Calcinaia Cittadino Informato collection and automatic comparisons in development; record cadence, diagnostic receipts and interpretation limits
 - 2026-10-04 [Fixed] Preserve archived primary evidence in automatic comparisons and make historical-query test boundaries deterministic
 - 2026-10-04 [Added] Add ordinary Cittadino Informato comparison workers and reviewed external PDF dependency scopes

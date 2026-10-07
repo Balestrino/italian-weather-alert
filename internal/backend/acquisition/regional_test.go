@@ -42,6 +42,20 @@ func TestMonitoringNeverCreatesAnAlertLevel(t *testing.T) {
 		t.Fatalf("monitoring was turned into a warning level: %#v", observation)
 	}
 }
+
+func TestRegionalIssuanceInstantUsesEditionAndRome(t *testing.T) {
+	for _, expression := range []string{"Mercoledí, 07 Ottobre 2026, ore 13.10", "07/10/2026, ore 13.10"} {
+		got := regionalIssuanceInstant(expression)
+		if got == nil || got.Format(time.RFC3339) != "2026-10-07T11:10:00Z" {
+			t.Fatal(expression, got)
+		}
+	}
+	for _, expression := range []string{"", "NESSUN AVVISO IN CORSO", "31/02/2026, ore 13.10", "07/10/2026, ore 25.00"} {
+		if got := regionalIssuanceInstant(expression); got != nil {
+			t.Fatal("invented publication instant", expression, got)
+		}
+	}
+}
 func TestRegionalPreviewRetainsHTMLPrintAndBoundedGraphics(t *testing.T) {
 	const pageURL = "https://www.cfr.toscana.it/index.php?IDS=2&IDSS=71"
 	const printURL = "https://www.cfr.toscana.it/bollettini/pdf_14.php?print=true"

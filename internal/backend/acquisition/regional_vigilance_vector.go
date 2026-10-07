@@ -331,6 +331,7 @@ func ProjectVigilanceVector(htmlBody []byte, pdfURL string, evidence VectorEvide
 		return false
 	}
 	unresolved := 0
+	dailyUnknown, totalUnknown, symbolsUnknown := 0, 0, 0
 	for side := 0; side < 2; side++ {
 		date, e := parseRegionalDay(dates[0][side])
 		otherDate, otherErr := parseRegionalDay(dates[1][side])
@@ -364,8 +365,14 @@ func ProjectVigilanceVector(htmlBody []byte, pdfURL string, evidence VectorEvide
 					if total := panels[2][zone]; total.known {
 						weather.TotalRainfallBand = bands[total.polygon.Fill]
 					}
-					if weather.RainfallBand == "" || weather.TotalRainfallBand == "" {
+					weather.TotalGraphicalStatus = "depicted"
+					if weather.TotalRainfallBand == "" {
+						weather.TotalGraphicalStatus = "unresolved"
+						totalUnknown++
+					}
+					if weather.RainfallBand == "" {
 						weather.GraphicalStatus = "unresolved"
+						dailyUnknown++
 					} else {
 						weather.GraphicalStatus = "depicted"
 					}
@@ -405,8 +412,11 @@ func ProjectVigilanceVector(htmlBody []byte, pdfURL string, evidence VectorEvide
 						weather.GraphicalStatus = "unresolved"
 					}
 				}
-				if weather.GraphicalStatus == "unresolved" {
+				if weather.GraphicalStatus == "unresolved" || weather.TotalGraphicalStatus == "unresolved" {
 					unresolved++
+					if risk >= 2 {
+						symbolsUnknown++
+					}
 				}
 				label := []string{"Pioggia", "Pioggia", "Temporali", "Vento", "Mare", "Neve", "Ghiaccio"}[risk]
 				out.Facts = append(out.Facts, RegionalFact{Risk: id, Label: label, Zone: zone, Level: "not_applicable", Original: dates[0][side], Precision: "date", Date: date, Locator: "Retained PDF vigilance labelled zone and product-specific map/legend; absence of a symbol is not absence of risk; " + evidence.PageMethods[pageNumber], EvidenceURL: pdfURL, Page: pageNumber, Weather: weather})
@@ -416,6 +426,7 @@ func ProjectVigilanceVector(htmlBody []byte, pdfURL string, evidence VectorEvide
 	out.Statement = "Vigilance weather maps and area-average rainfall bands read from retained PDF; warning colors do not apply"
 	if unresolved > 0 {
 		out.Limitations = append(out.Limitations, fmt.Sprintf("Unresolved vigilance graphics: %d zone/phenomenon/day entries; no weather value or absence is inferred.", unresolved))
+		out.Limitations = append(out.Limitations, fmt.Sprintf("Unresolved daily rainfall bands: %d; cumulative rainfall bands: %d; symbol or evaluation entries: %d. Bands require a fill present in this edition's labelled legend; daily and cumulative evidence remain separate.", dailyUnknown, totalUnknown, symbolsUnknown))
 	}
 	return out, nil
 }

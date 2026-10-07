@@ -300,12 +300,15 @@ func emptySourceSummary(name string) sourceSummary {
 
 func regionalConclusion(values []publicquery.RegionalWarning) string {
 	current, green, elevated, unknown, excluded := 0, 0, 0, 0, 0
+	var elevatedDetails []string
 	for _, r := range values {
 		if r.Product != "criticality" || r.Status != "current" {
 			continue
 		}
 		current++
-		if r.Quality.Interpretation.State != "supported" || r.Quality.Provenance.State != "verified" {
+		// A partial projection can still establish an explicit elevated level.
+		// Its reliability remains visible on the fact; uncertainty cannot erase it.
+		if (r.Level == "green" || r.Level == "not_applicable") && (r.Quality.Interpretation.State != "supported" || r.Quality.Provenance.State != "verified") {
 			unknown++
 			continue
 		}
@@ -314,6 +317,31 @@ func regionalConclusion(values []publicquery.RegionalWarning) string {
 			green++
 		case "yellow", "orange", "red":
 			elevated++
+			if len(elevatedDetails) < 5 {
+				risk := r.OfficialRiskLabel
+				if risk == "" {
+					risk = r.Risk
+				}
+				level := map[string]string{"yellow": "giallo", "orange": "arancione", "red": "rosso"}[r.Level]
+				detail := fmt.Sprintf("%s: livello %s nella zona %s", risk, level, r.Zone)
+				if r.Validity.Instant != nil {
+					zone := "UTC"
+					location := time.UTC
+					if r.Validity.Timezone != nil {
+						if resolved, err := time.LoadLocation(*r.Validity.Timezone); err == nil {
+							zone, location = *r.Validity.Timezone, resolved
+						}
+					}
+					detail += ", dal " + r.Validity.Instant.In(location).Format("02/01/2006 15:04")
+					if r.Validity.EndInstant != nil {
+						detail += " al " + r.Validity.EndInstant.In(location).Format("02/01/2006 15:04")
+					}
+					detail += " (" + zone + ")"
+				} else if r.Validity.Date != nil {
+					detail += ", giorno " + *r.Validity.Date
+				}
+				elevatedDetails = append(elevatedDetails, detail)
+			}
 		case "not_applicable":
 			excluded++
 		default:
@@ -324,7 +352,14 @@ func regionalConclusion(values []publicquery.RegionalWarning) string {
 		return "Criticità regionale attuale non determinabile dai dati disponibili."
 	}
 	if elevated > 0 {
-		return fmt.Sprintf("La criticità regionale riporta %d livelli gialli, arancioni o rossi nelle zone applicabili; consultare rischi e validità.", elevated)
+		conclusion := "Criticità regionale: " + strings.Join(elevatedDetails, "; ") + "."
+		if elevated > len(elevatedDetails) {
+			conclusion += fmt.Sprintf(" Altri %d livelli elevati nei dettagli.", elevated-len(elevatedDetails))
+		}
+		if unknown > 0 {
+			conclusion += fmt.Sprintf(" %d livelli restano non determinabili.", unknown)
+		}
+		return conclusion
 	}
 	if unknown > 0 {
 		return fmt.Sprintf("Criticità regionale interpretata solo in parte: %d livelli verdi, %d rischi non applicabili e %d livelli non determinabili.", green, excluded, unknown)

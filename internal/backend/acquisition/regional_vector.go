@@ -678,32 +678,46 @@ func MergeCriticalityMaps(maps, rows RegionalProjection) (RegionalProjection, er
 	}
 	merged := []RegionalFact{}
 	seen := map[string]bool{}
+	rank := map[string]int{"green": 0, "yellow": 1, "orange": 2, "red": 3}
 	for _, f := range maps.Facts {
+		var intervals []RegionalFact
+		peak := -1
 		for _, row := range rows.Facts {
 			if row.Risk != f.Risk || row.Zone != f.Zone || row.Precision != "interval" || row.Start == nil || row.End == nil || f.Date == nil {
 				continue
 			}
-			day := f.Date.Format(time.DateOnly)
-			if day < row.Start.In(loc).Format(time.DateOnly) || day > row.End.In(loc).Format(time.DateOnly) {
+			day := time.Date(f.Date.Year(), f.Date.Month(), f.Date.Day(), 0, 0, 0, 0, loc)
+			if !row.End.After(day) || !row.Start.Before(day.AddDate(0, 0, 1)) {
 				continue
 			}
-			if f.Level != "unknown" && f.Level != row.Level {
+			for _, previous := range intervals {
+				if row.Level != previous.Level && row.Start.Before(*previous.End) && previous.Start.Before(*row.End) {
+					return maps, fmt.Errorf("conflicting overlapping explicit criticality intervals")
+				}
+			}
+			intervals = append(intervals, row)
+			if value, ok := rank[row.Level]; ok && value > peak {
+				peak = value
+			}
+		}
+		if len(intervals) > 0 {
+			if value, ok := rank[f.Level]; f.Level != "unknown" && (!ok || value != peak) {
 				return maps, fmt.Errorf("explicit table/map level conflict")
 			}
-			f.Level = row.Level
-			f.Original = row.Original
-			f.Precision = row.Precision
-			f.Start = row.Start
-			f.End = row.End
-			f.Date = nil
-			f.Locator += "; precise validity from explicit HTML criticality row: " + row.Original
+		} else {
+			intervals = append(intervals, f)
 		}
-		key := fmt.Sprintf("%s:%s:%s:%s:%s", f.Risk, f.Zone, f.Level, f.Precision, f.Original)
-		if seen[key] {
-			continue
+		for _, fact := range intervals {
+			if fact.Precision == "interval" {
+				fact.Locator = f.Locator + "; precise validity from explicit HTML criticality row: " + fact.Original
+			}
+			key := fmt.Sprintf("%s:%s:%s:%s:%v:%v:%v", fact.Risk, fact.Zone, fact.Level, fact.Precision, fact.Start, fact.End, fact.Date)
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			merged = append(merged, fact)
 		}
-		seen[key] = true
-		merged = append(merged, f)
 	}
 	maps.Facts = merged
 	return maps, nil

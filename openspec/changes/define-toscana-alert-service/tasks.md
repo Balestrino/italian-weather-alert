@@ -725,3 +725,29 @@ preserved; production remains stopped. Ordinary quotation failures remain
 rejected and source acceptance stays pending. See [ordinary adoption](../../../docs/operations/cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026).
 The checklist is now 162/171 complete, with three source-continuation tasks and
 six operational/release tasks open; deferred backup/restore checks remain mandatory.
+
+## 32. Latest processing repairs — 7 October 2026
+
+The operator authorizes the nine-step repair plan following TOS-021, CLN-030
+and CIN-015. Original evidence, attempts, catalogs, projections and receipts
+remain immutable; public acceptance and production activation are separate.
+
+- [x] 32.1 Preserve multiple intraday criticality intervals when merging daily maps, reject genuine map/table conflicts and verify immutable corrected projections with historical queries.
+- [x] 32.2 Diagnose observed vigilance fills and weather symbols against document-local legends; retain genuine source ambiguity, separate daily/cumulative statuses, and verify supported values and unresolved diagnostics with synthetic controls and retained replay.
+- [ ] 32.3 Diagnose rejected quotations against exact provider inputs, correct JSON content preparation and evidence-selection instructions without accepting paraphrases, and verify bounded canaries before reprocessing affected ordinary records.
+- [ ] 32.4 Correct COC start/end semantics and resolve explicitly supported civil-protection activation dates with attributable year context and Europe/Rome, preserving an unknown end and historical interpretations.
+- [ ] 32.5 Establish supported platform claim identity, editions, primary counterparts and comparable validity; preserve diagnostic outcomes for missing evidence and append receipts without secondary domain admission.
+- [x] 32.6 Make current situation summaries report supported non-green levels and temporal boundaries, and allow complete saved-view responses within a bounded 30-second write budget; record verified CFR issuance timestamps for publication status with API/MCP and historical regression checks.
+- [ ] 32.7 Review the obsolete municipal target through the existing exact-URL disposition procedure; verify ordinary complete collection and monitoring catch-up without deleting evidence or changing cadence speculatively.
+- [ ] 32.8 Repair oversized OCR pages with a bounded lower-resolution retry and immutable renderer/configuration identities; run targeted unit/race and disposable PostgreSQL checks, adopt the verified repair in development, and perform explicitly bounded ordinary reprocessing and additive projections with retained rollback and configuration evidence.
+- [ ] 32.9 Repeat the same municipal/platform window contract and API/MCP/history checks, explain every residual evidence limitation, and update guides, dated discovery registers, operations documentation and changelog with actual results.
+
+**32 CFR validation — 7 October 2026:** daily peaks and precise intraday
+transitions are preserved under `cfr-graphics-v5`, while previous projections
+remain available at their historical boundaries. Daily and cumulative vigilance
+statuses remain independent, with edition-local legend/symbol limits explicit.
+Verified issuance timestamps and bounded early tolerance preserve actual dates
+and cadence. Exact risk/color/zone/interval summaries and the 30-second HTTP
+write budget pass unit/race, disposable PostgreSQL and API/MCP history checks.
+The remaining interpretation, OCR, comparison and documentation work is tracked
+separately below the same repair plan; source acceptance stays unchanged.

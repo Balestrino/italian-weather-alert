@@ -147,6 +147,7 @@ func (e *Engine) acquireRegional(ctx context.Context, sourceID string, revision 
 		return report, state, err
 	}
 	metadata, _ := json.Marshal(observation)
+	state.publicationObservedAt = regionalIssuanceInstant(observation.IssuanceExpression)
 	hash := sha256.New()
 	_, _ = hash.Write([]byte(cfg.URL))
 	for _, resource := range resources {
@@ -180,6 +181,33 @@ func (e *Engine) acquireRegional(ctx context.Context, sourceID string, revision 
 	report.Sections = []SectionPreview{{SectionURL: cfg.URL}}
 	report.Documents = []RetainedPage{{InferenceResources: version.Resources, URL: cfg.URL, VersionID: version.ID, Hash: version.Hash, Changed: changed, Workload: "ordinary"}}
 	return report, state, nil
+}
+
+// A product's edition is a publication observation, including on unchanged
+// checks. An undated no-event state has no publication instant.
+func regionalIssuanceInstant(expression string) *time.Time {
+	parts := strings.Split(expression, ", ore ")
+	if len(parts) != 2 {
+		return nil
+	}
+	day, err := parseRegionalDay(parts[0])
+	if err != nil {
+		parsed, parseErr := time.Parse("02/01/2006", parts[0])
+		if parseErr != nil {
+			return nil
+		}
+		day = &parsed
+	}
+	clock, err := time.Parse("15:04", strings.ReplaceAll(parts[1], ".", ":"))
+	if err != nil {
+		return nil
+	}
+	loc, err := time.LoadLocation("Europe/Rome")
+	if err != nil {
+		return nil
+	}
+	instant := time.Date(day.Year(), day.Month(), day.Day(), clock.Hour(), clock.Minute(), 0, 0, loc).UTC()
+	return &instant
 }
 
 type regionalResource struct {

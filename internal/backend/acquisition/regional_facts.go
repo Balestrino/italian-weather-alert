@@ -22,14 +22,15 @@ type RegionalFact struct {
 // VigilanceWeather describes depicted meteorology, never a warning color or
 // an assertion of absence of risk. Amounts are the literal area-average bands.
 type VigilanceWeather struct {
-	Phenomenon        string `json:"phenomenon"`
-	GraphicalStatus   string `json:"graphical_status"`
-	UnderEvaluation   bool   `json:"under_evaluation"`
-	RainfallBand      string `json:"rainfall_band,omitempty"`
-	TotalRainfallBand string `json:"total_rainfall_band,omitempty"`
-	TotalPeriod       string `json:"total_period,omitempty"`
-	Unit              string `json:"unit,omitempty"`
-	AmountScope       string `json:"amount_scope,omitempty"`
+	Phenomenon           string `json:"phenomenon"`
+	GraphicalStatus      string `json:"graphical_status"`
+	UnderEvaluation      bool   `json:"under_evaluation"`
+	RainfallBand         string `json:"rainfall_band,omitempty"`
+	TotalRainfallBand    string `json:"total_rainfall_band,omitempty"`
+	TotalGraphicalStatus string `json:"total_graphical_status,omitempty"`
+	TotalPeriod          string `json:"total_period,omitempty"`
+	Unit                 string `json:"unit,omitempty"`
+	AmountScope          string `json:"amount_scope,omitempty"`
 }
 type RegionalProjection struct {
 	Product, Statement string

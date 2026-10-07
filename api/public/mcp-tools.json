@@ -1709,6 +1709,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -3662,6 +3669,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -5384,6 +5398,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -7334,6 +7355,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -9110,6 +9138,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -11073,6 +11108,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -12802,6 +12844,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -14768,6 +14817,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -16495,6 +16551,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [
@@ -18448,6 +18511,13 @@
               },
               "amount_scope": {
                 "type": "string"
+              },
+              "total_graphical_status": {
+                "type": "string",
+                "enum": [
+                  "depicted",
+                  "unresolved"
+                ]
               }
             },
             "required": [

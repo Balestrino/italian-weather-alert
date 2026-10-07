@@ -26,6 +26,13 @@ The operator authorizes an internal MVP on the current dedicated VM (8 vCPU, app
 
 ## Capabilities
 
+The 7 October repair scope addresses daily-map/intraday validity merging,
+observed vigilance formats, literal classification evidence and platform JSON
+preparation, explicit COC activation times, primary counterpart comparability,
+situation summaries, CFR publication metadata and a reviewed obsolete municipal
+target. Bounded development adoption and ordinary reprocessing preserve earlier
+failed results and historical knowledge. Tasks 32.1–32.9 do not grant acceptance.
+
 The 4 October scope audit materializes a Calcinaia channel/window matrix and
 identifies remaining recent interpretation failures independently of the completed
 sample regression. Continue with bounded ordinary correction/reprocessing,

@@ -274,7 +274,12 @@ func publicationStateAt(anchor *time.Time, intervalSeconds, toleranceSeconds *in
 	}
 	interval := time.Duration(*intervalSeconds) * time.Second
 	due := anchor.Add(time.Duration(checkedAt.Sub(*anchor)/interval) * interval)
-	if lastPublication != nil && !lastPublication.Before(due) {
+	// A scheduled publication can carry an earlier issuance time (for example,
+	// CFR vigilance prepared before the daily publication deadline). Apply the
+	// configured tolerance before the expected instant too, bounded so an older
+	// cycle cannot satisfy the next one. Preserve the original issuance instant.
+	earlyTolerance := min(time.Duration(*toleranceSeconds)*time.Second, interval/2)
+	if lastPublication != nil && !lastPublication.Before(due.Add(-earlyTolerance)) {
 		return "observed"
 	}
 	if !checkedAt.After(due.Add(time.Duration(*toleranceSeconds) * time.Second)) {

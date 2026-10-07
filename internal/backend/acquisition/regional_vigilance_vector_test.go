@@ -43,6 +43,24 @@ func TestVigilanceMapsKeepAmountsSymbolsAndSevenRiskSemantics(t *testing.T) {
 	}
 }
 
+func TestVigilanceUnknownCumulativeFillDoesNotEraseDailyBand(t *testing.T) {
+	html, ev := vigilanceVectorFixture()
+	// Change only map fills, retaining the distinct labelled legend swatch.
+	ev.Pages[1] = []byte(strings.Replace(string(ev.Pages[1]), `fill="rgb(0%, 59.999084%, 100%)"`, `fill="rgb(27%, 70%, 100%)"`, 26))
+	p, err := ProjectVigilanceVector(html, "print", ev)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range p.Facts {
+		if f.Weather.Phenomenon == "rainfall" && (f.Weather.RainfallBand == "" || f.Weather.GraphicalStatus != "depicted" || f.Weather.TotalRainfallBand != "" || f.Weather.TotalGraphicalStatus != "unresolved") {
+			t.Fatal("daily evidence lost or unsupported total inferred", f)
+		}
+	}
+	if len(p.Limitations) < 2 {
+		t.Fatal("unresolved component not explained", p.Limitations)
+	}
+}
+
 func TestVigilanceRejectsMissingLegendPanelAndEdition(t *testing.T) {
 	for _, mutate := range []func(*VectorEvidence){
 		func(e *VectorEvidence) { e.BBox = []byte(strings.Replace(string(e.BBox), "ore 10.22", "ore 11.22", 1)) },

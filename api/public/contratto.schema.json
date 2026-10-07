@@ -1928,6 +1928,13 @@
         },
         "amount_scope": {
           "type": "string"
+        },
+        "total_graphical_status": {
+          "type": "string",
+          "enum": [
+            "depicted",
+            "unresolved"
+          ]
         }
       },
       "required": [

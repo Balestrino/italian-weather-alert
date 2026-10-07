@@ -4,6 +4,30 @@ Collect Toscana regional and municipal publications with verifiable authority, r
 
 ## ADDED Requirements
 
+### Requirement: Decoded JSON classification evidence
+Classification of retained JSON SHALL use bounded decoded visible scalar content, with resource and scalar provenance, rather than requiring quotations to reproduce serialized escapes or HTML tags. It SHALL preserve complete relevant input coverage, reject fabricated/paraphrased quotes and keep model/preparation changes and previous attempts versioned.
+
+#### Scenario: An API notice has HTML in a JSON string
+- **WHEN** a retained JSON scalar contains an HTML paragraph and escaped Unicode characters
+- **THEN** the classifier receives its decoded visible content and accepted evidence resolves to that retained scalar without accepting invented words
+
+### Requirement: Observed issuance feeds expected-publication status
+Regional acquisition SHALL populate the observed-publication instant from a verified explicit issuance using the product's local timezone, including unchanged complete checks. Missing or absent-event issuance SHALL remain absent; fetch time and display date SHALL NOT replace issuance.
+
+#### Scenario: A current bulletin is unchanged
+- **WHEN** a complete regional check reads an unchanged bulletin with a recognized issuance expression
+- **THEN** expected-publication accounting observes that actual issuance and does not report it missing merely because no new version was created
+
+#### Scenario: Issuance precedes the expected publication instant
+- **WHEN** a verified issuance precedes the current cycle's expected instant by no more than the configured tolerance, capped at half the publication interval
+- **THEN** that cycle reports publication observed while preserving the actual issuance timestamp and source cadence
+- **AND** an issuance from a previous cycle does not satisfy the next cycle
+
+#### Scenario: A primary original has a parameterized content type
+- **WHEN** retained primary HTML or platform JSON has a valid MIME type with charset parameters
+- **THEN** comparison selects and independently validates literal fields through the appropriate decoder, rather than dropping the evidence
+- **AND** missing claim identity, zone or complete issuance stays non-comparable without secondary domain admission
+
 The manually selected development publication exception is defined in [public alert access](../public-alert-access/spec.md#requirement-manual-municipality-publication-in-development). References below to acceptance before public activation apply to verified source publication in staging/production; the development exception grants consultation only and does not establish acceptance, infrastructure readiness or production authorization. Provenance, publication permissions, retained evidence and truthful interpretation remain mandatory.
 
 
@@ -558,3 +582,11 @@ Unproven reuse and acquisitions later than the review SHALL NOT establish it.
 - **WHEN** a campaign reviews unchanged original evidence first retained under an earlier configuration
 - **THEN** the service accepts the configuration binding only if an already finalized matching acquisition proves reuse under the campaign configuration
 - **AND** the original resource/version history remains unchanged
+
+#### Scenario: Oversized retained OCR page receives bounded recovery
+
+- **WHEN** an eligible retained PDF page rendered at 144 DPI exceeds the 5 MiB image limit
+- **THEN** the renderer retries only that physical page once at 72 DPI in grayscale
+- **AND** a still oversized, missing, misnumbered or failed replacement remains unreadable
+- **AND** cancellation, the aggregate/page limits and immutable original bytes remain enforced
+- **AND** the new renderer identity and processing configuration create a fresh selected run without overwriting prior unreadable results

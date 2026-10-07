@@ -1,3 +1,60 @@
+## Latest processing repair design — 7 October 2026
+
+Daily criticality maps describe daily peak levels, while explicit table rows
+govern precise operational intervals. Match the map to the highest explicit level
+overlapping its local calendar day; emit every distinct supported row once and
+retain map-only facts for other risks/zones. Reject overlapping contradictory
+rows and map peaks inconsistent with the table. Never extend a colored interval
+to midnight merely because its map is daily.
+
+Vigilance decoders use each retained PDF's legend and map geometry. A fill
+absent from that edition's legend remains unresolved; do not infer a rainfall
+band from a nearby color. Daily and cumulative graphical statuses are independent,
+so an unsupported cumulative fill cannot erase a supported daily band. Unlabelled
+wind marks and raster evidence remain unresolved. JSON classification inputs
+must contain decoded visible scalar content rather than serialized JSON escapes
+and HTML markup; preserve each scalar's resource/JSON-pointer provenance. Prompt
+and preparation revisions get immutable catalog identities; invented quotations
+remain invalid and correction is verified through selected ordinary canaries.
+
+COC temporal candidates distinguish a start linkage from an end. Resolve a
+yearless explicit day/month only from attributable matching publication-year
+context, with weekday validation, preserving original phrases and assumptions.
+Do not borrow the alert's closing time. Any unresolved actual conflict remains.
+
+Platform comparison uses supported product, zone, edition and primary evidence
+identity, not titles as votes or display dates as issuance. Missing identifiers
+remain diagnostic. Current situation prose derives its alert level from supported
+current facts, not projection reliability. Regional acquisition converts verified
+issuance to Europe/Rome instants for expected-publication accounting, including
+unchanged checks; no-event monitoring never invents an issuance.
+
+Expected-publication accounting accepts a genuine issuance within the configured
+tolerance before the expected instant, capped at half the interval so a previous
+cycle cannot satisfy the next. Preserve actual issuance and configured cadence.
+The elevated summary names the risk, color, zone and supported local interval.
+Comparison evidence normalizes valid MIME parameters before HTML/JSON decoding;
+select primary edition fields from literal text, including whitespace introduced
+by HTML nodes, without borrowing primary identifiers for a platform claim.
+
+Oversized OCR pages receive one physical-page-only retry at 72 DPI in grayscale. Keep the
+5 MiB provider cap, page/aggregate limits and cancellation. Version the renderer
+cache identity and processing configuration so prior unreadable results remain
+immutable and selected reprocessing uses a fresh run. Freeze legacy prompt bodies
+and reserve distinct catalog revisions to coexist with historical local prompts.
+
+A complete saved situation may take longer than ten seconds to gather retained
+evidence. Keep request-read limits unchanged and use a bounded 30-second HTTP
+write budget; verify a response that finishes after the previous ten-second
+cutoff and repeat current API/MCP equivalence after development adoption.
+
+Use the existing reviewed target-disposition and selected reprocessing controls.
+Append new logic-version projections and receipts, preserve archived attempts
+and catalogs, test historical boundaries, and adopt only the verified development
+scope. Monitoring catch-up is checked before proposing a cadence change. Original
+source/publication controls, independent collection and source acceptance remain
+separate. The detailed source captures and rollout evidence remain private.
+
 ## Context
 
 ### Calcinaia coverage continuation — 4 October 2026

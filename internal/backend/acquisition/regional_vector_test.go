@@ -116,6 +116,38 @@ func TestVectorMapsKeepExplicitAlertIntervals(t *testing.T) {
 	}
 }
 
+func TestDailyPeakPreservesSequentialIntervals(t *testing.T) {
+	loc, _ := time.LoadLocation("Europe/Rome")
+	day := time.Date(2026, 10, 7, 0, 0, 0, 0, time.UTC)
+	start := time.Date(2026, 10, 7, 15, 0, 0, 0, loc)
+	transition := start.Add(2 * time.Hour)
+	end := transition.Add(24 * time.Hour)
+	finish := time.Date(2026, 10, 9, 0, 0, 0, 0, loc)
+	row := func(level string, from, to *time.Time) RegionalFact {
+		return RegionalFact{Risk: "thunderstorms", Zone: "A4", Level: level, Precision: "interval", Start: from, End: to, Original: level}
+	}
+	next := day.AddDate(0, 0, 1)
+	maps := RegionalProjection{Product: "criticality", Facts: []RegionalFact{
+		{Risk: "thunderstorms", Zone: "A4", Level: "orange", Precision: "date", Date: &day},
+		{Risk: "thunderstorms", Zone: "A4", Level: "orange", Precision: "date", Date: &next},
+	}}
+	rows := RegionalProjection{Product: "criticality", Facts: []RegionalFact{row("yellow", &start, &transition), row("orange", &transition, &end), row("yellow", &end, &finish)}}
+	got, err := MergeCriticalityMaps(maps, rows)
+	if err != nil || len(got.Facts) != 3 || !got.Facts[0].Start.Equal(start) || !got.Facts[2].End.Equal(finish) {
+		t.Fatal("sequential levels or exact intervals lost", got, err)
+	}
+	third := next.AddDate(0, 0, 1)
+	maps.Facts = append(maps.Facts, RegionalFact{Risk: "thunderstorms", Zone: "A4", Level: "green", Precision: "date", Date: &third})
+	got, err = MergeCriticalityMaps(maps, rows)
+	if err != nil || len(got.Facts) != 4 || got.Facts[3].Precision != "date" {
+		t.Fatal("midnight end leaked into following day", got, err)
+	}
+	rows.Facts[0].End = &end
+	if _, err = MergeCriticalityMaps(maps, rows); err == nil {
+		t.Fatal("contradictory overlapping intervals accepted")
+	}
+}
+
 func TestVectorSeparatedFillAndScopedOutsideLabels(t *testing.T) {
 	shapes, err := vectorPolygons([]byte(`<svg><path fill="rgb(60%, 80%, 20%)" fill-opacity="1" d="M 0 0 L 20 0 L 20 20 L 0 20 Z"/></svg>`))
 	if err != nil || len(shapes) != 1 {
