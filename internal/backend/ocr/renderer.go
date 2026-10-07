@@ -14,6 +14,9 @@ import (
 
 const maxPageImageBytes = 5 << 20
 
+// PopplerRenderingVersion identifies the immutable rasterization policy in caches.
+const PopplerRenderingVersion = "png-144dpi-bounded-gray-v2"
+
 type Renderer interface {
 	Render(context.Context, []byte) ([]PageImage, error)
 }
@@ -82,6 +85,35 @@ func (r PopplerRenderer) Render(ctx context.Context, pdf []byte) ([]PageImage, e
 	var total int64
 	for index, entry := range entries {
 		if entry.number != index+1 {
+			return nil, ErrRasterization
+		}
+		info, statErr := os.Stat(entry.path)
+		if statErr != nil {
+			return nil, ErrRasterization
+		}
+		if info.Size() > maxPageImageBytes && dpi > 72 {
+			// Retry only this physical page, once, as grayscale at minimum DPI.
+			// The provider limit still applies to the replacement image.
+			retryPrefix := filepath.Join(dir, fmt.Sprintf("retry-%d", entry.number))
+			retry := exec.CommandContext(ctx, path, "-png", "-r", "72", "-gray", "-f", fmt.Sprint(entry.number), "-l", fmt.Sprint(entry.number), input, retryPrefix)
+			if err = retry.Run(); err != nil {
+				if ctx.Err() != nil {
+					return nil, ctx.Err()
+				}
+				return nil, ErrRasterization
+			}
+			matches, matchErr := filepath.Glob(retryPrefix + "-*.png")
+			if matchErr != nil || len(matches) != 1 {
+				return nil, ErrRasterization
+			}
+			physicalPage, parseErr := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(matches[0], retryPrefix+"-"), ".png"))
+			if parseErr != nil || physicalPage != entry.number {
+				return nil, ErrRasterization
+			}
+			entry.path = matches[0]
+			info, statErr = os.Stat(entry.path)
+		}
+		if statErr != nil || info.Size() <= 0 || info.Size() > maxPageImageBytes {
 			return nil, ErrRasterization
 		}
 		body, readErr := os.ReadFile(entry.path)

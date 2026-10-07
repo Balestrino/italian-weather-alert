@@ -132,9 +132,19 @@ func TestClassificationJobPersistsVersionedDecision(t *testing.T) {
 		t.Fatal(err)
 	}
 	process := processing.New(pool)
+	if err := process.RegisterPrompt(ctx, processing.PromptVersion{ID: "classification-prompt-local-relevance-it-v4", Name: "toscana-relevance", Stage: "classification", Revision: "v4", Body: "historical local prompt", CreatedAt: now}); err != nil {
+		t.Fatal(err)
+	}
+	legacy, err := RegisterLegacyCatalog(ctx, process, "openai-chat", "qwen3.8-27b", now)
+	if err != nil {
+		t.Fatal("legacy catalog registration", err)
+	}
 	catalog, err := RegisterCatalog(ctx, process, "openai-chat", "qwen3.8-27b", now)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if again, err := RegisterLegacyCatalog(ctx, process, "openai-chat", "qwen3.8-27b", now); err != nil || again.ConfigurationVersionID != legacy.ConfigurationVersionID || again.ConfigurationVersionID == catalog.ConfigurationVersionID {
+		t.Fatal("current catalog changed legacy immutable contract", again, err)
 	}
 	adapter := &fakeAdapter{response: inference.Response{ID: "qwen-integration", Model: "qwen3.8-27b", Content: `{"relevant":true,"reason_code":"local_weather_measure","evidence_quote":"dispone la chiusura del sottopasso"}`, Usage: inference.Usage{InputTokens: int64Pointer(120), OutputTokens: int64Pointer(25)}}}
 	runner := &Runner{Manifests: NewStore(pool), ReuseSources: map[string]bool{"calcinaia-municipal": true}, Documents: retained, OCR: ocr.NewStore(pool), Processing: process, Results: NewStore(pool), Adapter: adapter, Model: "qwen3.8-27b", ConfigurationVersion: catalog.ConfigurationVersionID, PriceVersion: catalog.PriceVersionID, Now: func() time.Time { return now }}

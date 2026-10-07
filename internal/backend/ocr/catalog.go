@@ -37,11 +37,11 @@ func RegisterCatalog(ctx context.Context, store catalogStore, adapter, model str
 	}
 	modelID := stableID("ocr-model", adapter, model)
 	promptID := "ocr-prompt-free-ocr-v1"
-	configurationID := stableID("ocr-config", modelID, promptID, "poppler-144dpi-v1")
-	settings := json.RawMessage(`{"max_tokens":4096,"pdf_dpi":144,"raw_pdf":false,"skip_special_tokens":false}`)
+	configurationID := stableID("ocr-config", modelID, promptID, PopplerRenderingVersion)
+	settings := json.RawMessage(`{"max_tokens":4096,"pdf_dpi":144,"oversized_page_retry_dpi":72,"oversized_page_retry_grayscale":true,"oversized_page_max_retries":1,"max_page_image_bytes":5242880,"raw_pdf":false,"skip_special_tokens":false}`)
 	if adapter == "local-openai-chat" {
-		configurationID = stableID("ocr-config", modelID, promptID, "poppler-144dpi-local-non-thinking-v2", inference.LocalChatPolicyVersion)
-		settings = json.RawMessage(`{"max_tokens":4096,"pdf_dpi":144,"raw_pdf":false,"skip_special_tokens":false,"qwen_enable_thinking":false}`)
+		configurationID = stableID("ocr-config", modelID, promptID, PopplerRenderingVersion, "local-non-thinking", inference.LocalChatPolicyVersion)
+		settings = json.RawMessage(`{"max_tokens":4096,"pdf_dpi":144,"oversized_page_retry_dpi":72,"oversized_page_retry_grayscale":true,"oversized_page_max_retries":1,"max_page_image_bytes":5242880,"raw_pdf":false,"skip_special_tokens":false,"qwen_enable_thinking":false}`)
 	}
 	if err := store.RegisterModel(ctx, processing.ModelVersion{ID: modelID, Provider: adapter, Model: model, Revision: modelRevision, Capabilities: json.RawMessage(`{"input":["image/png","image/jpeg"],"raw_pdf":false}`), CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
@@ -49,7 +49,7 @@ func RegisterCatalog(ctx context.Context, store catalogStore, adapter, model str
 	if err := store.RegisterPrompt(ctx, processing.PromptVersion{ID: promptID, Name: "deepseek-free-ocr", Stage: "ocr", Revision: "v1", Body: PromptBody, CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
 	}
-	if err := store.RegisterConfiguration(ctx, processing.ConfigurationVersion{ID: configurationID, Name: inference.LocalChatConfigurationName(adapter, "page-ocr", modelID), Stage: "ocr", Revision: "v1", ModelVersionID: &modelID, PromptVersionID: &promptID, LogicVersion: "page-evidence-v1", Settings: inference.LocalChatSettings(adapter, settings), CreatedAt: createdAt}); err != nil {
+	if err := store.RegisterConfiguration(ctx, processing.ConfigurationVersion{ID: configurationID, Name: inference.LocalChatConfigurationName(adapter, "page-ocr", modelID), Stage: "ocr", Revision: "v2-bounded-gray-20261007", ModelVersionID: &modelID, PromptVersionID: &promptID, LogicVersion: "page-evidence-bounded-size-v2", Settings: inference.LocalChatSettings(adapter, settings), CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
 	}
 	result := Catalog{ConfigurationVersionID: configurationID}

@@ -604,7 +604,7 @@ func run() bool {
 			}
 			ocrRunner.Artifacts = ocr.NewStore(pool)
 			ocrRunner.ProviderScope = ocrAdapterGateScope
-			ocrRunner.RendererIdentity = "png-144dpi-v1:" + rendererID
+			ocrRunner.RendererIdentity = ocr.PopplerRenderingVersion + ":" + rendererID
 		}
 
 		qwenConfig := inferenceConfig.Qwen

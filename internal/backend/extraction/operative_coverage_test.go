@@ -159,3 +159,13 @@ func TestTemporalCandidateRequiresItsOwnMeasurePredicate(t *testing.T) {
 		t.Fatalf("legacy result rewritten: %+v %v", old, err)
 	}
 }
+
+func TestActivationStartLinkCannotBecomeAnEnd(t *testing.T) {
+	text := "Per l'allerta meteo il COC (Centro Operativo Comunale) sarà aperto dalle ore 17.00 di mercoledì 7 ottobre, in concomitanza con l'inizio dello stato di allerta arancio."
+	w := Window{DocumentVersionID: 1, Ordinal: 1, Total: 1, Text: text, ResourceURL: "https://fixture.example/notice", CoreEndByte: len(text), ContextEndByte: len(text)}
+	raw := `{"envelope_version":"compact-evidence-v2","window_ordinal":1,"evidence":["il COC (Centro Operativo Comunale) sarà aperto dalle ore 17.00 di mercoledì 7 ottobre, in concomitanza con l'inizio dello stato di allerta arancio"],"measures":[{"kind":"activation","subject":"COC (Centro Operativo Comunale)","place":null,"evidence_refs":{"kind":[0],"subject":[0],"place":[]},"temporal_candidates":[{"field":"valid_from","original_expression":"dalle ore 17.00 di mercoledì 7 ottobre","evidence_refs":[0]},{"field":"valid_until","original_expression":"in concomitanza con l'inizio dello stato di allerta arancio","evidence_refs":[0]}]}]}`
+	got, err := ParseWindow(raw, w)
+	if err != nil || len(got) != 1 || got[0].ValidFrom == nil || got[0].ValidUntil != nil {
+		t.Fatal("activation acquired a false closing time", got, err)
+	}
+}

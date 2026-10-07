@@ -1,6 +1,7 @@
 package classification
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -19,7 +20,7 @@ func TestSegmentContentIsDeterministicBoundedAndPositioned(t *testing.T) {
 	}
 	var rebuilt strings.Builder
 	for index, segment := range first {
-		if segment != second[index] || segment.Ordinal != index+1 || segment.Total != len(first) || segment.DocumentVersionID != 91 || segment.ResourceURL != "https://comune.example/a" || segment.Page != 2 || len(segment.Text) > MaxSegmentTextBytes || !utf8.ValidString(segment.Text) || segment.Hash == "" {
+		if !reflect.DeepEqual(segment, second[index]) || segment.Ordinal != index+1 || segment.Total != len(first) || segment.DocumentVersionID != 91 || segment.ResourceURL != "https://comune.example/a" || segment.Page != 2 || len(segment.Text) > MaxSegmentTextBytes || !utf8.ValidString(segment.Text) || segment.Hash == "" {
 			t.Fatalf("invalid segment %d: %#v", index, segment)
 		}
 		if text[segment.StartByte:segment.EndByte] != segment.Text {

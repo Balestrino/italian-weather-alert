@@ -69,7 +69,7 @@ func makePreflight(ctx context.Context, pool *pgxpool.Pool, retained *documents.
 	}
 	wire, _ := json.Marshal([]any{interpretation.PreflightVersion, oc.ConfigurationVersionID, cl.ConfigurationVersionID, lc.ConfigurationVersionID, ex.ConfigurationVersionID, le.ConfigurationVersionID, oscope, qscope, r.OutputFixSources})
 	sum := sha256.Sum256(wire)
-	return &interpretation.Preflight{Documents: retained, Renderer: ocr.PopplerRenderer{DPI: 144}, RendererIdentity: "png-144dpi-v1:" + renderer, Configuration: hex.EncodeToString(sum[:]), Sources: r.PreflightSources}, nil
+	return &interpretation.Preflight{Documents: retained, Renderer: ocr.PopplerRenderer{DPI: 144}, RendererIdentity: ocr.PopplerRenderingVersion + ":" + renderer, Configuration: hex.EncodeToString(sum[:]), Sources: r.PreflightSources}, nil
 }
 
 // prepareInterpretations is bounded local work: no inference adapter is constructed.

@@ -24,6 +24,7 @@ type Segment struct {
 	Page               int
 	StartByte, EndByte int
 	Text, Hash         string
+	JSONScalars        []JSONScalar
 }
 
 func SegmentContent(documentVersionID int64, content Content) ([]Segment, error) {
@@ -45,11 +46,19 @@ func SegmentContent(documentVersionID int64, content Content) ([]Segment, error)
 				ResourceURL: section.ResourceURL, Role: section.Role, Page: section.Page,
 				StartByte: start, EndByte: end, Text: section.Text[start:end],
 			}
+			for _, scalar := range section.JSONScalars {
+				if scalar.StartByte < end && scalar.EndByte > start {
+					scalar.StartByte = max(scalar.StartByte, start) - start
+					scalar.EndByte = min(scalar.EndByte, end) - start
+					segment.JSONScalars = append(segment.JSONScalars, scalar)
+				}
+			}
 			wire, err := json.Marshal(struct {
 				DocumentVersionID                 int64
 				Ordinal, Page, StartByte, EndByte int
 				ResourceURL, Role, Text           string
-			}{segment.DocumentVersionID, segment.Ordinal, segment.Page, segment.StartByte, segment.EndByte, segment.ResourceURL, segment.Role, segment.Text})
+				JSONScalars                       []JSONScalar `json:",omitempty"`
+			}{segment.DocumentVersionID, segment.Ordinal, segment.Page, segment.StartByte, segment.EndByte, segment.ResourceURL, segment.Role, segment.Text, segment.JSONScalars})
 			if err != nil || len(segments) >= maxContentSegments {
 				return nil, ErrInvalid
 			}
@@ -88,6 +97,6 @@ func segmentEnd(text string, start int) int {
 }
 
 func (s Segment) Content() Content {
-	section := ContentSection{ResourceURL: s.ResourceURL, Role: s.Role, Page: s.Page, Text: s.Text}
+	section := ContentSection{ResourceURL: s.ResourceURL, Role: s.Role, Page: s.Page, Text: s.Text, JSONScalars: s.JSONScalars}
 	return Content{Sections: []ContentSection{section}, Complete: true, Hash: s.Hash, Text: s.Text}
 }

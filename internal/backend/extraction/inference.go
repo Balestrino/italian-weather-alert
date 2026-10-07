@@ -800,6 +800,11 @@ func expandCompactMeasureV2(ordinal int, candidate compactWireMeasureV2, window 
 	measure := Measure{Ordinal: ordinal, Kind: candidate.Kind, Subject: candidate.Subject, Place: place, Evidence: evidence}
 	for _, raw := range candidate.TemporalCandidates {
 		expression := classification.Normalize(raw.OriginalExpression)
+		// A link to the beginning of an alert establishes activation, never its
+		// end. Keep an explicit start candidate; reject this mislabelled end.
+		if raw.Field == "valid_until" && strings.Contains(strings.ReplaceAll(strings.ToLower(expression), "’", "'"), "in concomitanza con l'inizio") {
+			continue
+		}
 		if (raw.Field != "valid_from" && raw.Field != "valid_until") || expression == "" || len(expression) > 1000 || raw.Evidence == nil || len(raw.Evidence) == 0 || len(raw.Evidence) > 100 || !valueInReferencedQuotes(expression, raw.Evidence, quotes) {
 			continue
 		}

@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -74,14 +76,15 @@ func (s *Store) ProjectMunicipalExtraction(ctx context.Context, runID int64, at 
 	defer tx.Rollback(ctx)
 	var sourceID, municipality, authority, publisher, platform, product, workload, url string
 	var suspended *time.Time
+	var metadata []byte
 	var allowed, complete, relevant bool
 	err = tx.QueryRow(ctx, `SELECT s.id,s.territory,s.authority_id,c.publisher_id,c.platform,s.product_id,p.workload,d.official_url,
- s.interpretation_suspended_at,territorial_source_allowed(s.id),v.complete,COALESCE(cl.relevant,false)
+ s.interpretation_suspended_at,territorial_source_allowed(s.id),v.complete,COALESCE(cl.relevant,false),v.metadata
  FROM extraction_results e JOIN processing_runs p ON p.id=e.run_id
  JOIN classification_results cl ON cl.run_id=e.classification_run_id AND cl.document_version_id=e.document_version_id
  JOIN retained_versions v ON v.id=e.document_version_id JOIN retained_documents d ON d.id=v.document_id
  JOIN registry_sources s ON s.id=d.source_id JOIN registry_channels c ON c.id=s.channel_id
- WHERE e.run_id=$1 AND p.source_id=s.id AND p.document_version_id=e.document_version_id FOR SHARE OF s`, runID).Scan(&sourceID, &municipality, &authority, &publisher, &platform, &product, &workload, &url, &suspended, &allowed, &complete, &relevant)
+ WHERE e.run_id=$1 AND p.source_id=s.id AND p.document_version_id=e.document_version_id FOR SHARE OF s`, runID).Scan(&sourceID, &municipality, &authority, &publisher, &platform, &product, &workload, &url, &suspended, &allowed, &complete, &relevant, &metadata)
 	if err != nil {
 		return 0, err
 	}
@@ -92,6 +95,10 @@ func (s *Store) ProjectMunicipalExtraction(ctx context.Context, runID int64, at 
 		return 0, err
 	}
 	count := 0
+	var publication struct {
+		Date string `json:"source_publication_date"`
+	}
+	_ = json.Unmarshal(metadata, &publication)
 	for _, m := range r.Measures {
 		if !slices.Contains([]string{"closure", "reopening", "restriction", "prohibition", "suspension", "activation", "deactivation", "operational_update", "observation"}, m.Kind) || strings.TrimSpace(m.Subject) == "" || !municipalFieldEvidence(m, "kind") || !municipalFieldEvidence(m, "subject") {
 			continue
@@ -135,7 +142,7 @@ func (s *Store) ProjectMunicipalExtraction(ctx context.Context, runID int64, at 
 		if _, err = tx.Exec(ctx, `INSERT INTO domain_measure_bindings(local_measure_id,extraction_run_id,extraction_ordinal) VALUES($1,$2,$3)`, key, runID, m.Ordinal); err != nil {
 			return 0, err
 		}
-		v := municipalValidity(m, r.DocumentVersionID, key, at)
+		v := municipalValidity(m, r.DocumentVersionID, key, at, publication.Date)
 		if _, err = tx.Exec(ctx, `INSERT INTO domain_temporal_values(entity_kind,entity_id,meaning,original_expression,precision,instant,date_value,end_instant,timezone,assumption,condition,evidence_document_version_id,created_at)
  VALUES('local_measure',$1,'validity',NULLIF($2,''),$3,$4,$5,$6,$7,$8,$9,$10,$11)`, key, v.Original, v.Precision, v.Instant, dateValue(v.Date), v.EndInstant, v.Timezone, v.Assumption, v.Condition, r.DocumentVersionID, at.UTC()); err != nil {
 			return 0, err
@@ -185,7 +192,7 @@ func municipalFieldEvidence(m extraction.Measure, field string) bool {
 	})
 }
 
-func municipalValidity(m extraction.Measure, version int64, key string, at time.Time) TemporalValue {
+func municipalValidity(m extraction.Measure, version int64, key string, at time.Time, publicationDate ...string) TemporalValue {
 	v := TemporalValue{EntityKind: "local_measure", EntityID: key, Meaning: "validity", Precision: "unknown", EvidenceDocumentVersionID: version, CreatedAt: at.UTC()}
 	var parts []string
 	if m.ValidFrom != nil {
@@ -224,7 +231,54 @@ func municipalValidity(m extraction.Measure, version int64, key string, at time.
 			return v
 		}
 	}
+	if m.ValidFrom != nil && m.ValidUntil == nil {
+		if start, err := time.Parse(time.RFC3339, *m.ValidFrom); err == nil {
+			v.Precision, v.Instant = "instant", &start
+			return v
+		}
+		if len(publicationDate) == 1 {
+			if resolved, ok := municipalStartInstant(*m.ValidFrom, publicationDate[0]); ok {
+				v.Precision, v.Instant, v.Timezone, v.Assumption = resolved.Precision, resolved.Instant, resolved.Timezone, resolved.Assumption
+			}
+		}
+	}
 	return v
+}
+
+var municipalStartPattern = regexp.MustCompile(`(?i)^dalle ore ([0-9]{1,2})[.:]([0-9]{2}) di (?:(lunedì|martedì|mercoledì|giovedì|venerdì|sabato|domenica)\s+)?([0-9]{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)(?:\s+([0-9]{4}))?$`)
+
+func municipalStartInstant(original, publicationDate string) (TemporalValue, bool) {
+	match := municipalStartPattern.FindStringSubmatch(original)
+	if match == nil {
+		return TemporalValue{}, false
+	}
+	months := strings.Fields("gennaio febbraio marzo aprile maggio giugno luglio agosto settembre ottobre novembre dicembre")
+	month := time.Month(slices.Index(months, strings.ToLower(match[5])) + 1)
+	day, _ := strconv.Atoi(match[4])
+	hour, _ := strconv.Atoi(match[1])
+	minute, _ := strconv.Atoi(match[2])
+	year, _ := strconv.Atoi(match[6])
+	assumption := "Explicit operative start interpreted in Europe/Rome; no end stated."
+	if year == 0 {
+		publication, err := time.Parse(time.DateOnly, publicationDate)
+		// Use only a publication on the same explicit calendar day. Other
+		// missing-year expressions require further attributable context.
+		if err != nil || publication.Month() != month || publication.Day() != day {
+			return TemporalValue{}, false
+		}
+		year = publication.Year()
+		assumption = "Year from retained source_publication_date " + publicationDate + "; explicit operative day matches publication; Europe/Rome; no end stated."
+	}
+	value, err := EuropeRomeInstant(original, year, month, day, hour, minute, assumption)
+	if err != nil {
+		return TemporalValue{}, false
+	}
+	weekdays := []string{"domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"}
+	loc, _ := time.LoadLocation("Europe/Rome")
+	if match[3] != "" && weekdays[int(value.Instant.In(loc).Weekday())] != strings.ToLower(match[3]) {
+		return TemporalValue{}, false
+	}
+	return value, true
 }
 
 // Linking results are applied only after both primary measures have bindings.

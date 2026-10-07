@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 )
@@ -40,24 +41,59 @@ func SegmentRequest(model string, segment Segment) (inference.Request, error) {
 	body, err := json.Marshal(struct {
 		DocumentVersionID int64          `json:"document_version_id"`
 		Segment           segmentMessage `json:"segment"`
-	}{segment.DocumentVersionID, segmentMessage{segment.Ordinal, segment.Total, segment.ResourceURL, segment.Role, segment.Page, segment.StartByte, segment.EndByte, segment.Text}})
+		EvidenceOptions   []string       `json:"evidence_options"`
+	}{segment.DocumentVersionID, segmentMessage{segment.Ordinal, segment.Total, segment.ResourceURL, segment.Role, segment.Page, segment.StartByte, segment.EndByte, segment.Text, segment.JSONScalars}, evidenceOptions(segment.Text)})
 	if err != nil || len(segment.Text) > MaxSegmentTextBytes {
 		return inference.Request{}, ErrInvalid
 	}
 	input, _ := json.Marshal(string(body))
 	system, _ := json.Marshal(PromptBody)
-	return inference.Request{Model: model, Messages: []inference.Message{{Role: "system", Content: system}, {Role: "user", Content: input}}, ResponseFormat: responseFormat, MaxCompletionTokens: 4096}, nil
+	format := evidenceResponseFormat(evidenceOptions(segment.Text))
+	return inference.Request{Model: model, Messages: []inference.Message{{Role: "system", Content: system}, {Role: "user", Content: input}}, ResponseFormat: format, MaxCompletionTokens: 4096}, nil
+}
+
+// Offer short, mechanically copied passages. This constrains generation without
+// changing the independent literal-evidence validator or deciding relevance.
+func evidenceOptions(text string) []string {
+	var out []string
+	for start := 0; start < len(text); {
+		end := min(start+120, len(text))
+		for end < len(text) && !utf8.RuneStart(text[end]) {
+			end--
+		}
+		if end < len(text) {
+			if boundary := strings.LastIndexAny(text[start:end], " \n"); boundary > 60 {
+				end = start + boundary
+			}
+		}
+		piece := strings.TrimSpace(text[start:end])
+		if piece != "" {
+			out = append(out, piece)
+		}
+		start = end
+	}
+	return out
+}
+
+func evidenceResponseFormat(options []string) json.RawMessage {
+	var format map[string]any
+	_ = json.Unmarshal(responseFormat, &format)
+	properties := format["json_schema"].(map[string]any)["schema"].(map[string]any)["properties"].(map[string]any)
+	properties["evidence_quote"].(map[string]any)["enum"] = options
+	encoded, _ := json.Marshal(format)
+	return encoded
 }
 
 type segmentMessage struct {
-	Ordinal     int    `json:"ordinal"`
-	Total       int    `json:"total"`
-	ResourceURL string `json:"resource_url"`
-	Role        string `json:"role"`
-	Page        int    `json:"page,omitempty"`
-	StartByte   int    `json:"start_byte"`
-	EndByte     int    `json:"end_byte"`
-	Text        string `json:"text"`
+	Ordinal     int          `json:"ordinal"`
+	Total       int          `json:"total"`
+	ResourceURL string       `json:"resource_url"`
+	Role        string       `json:"role"`
+	Page        int          `json:"page,omitempty"`
+	StartByte   int          `json:"start_byte"`
+	EndByte     int          `json:"end_byte"`
+	Text        string       `json:"text"`
+	JSONScalars []JSONScalar `json:"json_scalars,omitempty"`
 }
 
 func LocalSegmentRequest(model string, segment Segment) (inference.Request, error) {
@@ -67,6 +103,24 @@ func LocalSegmentRequest(model string, segment Segment) (inference.Request, erro
 	}
 	request.Messages[0].Content, _ = json.Marshal(LocalPromptBody)
 	return inference.LocalChatRequest(request), nil
+}
+
+func legacySegmentRequest(model string, segment Segment) (inference.Request, error) {
+	request, err := SegmentRequest(model, segment)
+	if err != nil {
+		return inference.Request{}, err
+	}
+	body, err := json.Marshal(struct {
+		DocumentVersionID int64          `json:"document_version_id"`
+		Segment           segmentMessage `json:"segment"`
+	}{segment.DocumentVersionID, segmentMessage{segment.Ordinal, segment.Total, segment.ResourceURL, segment.Role, segment.Page, segment.StartByte, segment.EndByte, segment.Text, nil}})
+	if err != nil {
+		return inference.Request{}, err
+	}
+	request.Messages[0].Content, _ = json.Marshal(LegacyPromptBody)
+	request.Messages[1].Content, _ = json.Marshal(string(body))
+	request.ResponseFormat = responseFormat
+	return request, nil
 }
 
 func ParseDecision(raw string, content fullContent) (Decision, error) {

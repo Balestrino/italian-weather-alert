@@ -226,7 +226,9 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	for _, window := range windows {
 		window.legacyLiteral = r.legacyOutput
 		request, requestErr := WindowRequest(r.Model, window)
-		if r.Adapter.Name() == "local-openai-chat" {
+		if r.legacyOutput && requestErr == nil {
+			request.Messages[0].Content, _ = json.Marshal(LegacyCompactPromptBody)
+		} else if r.Adapter.Name() == "local-openai-chat" {
 			request, requestErr = LocalWindowRequest(r.Model, window)
 		}
 		if requestErr != nil {

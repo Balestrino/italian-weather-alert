@@ -238,6 +238,9 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	segmentResults := make([]SegmentResult, 0, len(segments))
 	for _, segment := range segments {
 		request, requestErr := SegmentRequest(r.Model, segment)
+		if r.legacyOutput {
+			request, requestErr = legacySegmentRequest(r.Model, segment)
+		}
 		if r.Adapter.Name() == "local-openai-chat" && !r.legacyOutput {
 			request, requestErr = LocalSegmentRequest(r.Model, segment)
 		}

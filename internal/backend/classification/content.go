@@ -7,6 +7,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
@@ -27,13 +29,22 @@ type ocrStore interface {
 }
 
 type ContentSection struct {
-	ResourceURL string `json:"resource_url"`
-	Role        string `json:"role"`
-	Page        int    `json:"page,omitempty"`
-	Text        string `json:"text"`
+	ResourceURL string       `json:"resource_url"`
+	Role        string       `json:"role"`
+	Page        int          `json:"page,omitempty"`
+	Text        string       `json:"text"`
+	JSONScalars []JSONScalar `json:"json_scalars,omitempty"`
 	// OffsetMap is populated for retained OCR pages and deliberately omitted
 	// from provider payloads. It maps normalized evidence back to verbatim OCR.
 	OffsetMap []OffsetSpan `json:"-"`
+}
+
+// JSONScalar identifies a decoded visible scalar in the retained resource.
+// Offsets refer to Text, while Pointer locates the original JSON value.
+type JSONScalar struct {
+	Pointer   string `json:"pointer"`
+	StartByte int    `json:"start_byte"`
+	EndByte   int    `json:"end_byte"`
 }
 
 type Content struct {
@@ -106,6 +117,13 @@ func GatherContent(ctx context.Context, retained documentStore, extracted ocrSto
 			return fullContent{}, readErr
 		}
 		text := normalize(string(body))
+		var scalars []JSONScalar
+		if mediaType == "application/json" || strings.HasSuffix(mediaType, "+json") {
+			text, scalars, err = decodedJSONContent(body)
+			if err != nil {
+				return Content{}, err
+			}
+		}
 		if mediaType == "text/html" || mediaType == "application/xhtml+xml" {
 			text = visibleHTML(body)
 			if reference.Role == "original" && reference.LocalProcessing != nil {
@@ -113,7 +131,7 @@ func GatherContent(ctx context.Context, retained documentStore, extracted ocrSto
 			}
 		}
 		if text != "" {
-			content.Sections = append(content.Sections, ContentSection{ResourceURL: reference.URL, Role: reference.Role, Text: text})
+			content.Sections = append(content.Sections, ContentSection{ResourceURL: reference.URL, Role: reference.Role, Text: text, JSONScalars: scalars})
 		}
 	}
 	wire, err := json.Marshal(struct {
@@ -135,12 +153,68 @@ func GatherContent(ctx context.Context, retained documentStore, extracted ocrSto
 	return content, nil
 }
 
+func decodedJSONContent(body []byte) (string, []JSONScalar, error) {
+	if !json.Valid(body) {
+		return "", nil, ErrInvalid
+	}
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.UseNumber()
+	var value any
+	if decoder.Decode(&value) != nil {
+		return "", nil, ErrInvalid
+	}
+	var text strings.Builder
+	var scalars []JSONScalar
+	var walk func(any, string)
+	walk = func(value any, pointer string) {
+		switch node := value.(type) {
+		case map[string]any:
+			keys := make([]string, 0, len(node))
+			for key := range node {
+				keys = append(keys, key)
+			}
+			sort.Strings(keys)
+			for _, key := range keys {
+				walk(node[key], pointer+"/"+strings.ReplaceAll(strings.ReplaceAll(key, "~", "~0"), "/", "~1"))
+			}
+		case []any:
+			for i, child := range node {
+				walk(child, pointer+"/"+strconv.Itoa(i))
+			}
+		default:
+			var scalar string
+			switch n := node.(type) {
+			case string:
+				scalar = visibleHTML([]byte(n))
+			case json.Number:
+				scalar = n.String()
+			case bool:
+				scalar = strconv.FormatBool(n)
+			case nil:
+				scalar = "null"
+			}
+			if scalar == "" {
+				return
+			}
+			if text.Len() > 0 {
+				text.WriteByte('\n')
+			}
+			text.WriteString(pointer + ": ")
+			start := text.Len()
+			text.WriteString(scalar)
+			scalars = append(scalars, JSONScalar{pointer, start, text.Len()})
+		}
+	}
+	walk(value, "")
+	return text.String(), scalars, nil
+}
+
 func gatherContent(ctx context.Context, retained documentStore, extracted ocrStore, version documents.Version) (fullContent, error) {
 	return GatherContent(ctx, retained, extracted, version)
 }
 
 func textual(mediaType string) bool {
-	return strings.HasPrefix(mediaType, "text/") || mediaType == "application/json" || mediaType == "application/xml" || strings.HasSuffix(mediaType, "+xml")
+	return strings.HasPrefix(mediaType, "text/") || mediaType == "application/json" || strings.HasSuffix(mediaType, "+json") || mediaType == "application/xml" || strings.HasSuffix(mediaType, "+xml")
 }
 
 func normalize(value string) string { return strings.Join(strings.Fields(value), " ") }

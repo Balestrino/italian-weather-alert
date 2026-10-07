@@ -50,7 +50,7 @@ func seedOCR(ctx context.Context, pool *pgxpool.Pool, c config.Config) bool {
 		slog.Error("OCR seed catalog unavailable")
 		return false
 	}
-	report, err := ocr.NewStore(pool).SeedHistorical(ctx, documents.New(pool, objects), ocr.PopplerRenderer{DPI: 144}, ocr.SeedOptions{AfterRun: after, Limit: limit, Scope: scope, Model: ic.OCR.Model, Configuration: catalog.ConfigurationVersionID, RendererIdentity: "png-144dpi-v1:" + rendererID})
+	report, err := ocr.NewStore(pool).SeedHistorical(ctx, documents.New(pool, objects), ocr.PopplerRenderer{DPI: 144}, ocr.SeedOptions{AfterRun: after, Limit: limit, Scope: scope, Model: ic.OCR.Model, Configuration: catalog.ConfigurationVersionID, RendererIdentity: ocr.PopplerRenderingVersion + ":" + rendererID})
 	if json.NewEncoder(os.Stdout).Encode(report) != nil {
 		return false
 	}
