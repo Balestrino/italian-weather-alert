@@ -192,7 +192,11 @@ func TestAutomaticVerificationRevisitsPrimaryAndPreservesHistory(t *testing.T) {
 
 func TestAutomaticRegionalDisplayDatesStayNonComparable(t *testing.T) {
 	f := automaticFixture(t)
-	f.retain("regional", "criticality", map[string]string{"product": "criticità", "risk": "vento", "zone": "A4", "level": "giallo"})
+	primaryURL := "https://regional.example/notices/criticality"
+	_, err := f.docs.Retain(f.ctx, documents.Acquisition{ID: "automatic-primary-html", SourceID: "regional", Configuration: 1, URL: primaryURL, Resources: []documents.Resource{{URL: primaryURL, Role: "original", Required: true, SourceID: "regional", Configuration: 1, MediaType: "text/html; charset=utf-8", Bytes: []byte("<h1>BOLLETTINO DI VALUTAZIONE DELLE CRITICITÀ</h1><p>Emissione di Domenica, 04 Ottobre 2026 , ore 13.10</p>")}}})
+	if err != nil {
+		t.Fatal(err)
+	}
 	url := "https://cittadinoinformato.it/calcinaia/wp-json/cittadino/v2/rischi/oggi"
 	versions, err := registry.New(f.pool).Versions(f.ctx, "platform")
 	if err != nil {
@@ -213,7 +217,7 @@ func TestAutomaticRegionalDisplayDatesStayNonComparable(t *testing.T) {
 	if err := reg.EnableCollection(f.ctx, "platform", revision, "fixture"); err != nil {
 		t.Fatal(err)
 	}
-	_, err = f.docs.Retain(f.ctx, documents.Acquisition{ID: "automatic-risk", SourceID: "platform", Configuration: revision, URL: url, Metadata: json.RawMessage(`{"kind":"regional_republication"}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "platform", Configuration: revision, MediaType: "application/json", Bytes: []byte(`{"stati_allerta":[{"tipologia":"Vento","oggi":{"allerta":"giallo","data_bollettino":"04/10/2026","validita_cfr":null}}]}`)}}})
+	_, err = f.docs.Retain(f.ctx, documents.Acquisition{ID: "automatic-risk", SourceID: "platform", Configuration: revision, URL: url, Metadata: json.RawMessage(`{"kind":"regional_republication"}`), Resources: []documents.Resource{{URL: url, Role: "original", Required: true, SourceID: "platform", Configuration: revision, MediaType: "application/json; charset=utf-8", Bytes: []byte(`{"stati_allerta":[{"tipologia":"Vento","oggi":{"allerta":"giallo","data_bollettino":"04/10/2026","validita_cfr":null}}]}`)}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -228,6 +232,9 @@ func TestAutomaticRegionalDisplayDatesStayNonComparable(t *testing.T) {
 	var r VerificationReceipt
 	if json.Unmarshal(body, &r) != nil || r.Outcome != "non_comparable" || r.Candidate.Fields["level"].Value != "yellow" || r.Candidate.Fields["risk"].Value != "wind" || r.Candidate.Fields["issuance"].Value != "" || r.Candidate.Fields["validity"].Value != "" || r.Admitted {
 		t.Fatalf("display date or primary context inferred: %s", body)
+	}
+	if len(r.Checks[0].Fields) != 2 || r.Checks[0].Fields["product"].Value != "criticality" || r.Checks[0].Fields["issuance"].Passage != "Domenica, 04 Ottobre 2026 , ore 13.10" {
+		t.Fatalf("explicit primary edition lost with parameterized media: %s", body)
 	}
 	if _, err := f.store.SetMunicipalityEnabled(f.ctx, "09", "050004", 1, false, "fixture"); err != nil {
 		t.Fatal(err)

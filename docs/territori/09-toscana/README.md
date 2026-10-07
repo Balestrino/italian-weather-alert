@@ -1,7 +1,7 @@
 ---
 tipo: "regione"
 codice_regione: "09"
-ultima_revisione: "2026-10-04"
+ultima_revisione: "2026-10-07"
 ---
 
 # Toscana
@@ -21,6 +21,21 @@ Regione Toscana, codice `09`. Questa scheda distingue i prodotti del Centro Funz
 Gli identificativi aiutano a riconoscere le fonti nel registro dell'ambiente; non ne indicano l'attivazione. Consultazione documentale: 2026-10-02. Il canale di monitoraggio è riferito dalla [specifica di acquisizione](../../../openspec/changes/define-toscana-alert-service/specs/official-source-ingestion/spec.md); la consultazione web usata per questa scheda non ne ha verificato il contenuto.
 
 ## Guida operativa
+
+TOS-022 aggiorna il seguito di TOS-021: la fusione `cfr-graphics-v5` confronta
+il massimo giornaliero con tutti gli intervalli precisi e conserva le successioni
+di livello. Le date di emissione verificate alimentano lo stato di pubblicazione.
+La vigilanza mantiene separati stato giornaliero e cumulato; riempimenti assenti
+dalla legenda e simboli non etichettati restano irrisolti. L'emissione anticipata
+entro la tolleranza configurata soddisfa il ciclo atteso senza spostarne la data
+effettiva o cambiare cadenza. API/MCP, paginazione e storico verificano le nuove
+proiezioni; il riepilogo esplicita rischio, colore, zona e intervallo sostenuti.
+
+TOS-021 registra una nuova verifica delimitata: un bollettino con cambi di
+livello nello stesso giorno rende parziale la fusione fra mappe giornaliere e
+intervalli HTML, anche quando i poligoni sono leggibili. Verificare la proiezione
+persistita oltre alla completezza degli originali; il collaudo TOS-015 resta
+valido per i suoi campioni e non certifica questo caso successivo.
 
 TOS-019 verifica la chiusura della campagna MVP 9.3 sui quattro ambiti: confronti
 originali/allegati corretti con audit, cadenza e ritardi documentati e prove di
@@ -130,6 +145,22 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 | Pontedera | `050029` | [Guida comunale](comuni/050029-pontedera.md) |
 
 ## Registro delle scoperte
+
+### TOS-022 — Fusione corretta e limiti della legenda conservati
+
+- **Data e ambito:** 2026-10-07; tre prodotti CFR conservati per Toscana, collaudo sintetico e sviluppo delimitato.
+- **Conoscenza confermata:** il conflitto della successione giallo–arancio–giallo era nella fusione software; alcune bande della vigilanza non sono sostenute dalla legenda dell'edizione.
+- **Comportamento verificato:** nuovi record `cfr-graphics-v5`, successione giallo–arancio–giallo preservata e riepilogo con intervallo preciso. Emissioni Europe/Rome registrate dai controlli normali; vigilanza osservata entro la tolleranza anticipata, monitoraggio aggiornato senza variazione di cadenza. Otto confronti SDK API/MCP, tre pagine sulla stessa vista e quattro confini storici passano dopo l'adozione development. Nessun colore derivato dalla narrativa.
+- **Limiti e prossima verifica:** legenda e simboli dell'edizione mantengono i limiti confermati; casi reali positivi e accettazione restano distinti. Il budget HTTP di 30 secondi è verificato senza modificare i limiti di lettura della richiesta.
+- **Evidenza:** [politica grafica aggiornata](../../operations/cfr-graphics.md), task 32 e registro privato `PROCESSING-REPAIR-20261007`; originali e risultati operativi non sono pubblicati.
+
+### TOS-021 — Intervalli intragiornalieri e limiti della proiezione corrente
+
+- **Data e ultima verifica:** 2026-10-07; letture HTTP ufficiali, originali conservati, replay senza scritture nel dominio e situazione development.
+- **Ambito e conoscenza:** criticità emessa il 7 ottobre alle 13.10 e vigilanza delle 11.39; comportamento confermato nel perimetro dei due originali. Le mappe della criticità sono leggibili, ma `MergeCriticalityMaps` segnala `explicit table/map level conflict` quando la tabella cambia livello nel corso della giornata. La proiezione conservata usa il fallback HTML parziale; il replay della vigilanza conferma valori grafici ancora irrisolti.
+- **Intervento:** sola diagnosi verificata, nessuna correzione o riproiezione. Gli intervalli HTML espliciti restano disponibili; il riepilogo della situazione non esplicita il livello arancione presente nei fatti. Il marker di pubblicazione attesa resta distinto dall'edizione effettivamente acquisita.
+- **Evidenza:** [criticità ufficiale](https://cfr.toscana.it/index.php?IDS=2&IDSS=76), [vigilanza ufficiale](https://cfr.toscana.it/index.php?IDS=2&IDSS=71), [fusione delle mappe](../../../internal/backend/acquisition/regional_vector.go); registro privato `LATEST-PROCESSING-20261007` con hash, replay e risposte.
+- **Limiti e prossima verifica:** correggere e provare la fusione di più intervalli nello stesso giorno, i formati di vigilanza irrisolti e il riepilogo; rivalutare la proiezione persistita separatamente. Il nuovo monitoraggio osservato richiede il proprio successivo controllo programmato. Nessuna accettazione o disponibilità in produzione dedotta dall'audit.
 
 ### TOS-015 — Grafica CFR per tutte le zone dei campioni conservati
 

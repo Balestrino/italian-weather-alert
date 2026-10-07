@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"mime"
 	"regexp"
 	"slices"
 	"strconv"
@@ -249,8 +250,12 @@ func (w *VerificationWorker) literals(ctx context.Context, v documents.Version, 
 		if resource.Missing != "" || !resource.InferenceEligible() {
 			continue
 		}
+		media, _, err := mime.ParseMediaType(resource.MediaType)
+		if err != nil {
+			continue
+		}
 		selection := EvidenceSelection{ResourceURL: resource.URL, Locator: "automatic retained evidence"}
-		if resource.MediaType == "application/pdf" || strings.HasPrefix(resource.MediaType, "image/") {
+		if media == "application/pdf" || strings.HasPrefix(media, "image/") {
 			rows, err := w.Store.pool.Query(ctx, `SELECT p.run_id,p.page_number,p.extracted_text FROM ocr_page_results p JOIN ocr_resource_results r USING(run_id)
  WHERE p.document_version_id=$1 AND p.resource_url=$2 AND p.status='complete' AND r.status='complete' AND p.created_at<=$3 AND r.created_at<=$3
  ORDER BY p.run_id DESC,p.page_number`, v.ID, resource.URL, at)
@@ -286,7 +291,7 @@ func (w *VerificationWorker) literals(ctx context.Context, v documents.Version, 
 		if err != nil {
 			return nil, err
 		}
-		if resource.MediaType == "application/json" {
+		if media == "application/json" {
 			var node any
 			if json.Unmarshal(body, &node) != nil {
 				return nil, ErrInvalid
@@ -371,6 +376,10 @@ func (w *VerificationWorker) requests(ctx context.Context, candidate verificatio
 			for _, risk := range candidate.Texts {
 				if risk.Selection.JSONPointer == riskPointer && slices.Contains(Risks, normalizedField("risk", risk.Text)) {
 					r.Candidate.Fields["risk"] = wholeLiteral(risk)
+				}
+				validityPointer := strings.TrimSuffix(literal.Selection.JSONPointer, "/allerta") + "/validita_cfr"
+				if risk.Selection.JSONPointer == validityPointer && len(risk.Text) <= 2000 {
+					r.Candidate.Fields["validity"] = wholeLiteral(risk)
 				}
 			}
 			r.Checks = []VerificationCheck{w.check("regional", candidate, regional, sources, at, true), {Role: "municipal", State: "not_applicable", Reason: "originating_regional_claim", CheckedAt: at}}
@@ -484,8 +493,47 @@ func (w *VerificationWorker) check(role string, candidate verificationDocument, 
 	check.Reason = "retained_counterpart_identity_not_inferred"
 	check.VersionID = matches[0].Version.ID
 	check.Fields = map[string]EvidenceSelection{}
+	if regional {
+		check.Fields = regionalEditionSelectors(matches[0])
+	}
 	return check
 }
+
+// Select only edition facts explicitly present in the retained primary. A
+// date-only platform data_bollettino or municipality mapping cannot supply a
+// missing issuance time or zone. Risk/day interval matching remains separate.
+func regionalEditionSelectors(document verificationDocument) map[string]EvidenceSelection {
+	fields := map[string]EvidenceSelection{}
+	for _, literal := range document.Texts {
+		if literal.Selection.JSONPointer != "" || literal.Selection.Page != 0 {
+			continue
+		}
+		lower := strings.ToLower(literal.Text)
+		for _, product := range []string{"criticità", "criticality", "vigilanza", "monitoraggio"} {
+			if normalizedField("product", product) != document.Source.Product {
+				continue
+			}
+			if start := strings.Index(lower, product); start >= 0 {
+				// Locate against original bytes: case conversion can change length.
+				pattern := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(product))
+				if span := pattern.FindStringIndex(literal.Text); span != nil {
+					s := literal.Selection
+					s.StartByte, s.EndByte = span[0], span[1]
+					fields["product"] = s
+				}
+			}
+		}
+		issuance := automaticRegionalIssuance.FindAllStringSubmatchIndex(literal.Text, -1)
+		if len(issuance) == 1 {
+			s := literal.Selection
+			s.StartByte, s.EndByte = issuance[0][2], issuance[0][3]
+			fields["issuance"] = s
+		}
+	}
+	return fields
+}
+
+var automaticRegionalIssuance = regexp.MustCompile(`(?i)Emissione(?: interna)? di\s+((?:Luned[iìí]|Marted[iìí]|Mercoled[iìí]|Gioved[iìí]|Venerd[iìí]|Sabato|Domenica),?\s+[0-9]{1,2}\s+[A-Za-z]+\s+[0-9]{4}\s*,\s*ore\s+[0-9]{1,2}[.:][0-9]{2})`)
 
 func wholeLiteral(literal verificationLiteral) EvidenceSelection {
 	s := literal.Selection

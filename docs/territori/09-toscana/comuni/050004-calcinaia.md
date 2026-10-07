@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050004"
-ultima_revisione: "2026-10-04"
+ultima_revisione: "2026-10-07"
 ---
 
 # Calcinaia
@@ -41,6 +41,24 @@ CFR originario per livelli regionali; non trasferire l'autorevolezza a tutti i
 contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
+
+CLN-031 registra il seguito delle correzioni: la disposizione revisionata
+dell'URL obsoleto consente nuovamente un controllo ordinario completo. I PDF
+sovradimensionati ricevono un solo tentativo a 72 DPI in scala di grigi, con
+identità di rendering distinta; le due copie prima illeggibili completano OCR.
+Il parser conserva l'apertura COC come inizio, senza ricavare una fine dal
+collegamento all'inizio dell'allerta. La nuova estrazione/proiezione registra
+il 7 ottobre alle 17.00 Europe/Rome con anno attribuito alla pubblicazione e fine
+ignota. La finestra iniziale e quella finale hanno tutte classificazioni valide;
+API/MCP e storico preservano le interpretazioni precedenti.
+
+CLN-030 aggiorna il controllo al 7 ottobre: l'avviso meteo corrente è acquisito
+ed estratto, ma la decorrenza del COC rimane indeterminata nella proiezione.
+Un target storico con URL ora 404 mantiene il controllo complessivo fallito,
+anche se il nuovo URL è acquisito. Separare l'esito del controllo dalla presenza
+dei singoli avvisi e seguire la procedura di revisione prima di escludere target.
+La piattaforma è aggiornata nella finestra selezionata, con interpretazioni e
+riscontri ancora incompleti; vedere CIN-015 nelle note della piattaforma.
 
 CLN-029 verifica configurazione attiva e confronti periodici di Cittadino
 Informato nel development ordinario: 36 avvisi nella finestra di visualizzazione
@@ -169,6 +187,24 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-031 — Recupero ordinario e tempi COC con fine ignota
+
+- **Data e ambito:** 2026-10-07; sezioni dichiarate e avviso COC di Calcinaia, con verifiche sintetiche e sviluppo delimitato.
+- **Osservazione confermata:** l'URL obsoleto è escluso attraverso la disposizione esatta revisionata; il controllo ordinario successivo è completo. L'URL corretto rimane un originale separato, senza equivalenza presunta.
+- **Software verificato:** una relazione all'inizio dell'allerta non può diventare `valid_until`; l'anno di un inizio esplicito senza anno richiede una data di pubblicazione attribuibile con lo stesso giorno/mese e giorno della settimana valido. La fine resta ignota.
+- **Comportamento verificato:** recupero OCR e classificazione dei due originali con lo stesso manifesto; lotto delimitato completato con evidenze letterali validate. La proiezione corrente del COC conserva apertura del 7 ottobre alle 17.00 Europe/Rome e fine ignota; i confini API/MCP precedenti/successivi mostrano le rispettive interpretazioni. La nuova scansione delle sezioni conserva tutti gli avvisi della finestra e non rileva classificazioni fallite. Le precedenti interpretazioni e gli errori sono conservati.
+- **Limiti e prossima verifica:** la composizione dell'elenco live può cambiare: sono verificati sia il perimetro iniziale sia quello finale, senza cancellare gli originali non più elencati. Luogo/fine COC non dichiarati e completezza di pubblicazioni esterne alle sezioni restano indeterminati; il recupero non stabilisce correttezza semantica generale o accettazione.
+- **Evidenza:** task 32 e registro privato `PROCESSING-REPAIR-20261007`; accettazione nel coverage tracker.
+
+### CLN-030 — Avviso corrente estratto, validità e controllo ancora parziali
+
+- **Data e ultima verifica:** 2026-10-07; sezioni ufficiali configurate, avviso corrente, target indisponibili, risultati ordinari e situazione development.
+- **Ambito e conoscenza:** solo Calcinaia `050004`, avviso del 7–8 ottobre e finestra delle sezioni dichiarate. L'attivazione del COC è estratta e proiettata; l'espressione esplicita delle 17.00 del 7 ottobre resta senza validità risolta. L'elaborazione riuscita non certifica quindi la correttezza temporale.
+- **Osservazione confermata:** l'URL degli scrutatori contenente `delalbo` restituisce 404, mentre quello contenente `dellalbo` è disponibile e acquisito. Il target precedente resta nel piano con tentativi differiti e contribuisce al controllo complessivo fallito. Non dedurre perdita di tutti i documenti né sostituzione automatica dei due URL.
+- **Intervento:** sola diagnosi, nessuna esclusione, riavvio o rielaborazione. Le classificazioni con citazioni non valide restano rifiutate; la raccolta della piattaforma non risolve questi esiti della primaria.
+- **Evidenza:** [avviso corrente](https://www.comune.calcinaia.pi.it/novita/allerta-meteo-mercoledi-7-e-giovedi-8-ottobre), [nuovo percorso degli scrutatori](https://www.comune.calcinaia.pi.it/novita/apertura-lanno-2026-dellalbo-scrutatori-e-presidenti-di-seggio-elettorale), registro privato `LATEST-PROCESSING-20261007`; [procedura target indisponibili](../../../operations/acquisition-recovery.md).
+- **Limiti e prossima verifica:** revisionare il target storico e la decorrenza del COC, preservando l'evidenza e il termine non dichiarato; correggere e rivalutare le interpretazioni fallite nel perimetro ordinario. Nessun completamento dei task di completezza o accettazione dichiarato.
 
 ### CLN-028 — Preparazione della raccolta ordinaria della piattaforma
 

@@ -23,6 +23,22 @@ Il [coverage tracker](../../coverage.md) resta il riferimento per l'accettazione
 
 ## Guida operativa
 
+CIN-016 registra il seguito di CIN-015: i segmenti JSON usano scalari visibili
+decodificati con provenienza resource/JSON-pointer; la citazione scelta deve
+rimanere letterale. Prompt e configurazioni hanno nuove identità, senza mutare
+i cataloghi precedenti. Canarie e lotto delimitato sono verificati; i rifiuti
+reason/relevant incoerenti restano conservati e le selezioni di recupero passano.
+Il verificatore gestisce i parametri MIME degli originali HTML/JSON e seleziona
+le identità primarie esplicite senza trasferirle alla dichiarazione della piattaforma.
+La validità letterale dei rischi può essere selezionata; date di visualizzazione
+o nomi comunali non sostituiscono zona, emissione e identità primaria mancanti.
+
+La verifica del 7 ottobre (CIN-015) conferma che gli originali della finestra
+Calcinaia corrispondono all'elenco e ai rischi correnti, ma molte classificazioni
+sono fallite e le ricevute restano diagnostiche. Controllare separatamente
+acquisizione, interpretazione e riscontro: `available` nella sintesi del canale
+non dimostra che i contenuti siano elaborati o confermati.
+
 CIN-014 registra l'attivazione ordinaria di Calcinaia in development dopo il
 preview completo: avvisi con filtro di visualizzazione dal 4 settembre, rischi
 oggi/domani e PDF comunali collegati nel percorso revisionato. Raccolta ogni
@@ -123,6 +139,24 @@ non costituisce da sola discovery delle controparti o accettazione semantica.
 La lettura HTTP non certifica aggiornamento continuo, completezza o assenza di avvisi.
 
 ## Registro delle scoperte
+
+### CIN-016 — Preparazione JSON letterale e recupero delimitato
+
+- **Data e ambito:** 2026-10-07; soltanto canale Calcinaia, finestra di visualizzazione dal 4 settembre, publisher `comune_calcinaia`.
+- **Conoscenza confermata:** le citazioni di HTML decodificato non corrispondevano al precedente input JSON serializzato; la preparazione e la selezione delle evidenze sono corrette senza ammettere parafrasi.
+- **Comportamento verificato:** canarie e lotto ordinario con citazioni validate, recupero OCR/classificazione del manifesto PDF e cataloghi compatibili con i prompt storici locali/remoti. La finestra corrente di 41 avvisi e i due flussi rischi sono conservati e classificati; gli hash dei rischi corrispondono agli originali live. I rifiuti reason/relevant restano conservati; il recupero usa una revisione distinta. Parametri MIME HTML/JSON e selettori di prodotto/emissione primari sono verificati con ricevute additive e controlli PostgreSQL. Un falso positivo su viabilità ordinaria viene riclassificato non pertinente dopo tutti i segmenti; il risultato precedente resta conservato.
+- **Limiti:** validità e data del bollettino non stabiliscono una zona o un'emissione completa. Identità dell'atto locale non esplicita e ricevute non comparabili rimangono diagnostiche, senza ammissione secondaria.
+- **Prossima verifica:** API/MCP, paginazione e storico passano sul perimetro delimitato; raccolta, correttezza semantica generale e accettazione restano dimensioni separate.
+- **Evidenza:** task 32 e registro privato `PROCESSING-REPAIR-20261007`; acquisizioni, output provider e ricevute dettagliate restano privati.
+
+### CIN-015 — Originali aggiornati e interpretazioni non completate
+
+- **Data e ultima verifica:** 2026-10-07; elenco e rischi API di Calcinaia, originali riletti con verifica degli hash, risultati e ricevute ordinari development.
+- **Ambito e conoscenza:** solo `calcinaia`, pubblicatore `comune_calcinaia`, filtro di visualizzazione dal 4 settembre 2026. Identità dei dettagli, conteggi dell'elenco e hash delle risposte rischi coincidono con gli originali correnti; questa osservazione non si estende ad altri comuni o finestre.
+- **Osservazione confermata:** numerose classificazioni degli avvisi correnti e delle risposte rischi sono rifiutate per citazioni non valide. Le ricevute automatiche mantengono separati indisponibilità delle controparti e non comparabilità regionale; nessun candidato diagnosticato viene ammesso nel dominio.
+- **Intervento:** audit in sola lettura, senza correggere citazioni, modificare controlli o ammettere fatti. Il canale disponibile nella situazione certifica la presenza di dati consultabili, non il successo dell'intera pipeline.
+- **Evidenza:** [canale Calcinaia](https://cittadinoinformato.it/calcinaia/), registro privato `LATEST-PROCESSING-20261007`, CLN-030 e TOS-021 nelle guide territoriali; originali, ricevute e risposte dettagliate restano privati.
+- **Limiti e prossima verifica:** diagnosticare le classificazioni ordinarie e stabilire identità, edizioni e controparti necessarie alle ricevute, senza sostituire i controlli primari con il rilancio. Accettazione e pubblicazione in produzione restano separate.
 
 ### CIN-013 — Percorso periodico e dipendenze esterne
 

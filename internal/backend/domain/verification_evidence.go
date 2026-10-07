@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"mime"
 	"net/url"
 	"slices"
 	"strconv"
@@ -157,6 +158,10 @@ func (s *Store) loadVerificationEvidence(ctx context.Context, docs RegionalDocum
 }
 
 func verificationText(media string, body []byte, pointer string) (string, error) {
+	media, _, err := mime.ParseMediaType(media)
+	if err != nil {
+		return "", ErrVerificationEvidence
+	}
 	switch media {
 	case "application/json":
 		if pointer == "" || !strings.HasPrefix(pointer, "/") {

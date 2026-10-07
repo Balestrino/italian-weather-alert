@@ -1,6 +1,6 @@
 # Retained CFR graphical interpretation
 
-Task 27.4 adds `cfr-graphics-v4` for retained criticality and vigilance products.
+Tasks 27.4 and 32 add `cfr-graphics-v5` for retained criticality and vigilance products.
 The ordinary projection boundary uses the matching retained HTML and required
 PDF from a complete source version. It performs no upstream fetch or model call.
 Source publication, development overrides and acceptance keep their existing gates.
@@ -13,7 +13,9 @@ the issuance day and next day. Preceding adoption/scenario pages are allowed;
 evidence cites the original physical page. Recognized fills yield green, yellow,
 orange or red. White zone fills yield non-applicability only in main-river/coastal
 masks. Whitespace, anonymous background rectangles and a no-criticality statement
-cannot supply a level. Explicit alert table intervals retain their precise hours.
+cannot supply a level. Daily map colors are compared with the highest supported table level overlapping
+the Europe/Rome calendar day. Every sequential table interval retains its precise
+hours; conflicting overlapping intervals or inconsistent daily peaks are rejected.
 
 Vigilance requires five complete labelled panels: two daily rainfall maps, the
 separate cumulative map, and two other-phenomena maps. Its own eight-band legend
@@ -27,8 +29,10 @@ Optional `weather` accompanies regional search and situation facts. `depicted`
 means the band or symbol was interpreted, `not_depicted` means no recognized
 symbol was present, and `unresolved` discloses unsupported evidence. None means
 absence of risk. `under_evaluation` independently records HTML table membership.
-An unrecognized mark or a listed phenomenon without a matching symbol remains
-unresolved. Source coverage retains aggregate limitations; supported individual
+The optional `total_graphical_status` assesses cumulative rainfall independently
+from the daily `graphical_status`. An unrecognized cumulative fill does not erase
+a supported daily band. An unrecognized mark or a listed phenomenon without a
+matching labelled symbol remains unresolved. Source coverage retains aggregate limitations; supported individual
 facts keep their own evidence assessment.
 
 The interpreter supports reviewed linear vector geometry, compound subpaths,
@@ -48,7 +52,7 @@ render; the locator records that method and the original physical page.
 
 No database migration is needed: PDF URL, page, locator and optional weather
 metadata use the retained evidence locator. New immutable projection records use
-`cfr-graphics-v4` and their actual knowledge time. Repeated projection is
+`cfr-graphics-v5` and their actual knowledge time. Repeated projection is
 idempotent. Historical `cfr-vector-v3` and HTML records remain unchanged. A newer
 unsupported version does not erase the preceding supported facts, and the query
 reports that limitation.
@@ -106,3 +110,29 @@ development. Passano i controlli di immagine/configurazione, readiness e confron
 API/MCP della situazione sulla stessa vista. La verifica del formato resta quella
 dei campioni conservati descritti sopra; l'adozione non certifica nuovi casi reali,
 confronti mancanti del trial o accettazione dei prodotti CFR.
+
+## Corrected processing policy — 7 October 2026
+
+The intraday merge regression is covered by synthetic yellow–orange–yellow rows,
+true overlapping conflicts and midnight boundaries. Summary prose preserves
+supported elevated alert levels even when the projection is partial. Successful
+ordinary acquisition records the verified issuance instant in Europe/Rome for
+publication accounting, including unchanged versions.
+
+An issuance within the configured tolerance before the expected instant satisfies
+the current publication cycle; the early allowance is capped at half the interval
+to prevent previous-cycle carryover. Actual issuance and cadence are preserved.
+The current summary names the supported risk, color, zone and precise interval.
+Primary comparison evidence accepts valid MIME parameters and selects the literal
+product/issuance independently of the platform's missing identifiers.
+
+The inspected vigilance edition contains fills absent from its own labelled
+legend and an unlabelled wind mark. These are source-evidence limitations, rather
+than a basis for a guessed palette or wind observation. Daily and cumulative
+limitations are reported separately; no absence of risk is inferred. Revised
+projections append knowledge under `cfr-graphics-v5`; prior records remain available
+at their historical knowledge boundary. The bounded development adoption passes
+eight actual SDK API/MCP comparisons, three pinned pagination pages and four
+before/after projection and COC history boundaries. The exact yellow–orange–yellow
+intervals and independent daily/cumulative weather metadata are verified. Source
+acceptance remains separate, as documented in TOS-022.

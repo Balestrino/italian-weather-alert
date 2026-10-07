@@ -736,31 +736,46 @@ remain immutable; public acceptance and production activation are separate.
 - [x] 32.2 Diagnose observed vigilance fills and weather symbols against document-local legends; retain genuine source ambiguity, separate daily/cumulative statuses, and verify supported values and unresolved diagnostics with synthetic controls and retained replay.
 - [x] 32.3 Diagnose rejected quotations against exact provider inputs, correct JSON content preparation and evidence-selection instructions without accepting paraphrases, and verify bounded canaries before reprocessing affected ordinary records.
 - [x] 32.4 Correct COC start/end semantics and resolve explicitly supported civil-protection activation dates with attributable year context and Europe/Rome, preserving an unknown end and historical interpretations.
-- [ ] 32.5 Establish supported platform claim identity, editions, primary counterparts and comparable validity; preserve diagnostic outcomes for missing evidence and append receipts without secondary domain admission.
+- [x] 32.5 Establish supported platform claim identity, editions, primary counterparts and comparable validity; preserve diagnostic outcomes for missing evidence and append receipts without secondary domain admission.
 - [x] 32.6 Make current situation summaries report supported non-green levels and temporal boundaries, and allow complete saved-view responses within a bounded 30-second write budget; record verified CFR issuance timestamps for publication status with API/MCP and historical regression checks.
-- [ ] 32.7 Review the obsolete municipal target through the existing exact-URL disposition procedure; verify ordinary complete collection and monitoring catch-up without deleting evidence or changing cadence speculatively.
+- [x] 32.7 Review the obsolete municipal target through the existing exact-URL disposition procedure; verify ordinary complete collection and monitoring catch-up without deleting evidence or changing cadence speculatively.
 - [x] 32.8 Repair oversized OCR pages with a bounded lower-resolution retry and immutable renderer/configuration identities; run targeted unit/race and disposable PostgreSQL checks, adopt the verified repair in development, and perform explicitly bounded ordinary reprocessing and additive projections with retained rollback and configuration evidence.
-- [ ] 32.9 Repeat the same municipal/platform window contract and API/MCP/history checks, explain every residual evidence limitation, and update guides, dated discovery registers, operations documentation and changelog with actual results.
+- [x] 32.9 Repeat the same municipal/platform window contract and API/MCP/history checks, explain every residual evidence limitation, and update guides, dated discovery registers, operations documentation and changelog with actual results.
 
-**32 CFR validation — 7 October 2026:** daily peaks and precise intraday
-transitions are preserved under `cfr-graphics-v5`, while previous projections
-remain available at their historical boundaries. Daily and cumulative vigilance
-statuses remain independent, with edition-local legend/symbol limits explicit.
-Verified issuance timestamps and bounded early tolerance preserve actual dates
-and cadence. Exact risk/color/zone/interval summaries and the 30-second HTTP
-write budget pass unit/race, disposable PostgreSQL and API/MCP history checks.
-The remaining interpretation, OCR, comparison and documentation work is tracked
-separately below the same repair plan; source acceptance stays unchanged.
+**32 verified implementation — 7 October 2026:** new `cfr-graphics-v5`
+projections preserve daily peaks and precise intraday transitions; historical
+queries retain prior logic. Decoded JSON evidence, strict quotations and immutable
+local/remote catalogs pass canaries and bounded reprocessing. Fresh OCR completes
+both previously unreadable poster copies; classification then succeeds. The new
+COC extraction/projection records the explicit 7 October 17:00 Europe/Rome start
+with attributable year context and no closing time.
 
-**32 interpretation validation — 7 October 2026:** decoded JSON scalars retain
-literal content and source pointers; strict quotations and coherent reason codes
-pass selected ordinary canaries and bounded reprocessing. The ordinary-road
-false positive is corrected after every segment, preserving its previous result.
-New immutable renderer/configuration identities recover both oversized poster
-copies with one 72-DPI grayscale retry below the unchanged image cap; subsequent
-classification succeeds. The new COC extraction/projection resolves the explicit
-opening from attributable matching publication context in Europe/Rome and keeps
-the end unknown. Legacy catalogs remain compatible. Unit/race and disposable
-PostgreSQL classification/extraction/OCR/domain checks, development catalog
-preflight, selected recovery and before/after historical queries pass. Source
-acceptance and primary evidence remain independent of this processing recovery.
+Complete normal checks verify the reviewed obsolete-URL disposition, current
+monitoring and CFR issuance timestamps. Vigilance publication is observed within
+the configured early tolerance, bounded against previous-cycle carryover. Source
+cadence and acceptance/publication controls remain unchanged. Parameterized
+HTML/JSON evidence now retains explicit primary product/issuance and literal
+platform validity in additive receipts; missing platform zone, complete issuance
+or local act edition stays diagnostic, without secondary domain admission.
+
+Full unit tests, targeted race checks, disposable PostgreSQL acquisition,
+classification, extraction, OCR, domain and public-query suites and `go vet` pass.
+The final development image passes immutable catalog preflight and nondisruptive
+smoke checks with six workers and preserved dependencies. Eight SDK API/MCP
+comparisons cover three pinned pages, precise alert intervals, independent
+weather status and four projection/COC historical boundaries; a ninth comparison
+verifies platform document receipts with explicit primary evidence.
+
+The final section scan retains and classifies every notice in the initial and
+final recent municipal windows; their membership changed, and removed originals
+remain retained. All 41 platform notices plus both risk feeds have validated
+classifications; current risk originals match live hashes. Hash-verified readback
+covers the selected required resources. An additional ordinary-road false
+positive is corrected by exact-version recovery under the new prompt after all
+five content segments; its prior successful but incorrect result is preserved.
+
+Vigilance fills absent from the edition's legend and an unlabelled wind mark
+remain confirmed source limits, with daily/cumulative status separate. Undeclared
+COC place/end, missing platform identity, older notices outside the reviewed
+window and source acceptance remain explicit. These repairs do not certify
+all municipal publications or activate production.

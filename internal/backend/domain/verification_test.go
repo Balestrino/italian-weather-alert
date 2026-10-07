@@ -5,6 +5,24 @@ import (
 	"time"
 )
 
+func TestVerificationTextAcceptsParameterizedMediaTypes(t *testing.T) {
+	for _, test := range []struct{ media, body, pointer, want string }{
+		{"text/html; charset=utf-8", "<p>Criticità <b>arancione</b></p>", "", "Criticità arancione"},
+		{"application/json; charset=utf-8", `{"claim":"<b>Temporali</b>"}`, "/claim", "Temporali"},
+		{"text/plain; charset=utf-8", "Emissione ufficiale", "", "Emissione ufficiale"},
+	} {
+		text, err := verificationText(test.media, []byte(test.body), test.pointer)
+		if err != nil || text != test.want {
+			t.Fatalf("%s: text=%q error=%v", test.media, text, err)
+		}
+	}
+	for _, media := range []string{"text/html; invalid", "application/pdf"} {
+		if _, err := verificationText(media, []byte("untrusted"), ""); err == nil {
+			t.Fatalf("invalid or unsupported media accepted: %s", media)
+		}
+	}
+}
+
 func evidenceFields(role string, values map[string]string) ChannelEvidence {
 	result := ChannelEvidence{Role: role, SourceID: role, VersionID: 1, Complete: true, Fields: map[string]VerifiedField{}}
 	for name, value := range values {
