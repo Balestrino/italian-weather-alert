@@ -40,3 +40,8 @@ A software release SHALL preserve dated history under a version/date section and
 #### Scenario: A minor release changes a public response shape
 - **WHEN** the operator requests version 0.3.0 with the concise situation contract
 - **THEN** aligned API/MCP metadata and versioned notes describe old-to-new consumer paths, cursor transition, additive migrations and worker replacement, retain dated history and pilot limitations, and software tagging/publication target the merged main revision only after CI, Coverage and Security pass
+
+#### Scenario: A performance and processing repair minor release is prepared
+- **WHEN** the operator requests version 0.4.0
+- **THEN** aligned API/MCP metadata and preserved versioned history accompany notes describing indexed per-operation reads, supported interpretation and comparison repairs, additive migrations, worker replacement and source limits
+- **AND** reachable dependency vulnerabilities are resolved before the exact-revision CI, Coverage and Security gates permit software tagging and publication
