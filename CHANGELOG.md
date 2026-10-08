@@ -4,6 +4,10 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-08 [Changed] Reduce development inference concurrency after a bounded timeout trial; record preserved rollback evidence, verified OCR progress and pending model-host capacity checks.
+
+- 2026-10-08 [Changed] Document local model timeout diagnostics and bounded capacity checks for prompt processing, generation and GPU memory placement.
+
 - 2026-10-08 [Changed] Clarify Livorno failure diagnosis, separating unavailable tracked notices, crawler structural rejection and interpretation retries.
 
 ## 0.4.0 - 2026-10-08

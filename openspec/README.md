@@ -37,7 +37,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 175 | 9 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 176 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 18 | 0 |
@@ -48,6 +48,13 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Five subsequent local fallback tasks verify opt-in Qwen chat/image tests and scoped development routing; three further tasks verify explicit register-wide fallback selection, worker configuration and local OCR progress. Three further two-request trial tasks verify server slots, concurrent development worker calls and stored OCR results, with documented scale-down and private rollback evidence. Three subsequent tasks verify expansion to four worker replicas, fix reproduced pre-claim deadlocks and validate concurrent processing on the corrected development image while distinguishing worker count from available server slots. One further task verifies an operator-requested six-worker expansion, preserved existing replicas and queue progress, with server/model concurrency reported separately. See [local fallback operations](../docs/operations/local-llm-fallback.md). Provider entitlement restoration is subsequently verified below; dependent semantic embeddings remain separate unverified work. These checks do not complete source acceptance or production readiness.
 
 Three subsequent documentation tasks add [territorial source guides](../docs/territori/README.md), a shared template, scoped platform notes and contributor upkeep instructions. Public findings and private operational evidence remain separate; document verification does not resolve the recorded acquisition problems or change the coverage snapshot.
+
+A subsequent 8 October capacity trial reduces development inference workers from
+six to two and then one, preserving rollback evidence and verifying fresh local
+OCR progress and runtime readiness. Repeated deadlines and simultaneous slot
+stalls support further server-capacity investigation; GPU placement, context
+tuning and recovery across all stages remain unverified. See task 22.8 and
+[local fallback operations](../docs/operations/local-llm-fallback.md).
 
 Five subsequent municipal recheck tasks preserve diagnostic evidence and scoped download observations. Five further attachment tasks add revision-scoped external PDF permissions, content filtering and preview/collector validation, with isolated persistence tests and a verified development Livorno rollout. See [municipal attachment operations](../docs/operations/municipal-attachments.md). Five further Cascina tasks verify listing dates, its separately reviewed PDF scope, CSRF interpretation equivalence and retirement of only reviewed stale unattempted work in development. Isolated tests verify validated reuse without a second call; ordinary checks verify unchanged-version retention. These checks do not complete source acceptance or establish future availability.
 

@@ -508,6 +508,11 @@ An explicitly configured local chat endpoint MAY replace an unavailable remote c
 - **WHEN** the operator requests additional development worker replicas and the server exposes fewer slots than the worker count
 - **THEN** replicas retain the same image/settings and exclusive queue claims, existing replicas remain running, and verification distinguishes running workers from concurrent model executions and documents returning to the previous count
 
+#### Scenario: Local requests exceed the HTTP deadline despite available slots
+- **WHEN** ordinary local inference calls repeatedly reach their configured deadline and the operator requests a reduced-concurrency capacity trial
+- **THEN** operators preserve rollback settings and a verified database archive, reduce development inference workers to one or two, and compare fresh call receipts and token progress while retaining historical failures and provider controls
+- **AND** slot availability alone does not establish usable capacity; GPU memory placement and a smaller server context require separate host verification and full input/output fit checks
+
 #### Scenario: Concurrent workers maintain the inference queue
 - **WHEN** several workers apply recovery, equivalent-copy and provider-hold deferrals before claiming inference jobs
 - **THEN** maintenance is serialized within the database and errors or cancellation release ownership; job claiming and model execution remain parallel after maintenance returns

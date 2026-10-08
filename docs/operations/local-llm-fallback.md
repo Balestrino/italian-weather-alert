@@ -38,6 +38,31 @@ repeatability; all output still has to pass the normal validators. Consult the
 [llama.cpp server documentation](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)
 for model loading, multimodal projectors and OpenAI-compatible API behavior.
 
+## Diagnose local request timeouts
+
+Compare durable call receipts with `/metrics`, `/slots` and `/v1/models` on the
+configured server. Calls ending at the configured HTTP deadline establish a
+client timeout, not an HTTP rejection. Inspect prompt processing and generation
+separately; OCR also requires image processing. Snapshot slot task IDs and token
+progress over time, since occupied slots alone do not establish useful throughput.
+Server work visible after application calls have ended needs investigation of
+cancellation and other clients sharing that server.
+
+Check GPU model/VRAM, actual GPU utilization and the server startup log's tensor,
+projector, context-cache and compute-buffer placement. Model tensor size alone
+does not describe total memory demand. A GPU name or slow API metrics cannot
+prove CPU offloading, memory exhaustion or a hardware fault without host evidence.
+Verify the loaded quantization, per-slot context and server parallelism as well
+as worker count; a large context allocation can compete with model residency.
+
+For a reviewed capacity trial, preserve current settings and compare a bounded
+representative workload at one or two inference workers. Select a smaller
+per-slot context only after checking full prompt, image and output requirements;
+never truncate evidence to fit. Measure completion rate and useful throughput,
+then set a timeout that covers measured work. Changing quantization/model requires
+the ordinary output-contract evaluation. A timeout increase or job relaunch does
+not establish server recovery; retain retry history and provider gates.
+
 ## Configure development
 
 Put reviewed settings in ignored `.local/development.env`:
@@ -180,8 +205,32 @@ restarts or observed pre-claim deadlocks and a passing HTTP/runtime-boundary
 smoke. The server initially returned HTTP 503, then exposed six slots. No active
 model slots were observed in the first sixty-second sample window, so this
 expansion verifies worker activation and queue progress rather than six
-simultaneous model calls. Six corrected replicas remain active; detailed runtime
+simultaneous model calls. Six corrected replicas were active for that observation; detailed runtime
 evidence and settings are private.
+
+The 8 October 2026 timeout investigation subsequently reduced development from
+six workers to two and then one, using the same image/settings and preserving
+the original worker and other services. A verified database archive and private
+rollback settings were retained. An isolated recovery OCR call completed in
+108 seconds and persisted a complete page with matching returned model; two
+simultaneous requests then showed no token progress across repeated samples.
+After reduction to one worker, the surviving request resumed generation, but
+still reached its original deadline after spending time in the concurrent phase.
+A fresh single-worker OCR request then completed in 67.5 seconds and persisted a
+complete page with matching model provenance. Compare fresh single-worker calls
+separately from that interrupted transition.
+A subsequent longer OCR call continued generating but reached the 180-second
+deadline with one worker, so worker reduction alone did not eliminate timeouts.
+These observations support a capacity investigation, not a confirmed GPU fault,
+offloading diagnosis or proof that all timeouts are resolved.
+
+Use `--scale worker=1` on subsequent development worker `up` commands for this
+reduced selection. Server context, GPU placement and quantization were not
+changed during the worker reduction. Cancelling an in-flight half-open recovery
+probe can leave a gate held as `invalid_response` while its call receipt records
+`request_cancelled`; investigate both records before diagnosing malformed model
+output. Resume only the affected local gate after a healthy bounded server check,
+preserving unrelated provider holds and ordinary retry/lease recovery.
 
 ## Deploy and roll back
 

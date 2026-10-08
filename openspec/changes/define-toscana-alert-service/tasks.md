@@ -313,6 +313,25 @@ This verifies six active queue workers, not six simultaneous model executions.
 The nondisruptive HTTP/runtime-boundary smoke passed. Provider retry/circuit
 controls remained active; settings, logs and observations remain private.
 
+- [x] 22.8 On operator request, investigate repeated local deadlines in a bounded reduced-concurrency development trial; preserve a verified database archive and rollback settings, compare fresh receipts/token progress at two and one workers, verify runtime readiness, and record unresolved host/context checks separately.
+
+The 8 October 2026 trial reduced six workers to two and then one while retaining
+the original worker image, container identity and other services. An isolated
+recovery OCR request completed in 108 seconds with a persisted complete page and
+matching model provenance. Two simultaneous requests subsequently showed no
+token progress across repeated samples. The surviving request resumed generation
+after reduction to one worker but reached its original deadline; a fresh
+single-worker request then completed in 67.5 seconds with a complete stored page.
+Another fresh single-worker OCR request continued generating but still reached
+the 180-second deadline, leaving timeout recovery incomplete.
+Transition cancellations remain separate from timeouts. The local gate was
+resumed after a bounded healthy server check; the unrelated remote hold remained
+in place. Runtime configuration and HTTP smoke passed. One worker remains selected
+for the capacity trial. GPU memory placement and server context changes remain
+unverified because model-host SSH access is unavailable; this observation does
+not establish recovery across all stages or source acceptance. Private receipts,
+samples and rollback evidence remain ignored.
+
 ## 23. Private browser access to API documentation — 2 October 2026
 
 - [x] 23.1 Open Scalar in the integrated browser through a dedicated private Tailscale Serve proxy to the development public listener; preserve existing Serve routes, verify all six endpoint references and the same-origin OpenAPI contract, and document targeted proxy removal with private rollback settings retained.
