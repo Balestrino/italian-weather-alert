@@ -31,6 +31,7 @@ func (s *Store) Document(ctx context.Context, query DocumentQuery) (DocumentResu
 	if err != nil || query.DocumentID == "" {
 		return DocumentResult{}, ErrInvalidParameters
 	}
+	s = s.withQueryReads(qt)
 	documentID, err := strconv.ParseInt(query.DocumentID, 10, 64)
 	if err != nil || documentID < 1 {
 		return DocumentResult{}, ErrUnknownIdentifier
@@ -65,19 +66,27 @@ func (s *Store) Document(ctx context.Context, query DocumentQuery) (DocumentResu
 			return DocumentResult{}, rowsErr
 		}
 		defer rows.Close()
+		ids := []int64{}
 		for rows.Next() {
 			var id int64
 			if err = rows.Scan(&id); err != nil {
 				return DocumentResult{}, err
 			}
+			ids = append(ids, id)
+		}
+		if err = rows.Err(); err != nil {
+			return DocumentResult{}, err
+		}
+		rows.Close()
+		if err = s.preloadDocumentVersions(ctx, ids, qt.KnownAt); err != nil {
+			return DocumentResult{}, err
+		}
+		for _, id := range ids {
 			value, loadErr := s.documentVersion(ctx, id, qt)
 			if loadErr != nil {
 				return DocumentResult{}, loadErr
 			}
 			result.Versions = append(result.Versions, value)
-		}
-		if err = rows.Err(); err != nil {
-			return DocumentResult{}, err
 		}
 	}
 	result.History, err = s.history(ctx, qt.KnownAt, nil, historyScope{DocumentID: documentID})
@@ -85,26 +94,25 @@ func (s *Store) Document(ctx context.Context, query DocumentQuery) (DocumentResu
 }
 
 func (s *Store) documentVersion(ctx context.Context, versionID int64, qt QueryTime) (Document, error) {
+	key := documentReadKey{versionID, s.municipalityScope}
 	var value Document
-	var numericDocumentID int64
-	var issuer *string
-	var metadata []byte
-	err := s.pool.QueryRow(ctx, `SELECT d.id,v.id,d.source_id,issuer.name,publisher.name,d.official_url,v.content_hash,v.first_acquired_at,v.metadata
- FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
- JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id JOIN registry_channels c ON c.id=s.channel_id
- JOIN registry_authorities publisher ON publisher.id=c.publisher_id
- LEFT JOIN registry_authorities issuer ON issuer.id=v.issuer_id
- WHERE v.id=$1 AND v.first_acquired_at<=$2 AND (`+s.visibilitySQL()+`)`, versionID, qt.KnownAt).Scan(&numericDocumentID, &versionID, &value.SourceID, &issuer, &value.Publisher, &value.OfficialURL, &value.SHA256, &value.AcquiredAt, &metadata)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return Document{}, ErrUnknownIdentifier
+	var found bool
+	if s.reads != nil {
+		value, found = s.reads.documents[key]
 	}
-	if err != nil {
-		return Document{}, err
+	if !found {
+		values, err := s.loadDocumentMetadata(ctx, []int64{versionID}, qt.KnownAt)
+		if err != nil {
+			return Document{}, err
+		}
+		value, found = values[versionID]
+		if !found {
+			return Document{}, ErrUnknownIdentifier
+		}
+		if s.reads != nil {
+			s.reads.documents[key] = value
+		}
 	}
-	value.ID, value.VersionID, value.Issuer = stringID(numericDocumentID), stringID(versionID), issuer
-	value.AcquiredAt = value.AcquiredAt.UTC()
-	value.CopyURL = nil // Task 6.5 owns application-mediated copy authorization.
-	value.Publication, value.Modification, value.Kind = metadataFields(metadata)
 	interpretation, interpretedAt, runID, err := s.documentInterpretation(ctx, versionID, qt.KnownAt)
 	if err != nil {
 		return Document{}, err
@@ -155,53 +163,24 @@ func temporalFromMetadata(value metadataTemporal) Temporal {
 	return result
 }
 
-func (s *Store) documentInterpretation(ctx context.Context, versionID int64, knownAt time.Time) (Dimension, *time.Time, *string, error) {
-	var status, reason string
-	var createdAt time.Time
-	var runID int64
-	err := s.pool.QueryRow(ctx, `SELECT e.status,e.reason_code,e.created_at,e.run_id FROM extraction_results e JOIN processing_runs p ON p.id=e.run_id
- WHERE p.workload<>'evaluation' AND e.document_version_id=$1 AND e.created_at<=registry_interpretation_cutoff((SELECT d.source_id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id WHERE v.id=$1),$2) ORDER BY e.created_at DESC,e.run_id DESC LIMIT 1`, versionID, knownAt).Scan(&status, &reason, &createdAt, &runID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		// Irrelevant publications intentionally have no extraction job.
-		var irrelevant bool
-		classificationErr := s.pool.QueryRow(ctx, `SELECT NOT COALESCE(c.relevant,true) FROM classification_results c JOIN processing_runs p ON p.id=c.run_id
- WHERE p.workload<>'evaluation' AND c.document_version_id=$1 AND c.created_at<=registry_interpretation_cutoff((SELECT d.source_id FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id WHERE v.id=$1),$2) ORDER BY c.created_at DESC,c.run_id DESC LIMIT 1`, versionID, knownAt).Scan(&irrelevant)
-		if classificationErr != nil && !errors.Is(classificationErr, pgx.ErrNoRows) {
-			return Dimension{}, nil, nil, classificationErr
-		}
-		if irrelevant {
-			return Dimension{State: "supported", Limitations: []string{"classified_not_relevant"}, Evidence: []Evidence{}}, nil, nil, nil
-		}
-		return Dimension{State: "not_processed", Limitations: []string{"no interpretation was available at the knowledge boundary"}, Evidence: []Evidence{}}, nil, nil, nil
-	}
+func (s *Store) loadDocumentInterpretation(ctx context.Context, versionID int64, knownAt time.Time) (Dimension, *time.Time, *string, error) {
+	values, err := s.loadDocumentInterpretations(ctx, []int64{versionID}, knownAt)
 	if err != nil {
 		return Dimension{}, nil, nil, err
 	}
-	state := "failed"
-	if status == "extracted" || status == "not_applicable" {
-		state = "supported"
+	value, found := values[versionID]
+	if !found {
+		return Dimension{State: "not_processed", Limitations: []string{"no interpretation was available at the knowledge boundary"}, Evidence: []Evidence{}}, nil, nil, nil
 	}
-	if status == "extracted" {
-		var unprojected bool
-		if err = s.pool.QueryRow(ctx, `WITH RECURSIVE lineage(id) AS (
- SELECT $1::bigint UNION ALL SELECT u.original_run_id FROM interpretation_reuse u JOIN lineage l ON l.id=u.run_id WHERE u.created_at<=$3)
- SELECT EXISTS(SELECT 1 FROM extracted_measures m WHERE m.run_id=$1 AND NOT EXISTS(
- SELECT 1 FROM domain_measure_bindings b JOIN domain_local_measures projected ON projected.id=b.local_measure_id
- WHERE b.extraction_run_id IN(SELECT id FROM lineage) AND b.extraction_ordinal=m.ordinal AND projected.recorded_at<=$3)) AND EXISTS(SELECT 1 FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id JOIN registry_sources s ON s.id=d.source_id WHERE v.id=$2 AND s.product_id='municipal')`, runID, versionID, knownAt).Scan(&unprojected); err != nil {
-			return Dimension{}, nil, nil, err
-		}
-		if unprojected {
-			state = "partial"
-			reason = "validated extraction has municipal facts awaiting domain projection"
-		}
-	}
-	createdAt = createdAt.UTC()
-	id := stringID(runID)
-	assessment, err := s.preserveDefectWarning(ctx, versionID, createdAt, Dimension{State: state, Limitations: []string{reason}, Evidence: []Evidence{}})
-	return assessment, &createdAt, &id, err
+	return value.dimension, value.interpretedAt, value.runID, nil
 }
 
 func (s *Store) attachments(ctx context.Context, versionID int64) ([]Attachment, error) {
+	if s.reads != nil {
+		if values, found := s.reads.attachments[versionID]; found {
+			return append([]Attachment{}, values...), nil
+		}
+	}
 	rows, err := s.pool.Query(ctx, `SELECT url,object_hash,missing FROM retained_resources WHERE version_id=$1 AND role='attachment' ORDER BY url`, versionID)
 	if err != nil {
 		return nil, err

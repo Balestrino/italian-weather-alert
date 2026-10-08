@@ -56,5 +56,8 @@ func migrateProjections(ctx context.Context, pool *pgxpool.Pool) error {
 	if err := domain.MigrateRegionalProjection(ctx, pool); err != nil {
 		return err
 	}
-	return domain.MigrateVerification(ctx, pool)
+	if err := domain.MigrateVerification(ctx, pool); err != nil {
+		return err
+	}
+	return migrateLookups(ctx, pool)
 }

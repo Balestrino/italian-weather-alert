@@ -181,3 +181,16 @@ freshness, interpretation and source acceptance SHALL remain distinguishable.
 - **WHEN** a current regional fact supports an elevated alert despite unrelated unresolved projection entries
 - **THEN** the summary names its risk, color and zone with the supported interval in its recorded timezone
 - **AND** fact reliability and unsupported entries remain explicit across all pages
+
+### Requirement: Efficient complete public reads
+
+Public API/MCP queries SHALL use indexed version and receipt lookups and reuse repeated source quality and document interpretation reads only within one operation at one evaluation/knowledge boundary. Municipality discovery SHALL batch coverage reads rather than issue queries for every municipality. Reuse SHALL preserve independent fact limitations, source suspension, publication revocation, historical cutoffs and complete saved-view pagination; no cross-request result cache SHALL delay those changes.
+
+#### Scenario: Repeated facts share a source
+- **WHEN** a complete query includes many facts or documents from the same source
+- **THEN** source quality is loaded once for that source and scope within the operation
+- **AND** each fact retains its independent interpretation and limitations
+
+#### Scenario: Publication or interpretation changes between requests
+- **WHEN** a subsequent request follows a publication revocation, source suspension or new interpretation
+- **THEN** the new request reevaluates current controls at its requested knowledge boundary, without reusing prior-request quality or interpretation results

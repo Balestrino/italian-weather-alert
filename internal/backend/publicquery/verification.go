@@ -3,6 +3,8 @@ package publicquery
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
@@ -54,9 +56,40 @@ type VerificationField struct {
 }
 
 func (s *Store) verifications(ctx context.Context, kind, recordID string, versionID int64, qt QueryTime) ([]Verification, error) {
+	// Most retained notices have no receipt. Avoid planning the complete policy
+	// and evidence query for those misses; a positive result still goes through
+	// every publication and knowledge-boundary check below.
+	var exists bool
+	var existenceErr error
+	var checked bool
+	if versionID > 0 && s.reads != nil {
+		exists, checked = s.reads.versionReceipts[versionID]
+	}
+	if !checked {
+		if versionID > 0 {
+			existenceErr = s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM domain_verification_receipts WHERE candidate_version_id=$1)
+ OR EXISTS(SELECT 1 FROM domain_verification_dependencies WHERE evidence_version_id=$1)`, versionID).Scan(&exists)
+		} else {
+			existenceErr = s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM domain_verification_receipts
+ WHERE kind=$1 AND (body->>'primary_record_id'=$2 OR body->>'domain_record_id'=$2))`, kind, recordID).Scan(&exists)
+		}
+	}
+	if existenceErr != nil {
+		return nil, existenceErr
+	}
+	if !exists {
+		return []Verification{}, nil
+	}
 	municipalVisibility := "true"
 	if s.development && s.region == "" {
 		municipalVisibility = "EXISTS(SELECT 1 FROM development_publication_current_municipalities dm WHERE dm.istat=r.municipality_istat)"
+	}
+	// Split the two lookup forms so PostgreSQL can select matching receipts
+	// using their record/version indexes before evaluating publication policy.
+	lookup := `(r.body->>'primary_record_id'=$2 OR r.body->>'domain_record_id'=$2)`
+	if versionID > 0 {
+		lookup = `r.id IN (SELECT id FROM domain_verification_receipts WHERE candidate_version_id=$3
+ UNION SELECT receipt_id FROM domain_verification_dependencies WHERE evidence_version_id=$3)`
 	}
 	// The candidate itself must be publishable. A shared primary bulletin must
 	// never reveal private candidates for another municipality through its receipts.
@@ -66,9 +99,8 @@ func (s *Store) verifications(ctx context.Context, kind, recordID string, versio
  WHERE r.verified_at<=registry_interpretation_cutoff(s.id,$4)
  AND v.first_acquired_at<=$4 AND (`+s.visibilitySQL()+`)
  AND ($1='' OR r.kind=$1)
- AND (($2<>'' AND (r.body->>'primary_record_id'=$2 OR r.body->>'domain_record_id'=$2))
- OR ($3::bigint>0 AND (r.candidate_version_id=$3 OR EXISTS(
- SELECT 1 FROM domain_verification_dependencies d WHERE d.receipt_id=r.id AND d.evidence_version_id=$3))))
+ AND (`+lookup+`)
+ AND $2::text IS NOT NULL AND $3::bigint IS NOT NULL
  AND ($5='' OR r.municipality_istat=$5)
  AND (`+municipalVisibility+`)
  ORDER BY r.verified_at DESC,r.id DESC LIMIT 101`, kind, recordID, versionID, qt.KnownAt, s.municipalityScope)
@@ -121,10 +153,7 @@ func (s *Store) publicVerification(ctx context.Context, receipt domain.Verificat
 		if channel.VersionID == 0 {
 			continue
 		}
-		var allowed bool
-		err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
- JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id WHERE v.id=$1 AND s.id=$2 AND v.first_acquired_at<=$3
- AND $4::timestamptz<=registry_interpretation_cutoff(s.id,$3) AND (`+s.visibilitySQL()+`))`, channel.VersionID, channel.SourceID, qt.KnownAt, receipt.VerifiedAt).Scan(&allowed)
+		allowed, err := s.verificationEvidenceVisible(ctx, channel.VersionID, channel.SourceID, qt.KnownAt, receipt.VerifiedAt)
 		if err != nil {
 			return value, err
 		}
@@ -173,4 +202,26 @@ func (s *Store) publicVerification(ctx context.Context, receipt domain.Verificat
 		value.Checks = append(value.Checks, check)
 	}
 	return value, nil
+}
+
+func (s *Store) verificationEvidenceVisible(ctx context.Context, versionID int64, sourceID string, knownAt, verifiedAt time.Time) (bool, error) {
+	key := evidenceReadKey{versionID, sourceID, s.municipalityScope}
+	var cutoff *time.Time
+	var found bool
+	if s.reads != nil {
+		cutoff, found = s.reads.evidenceCutoffs[key]
+	}
+	if !found {
+		err := s.pool.QueryRow(ctx, `SELECT registry_interpretation_cutoff(s.id,$3) FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id
+ JOIN `+s.sourcesSQL()+` s ON s.id=d.source_id WHERE v.id=$1 AND s.id=$2 AND v.first_acquired_at<=$3 AND (`+s.visibilitySQL()+`)`, versionID, sourceID, knownAt).Scan(&cutoff)
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return false, err
+		}
+		if s.reads != nil {
+			s.reads.evidenceCutoffs[key] = cutoff
+		}
+	}
+	// pgx encodes timestamptz parameters at PostgreSQL's microsecond precision.
+	// Preserve that comparison when applying a reused cutoff in Go.
+	return cutoff != nil && !verifiedAt.Truncate(time.Microsecond).After(*cutoff), nil
 }

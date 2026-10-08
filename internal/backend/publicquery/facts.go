@@ -38,6 +38,12 @@ func (s *Store) temporal(ctx context.Context, entityKind, entityID, meaning stri
 }
 
 func (s *Store) versionEvidence(ctx context.Context, versionID int64, locator string) (Evidence, error) {
+	if s.reads != nil {
+		if value, ok := s.reads.evidence[versionID]; ok {
+			value.Locator = &locator
+			return value, nil
+		}
+	}
 	var documentID int64
 	var value Evidence
 	err := s.pool.QueryRow(ctx, `SELECT d.id,v.id,d.official_url FROM retained_versions v JOIN retained_documents d ON d.id=v.document_id WHERE v.id=$1`, versionID).Scan(&documentID, &versionID, &value.SourceURL)
@@ -45,6 +51,9 @@ func (s *Store) versionEvidence(ctx context.Context, versionID int64, locator st
 		return Evidence{}, err
 	}
 	value.DocumentID, value.VersionID = stringID(documentID), stringID(versionID)
+	if s.reads != nil {
+		s.reads.evidence[versionID] = value
+	}
 	value.Locator = &locator
 	return value, nil
 }
@@ -340,11 +349,16 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
 			mappingVersion = *selected.MappingVersion
 		}
 	}
+	zones := make([]string, 0, len(zoneSet))
+	for applicable := range zoneSet {
+		zones = append(zones, applicable)
+	}
 	rows, err := s.pool.Query(ctx, `SELECT r.id,r.document_version_id,r.source_id,r.product,f.ordinal,f.risk,f.official_risk_label,f.zone,f.level,r.recorded_at,COALESCE(r.evidence_locator,'retained regional product evidence'),COALESCE(p.limitations,'[]'::jsonb),EXISTS(SELECT 1 FROM domain_regional_projections failed JOIN retained_versions fv ON fv.id=failed.document_version_id WHERE failed.status='unsupported' AND fv.document_id=v.document_id AND (fv.first_acquired_at,fv.id)>(v.first_acquired_at,v.id) AND failed.projected_at<=registry_interpretation_cutoff(s.id,$1) AND fv.first_acquired_at<=$1)
  FROM domain_regional_records r JOIN domain_regional_facts f ON f.regional_record_id=r.id
  LEFT JOIN domain_regional_projections p ON p.document_version_id=r.document_version_id AND p.logic_version=r.projection_logic
  JOIN retained_versions v ON v.id=r.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=r.source_id
 	 WHERE v.first_acquired_at<=$1 AND r.recorded_at<=registry_interpretation_cutoff(s.id,$1) AND (`+s.visibilitySQL()+`) AND (`+s.regionalDevelopmentScopeSQL(selectedMapping)+`) AND ($2='' OR r.product=$2) AND ($3='' OR f.risk=$3) AND ($4='' OR r.source_id=$4)
+ AND ($6='' OR f.zone=ANY($7::text[])) AND ($8='' OR f.zone=$8)
  AND ($5 OR domain_verification_record_current('regional_record',r.id,registry_interpretation_cutoff(s.id,$1)))
  AND (r.projection_logic IS NULL OR NOT EXISTS(
  SELECT 1 FROM domain_regional_projections replacement
@@ -356,7 +370,7 @@ func (s *Store) regional(ctx context.Context, municipality, zone, product, risk,
  WHERE nv.document_id=v.document_id AND newer.status<>'unsupported'
  AND newer.projected_at<=registry_interpretation_cutoff(s.id,$1) AND nv.first_acquired_at<=$1
  AND (nv.first_acquired_at,nv.id)>(v.first_acquired_at,v.id)))
- ORDER BY v.first_acquired_at,r.id,f.ordinal`, qt.KnownAt, product, risk, sourceID, len(history) > 0 && history[0])
+ ORDER BY v.first_acquired_at,r.id,f.ordinal`, qt.KnownAt, product, risk, sourceID, len(history) > 0 && history[0], municipality, zones, zone)
 	if err != nil {
 		return nil, err
 	}

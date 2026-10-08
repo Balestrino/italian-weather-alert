@@ -12,6 +12,7 @@ func (s *Store) MunicipalitySituation(ctx context.Context, query SituationQuery)
 	if err != nil || len(query.MunicipalityISTAT) != 6 {
 		return Situation{}, ErrInvalidParameters
 	}
+	s = s.withQueryReads(qt)
 	result := Situation{}
 	result.Municipality, err = s.municipality(ctx, query.MunicipalityISTAT, qt.KnownAt)
 	if err != nil {
@@ -80,6 +81,7 @@ func (s *Store) Search(ctx context.Context, query SearchQuery) (SearchResult, er
 	if query.Kind == "document" && query.Status != "" {
 		return SearchResult{}, ErrInvalidParameters
 	}
+	s = s.withQueryReads(qt)
 	query.QueryTime = qt
 	result := SearchResult{Kind: query.Kind, Documents: []Document{}, Measures: []Measure{}, Regional: []RegionalWarning{}}
 	switch query.Kind {
@@ -144,6 +146,10 @@ func (s *Store) searchDocuments(ctx context.Context, query SearchQuery) ([]Docum
 		ids = append(ids, id)
 	}
 	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	rows.Close()
+	if err = s.preloadDocumentVersions(ctx, ids, query.KnownAt); err != nil {
 		return nil, err
 	}
 	result := []Document{}

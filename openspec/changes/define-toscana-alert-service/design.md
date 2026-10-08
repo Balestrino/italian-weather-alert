@@ -790,3 +790,21 @@ decoded canonical path, rejecting encoded separators, traversal, query/fragment,
 other origins and scope-changing redirects. Validate PDFs before retention. Source
 configuration, full-window preview, cadence and live adoption remain separately
 verified operational steps; the earlier failed wider scope stays in the history.
+
+## Public query latency — 8 October 2026
+
+Add an immutable-checksum additive migration for retained version chronology,
+acquisition visibility and verification lookup indexes. Keep existing migration
+checksums unchanged. Shape receipt selection separately for record and version
+lookups so indexes apply before visibility/evidence evaluation. Scope repeated
+source quality, batched document metadata/interpretation/attachments and evidence
+reuse to one normalized operation;
+nested queries at the same time boundary share that state, while a new operation
+always starts fresh. Copy mutable limitation/evidence slices before combining
+fact-specific interpretation. Batch municipality coverage and manual-development
+selection reads over the candidate ISTAT set. Filter applicable regional zones in
+SQL before assembling facts. Release row readers before nested queries and retain
+PostgreSQL microsecond comparison precision for reused evidence cutoffs. Preserve complete saved snapshots,
+source controls, historical semantics and current interpretation warnings.
+Validate synthetic data and query counts, then adopt only the development public
+listener, recording timings and rollback details privately.

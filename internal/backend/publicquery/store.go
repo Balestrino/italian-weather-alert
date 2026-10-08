@@ -16,6 +16,7 @@ import (
 )
 
 type Store struct {
+	reads             *queryReads
 	development       bool
 	municipalityScope string
 	collectedOnly     bool
@@ -36,6 +37,7 @@ func (s *Store) DiscoverMunicipalities(ctx context.Context, query DiscoveryQuery
 	if err != nil || countSet(query.Name, query.ISTAT, query.PostalCode) > 1 || (query.ISTAT != "" && len(query.ISTAT) != 6) || (query.PostalCode != "" && len(query.PostalCode) != 5) {
 		return DiscoveryResult{}, ErrInvalidParameters
 	}
+	s = s.withQueryReads(qt)
 	query.QueryTime = qt
 	var candidates []domain.MunicipalityCandidate
 	switch {
@@ -144,6 +146,13 @@ func (s *Store) listMunicipalities(ctx context.Context, knownAt time.Time) ([]do
 			return nil, err
 		}
 		value.MunicipalityDatasetID = municipalityDataset
+		result = append(result, value)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	rows.Close()
+	for index, value := range result {
 		lookup, lookupErr := s.geography.LookupMunicipality(ctx, domain.Lookup{ISTAT: value.ISTAT, MunicipalityDatasetID: municipalityDataset, ZoneDatasetID: zoneDataset, ZoneDatasetResolved: true})
 		if lookupErr != nil {
 			return nil, lookupErr
@@ -151,9 +160,9 @@ func (s *Store) listMunicipalities(ctx context.Context, knownAt time.Time) ([]do
 		if len(lookup.Candidates) == 1 {
 			value = lookup.Candidates[0]
 		}
-		result = append(result, value)
+		result[index] = value
 	}
-	return result, rows.Err()
+	return result, nil
 }
 
 func (s *Store) postalCandidates(ctx context.Context, postalCode string, knownAt time.Time) ([]domain.MunicipalityCandidate, error) {
@@ -205,19 +214,41 @@ func (s *Store) postalCandidates(ctx context.Context, postalCode string, knownAt
 }
 
 func (s *Store) municipalities(ctx context.Context, candidates []domain.MunicipalityCandidate) ([]Municipality, error) {
-	result := make([]Municipality, 0, len(candidates))
+	codes := make([]string, 0, len(candidates))
 	for _, candidate := range candidates {
-		coverage, err := s.localCoverage(ctx, candidate.ISTAT)
+		codes = append(codes, candidate.ISTAT)
+	}
+	coverage, err := s.localCoverages(ctx, codes)
+	if err != nil {
+		return nil, err
+	}
+	selected := map[string]bool{}
+	if s.development && len(codes) > 0 {
+		rows, err := s.pool.Query(ctx, `SELECT istat FROM development_publication_current_municipalities WHERE istat=ANY($1::text[])`, codes)
 		if err != nil {
 			return nil, err
 		}
-		value := Municipality{ISTAT: candidate.ISTAT, Name: candidate.Name, MappingVersion: candidate.MappingVersionID, MappingLimitations: nonNil(candidate.MappingLimitations), LocalCoverage: coverage, Zones: []string{}}
-		if s.development {
-			err = s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM development_publication_current_municipalities WHERE istat=$1)`, candidate.ISTAT).Scan(&value.DevelopmentPublication)
-			if err != nil {
+		for rows.Next() {
+			var code string
+			if err = rows.Scan(&code); err != nil {
+				rows.Close()
 				return nil, err
 			}
+			selected[code] = true
 		}
+		err = rows.Err()
+		rows.Close()
+		if err != nil {
+			return nil, err
+		}
+	}
+	result := make([]Municipality, 0, len(candidates))
+	for _, candidate := range candidates {
+		state := coverage[candidate.ISTAT]
+		if state == "" {
+			state = "outside_scope"
+		}
+		value := Municipality{ISTAT: candidate.ISTAT, Name: candidate.Name, MappingVersion: candidate.MappingVersionID, MappingLimitations: nonNil(candidate.MappingLimitations), LocalCoverage: state, Zones: []string{}, DevelopmentPublication: selected[candidate.ISTAT]}
 		for _, zone := range candidate.Zones {
 			value.Zones = append(value.Zones, zone.Zone)
 		}
@@ -263,27 +294,36 @@ func (s *Store) municipality(ctx context.Context, istat string, knownAt time.Tim
 	return values[0], nil
 }
 
-func (s *Store) localCoverage(ctx context.Context, istat string) (string, error) {
-	var total, enabled, accepted int
-	err := s.pool.QueryRow(ctx, `SELECT count(*),count(*) FILTER (WHERE s.public_enabled),count(*) FILTER (WHERE EXISTS(
+func (s *Store) localCoverages(ctx context.Context, codes []string) (map[string]string, error) {
+	result := map[string]string{}
+	if len(codes) == 0 {
+		return result, nil
+	}
+	rows, err := s.pool.Query(ctx, `SELECT s.territory,count(*),count(*) FILTER (WHERE s.public_enabled),count(*) FILTER (WHERE EXISTS(
  SELECT 1 FROM registry_events e JOIN registry_acceptance_reviews rr ON rr.acceptance_event_id=e.id
  WHERE e.source_id=s.id AND e.revision=s.active_revision AND e.kind='acceptance' AND rr.status='accepted'
  AND e.id=(SELECT max(latest.id) FROM registry_events latest WHERE latest.source_id=e.source_id AND latest.revision=e.revision AND latest.kind='acceptance')
  AND NOT EXISTS(SELECT 1 FROM registry_regressions r WHERE r.source_id=e.source_id AND r.revision=e.revision AND NOT r.passed AND r.recorded_at>=e.created_at)))
- FROM `+s.sourcesSQL()+` s WHERE s.product_id='municipal' AND s.territory=$1`, istat).Scan(&total, &enabled, &accepted)
+ FROM `+s.sourcesSQL()+` s WHERE s.product_id='municipal' AND s.territory=ANY($1::text[]) GROUP BY s.territory`, codes)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	if enabled > 0 {
-		return "enabled", nil
+	defer rows.Close()
+	for rows.Next() {
+		var code string
+		var total, enabled, accepted int
+		if err = rows.Scan(&code, &total, &enabled, &accepted); err != nil {
+			return nil, err
+		}
+		state := "pending"
+		if enabled > 0 {
+			state = "enabled"
+		} else if accepted > 0 {
+			state = "suspended"
+		}
+		result[code] = state
 	}
-	if accepted > 0 {
-		return "suspended", nil
-	}
-	if total > 0 {
-		return "pending", nil
-	}
-	return "outside_scope", nil
+	return result, rows.Err()
 }
 
 type historyScope struct {
@@ -337,6 +377,7 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 	if err != nil || (query.MunicipalityISTAT != "" && len(query.MunicipalityISTAT) != 6) {
 		return CoverageResult{}, ErrInvalidParameters
 	}
+	s = s.withQueryReads(qt)
 	rows, err := s.pool.Query(ctx, `SELECT s.id,s.product_id,s.territory,ch.platform,s.public_enabled,s.collection_enabled,
  COALESCE(EXISTS(SELECT 1 FROM registry_events e JOIN registry_acceptance_reviews rr ON rr.acceptance_event_id=e.id
   WHERE e.source_id=s.id AND e.revision=s.active_revision AND e.kind='acceptance' AND rr.status='accepted'
@@ -358,14 +399,28 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 		return CoverageResult{}, err
 	}
 	defer rows.Close()
-	result := CoverageResult{Sources: []Coverage{}}
+	type coverageRow struct {
+		value                                      Coverage
+		publicEnabled, collectionEnabled, accepted bool
+		raw, releaseRaw                            []byte
+	}
+	pending := []coverageRow{}
 	for rows.Next() {
-		var value Coverage
-		var publicEnabled, collectionEnabled, accepted bool
-		var raw, releaseRaw []byte
-		if err = rows.Scan(&value.SourceID, &value.Product, &value.Territory, &value.Platform, &publicEnabled, &collectionEnabled, &accepted, &raw, &releaseRaw); err != nil {
+		item := coverageRow{}
+		if err = rows.Scan(&item.value.SourceID, &item.value.Product, &item.value.Territory, &item.value.Platform, &item.publicEnabled, &item.collectionEnabled, &item.accepted, &item.raw, &item.releaseRaw); err != nil {
 			return CoverageResult{}, err
 		}
+		pending = append(pending, item)
+	}
+	if err = rows.Err(); err != nil {
+		return CoverageResult{}, err
+	}
+	rows.Close()
+	result := CoverageResult{Sources: []Coverage{}}
+	for _, item := range pending {
+		value := item.value
+		publicEnabled, collectionEnabled, accepted := item.publicEnabled, item.collectionEnabled, item.accepted
+		raw, releaseRaw := item.raw, item.releaseRaw
 		var configuration struct {
 			Sections    []string `json:"sections"`
 			Limitations []string `json:"limitations"`
@@ -466,7 +521,7 @@ func (s *Store) Coverage(ctx context.Context, query CoverageQuery) (CoverageResu
 	return result, err
 }
 
-func (s *Store) quality(ctx context.Context, sourceID string, qt QueryTime, interpretation Dimension) (Quality, error) {
+func (s *Store) loadQuality(ctx context.Context, sourceID string, qt QueryTime, interpretation Dimension) (Quality, error) {
 	result := Quality{Interpretation: interpretation}
 	dev, devErr := s.developmentSource(ctx, sourceID)
 	if devErr != nil {

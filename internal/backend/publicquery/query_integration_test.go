@@ -31,8 +31,19 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/territory"
 	"github.com/Balestrino/italian-weather-alert/internal/testfixtures/cfrgraphics"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type countedPublicReads struct {
+	*pgxpool.Pool
+	calls map[string]int
+}
+
+func (p *countedPublicReads) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+	p.calls[sql]++
+	return p.Pool.QueryRow(ctx, sql, args...)
+}
 
 type memoryObjects struct {
 	mu    sync.Mutex
@@ -299,6 +310,70 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 	if len(situation.Coverage) != 2 || situation.Coverage[0].Product != "municipal" || situation.Coverage[1].Product != "criticality" {
 		t.Fatalf("regional/local coverage was not separate: %#v", situation.Coverage)
 	}
+	t.Run("request-scoped-quality-reuse", func(t *testing.T) {
+		counted := &countedPublicReads{Pool: pool, calls: map[string]int{}}
+		shared := New(pool)
+		shared.pool = counted
+		query := SituationQuery{QueryTime: queryTime, MunicipalityISTAT: "050004"}
+		if _, e := shared.MunicipalitySituation(ctx, query); e != nil {
+			t.Fatal(e)
+		}
+		counts := map[string]int{}
+		for sql, count := range counted.calls {
+			if strings.Contains(sql, "FROM domain_provenance_events") || strings.Contains(sql, "WITH latest AS") {
+				if count != 2 {
+					t.Fatalf("source read repeated within situation: %d: %s", count, sql)
+				}
+				counts[sql] = count
+			}
+		}
+		if len(counts) != 2 {
+			t.Fatal("quality queries were not exercised", counts)
+		}
+		if _, e := shared.MunicipalitySituation(ctx, query); e != nil {
+			t.Fatal(e)
+		}
+		for sql, count := range counts {
+			if counted.calls[sql] != 2*count {
+				t.Fatal("new request reused previous quality")
+			}
+		}
+		if shared.reads != nil {
+			t.Fatal("shared store retained request state")
+		}
+	})
+	t.Run("concurrent-reads-with-one-connection", func(t *testing.T) {
+		config := pool.Config()
+		config.MaxConns = 1
+		limited, e := pgxpool.NewWithConfig(ctx, config)
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer limited.Close()
+		deadline, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+		shared := New(limited)
+		errors := make(chan error, 6)
+		for i := 0; i < 6; i++ {
+			go func(i int) {
+				var e error
+				switch i % 3 {
+				case 0:
+					_, e = shared.Coverage(deadline, CoverageQuery{QueryTime: queryTime})
+				case 1:
+					_, e = shared.Document(deadline, DocumentQuery{QueryTime: queryTime, DocumentID: stringID(municipalV1.DocumentID), IncludeVersions: true})
+				case 2:
+					_, e = shared.DiscoverMunicipalities(deadline, DiscoveryQuery{QueryTime: queryTime})
+				}
+				errors <- e
+			}(i)
+		}
+		for i := 0; i < 6; i++ {
+			if e := <-errors; e != nil {
+				t.Errorf("nested reads held the only connection: %v", e)
+			}
+		}
+	})
 	from := now.Add(-365 * 24 * time.Hour)
 	search, err := store.Search(ctx, SearchQuery{QueryTime: queryTime, Kind: "measure", MunicipalityISTAT: "050004", Status: "current", From: &from})
 	if err != nil || len(search.Measures) != 1 || len(search.History.Gaps) == 0 {

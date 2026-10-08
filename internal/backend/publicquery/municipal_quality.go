@@ -41,6 +41,9 @@ func (s *Store) municipalInterpretation(ctx context.Context, sourceID string, qt
 		result.Limitations = append(result.Limitations, "no visible municipal document was available at the knowledge boundary")
 		return result, nil
 	}
+	if err = s.preloadDocumentInterpretations(ctx, ids, qt.KnownAt); err != nil {
+		return Dimension{}, err
+	}
 	supported, incomplete := 0, 0
 	for _, id := range ids {
 		assessment, _, _, e := s.documentInterpretation(ctx, id, qt.KnownAt)
