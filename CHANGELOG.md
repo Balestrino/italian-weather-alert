@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-08 [Changed] Clarify Livorno failure diagnosis, separating unavailable tracked notices, crawler structural rejection and interpretation retries.
+
 ## 0.4.0 - 2026-10-08
 
 - 2026-10-08 [Changed] Prepare 0.4.0 with aligned API/MCP metadata, preserved release history, performance and processing upgrade notes, and the fixed text dependency

@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "049009"
-ultima_revisione: "2026-10-04"
+ultima_revisione: "2026-10-08"
 ---
 
 # Livorno
@@ -22,6 +22,13 @@ Comune di Livorno, provincia di Livorno, ISTAT `049009`. Fonte IWA: `livorno-mun
 La [notizia comunale esaminata](https://www.comune.livorno.it/it/news/133640/allerta-arancio-per-forti-temporali-con-rischio-idrogeologico-e-idraulico-del-reticolo-minore) collega l'ordinanza n. 303 del 20 agosto 2026 nella sezione Allegati e una guida alla navigazione nel footer. I due PDF sono su domini Municipium distinti da quello della pagina. Consultazione documentale: 2026-10-02; il contenuto può cambiare.
 
 ## Guida operativa
+
+Per `source_http_error`, distinguere il controllo complessivo dai singoli target
+e dai log del crawler (LIV-009). I target 404/410 non revisionati mantengono il
+giro incompleto anche durante il backoff, pur consentendo di acquisire altri
+documenti. Il messaggio strutturale «anti-bot» di Crawl4AI non dimostra da solo
+un blocco del sito: verificare stato HTTP e contenuto restituito. Gli errori di
+elaborazione del modello hanno ricevute e retry separati dalla raccolta.
 
 Il precollaudo del 2026-10-04 produce un report individuale **pending**,
 con valutazione, osservazione, accettazione e pubblicazione distinte. La
@@ -63,6 +70,15 @@ LIV-005 ha corretto il limite di accesso registrato in LIV-004: la prima prova H
 Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente interessato, conservare il risultato e validare il PDF, oltre allo stato HTTP. Un esito del browser o di un altro client non sostituisce la verifica di `DirectHTTP`. Prima di considerare completo un giro verificare anche persistenza, riferimenti e tutti gli allegati necessari. Gestire i fallimenti temporanei con retry limitati e cadenze della fonte; un rifiuto persistente richiede diagnosi o un canale ufficiale alternativo verificato.
 
 ## Registro delle scoperte
+
+### LIV-009 — Diagnosi distinta di target indisponibili e rifiuto del crawler
+
+- **Data e ultima verifica:** 2026-10-08, codice e ricevute/log conservati; nessun nuovo fetch ufficiale o chiamata al modello.
+- **Ambito:** `livorno-municipal`, categoria Protezione Civile e target già tracciati. Ambiente, revisione, URL ed esiti dettagliati restano nel registro privato `PROCESSING-FAILURES-20261008`.
+- **Conoscenza confermata:** i target 404/410 e quelli in backoff rendono incompleto il giro senza impedire tutti i download successivi. Un rifiuto strutturale del crawler può essere riportato come `source_http_error` anche se la pagina è raggiungibile; la dicitura «anti-bot» non prova la causa remota.
+- **Intervento:** sola diagnosi verificata; nessuna esclusione di target, modifica dei retry, riattivazione provider o correzione applicata.
+- **Evidenza:** [collector programmato](../../../../internal/backend/acquisition/preview.go), [adattatore Crawl4AI](../../../../internal/backend/acquisition/crawl4ai.go) e [procedura di recupero](../../../operations/acquisition-recovery.md). Ricevute e log originali conservati privatamente.
+- **Prossima verifica:** confrontare stato HTTP/contenuto del target rifiutato con il trasporto effettivo; prima di escludere un URL indisponibile, completare la traversata e la revisione previste dalla procedura. Non dedurre rimozione definitiva, revoca di una misura o completezza dalla sola raggiungibilità; accettazione e pubblicazione restano separate.
 
 Le voci LIV-001–LIV-005 descrivono gli stati osservati nelle rispettive fasi del 2026-10-02; LIV-006 aggiorna il comportamento corrente dopo la correzione.
 
