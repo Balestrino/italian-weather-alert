@@ -31,6 +31,7 @@ x-env: &env
 services:
   public:
     <<: *app
+    image: ${IWA_PUBLIC_IMAGE:-${IWA_APP_IMAGE:-iwa-app:local}}
     secrets: [postgres_password, crawl_token, public_cursor_key, rustfs_access_key, rustfs_secret_key]
     environment:
       <<: *env

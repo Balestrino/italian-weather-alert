@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-08 [Fixed] Allow isolated development public listener image updates and document the verified latency repair rollout
 - 2026-10-08 [Fixed] Reduce public API/MCP latency with indexed batch reads and per-query reuse
 - 2026-10-07 [Changed] Preserve parameterized primary comparison evidence and document the source audit, completed repair rollout and API/MCP pagination and historical verification
 - 2026-10-07 [Changed] Recover decoded JSON literal classification and oversized PDF OCR with immutable catalogs; correct COC activation validity and verify selected ordinary reprocessing

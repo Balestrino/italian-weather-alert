@@ -12,6 +12,8 @@ These are example ports; select free ports in each private environment file. The
 
 For an existing development stack, apply the API binding without rebuilding its image or restarting dependencies with `scripts/compose-env.sh development up -d --no-deps --no-build --pull never --wait public`. The runtime boundary checks verify the selected environment's host binding and use loopback for local readiness requests. Native public startup with `IWA_ENVIRONMENT=development` also defaults to `0.0.0.0:8080`; an explicit `IWA_LISTEN` takes precedence.
 
+For a targeted development public-listener repair, set `IWA_PUBLIC_IMAGE` in `.local/development.env`; it defaults to `IWA_APP_IMAGE` and leaves other services on their existing image selection. Staging and production ignore this override and retain the shared release image.
+
 The runtime `IWA_ENVIRONMENT` is pinned to the selected Compose environment; its software default is strict production. Development alone supports [manual municipality publication](development-publication.md) before source acceptance. Staging/production ignore these selections and retain the specified gates.
 
 All projects share CPU, RAM and disk. Their named volumes, networks and credentials are separate, but a host outage affects every environment. Review capacity and off-host recovery before production activation.

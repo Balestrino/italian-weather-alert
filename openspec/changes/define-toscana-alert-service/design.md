@@ -808,3 +808,7 @@ PostgreSQL microsecond comparison precision for reused evidence cutoffs. Preserv
 source controls, historical semantics and current interpretation warnings.
 Validate synthetic data and query counts, then adopt only the development public
 listener, recording timings and rollback details privately.
+
+Development can select `IWA_PUBLIC_IMAGE` for the targeted listener while other
+services retain their configured image. Staging/production overlays keep the
+shared release image and its existing approval gates.

@@ -194,3 +194,8 @@ Public API/MCP queries SHALL use indexed version and receipt lookups and reuse r
 #### Scenario: Publication or interpretation changes between requests
 - **WHEN** a subsequent request follows a publication revocation, source suspension or new interpretation
 - **THEN** the new request reevaluates current controls at its requested knowledge boundary, without reusing prior-request quality or interpretation results
+
+#### Scenario: A development public-listener repair is adopted independently
+- **WHEN** development selects `IWA_PUBLIC_IMAGE` for a verified query repair
+- **THEN** the public listener uses that image while other application surfaces retain `IWA_APP_IMAGE`
+- **AND** the staging and production overlays retain their shared release image selection

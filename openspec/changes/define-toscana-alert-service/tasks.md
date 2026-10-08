@@ -785,12 +785,13 @@ all municipal publications or activate production.
 - [x] 33.1 Measure slow public endpoints and profile retained-data query costs, keeping operational evidence private.
 - [x] 33.2 Add version/receipt lookup indexes and eliminate repeated source/interpretation reads within a single query; batch municipality coverage without weakening publication, historical or pagination semantics.
 - [x] 33.3 Verify synthetic PostgreSQL behavior, request isolation, bounded query counts and API/MCP equivalence; run unit/race checks and record the repair.
-- [ ] 33.4 Adopt the verified repair on the development public listener with rollback evidence and repeat endpoint timing and browser checks.
+- [x] 33.4 Adopt the verified repair on the development public listener with rollback evidence and repeat endpoint timing and browser checks.
 
 **33 verified implementation — 8 October 2026:** synthetic PostgreSQL and
 unit/race checks verify indexed batch reads, per-operation source quality reuse,
 independent interpretation limitations, publication/knowledge boundaries,
 PostgreSQL timestamp precision and concurrent reads with one connection.
-Profiles and detailed timings remain private. Targeted development adoption and
-rollback verification are tracked by task 33.4. See
-[public API latency](../../../docs/operations/public-api-latency.md).
+Development adoption preserves the other running services; fixed-time data
+comparisons, three API/MCP pages, readiness and integrated-browser timing verify
+the listener repair. Profiles, exact timings and rollback identities remain
+private. See [public API latency](../../../docs/operations/public-api-latency.md).

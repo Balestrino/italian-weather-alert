@@ -37,7 +37,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 174 | 10 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 175 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
@@ -266,9 +266,10 @@ explicit. The checklist is now 171/180, with nine prior continuation/release tas
 open; source acceptance and production controls are unchanged. See the
 [repair checklist](changes/define-toscana-alert-service/tasks.md#32-latest-processing-repairs--7-october-2026).
 
-Three completed public-query latency tasks verify indexed version/receipt reads,
+Four subsequent public-query latency tasks verify indexed version/receipt reads,
 request-scoped source quality and batched document reads, isolated historical
 semantics and concurrent reads with one database connection. Synthetic PostgreSQL,
-unit/race and API/MCP equivalence checks verify the query repair. Targeted
-public-listener adoption remains the next rollout task.
+unit/race, API/MCP pagination, fixed-time response comparisons and development
+browser checks verify the targeted public-listener adoption. Other running services
+retain their images; staging/production keep their shared release image gates.
 See [public API latency](../docs/operations/public-api-latency.md).
