@@ -45,3 +45,18 @@ Explain the additive multi-source verification migration, replacement of process
 replicas and separate retained-data replay. Preserve historical releases, pending
 source acceptance and independent collection/image/production gates. Software
 promotion follows the same dev PR, merge-commit and exact-revision workflows.
+
+## Query performance and processing repair minor release — 8 October 2026
+
+The 0.4.0 preparation preserves all dated changes since 0.3.0 and aligns public
+metadata. Notes cover additive lookup, archive-recovery and observation migrations,
+per-operation query reuse, source-scoped processing repairs and ordinary comparison
+workers. Existing situation paths and saved-view semantics remain compatible with
+0.3.0. Replacing processing replicas adopts immutable corrective catalogs; retained
+results require deliberate bounded reprocessing. Development may select a public
+listener image independently, while staging/production keep the shared release
+image. Upgrade `golang.org/x/text` to 0.41.0 to resolve the reachable
+GO-2026-6629 finding, and validate the required transitive module updates.
+Software publication retains dev-to-main history and passing CI, Coverage and
+Security on the exact PR and merged revisions. Source acceptance, image publication
+and production activation keep their independent gates.

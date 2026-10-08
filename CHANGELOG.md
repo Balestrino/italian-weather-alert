@@ -4,6 +4,9 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+## 0.4.0 - 2026-10-08
+
+- 2026-10-08 [Changed] Prepare 0.4.0 with aligned API/MCP metadata, preserved release history, performance and processing upgrade notes, and the fixed text dependency
 - 2026-10-08 [Fixed] Allow isolated development public listener image updates and document the verified latency repair rollout
 - 2026-10-08 [Fixed] Reduce public API/MCP latency with indexed batch reads and per-query reuse
 - 2026-10-07 [Changed] Preserve parameterized primary comparison evidence and document the source audit, completed repair rollout and API/MCP pagination and historical verification
@@ -24,6 +27,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 - 2026-10-04 [Changed] Align active development applications to the verified revision and validate runtime images, private municipal gates and API/MCP equivalence
 - 2026-10-04 [Changed] Add independent municipal observation gates and pending reports, summarize trial costs, verify provider recovery and prepare the PBS runbook
 - 2026-10-04 [Fixed] Complete retained CFR criticality and vigilance graphics with product-specific weather metadata, applicability, PDF evidence and preserved history
+
 ## 0.3.0 - 2026-10-03
 
 - 2026-10-03 [Changed] Prepare the 0.3.0 release with aligned API/MCP metadata, situation consumer migration notes, source verification upgrades and exact-revision promotion checks.

@@ -40,7 +40,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 175 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 16 | 0 |
+| [Automatic changelog](changes/automate-changelog/proposal.md) | 18 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
@@ -273,3 +273,10 @@ unit/race, API/MCP pagination, fixed-time response comparisons and development
 browser checks verify the targeted public-listener adoption. Other running services
 retain their images; staging/production keep their shared release image gates.
 See [public API latency](../docs/operations/public-api-latency.md).
+
+Two subsequent 0.4.0 release-preparation tasks align API/MCP metadata, preserve
+all dated history, document public-query and processing upgrades and resolve the
+reachable text dependency vulnerability. Local race, transport, build, vet,
+changelog/environment and vulnerability checks pass. See
+[v0.4.0 notes](../docs/releases/v0.4.0.md); exact-revision CI, Coverage and Security
+remain software publication gates, independent of images and production.

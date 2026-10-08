@@ -59,3 +59,17 @@ post-0.2.0 entries are preserved. Changelog regressions, public API/MCP tests,
 local release-note links, whitespace and strict OpenSpec checks pass. The prepared
 dev-to-main software promotion retains the existing exact-revision workflow
 gates. Source acceptance, images and production activation remain separate.
+
+## 8. Query performance and processing repair minor release — 8 October 2026
+
+- [x] 8.1 Align OpenAPI/MCP metadata to 0.4.0, preserve dated and historical release records, document query performance, interpretation and comparison repairs, additive migrations, worker replacement and pilot limits; update the vulnerable text dependency to its fixed version.
+- [x] 8.2 Verify metadata, preserved history, local release-note links, changelog regressions/enforcement, public transports, unit/race, vet, command builds and reachable-vulnerability checks; prepare publication through the existing exact-revision CI/Coverage/Security gates.
+
+Preparation validation for 0.4.0 on 8 October 2026: OpenAPI/MCP metadata agree;
+all prior dated entries and historical sections/notes are preserved. All 26
+changelog/environment regression tests, full Go race tests, public transport tests,
+vet, command builds and deployment templates pass; 57 local release-document
+links resolve. The reachable-vulnerability scan passes after updating text and its
+required sync dependency. OpenSpec CLI validation is unavailable and is not
+claimed. Exact-revision hosted CI, Coverage and Security remain publication gates;
+container publication, source acceptance and production activation are separate.
