@@ -63,6 +63,22 @@ then set a timeout that covers measured work. Changing quantization/model requir
 the ordinary output-contract evaluation. A timeout increase or job relaunch does
 not establish server recovery; retain retry history and provider gates.
 
+Distinguish current provider calls, queue attempts and historical job states.
+Pre-claim provider deferral updates `available_at`, the last reason and
+`updated_at` without making a model call or consuming an attempt. A recent
+timestamp therefore does not establish a new execution. Separate archived
+failures and older terminal failures from the latest completed jobs.
+
+The local fallback shares one scope/model gate across OCR, classification,
+extraction and linking. Repeated slow OCR failures can therefore pause text
+work too. A healthy idle `/health` response does not verify completion of a
+representative request. Inspect actual source-scoped OCR/interpretation reuse
+and preflight selections: new HTML versions may queue the same unchanged PDF,
+and the per-job retry ceiling does not bound calls across those versions.
+Compare resource hashes and request hashes before proposing deduplication.
+The 9 October follow-up records this pattern for the reviewed Livorno sample
+in [LIV-010](../territori/09-toscana/comuni/049009-livorno.md).
+
 ## Configure development
 
 Put reviewed settings in ignored `.local/development.env`:

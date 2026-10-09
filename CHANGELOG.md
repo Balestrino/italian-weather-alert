@@ -4,6 +4,8 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-09 [Changed] Diagnose recurring Livorno OCR work from CSRF-only versions; distinguish shared provider pauses, new timeouts and historical job failures.
+
 - 2026-10-08 [Changed] Reduce development inference concurrency after a bounded timeout trial; record preserved rollback evidence, verified OCR progress and pending model-host capacity checks.
 
 - 2026-10-08 [Changed] Document local model timeout diagnostics and bounded capacity checks for prompt processing, generation and GPU memory placement.

@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "049009"
-ultima_revisione: "2026-10-08"
+ultima_revisione: "2026-10-09"
 ---
 
 # Livorno
@@ -22,6 +22,14 @@ Comune di Livorno, provincia di Livorno, ISTAT `049009`. Fonte IWA: `livorno-mun
 La [notizia comunale esaminata](https://www.comune.livorno.it/it/news/133640/allerta-arancio-per-forti-temporali-con-rischio-idrogeologico-e-idraulico-del-reticolo-minore) collega l'ordinanza n. 303 del 20 agosto 2026 nella sezione Allegati e una guida alla navigazione nel footer. I due PDF sono su domini Municipium distinti da quello della pagina. Consultazione documentale: 2026-10-02; il contenuto può cambiare.
 
 ## Guida operativa
+
+Per timeout OCR ricorrenti, confrontare anche hash del PDF, input delle chiamate
+e versioni HTML (LIV-010). Nel campione confrontato cambiano soltanto i token
+CSRF: una nuova versione conservata non dimostra una nuova pubblicazione o un
+nuovo allegato. Verificare le liste effettive di riuso e preflight del worker;
+la policy CSRF di Cascina non si applica automaticamente a Livorno. Il riuso per
+Livorno richiede una propria verifica e adozione, conservando gli originali e
+distinguendo copie equivalenti, cache riuscite e tentativi falliti.
 
 Per `source_http_error`, distinguere il controllo complessivo dai singoli target
 e dai log del crawler (LIV-009). I target 404/410 non revisionati mantengono il
@@ -70,6 +78,15 @@ LIV-005 ha corretto il limite di accesso registrato in LIV-004: la prima prova H
 Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente interessato, conservare il risultato e validare il PDF, oltre allo stato HTTP. Un esito del browser o di un altro client non sostituisce la verifica di `DirectHTTP`. Prima di considerare completo un giro verificare anche persistenza, riferimenti e tutti gli allegati necessari. Gestire i fallimenti temporanei con retry limitati e cadenze della fonte; un rifiuto persistente richiede diagnosi o un canale ufficiale alternativo verificato.
 
 ## Registro delle scoperte
+
+### LIV-010 — Versioni CSRF, OCR ripetuto e pausa condivisa del provider
+
+- **Data e ultima verifica:** 2026-10-09, ricevute recenti, configurazione effettiva e confronto di due originali già conservati; nessun nuovo fetch ufficiale o chiamata manuale al modello.
+- **Ambito:** elaborazione ordinaria `livorno-municipal`; coppia di versioni della notizia collegata all'ordinanza n. 303 e hash degli allegati nelle ricevute. Dettagli e originali nel registro privato `JOB-DIAGNOSIS-20261009`.
+- **Conoscenza confermata:** la coppia HTML ha metadati e PDF identici e differisce soltanto nelle due forme CSRF esatte già documentate per Cascina. Più versioni accodano OCR dello stesso PDF/input; nel worker ispezionato Livorno è esclusa dalle liste di riuso OCR, interpretativo e preflight. I timeout al limite HTTP esauriscono i tentativi del singolo job, mentre nuove versioni possono creare nuovi job. Il gate locale dello stesso modello è condiviso fra OCR e fasi testuali; la sua pausa può rinviare entrambe.
+- **Intervento:** diagnosi verificata; normalizzazione, adozione del riuso per Livorno e regolazione della capacità restano proposte. Nessuna modifica dei provider, rilancio, archiviazione o attivazione della fonte.
+- **Evidenza:** [identità dei documenti](../../../../internal/backend/documents/model.go), [policy HTML](../../../../internal/backend/classification/manifest.go), [identità dei job OCR](../../../../internal/backend/ocr/runner.go), [fallback e gate condiviso](../../../../cmd/iwa/local_fallback.go) e [operazioni locali](../../../operations/local-llm-fallback.md). Originali, hash e ricevute dettagliate restano privati.
+- **Prossima verifica:** verificare su fixture sintetiche una policy Livorno che ignori soltanto le forme CSRF osservate e preservi cambi reali; valutare riuso OCR/preflight con un trial delimitato. Verificare separatamente tempo dei documenti più lunghi, timeout e capacità del modello. La coppia esaminata non certifica equivalenza di ogni pagina o completezza della raccolta.
 
 ### LIV-009 — Diagnosi distinta di target indisponibili e rifiuto del crawler
 

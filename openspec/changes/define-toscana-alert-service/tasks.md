@@ -332,6 +332,17 @@ unverified because model-host SSH access is unavailable; this observation does
 not establish recovery across all stages or source acceptance. Private receipts,
 samples and rollback evidence remain ignored.
 
+The read-only 9 October follow-up to 22.8 confirms that one worker remains
+running without restarts, while OCR still reaches the HTTP deadline. Recent
+queue failures exhaust ordinary attempts; provider deferrals and historical
+failures remain separate. In the reviewed Livorno pair, only CSRF fields change
+between retained HTML versions while the PDF remains identical. The active
+rollout excludes Livorno from OCR/interpretation reuse and preflight, allowing
+equivalent work to recur under new job identities. Shared local-model circuit
+pauses then delay text stages as well. [LIV-010](../../../docs/territori/09-toscana/comuni/049009-livorno.md)
+records the scoped diagnosis and proposed verification; no new source policy,
+runtime setting, job relaunch or recovery claim is introduced.
+
 ## 23. Private browser access to API documentation — 2 October 2026
 
 - [x] 23.1 Open Scalar in the integrated browser through a dedicated private Tailscale Serve proxy to the development public listener; preserve existing Serve routes, verify all six endpoint references and the same-origin OpenAPI contract, and document targeted proxy removal with private rollback settings retained.
