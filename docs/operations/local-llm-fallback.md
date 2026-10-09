@@ -277,8 +277,12 @@ This trial keeps one worker and extends the local HTTP timeout from 180 to
 600 seconds, the supported upper bound. Context allocation, server slots, model,
 quantization and GPU placement were unchanged. Inspect ordinary complete OCR pages
 and actual warm-cache associations separately from HTTP success; longer requests
-can still fail or delay text jobs sharing the local gate. This bounded rollout
-does not complete the 24-hour quality observation or establish GPU recovery,
+can still fail or delay text jobs sharing the local gate. The initial ordinary
+sample persisted three complete Livorno OCR pages; the longest finished in
+305 seconds, beyond the former 180-second deadline. No new timeout occurred in
+that bounded sample. This verifies the benefit for the observed page, not all
+long documents or continuous capacity. This bounded rollout does not complete
+the 24-hour quality observation or establish GPU recovery,
 source acceptance, remote entitlement recovery or complete backlog processing.
 
 For rollback, restore the private previous development environment and image,
