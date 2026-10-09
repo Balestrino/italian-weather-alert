@@ -11,8 +11,13 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
 )
 
-func TestCascinaCSRFPolicyAndManifest(t *testing.T) {
-	const source = "cascina-municipal"
+func TestReviewedCSRFPoliciesAndManifest(t *testing.T) {
+	for _, source := range []string{"cascina-municipal", "livorno-municipal"} {
+		t.Run(source, func(t *testing.T) { testReviewedCSRFPolicyAndManifest(t, source) })
+	}
+}
+
+func testReviewedCSRFPolicyAndManifest(t *testing.T, source string) {
 	const url = "https://municipal.example/it/news/42/avviso"
 	one := `<meta name="csrf-token" content="` + strings.Repeat("a", 40) + `"><main><a href="/ordinanza">Chiusura 8 ottobre, ore 18:00</a></main><form id="ricerca"><input type="hidden" name="_token" value="` + strings.Repeat("a", 40) + `"></form>`
 	two := strings.ReplaceAll(one, strings.Repeat("a", 40), strings.Repeat("b", 40))
@@ -32,15 +37,15 @@ func TestCascinaCSRFPolicyAndManifest(t *testing.T) {
 		return m
 	}
 	a, b := build(one, source, true), build(two, source, true)
-	if a.Hash != b.Hash || !a.Reusable || !strings.HasSuffix(a.Resources[0].Policy, ":"+CascinaHTMLPolicy) {
+	if a.Hash != b.Hash || !a.Reusable || !strings.HasSuffix(a.Resources[0].Policy, ":"+HTMLPolicy(source)) {
 		t.Fatal("CSRF-only change not reusable under the versioned policy")
 	}
 	if bytes.Equal([]byte(one), CanonicalHTML(source, []byte(one))) {
 		t.Fatal("fixture not normalized")
 	}
-	for _, s := range []string{"unknown", "livorno-municipal", "calcinaia-municipal"} {
+	for _, s := range []string{"unknown", "pisa-municipal", "calcinaia-municipal"} {
 		if build(one, s, true).Hash == build(two, s, true).Hash {
-			t.Fatalf("normalization escaped Cascina: %s", s)
+			t.Fatalf("normalization escaped reviewed sources: %s", s)
 		}
 	}
 	for _, changed := range []string{strings.Replace(two, "18:00", "19:00", 1), strings.Replace(two, "8 ottobre", "9 ottobre", 1), strings.Replace(two, "Chiusura", "Revoca", 1), strings.Replace(two, "/ordinanza", "/revoca", 1), strings.Replace(two, `type="hidden"`, `type="text"`, 1)} {
@@ -53,6 +58,17 @@ func TestCascinaCSRFPolicyAndManifest(t *testing.T) {
 	}
 	if !bytes.Equal(CanonicalHTML(source, []byte(one)), CanonicalHTML(source, CanonicalHTML(source, []byte(one)))) {
 		t.Fatal("normalization not idempotent")
+	}
+	for _, unreviewed := range []string{
+		`<meta name="csrf-token" content="` + strings.Repeat("a", 39) + `">`,
+		`<meta name="csrf-token" content="` + strings.Repeat("a", 41) + `">`,
+		`<meta content="` + strings.Repeat("a", 40) + `" name="csrf-token">`,
+		`<input type="text" name="_token" value="` + strings.Repeat("a", 40) + `">`,
+		`<input type="hidden" name="other" value="` + strings.Repeat("a", 40) + `">`,
+	} {
+		if !bytes.Equal([]byte(unreviewed), CanonicalHTML(source, []byte(unreviewed))) {
+			t.Fatal("unreviewed token form changed")
+		}
 	}
 }
 

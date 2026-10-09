@@ -11,6 +11,7 @@ services:
     environment:
       IWA_ENVIRONMENT: staging
   worker:
+    image: ${IWA_APP_IMAGE:-iwa-app:local}
     build: !reset null
     environment:
       IWA_ENVIRONMENT: staging

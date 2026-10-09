@@ -23,7 +23,7 @@ import (
 )
 
 func TestPreflightContiguousGroups(t *testing.T) {
-	for _, source := range []string{"calcinaia-municipal", "cascina-municipal"} {
+	for _, source := range []string{"calcinaia-municipal", "cascina-municipal", "livorno-municipal"} {
 		t.Run(source, func(t *testing.T) { testPreflightContiguousGroups(t, source) })
 	}
 }
@@ -53,7 +53,7 @@ func testPreflightContiguousGroups(t *testing.T, source string) {
 	retain := func(id, marker, text, mediaType string) documents.Version {
 		t.Helper()
 		b := []byte(`<div class="js-view-dom-id-` + strings.Repeat(marker, 64) + `">` + text + `</div>`)
-		if source == "cascina-municipal" {
+		if source == "cascina-municipal" || source == "livorno-municipal" {
 			b = []byte(`<meta name="csrf-token" content="` + strings.Repeat(marker, 40) + `"><main>` + text + `</main><input type="hidden" name="_token" value="` + strings.Repeat(marker, 40) + `">`)
 		}
 		v, e := retained.Retain(ctx, documents.Acquisition{ID: id, SourceID: source, Configuration: 1, URL: "https://example.org/notice", Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{{URL: "https://example.org/notice", SourceID: source, Configuration: 1, Role: "original", Required: true, MediaType: mediaType, Bytes: b}}})

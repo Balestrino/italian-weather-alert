@@ -248,6 +248,45 @@ probe can leave a gate held as `invalid_response` while its call receipt records
 output. Resume only the affected local gate after a healthy bounded server check,
 preserving unrelated provider holds and ordinary retry/lease recovery.
 
+## Reviewed Livorno reuse and extended timeout trial — 9 October 2026
+
+The subsequent development repair gives Livorno its independent
+`livorno-html-v1` policy for the two exact reviewed CSRF forms. Preflight and
+interpretation manifests share this policy; dates, text, links, metadata,
+attachments and completeness remain significant. Raw originals and historical
+versions retain their original identities. Synthetic boundary tests and isolated
+PostgreSQL race checks verify contiguous grouping and zero-call reuse. See
+[LIV-011](../territori/09-toscana/comuni/049009-livorno.md).
+
+A verified database archive and previous image/settings were retained before
+targeted worker replacement. `IWA_WORKER_IMAGE` selects the candidate only in
+development; staging/production still resolve the shared release image. All six
+other running containers retained their IDs and start times. HTTP/runtime checks
+pass, the remote quota hold remains held, and historical terminal failures are
+preserved. Replacement cancelled one ordinary in-flight call; its uncertain
+receipt remains subject to ordinary lease recovery.
+
+The selected worker enables Livorno in the existing OCR/interpretation reuse and
+preflight lists. Local preparation identified 18 equivalent copies among 36
+complete Livorno versions without provider calls. An already queued copy remained
+unclaimed with zero attempts while waiting for its representative. Previously
+unprepared backlog retains conservative group boundaries; no wholesale historical
+relaunch or local historical cache seeding was performed.
+
+This trial keeps one worker and extends the local HTTP timeout from 180 to
+600 seconds, the supported upper bound. Context allocation, server slots, model,
+quantization and GPU placement were unchanged. Inspect ordinary complete OCR pages
+and actual warm-cache associations separately from HTTP success; longer requests
+can still fail or delay text jobs sharing the local gate. This bounded rollout
+does not complete the 24-hour quality observation or establish GPU recovery,
+source acceptance, remote entitlement recovery or complete backlog processing.
+
+For rollback, restore the private previous development environment and image,
+then recreate only one worker with `--no-deps --no-build --pull never`. Keep data
+volumes and additive preflight/cache records. Do not restore a database archive
+over newly collected evidence as part of an image rollback. Verify runtime,
+provider gates and retained histories afterward.
+
 ## Deploy and roll back
 
 Run the ordinary Go checks and the processing integration tests on disposable

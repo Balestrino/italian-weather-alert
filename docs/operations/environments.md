@@ -14,6 +14,12 @@ For an existing development stack, apply the API binding without rebuilding its 
 
 For a targeted development public-listener repair, set `IWA_PUBLIC_IMAGE` in `.local/development.env`; it defaults to `IWA_APP_IMAGE` and leaves other services on their existing image selection. Staging and production ignore this override and retain the shared release image.
 
+For a targeted development processing rollout, `IWA_WORKER_IMAGE` selects the
+worker image and otherwise defaults to `IWA_APP_IMAGE`. Recreate only `worker`
+with the selected replica count after preserving rollback settings and checking
+the candidate. Staging and production ignore this override and retain their
+shared release image.
+
 The runtime `IWA_ENVIRONMENT` is pinned to the selected Compose environment; its software default is strict production. Development alone supports [manual municipality publication](development-publication.md) before source acceptance. Staging/production ignore these selections and retain the specified gates.
 
 All projects share CPU, RAM and disk. Their named volumes, networks and credentials are separate, but a host outage affects every environment. Review capacity and off-host recovery before production activation.

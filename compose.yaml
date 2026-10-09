@@ -64,6 +64,7 @@ services:
     ports: ["127.0.0.1:${IWA_ADMIN_PORT:-8081}:8081"]
   worker:
     <<: *app
+    image: ${IWA_WORKER_IMAGE:-${IWA_APP_IMAGE:-iwa-app:local}}
     profiles: [processing-worker]
     command: [worker]
     secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key, regolo_api_key, notifications_config]

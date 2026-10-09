@@ -43,7 +43,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 18 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
 | [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
-| [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 29 | 3 |
+| [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 32 | 3 |
 
 The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Five subsequent local fallback tasks verify opt-in Qwen chat/image tests and scoped development routing; three further tasks verify explicit register-wide fallback selection, worker configuration and local OCR progress. Three further two-request trial tasks verify server slots, concurrent development worker calls and stored OCR results, with documented scale-down and private rollback evidence. Three subsequent tasks verify expansion to four worker replicas, fix reproduced pre-claim deadlocks and validate concurrent processing on the corrected development image while distinguishing worker count from available server slots. One further task verifies an operator-requested six-worker expansion, preserved existing replicas and queue progress, with server/model concurrency reported separately. See [local fallback operations](../docs/operations/local-llm-fallback.md). Provider entitlement restoration is subsequently verified below; dependent semantic embeddings remain separate unverified work. These checks do not complete source acceptance or production readiness.
 
@@ -287,3 +287,16 @@ reachable text dependency vulnerability. Local race, transport, build, vet,
 changelog/environment and vulnerability checks pass. See
 [v0.4.0 notes](../docs/releases/v0.4.0.md); exact-revision CI, Coverage and Security
 remain software publication gates, independent of images and production.
+
+The 9 October Livorno follow-up adds independently versioned exact CSRF
+equivalence, source-scoped reuse and preflight on one development worker.
+Synthetic meaningful-change controls and disposable PostgreSQL race checks pass;
+retained complete versions group without provider calls, and already queued
+copies defer without attempts. Development-only worker image selection preserves
+other running services and the shared staging/production release image. A
+verified backup and rollback settings precede the bounded 600-second local
+timeout trial; GPU/context settings and historical failures are preserved.
+Ordinary complete OCR pages populate the cache. Tasks 9.2–9.4 remain open for
+remote recovery, the broader warm-cache/quality canary and the actual 24-hour
+observation. See [the local runbook](../docs/operations/local-llm-fallback.md)
+and [LIV-011](../docs/territori/09-toscana/comuni/049009-livorno.md).

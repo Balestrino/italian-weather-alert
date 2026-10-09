@@ -44,6 +44,7 @@ var municipalViewClass = regexp.MustCompile(`<div class="js-view-dom-id-[0-9a-f]
 const MunicipalHTMLPolicy = "municipal-html-v2"
 
 const CascinaHTMLPolicy = "cascina-html-v1"
+const LivornoHTMLPolicy = "livorno-html-v1"
 
 var cascinaCSRFMeta = regexp.MustCompile(`<meta name="csrf-token" content="[A-Za-z0-9]{40}">`)
 var cascinaCSRFInput = regexp.MustCompile(`<input type="hidden" name="_token" value="[A-Za-z0-9]{40}">`)
@@ -55,6 +56,8 @@ func HTMLPolicy(source string) string {
 		return MunicipalHTMLPolicy
 	case "cascina-municipal":
 		return CascinaHTMLPolicy
+	case "livorno-municipal":
+		return LivornoHTMLPolicy
 	default:
 		return ""
 	}
@@ -63,7 +66,7 @@ func HTMLPolicy(source string) string {
 // CanonicalHTML removes exact reviewed transport fields for the named source.
 // Text, dates, links, other attributes and card order remain byte-significant.
 func CanonicalHTML(source string, body []byte) []byte {
-	if source == "cascina-municipal" {
+	if source == "cascina-municipal" || source == "livorno-municipal" {
 		body = cascinaCSRFMeta.ReplaceAll(body, []byte(`<meta name="csrf-token" content="">`))
 		return cascinaCSRFInput.ReplaceAll(body, []byte(`<input type="hidden" name="_token" value="">`))
 	}
@@ -159,8 +162,8 @@ func BuildManifest(ctx context.Context, retained documentStore, extracted ocrSto
 			}
 			if (media == "text/html" || media == "application/xhtml+xml") && HTMLPolicy(manifest.SourceID) != "" {
 				body = CanonicalHTML(manifest.SourceID, body)
-				if manifest.SourceID == "cascina-municipal" {
-					item.Policy += ":" + CascinaHTMLPolicy
+				if manifest.SourceID == "cascina-municipal" || manifest.SourceID == "livorno-municipal" {
+					item.Policy += ":" + HTMLPolicy(manifest.SourceID)
 				}
 			}
 			item.Identity = manifestHash(body)

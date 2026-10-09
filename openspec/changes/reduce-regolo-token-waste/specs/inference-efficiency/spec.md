@@ -55,6 +55,11 @@ The service SHALL distinguish raw revisions from contiguous equivalent interpret
 - **WHEN** complete new raw revisions have identical preflight inputs to the immediately preceding unarchived version
 - **THEN** they form one pending interpretation group, original evidence remains retained and no duplicate provider work is admitted
 
+#### Scenario: Reviewed Livorno CSRF fields change
+- **WHEN** complete retained Livorno inputs differ only in the reviewed exact CSRF meta and hidden-input token forms under `livorno-html-v1`
+- **THEN** source-scoped preflight and interpretation manifests treat those inputs as equivalent while preserving original bytes and current-version evidence
+- **AND** dates, operative text, links, attachments, completeness, unreviewed token forms and processing policies remain significant; the policy does not extend to unreviewed sources
+
 #### Scenario: Content returns to an older value
 - **WHEN** meaningful content changes from A to B and then returns to A
 - **THEN** the final transition is a new interpretation group rather than a duplicate of the first A

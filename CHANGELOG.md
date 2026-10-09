@@ -4,6 +4,9 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-09 [Changed] Enable reviewed Livorno reuse on one development worker and extend the bounded local timeout trial with retained rollback settings and histories.
+- 2026-10-09 [Fixed] Add reviewed Livorno CSRF equivalence and a development worker image selection for scoped OCR reuse rollout.
+
 - 2026-10-09 [Changed] Diagnose recurring Livorno OCR work from CSRF-only versions; distinguish shared provider pauses, new timeouts and historical job failures.
 
 - 2026-10-08 [Changed] Reduce development inference concurrency after a bounded timeout trial; record preserved rollback evidence, verified OCR progress and pending model-host capacity checks.

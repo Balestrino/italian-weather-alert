@@ -27,9 +27,11 @@ Per timeout OCR ricorrenti, confrontare anche hash del PDF, input delle chiamate
 e versioni HTML (LIV-010). Nel campione confrontato cambiano soltanto i token
 CSRF: una nuova versione conservata non dimostra una nuova pubblicazione o un
 nuovo allegato. Verificare le liste effettive di riuso e preflight del worker;
-la policy CSRF di Cascina non si applica automaticamente a Livorno. Il riuso per
-Livorno richiede una propria verifica e adozione, conservando gli originali e
-distinguendo copie equivalenti, cache riuscite e tentativi falliti.
+la policy indipendente `livorno-html-v1` ignora soltanto le due forme CSRF
+esatte verificate in LIV-011. Il riuso è stato adottato nel perimetro development
+revisionato; conservare gli originali e distinguere copie equivalenti, cache
+riuscite e tentativi falliti. Le variazioni di testo, date, link, metadati,
+allegati o completezza mantengono una nuova identità interpretativa.
 
 Per `source_http_error`, distinguere il controllo complessivo dai singoli target
 e dai log del crawler (LIV-009). I target 404/410 non revisionati mantengono il
@@ -64,6 +66,7 @@ Vedere [elaborazione locale](../../../operations/local-processing.md).
 | LIV-001 | PDF della pagina esaminata | Allegati esterni ammessi solo nel perimetro HTTPS/percorso revisionato; altri riferimenti restano `forbidden` | Correzione implementata e verificata sul perimetro; LIV-006 |
 | LIV-002 | Discovery degli allegati | Selezione entro `article-content`, con esclusione di footer, navigazione e intestazioni | Correzione implementata e verificata sul perimetro; LIV-006 |
 | LIV-007 | Testo delle notizie conservate di Livorno | `main#main-content` conserva titolo/corpo e rimuove navigazione/footer; PDF locali revisionati individualmente | Replay e trial limitato verificati; policy continuativa separata |
+| LIV-011 | Equivalenza di versioni complete | `livorno-html-v1` normalizza soltanto i due campi CSRF esatti; PDF, testo, metadati e completezza restano significativi | Test e adozione development verificati; osservazione prolungata separata |
 
 L'eventuale ammissione di risorse Municipium deve essere esplicita e limitata alla fonte e ai percorsi verificati. La nota di piattaforma non costituisce una autorizzazione generale.
 
@@ -78,6 +81,16 @@ LIV-005 ha corretto il limite di accesso registrato in LIV-004: la prima prova H
 Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente interessato, conservare il risultato e validare il PDF, oltre allo stato HTTP. Un esito del browser o di un altro client non sostituisce la verifica di `DirectHTTP`. Prima di considerare completo un giro verificare anche persistenza, riferimenti e tutti gli allegati necessari. Gestire i fallimenti temporanei con retry limitati e cadenze della fonte; un rifiuto persistente richiede diagnosi o un canale ufficiale alternativo verificato.
 
 ## Registro delle scoperte
+
+### LIV-011 — Equivalenza CSRF e riuso adottati nel perimetro revisionato
+
+- **Data e ultima verifica:** 2026-10-09, fixture sintetiche, PostgreSQL isolato con race detector, preparazione locale di originali conservati e worker development; nessun nuovo fetch ufficiale manuale.
+- **Ambito:** soltanto `livorno-municipal`, con policy indipendente `livorno-html-v1`. Campione di versioni complete e pagine OCR; configurazione, backup verificato, immagini e osservazioni dettagliate nel registro privato `livorno-reuse-20261009`.
+- **Conoscenza confermata:** le forme esatte `<meta name="csrf-token" content="[A-Za-z0-9]{40}">` e `<input type="hidden" name="_token" value="[A-Za-z0-9]{40}">` possono essere normalizzate nel manifest senza modificare gli originali. I test conservano cambi di testo, data, orario, link e completezza; forme non revisionate e altre fonti non ereditano la regola. I gruppi sono contigui e rispettano i confini di archiviazione.
+- **Intervento:** policy implementata e riuso OCR/interpretativo con preflight attivato sul singolo worker development. La preparazione locale ha riconosciuto 18 copie fra 36 versioni di Livorno senza chiamate al provider; un job copia già in coda resta differito con zero tentativi. Timeout locale esteso a 600 secondi come trial di capacità separato; contesto, GPU e modello non modificati.
+- **Evidenza:** [policy e fixture sintetiche](../../../../internal/backend/classification/manifest_test.go), [gruppi e riuso senza chiamate](../../../../internal/backend/interpretation/preflight_integration_test.go), [riuso delle pagine](../../../../internal/backend/ocr/reuse.go) e [trial operativo](../../../operations/local-llm-fallback.md). Originali, ricevute e misure operative restano privati.
+- **Prossima verifica:** osservare cache ordinaria, documenti lunghi, cambi significativi e qualità per almeno la finestra prevista dal canary. La verifica delimitata non chiude i fallimenti storici, LIV-009, accettazione o copertura della fonte; stato della GPU e capacità continuativa restano da verificare.
+- **Collegamenti:** aggiorna la proposta LIV-010; task 11 della [specifica di efficienza](../../../../openspec/changes/reduce-regolo-token-waste/tasks.md).
 
 ### LIV-010 — Versioni CSRF, OCR ripetuto e pausa condivisa del provider
 
