@@ -844,3 +844,20 @@ The first consolidated outbox snapshot is read back and accepted by SMTP; no
 stage reminder is emitted for unchanged failures. Database archive, selection,
 prior settings and detailed runtime evidence remain private. See
 [actionable notifications](../../../docs/operations/actionable-notifications.md).
+
+## 35. Exclusive local primary inference — 11 October 2026
+
+- [x] 35.1 Expose primary chat/OCR settings through Compose, support independent local credentials and bounded deadlines, and apply local policy without remote fallback.
+- [x] 35.2 Verify configuration rejection/isolation, retained catalog coexistence, Compose templates and real synthetic local classification/extraction/linking/OCR.
+- [x] 35.3 Preserve private rollback evidence, configure both development primaries to the reviewed local model with fallback/embeddings disabled, replace only the worker and verify startup, effective settings and a synthetic request from the running worker.
+
+**35 verified — 11 October 2026:** full Go unit tests, vet, disposable PostgreSQL
+catalog/race checks, environment regressions and template checks pass. Live
+synthetic classification, extraction, linking and OCR pass, including both
+literal forms of the fixture's COC subject and rejection of unrelated alert times.
+Development adoption preserves a readable database archive and rollback settings,
+replaces only the worker and verifies exclusive local primary settings, disabled
+fallback/embedding controls, startup, runtime readiness and the actual returned
+model from a synthetic worker-origin request. Existing queued deferrals and
+historical results remain preserved; the bounded observation produced no new
+ordinary durable call receipts. Detailed network/response evidence stays private.

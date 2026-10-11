@@ -314,3 +314,58 @@ conservato nelle prove precedenti: sonda autenticata, ripresa controllata, OCR
 remoto e pipeline ordinaria riusciti. Il fallback resta configurato e i risultati
 locali storici sono conservati. Gli embedding restano disabilitati e non sono
 certificati da questa verifica. Vedere [recupero provider](acquisition-recovery.md#verifica-del-recupero-provider--4-ottobre-2026).
+
+## Use a local model as the only primary chat/OCR provider
+
+Set both primary providers in the selected ignored `.local/<environment>.env`:
+
+```dotenv
+IWA_QWEN_ADAPTER=local-openai-chat
+IWA_QWEN_ENDPOINT=http://local-server:8081/v1/chat/completions
+IWA_QWEN_MODEL=qwen3.5-9b
+IWA_QWEN_TIMEOUT_SECONDS=600
+IWA_QWEN_GATE_SCOPE=local-primary
+IWA_OCR_ADAPTER=local-openai-chat
+IWA_OCR_ENDPOINT=http://local-server:8081/v1/chat/completions
+IWA_OCR_MODEL=qwen3.5-9b
+IWA_OCR_TIMEOUT_SECONDS=600
+IWA_OCR_GATE_SCOPE=local-primary
+IWA_LOCAL_FALLBACK_ENABLED=false
+IWA_LOCAL_FALLBACK_OCR_ENABLED=false
+```
+
+Use the exact model ID returned by `/v1/models`, rather than assuming the server
+still accepts a previous GGUF path. The primary settings apply to all admitted
+sources and do not require a remote hold. Classification, extraction, linking
+and OCR use the existing local prompts, non-thinking sampling and local accounting.
+Primary local configuration requires explicit endpoint/model values, never reads
+the shared Regolo key and uses `local-no-key` for an unauthenticated server.
+An authenticated gateway requires its own `IWA_QWEN_API_KEY_FILE` and/or
+`IWA_OCR_API_KEY_FILE`, mounted privately. Each timeout accepts 1–600 seconds;
+remote defaults remain 90 seconds. Compose forwards all primary settings.
+
+Keep evaluated `IWA_OUTPUT_FIX_SOURCES` and existing source/reuse controls.
+Disable global embeddings through the [embedding controls](embedding-controls.md)
+when only this chat/vision model is permitted; chat/vision capability does not
+establish the separate 1024-dimensional embedding contract. With embeddings
+disabled and fallback disabled, these primary settings make no Regolo model calls.
+
+Preserve the selected environment's settings, image and database archive, pass
+the live synthetic chat/image tests, build the compatible development worker
+and recreate only the worker. Verify catalog coexistence, resolved/container
+settings, startup and a synthetic request from the worker; inspect fresh durable
+call provenance when admitted work becomes available. Existing provider holds,
+failed jobs, source admission and completed results remain historical evidence;
+a configuration change neither retries terminal jobs nor reinterprets old results.
+
+**11 October 2026 local-primary verification:** ordinary unit tests, vet,
+disposable PostgreSQL catalog coexistence/race tests and Compose environment
+checks pass. Live synthetic classification, extraction, update linking and OCR
+pass on the selected local chat/vision model. The COC extraction fixture accepts
+the explicitly stated acronym or full name while retaining activation and
+unrelated-time rejection checks. Development adoption replaces only the worker;
+resolved/container settings, startup, disabled embedding status, runtime readiness
+and a synthetic request from the running worker verify the selected model.
+Existing queue deferrals remain preserved; no new ordinary durable provider
+receipts were observed in the bounded adoption window. Network addresses,
+settings, database archive and response evidence remain private.

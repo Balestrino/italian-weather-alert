@@ -75,6 +75,16 @@ services:
       IWA_RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_secret_key
       IWA_RUSTFS_BUCKET: iwa-originals
       IWA_REGOLO_API_KEY_FILE: /run/secrets/regolo_api_key
+      IWA_QWEN_ADAPTER: ${IWA_QWEN_ADAPTER:-openai-chat}
+      IWA_QWEN_ENDPOINT: ${IWA_QWEN_ENDPOINT:-https://api.regolo.ai/v1/chat/completions}
+      IWA_QWEN_MODEL: ${IWA_QWEN_MODEL:-qwen3.8-27b}
+      IWA_QWEN_API_KEY_FILE: ${IWA_QWEN_API_KEY_FILE:-}
+      IWA_QWEN_TIMEOUT_SECONDS: ${IWA_QWEN_TIMEOUT_SECONDS:-90}
+      IWA_OCR_ADAPTER: ${IWA_OCR_ADAPTER:-openai-chat}
+      IWA_OCR_ENDPOINT: ${IWA_OCR_ENDPOINT:-https://api.regolo.ai/v1/chat/completions}
+      IWA_OCR_MODEL: ${IWA_OCR_MODEL:-deepseek-ocr-2}
+      IWA_OCR_API_KEY_FILE: ${IWA_OCR_API_KEY_FILE:-}
+      IWA_OCR_TIMEOUT_SECONDS: ${IWA_OCR_TIMEOUT_SECONDS:-90}
       IWA_REGOLO_GATE_SCOPE: ${IWA_REGOLO_GATE_SCOPE:-regolo-primary}
       IWA_OCR_GATE_SCOPE: ${IWA_OCR_GATE_SCOPE:-}
       IWA_PREFLIGHT_SOURCES: ${IWA_PREFLIGHT_SOURCES:-}

@@ -3,6 +3,7 @@ package classification
 import (
 	"context"
 	"encoding/json"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
 	"time"
 )
@@ -30,7 +31,7 @@ func RegisterLegacyCatalog(ctx context.Context, store catalogStore, adapter, mod
 	if err := store.RegisterPrompt(ctx, processing.PromptVersion{ID: promptID, Name: "toscana-relevance", Stage: "classification", Revision: "v3", Body: LegacyPromptBody, CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
 	}
-	if err := store.RegisterConfiguration(ctx, processing.ConfigurationVersion{ID: configurationID, Name: "full-document-relevance", Stage: "classification", Revision: "v6", ModelVersionID: &modelID, PromptVersionID: &promptID, LogicVersion: "bounded-segments-any-relevant-explicit-operative-guard-non-thinking-v3", Settings: json.RawMessage(`{"max_segment_text_bytes":12288,"max_completion_tokens_per_segment":4096,"input":"all_retained_text_plus_ocr_in_deterministic_segments","document_merge":"any_relevant","source_categories_decisive":false,"qwen_enable_thinking":false,"normalization":"typographic_apostrophes_to_ascii_with_source_offsets","literal_evidence":"single_contiguous_normalized_substring","negative_override":"high_precision_explicit_local_operative_formula_only"}`), CreatedAt: createdAt}); err != nil {
+	if err := store.RegisterConfiguration(ctx, processing.ConfigurationVersion{ID: configurationID, Name: inference.LocalChatConfigurationName(adapter, "full-document-relevance", modelID), Stage: "classification", Revision: "v6", ModelVersionID: &modelID, PromptVersionID: &promptID, LogicVersion: "bounded-segments-any-relevant-explicit-operative-guard-non-thinking-v3", Settings: json.RawMessage(`{"max_segment_text_bytes":12288,"max_completion_tokens_per_segment":4096,"input":"all_retained_text_plus_ocr_in_deterministic_segments","document_merge":"any_relevant","source_categories_decisive":false,"qwen_enable_thinking":false,"normalization":"typographic_apostrophes_to_ascii_with_source_offsets","literal_evidence":"single_contiguous_normalized_substring","negative_override":"high_precision_explicit_local_operative_formula_only"}`), CreatedAt: createdAt}); err != nil {
 		return Catalog{}, err
 	}
 	result := Catalog{ModelVersionID: modelID, ConfigurationVersionID: configurationID}

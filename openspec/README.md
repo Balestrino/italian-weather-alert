@@ -37,7 +37,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 180 | 9 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 183 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 18 | 0 |
@@ -310,3 +310,10 @@ without claiming provider recovery. Development adoption and exact-version
 redundant-job retirement are documented in
 [actionable notifications](../docs/operations/actionable-notifications.md);
 source acceptance and production controls remain independent.
+
+The 11 October local-primary adoption allows independently configured local chat
+and OCR primaries with no remote preference, independent optional credentials,
+bounded deadlines and retained catalog coexistence. Repository, synthetic live
+model and development runtime checks verify the selected local model with
+fallback/embeddings disabled; existing deferrals and source/publication controls
+remain effective. See task 35 and [local inference operations](../docs/operations/local-llm-fallback.md).

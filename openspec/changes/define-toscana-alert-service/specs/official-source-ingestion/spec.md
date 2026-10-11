@@ -609,3 +609,22 @@ Unproven reuse and acquisitions later than the review SHALL NOT establish it.
 - **AND** a still oversized, missing, misnumbered or failed replacement remains unreadable
 - **AND** cancellation, the aggregate/page limits and immutable original bytes remain enforced
 - **AND** the new renderer identity and processing configuration create a fresh selected run without overwriting prior unreadable results
+
+### Requirement: Explicit local primary chat and OCR providers
+The operator MAY configure a local OpenAI-compatible chat/vision model as the
+sole primary provider for classification, extraction, linking and OCR. Both local
+primary endpoints and model identifiers SHALL be explicit. Local primaries SHALL
+use independent optional credentials without reading the shared remote key,
+bounded configurable HTTP deadlines and the existing local non-thinking policy.
+Local and retained remote catalogs SHALL coexist without rewriting historical
+contracts or assigning remote tariffs to local calls. Disabled fallback SHALL
+make no alternative provider calls. Embedding SHALL remain separately controlled;
+a chat/vision-only deployment SHALL keep embeddings disabled.
+
+#### Scenario: The operator selects one local chat/vision model
+- **WHEN** both primary providers select the local adapter with explicit endpoint/model values, fallback is disabled and embeddings are disabled
+- **THEN** admitted chat/OCR work calls only that local server, irrespective of remote health, and retains ordinary source, retry, reuse and provider controls
+
+#### Scenario: A local primary lacks an explicit target
+- **WHEN** a local primary omits its endpoint or model or uses a non-chat endpoint
+- **THEN** configuration fails before dispatch without falling back to remote defaults or reading a remote credential

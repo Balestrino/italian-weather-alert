@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-11 [Changed] Support exclusive local primary chat and OCR providers with independent credentials, configurable deadlines and retained catalog coexistence; verify development adoption.
 - 2026-10-11 [Changed] Suppress unchanged processing failure reminders, consolidate daily backlog notifications and verify targeted development adoption with audited redundant-job retirement.
 - 2026-10-09 [Changed] Clean unused development images, old tool releases and regenerable host caches while preserving application data, backups and existing services.
 

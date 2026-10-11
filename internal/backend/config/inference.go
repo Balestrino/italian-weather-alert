@@ -15,6 +15,7 @@ const defaultRegoloEmbeddingEndpoint = "https://api.regolo.ai/v1/embeddings"
 // only on the code paths that call an inference provider.
 type InferenceEndpoint struct {
 	Adapter, URL, Model, APIKey string
+	Timeout                     time.Duration
 }
 
 type Inference struct {
@@ -99,8 +100,24 @@ func inferenceEndpoint(prefix, defaultModel, sharedKeyFile string) (InferenceEnd
 	if c.Adapter == "" || c.Model == "" {
 		return InferenceEndpoint{}, errors.New(prefix + " adapter and model are required")
 	}
+	seconds, err := boundedInt(prefix+"_TIMEOUT_SECONDS", 90, 1, 600)
+	if err != nil {
+		return InferenceEndpoint{}, err
+	}
+	c.Timeout = time.Duration(seconds) * time.Second
 	keyVariable := prefix + "_API_KEY_FILE"
 	keyFile := os.Getenv(keyVariable)
+	if c.Adapter == "local-openai-chat" {
+		// Local primaries require an explicit target and never inherit a remote key.
+		if os.Getenv(prefix+"_ENDPOINT") == "" || os.Getenv(prefix+"_MODEL") == "" || u.Path != "/v1/chat/completions" {
+			return InferenceEndpoint{}, errors.New(prefix + " local endpoint and model must be explicit")
+		}
+		c.APIKey = "local-no-key"
+		if keyFile != "" {
+			c.APIKey, err = secretFile(keyVariable, keyFile)
+		}
+		return c, err
+	}
 	if keyFile == "" {
 		keyVariable = "IWA_REGOLO_API_KEY_FILE"
 		keyFile = sharedKeyFile

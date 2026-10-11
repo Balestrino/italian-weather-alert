@@ -94,3 +94,47 @@ func TestQwenWorkerDoesNotRequireOCRCredential(t *testing.T) {
 		t.Fatalf("independent Qwen configuration rejected: %#v %v", endpoint, err)
 	}
 }
+
+func TestLocalPrimaryNeverReadsRemoteCredential(t *testing.T) {
+	t.Setenv("IWA_REGOLO_API_KEY_FILE", "/missing/remote-key")
+	for _, prefix := range []string{"IWA_QWEN", "IWA_OCR"} {
+		t.Setenv(prefix+"_ADAPTER", "local-openai-chat")
+		t.Setenv(prefix+"_ENDPOINT", "http://local-server:8081/v1/chat/completions")
+		t.Setenv(prefix+"_MODEL", "qwen3.5-9b")
+		t.Setenv(prefix+"_TIMEOUT_SECONDS", "600")
+		t.Setenv(prefix+"_API_KEY_FILE", "")
+	}
+	cfg, err := LoadInference()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, endpoint := range []InferenceEndpoint{cfg.Qwen, cfg.OCR} {
+		if endpoint.APIKey != "local-no-key" || endpoint.Model != "qwen3.5-9b" || endpoint.Timeout != 600*time.Second {
+			t.Fatal("local primary did not keep independent configuration")
+		}
+	}
+	t.Setenv("IWA_QWEN_API_KEY_FILE", inferenceSecret(t))
+	endpoint, err := LoadQwen()
+	if err != nil || endpoint.APIKey != "private-inference-fixture" {
+		t.Fatal("explicit local gateway credential was not used", err)
+	}
+}
+
+func TestLocalPrimaryRequiresExplicitTargetAndBoundedTimeout(t *testing.T) {
+	t.Setenv("IWA_QWEN_ADAPTER", "local-openai-chat")
+	t.Setenv("IWA_QWEN_API_KEY_FILE", "")
+	for _, test := range []struct{ endpoint, model, timeout string }{
+		{"", "qwen3.5-9b", "90"},
+		{"http://local-server:8081/v1/chat/completions", "", "90"},
+		{"http://local-server:8081/v1/models", "qwen3.5-9b", "90"},
+		{"http://local-server:8081/v1/chat/completions", "qwen3.5-9b", "0"},
+		{"http://local-server:8081/v1/chat/completions", "qwen3.5-9b", "601"},
+	} {
+		t.Setenv("IWA_QWEN_ENDPOINT", test.endpoint)
+		t.Setenv("IWA_QWEN_MODEL", test.model)
+		t.Setenv("IWA_QWEN_TIMEOUT_SECONDS", test.timeout)
+		if _, err := LoadQwen(); err == nil {
+			t.Fatal("incomplete local target or unbounded timeout accepted", test)
+		}
+	}
+}

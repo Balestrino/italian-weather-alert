@@ -162,6 +162,27 @@ elif 'ps' in args:
         self.assertIn('Git checkout', result.stderr)
         self.assertEqual(self.calls(), [])
 
+    def test_real_compose_forwards_exclusive_local_primary_settings(self):
+        if shutil.which('docker') is None:
+            self.skipTest('Docker Compose is needed for template parsing')
+        env_file = self.root / '.local/development.env'
+        settings = {'IWA_LOCAL_FALLBACK_ENABLED': 'false'}
+        for prefix in ('QWEN', 'OCR'):
+            for key, value in {'ADAPTER': 'local-openai-chat',
+                               'ENDPOINT': 'http://local-server:8081/v1/chat/completions',
+                               'MODEL': 'local-qwen', 'TIMEOUT_SECONDS': '600'}.items():
+                settings[f'IWA_{prefix}_{key}'] = value
+        with env_file.open('a') as handle:
+            handle.write('\n' + ''.join(f'{key}={value}\n' for key, value in settings.items()))
+        result = subprocess.run([str(self.root / 'scripts/compose-env.sh'), 'development',
+                                 '--profile', '*', 'config', '--format', 'json'],
+                                env=dict(os.environ), capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        config = json.loads(result.stdout)
+        worker = config['services']['worker']['environment']
+        for key, value in settings.items():
+            self.assertEqual(str(worker[key]).lower(), value)
+
     def test_real_compose_from_archive_keeps_fixed_namespace(self):
         if shutil.which('docker') is None:
             self.skipTest('Docker Compose is needed for template parsing')

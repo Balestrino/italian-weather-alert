@@ -142,4 +142,30 @@ func TestLocalFallbackCatalogsCoexistWithRemoteAndOtherLocalModels(t *testing.T)
 	if err := pool.QueryRow(ctx, `SELECT count(*) FROM processing_price_versions p JOIN processing_model_versions m ON m.id=p.model_version_id WHERE m.provider='local-openai-chat'`).Scan(&prices); err != nil || prices != 0 {
 		t.Fatal("remote tariff assigned to local model", prices, err)
 	}
+	// Primary startup also registers legacy contracts; these must coexist with
+	// retained remote configurations and with more than one local model.
+	t.Setenv("IWA_REGOLO_API_KEY_FILE", "")
+	for _, prefix := range []string{"IWA_QWEN", "IWA_OCR"} {
+		t.Setenv(prefix+"_ADAPTER", "local-openai-chat")
+		t.Setenv(prefix+"_ENDPOINT", "http://127.0.0.1:1/v1/chat/completions")
+		t.Setenv(prefix+"_API_KEY_FILE", "")
+	}
+	remote, err := classification.RegisterLegacyCatalog(ctx, store, "openai-chat", "qwen3.8-27b", now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := extraction.RegisterLegacyCatalog(ctx, store, "openai-chat", "qwen3.8-27b", now); err != nil {
+		t.Fatal(err)
+	}
+	for _, model := range []string{"local-qwen-one", "local-qwen-two", "local-qwen-one"} {
+		t.Setenv("IWA_QWEN_MODEL", model)
+		t.Setenv("IWA_OCR_MODEL", model)
+		if err := checkInferenceCatalogs(ctx, pool); err != nil {
+			t.Fatal("local primary cannot coexist with retained catalogs", err)
+		}
+	}
+	again, err := classification.RegisterLegacyCatalog(ctx, store, "openai-chat", "qwen3.8-27b", now)
+	if err != nil || again.ConfigurationVersionID != remote.ConfigurationVersionID {
+		t.Fatal("local primary changed the historical remote contract", err)
+	}
 }

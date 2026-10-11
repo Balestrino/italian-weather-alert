@@ -820,3 +820,16 @@ Keep processing incidents open while their unarchived failed/relaunched work is 
 Reconcile a separate `processing_backlog` observation per queue after outstanding failed/pending work has aged 24 hours. Persist failed/pending/provider-held counts both on the incident and as an immutable outbox snapshot. Use at least a 24-hour reminder interval, or the longer configured interval; zero disables reminders. Clearing an aged backlog reports workload clearance only. Source and backup detection retain their existing rules. Additive migrations preserve existing incident/message history.
 
 A bounded development retirement selects only jobs whose exact retained version and stage/resource has a later validated result. Originals, attempts, result history and accounting remain unchanged; uncovered jobs and provider holds remain pending. Retain selected identifiers, replacement checks, rollback configuration and actual adoption evidence privately.
+
+## Local primary providers — 11 October 2026
+
+Expose the existing Qwen/OCR endpoint, adapter and model settings through Compose.
+Recognize `local-openai-chat` as a primary independently of remote health and
+without inheriting Regolo credentials. Require explicit chat endpoints/models;
+allow private endpoint-specific gateway keys and 1–600-second HTTP deadlines.
+Apply the existing local policy in every primary runner, and isolate local legacy
+catalog names by model so retained remote revisions remain immutable. The worker
+has no remote alternative when fallback is disabled; preserve separate embedding
+activation and keep it disabled for a chat/vision-only deployment. Development
+adoption replaces only the worker after synthetic, live-model and catalog checks;
+private network settings and rollback evidence stay under ignored `.local/`.

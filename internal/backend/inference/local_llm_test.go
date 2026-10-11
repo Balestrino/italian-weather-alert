@@ -128,7 +128,13 @@ func TestLocalLLMExtraction(t *testing.T) {
 			}
 			var found bool
 			for _, measure := range measures {
-				if measure.Kind == test.kind && strings.Contains(strings.ToLower(measure.Subject), strings.ToLower(test.subject)) {
+				subjectMatches := strings.Contains(strings.ToLower(measure.Subject), strings.ToLower(test.subject))
+				// The fixture explicitly names COC and its expansion; either literal
+				// subject identifies the same centre. Keep kind/time checks below.
+				if test.subject == "Centro Operativo Comunale" && strings.EqualFold(measure.Subject, "COC") {
+					subjectMatches = true
+				}
+				if measure.Kind == test.kind && subjectMatches {
 					found = true
 					if test.missingTimes && (measure.ValidFrom != nil || measure.ValidUntil != nil) {
 						t.Fatal("times borrowed from unrelated evidence")
