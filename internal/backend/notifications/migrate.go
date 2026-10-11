@@ -17,6 +17,9 @@ var schema string
 //go:embed daily_schema.sql
 var dailySchema string
 
+//go:embed backlog_schema.sql
+var backlogSchema string
+
 // Migrate installs durable incidents and the notification outbox.
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
@@ -30,7 +33,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	if _, err = tx.Exec(ctx, `CREATE TABLE IF NOT EXISTS iwa_migrations (name text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())`); err != nil {
 		return err
 	}
-	for _, migration := range []struct{ name, sql string }{{"025_notifications", schema}, {"065_daily_reports", dailySchema}} {
+	for _, migration := range []struct{ name, sql string }{{"025_notifications", schema}, {"065_daily_reports", dailySchema}, {"082_notification_backlog", backlogSchema}} {
 		hash := sha256.Sum256([]byte(migration.sql))
 		checksum := hex.EncodeToString(hash[:])
 		var previous string

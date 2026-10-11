@@ -825,3 +825,22 @@ Development adoption preserves the other running services; fixed-time data
 comparisons, three API/MCP pages, readiness and integrated-browser timing verify
 the listener repair. Profiles, exact timings and rollback identities remain
 private. See [public API latency](../../../docs/operations/public-api-latency.md).
+
+## 34. Actionable processing notifications — 11 October 2026
+
+- [x] 34.1 Preserve unresolved processing incidents and immutable failure history while suppressing unchanged failure reminders; notify again for newer terminal failures or explicit relaunch activity, without treating unrelated successes as recovery.
+- [x] 34.2 Consolidate unresolved work older than 24 hours and provider-deferred pending work into one daily queue backlog notification with persisted failed/pending/held counts; distinguish cleared workload from verified provider recovery. Keep source-delay and backup semantics unchanged.
+- [x] 34.3 Verify restart, durable snapshots, interval boundaries, new failure activity, partial recovery, archival and deferral behavior with disposable PostgreSQL and SMTP fixtures; document operational semantics and validate the affected administration.
+- [x] 34.4 Inspect development work for exact-version validated replacements, retire only verified redundant work with an audited private selection, adopt the tested worker/admin change and verify notifications, preserved remaining work and runtime readiness.
+
+**34 verified — 11 October 2026:** full Go unit tests, notification PostgreSQL/SMTP
+integration/race checks, administration tests, vet, strict OpenSpec and environment
+template tests pass. Development adoption applies the additive migration and
+replaces only worker/admin; other container identities and settings remain intact.
+A bounded audited selection retires only terminal ordinary classification jobs
+covered by the latest same-version validated non-evaluation result. Remaining
+uncovered/deferred work, historical attempts and provider holds are preserved.
+The first consolidated outbox snapshot is read back and accepted by SMTP; no
+stage reminder is emitted for unchanged failures. Database archive, selection,
+prior settings and detailed runtime evidence remain private. See
+[actionable notifications](../../../docs/operations/actionable-notifications.md).

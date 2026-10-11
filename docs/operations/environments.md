@@ -14,6 +14,11 @@ For an existing development stack, apply the API binding without rebuilding its 
 
 For a targeted development public-listener repair, set `IWA_PUBLIC_IMAGE` in `.local/development.env`; it defaults to `IWA_APP_IMAGE` and leaves other services on their existing image selection. Staging and production ignore this override and retain the shared release image.
 
+For a targeted administration repair, `IWA_ADMIN_IMAGE` selects only the
+development admin image, defaulting to `IWA_APP_IMAGE`. Staging and production
+ignore this override and retain their shared release image. This permits a
+notification worker/admin rollout without replacing the public or backup services.
+
 For a targeted development processing rollout, `IWA_WORKER_IMAGE` selects the
 worker image and otherwise defaults to `IWA_APP_IMAGE`. Recreate only `worker`
 with the selected replica count after preserving rollback settings and checking

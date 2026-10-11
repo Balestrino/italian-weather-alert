@@ -812,3 +812,11 @@ listener, recording timings and rollback details privately.
 Development can select `IWA_PUBLIC_IMAGE` for the targeted listener while other
 services retain their configured image. Staging/production overlays keep the
 shared release image and its existing approval gates.
+
+## Actionable notification design — 11 October 2026
+
+Keep processing incidents open while their unarchived failed/relaunched work is unresolved. Stage reminders require terminal-failure or explicit-relaunch timestamps newer than the last delivered notification; repeated provider deferrals update job timestamps but do not qualify as new failures. Retain one initial failure notification and do not infer recovery from unrelated successes.
+
+Reconcile a separate `processing_backlog` observation per queue after outstanding failed/pending work has aged 24 hours. Persist failed/pending/provider-held counts both on the incident and as an immutable outbox snapshot. Use at least a 24-hour reminder interval, or the longer configured interval; zero disables reminders. Clearing an aged backlog reports workload clearance only. Source and backup detection retain their existing rules. Additive migrations preserve existing incident/message history.
+
+A bounded development retirement selects only jobs whose exact retained version and stage/resource has a later validated result. Originals, attempts, result history and accounting remain unchanged; uncovered jobs and provider holds remain pending. Retain selected identifiers, replacement checks, rollback configuration and actual adoption evidence privately.

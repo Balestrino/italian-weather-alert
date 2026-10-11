@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -59,7 +60,7 @@ func (s *Store) RecordBackup(ctx context.Context, scope, runID string, succeeded
 		if succeeded {
 			recovery = &at
 		}
-		if err = s.observe(ctx, tx, observation{"backup_failed", scope, !succeeded, recovery}, at.UTC(), 0); err != nil {
+		if err = s.observe(ctx, tx, observation{category: "backup_failed", scope: scope, active: !succeeded, recovery: recovery}, at.UTC(), 0); err != nil {
 			return err
 		}
 	}
@@ -81,6 +82,16 @@ type observation struct {
 	category, scope string
 	active          bool
 	recovery        *time.Time
+	latestActivity  *time.Time
+	workload        Workload
+}
+
+// Workload is an operational count, not a claim of document completeness.
+type Workload struct {
+	Available   bool  `json:"available"`
+	FailedJobs  int64 `json:"failed_jobs"`
+	PendingJobs int64 `json:"pending_jobs"`
+	HeldJobs    int64 `json:"held_jobs"`
 }
 
 // Reconcile takes one consistent snapshot. Missing/suspended sources and failed
@@ -114,7 +125,8 @@ func (s *Store) Reconcile(ctx context.Context, now time.Time, reminder time.Dura
 	rows, err := tx.Query(ctx, `SELECT 'source_delay',r.id,
  $1::timestamptz >= COALESCE(a.last_complete_at,
  (SELECT min(started_at) FROM acquisition_checks c WHERE c.source_id=r.id AND c.configuration=r.active_revision),
- a.last_started_at,w.first_seen_at) + COALESCE(r.delay_seconds_override,(cfg.body->>'delay_seconds')::integer,1800)*interval '1 second', a.last_complete_at
+ a.last_started_at,w.first_seen_at) + COALESCE(r.delay_seconds_override,(cfg.body->>'delay_seconds')::integer,1800)*interval '1 second', a.last_complete_at,
+ NULL::timestamptz,0::bigint,0::bigint,0::bigint
  FROM registry_sources r JOIN registry_configurations cfg ON cfg.source_id=r.id AND cfg.revision=r.active_revision
  JOIN notification_source_watches w ON w.source_id=r.id
  LEFT JOIN acquisition_source_status a ON a.source_id=r.id AND a.configuration=r.active_revision
@@ -122,10 +134,25 @@ func (s *Store) Reconcile(ctx context.Context, now time.Time, reminder time.Dura
  UNION ALL
  SELECT 'processing_failed',jsonb_build_array(queue,kind)::text,
  bool_or(archived_at IS NULL AND state<>'succeeded' AND (state='failed' OR EXISTS(SELECT 1 FROM processing_job_relaunches l WHERE l.job_id=j.id))),
- max(completed_at) FILTER (WHERE state='succeeded')
+ max(completed_at) FILTER (WHERE state='succeeded' AND EXISTS(SELECT 1 FROM processing_job_relaunches l WHERE l.job_id=j.id)),
+ GREATEST(max(completed_at) FILTER (WHERE archived_at IS NULL AND state='failed'),
+ max((SELECT max(l.created_at) FROM processing_job_relaunches l WHERE l.job_id=j.id)) FILTER (WHERE archived_at IS NULL AND state<>'succeeded')),
+ count(*) FILTER (WHERE archived_at IS NULL AND state='failed'),
+ count(*) FILTER (WHERE archived_at IS NULL AND state IN ('queued','retry_wait','running')),
+ count(*) FILTER (WHERE archived_at IS NULL AND state IN ('queued','retry_wait') AND last_error_code='provider_scope_held')
  FROM processing_jobs j GROUP BY queue,kind
  UNION ALL
- SELECT 'backup_failed',scope,NOT succeeded,CASE WHEN succeeded THEN finished_at END
+ SELECT 'processing_backlog',queue,
+ bool_or(archived_at IS NULL AND ((state='failed' AND completed_at<=$1::timestamptz-interval '24 hours')
+ OR (state IN ('queued','retry_wait','running') AND created_at<=$1::timestamptz-interval '24 hours'))),
+ $1::timestamptz,NULL::timestamptz,
+ count(*) FILTER (WHERE archived_at IS NULL AND state='failed'),
+ count(*) FILTER (WHERE archived_at IS NULL AND state IN ('queued','retry_wait','running')),
+ count(*) FILTER (WHERE archived_at IS NULL AND state IN ('queued','retry_wait') AND last_error_code='provider_scope_held')
+ FROM processing_jobs GROUP BY queue
+ UNION ALL
+ SELECT 'backup_failed',scope,NOT succeeded,CASE WHEN succeeded THEN finished_at END,
+ NULL::timestamptz,0::bigint,0::bigint,0::bigint
  FROM (SELECT DISTINCT ON(scope) scope,succeeded,finished_at FROM notification_backup_results WHERE finished_at<=$1 ORDER BY scope,finished_at DESC,id DESC) b`, now.UTC())
 	if err != nil {
 		return err
@@ -133,7 +160,7 @@ func (s *Store) Reconcile(ctx context.Context, now time.Time, reminder time.Dura
 	var observations []observation
 	for rows.Next() {
 		var o observation
-		if err = rows.Scan(&o.category, &o.scope, &o.active, &o.recovery); err != nil {
+		if err = rows.Scan(&o.category, &o.scope, &o.active, &o.recovery, &o.latestActivity, &o.workload.FailedJobs, &o.workload.PendingJobs, &o.workload.HeldJobs); err != nil {
 			rows.Close()
 			return err
 		}
@@ -152,15 +179,20 @@ func (s *Store) Reconcile(ctx context.Context, now time.Time, reminder time.Dura
 }
 
 func (s *Store) observe(ctx context.Context, tx pgx.Tx, o observation, now time.Time, reminder time.Duration) error {
+	o.workload.Available = o.category == "processing_failed" || o.category == "processing_backlog"
+	workload, err := json.Marshal(o.workload)
+	if err != nil {
+		return err
+	}
 	var id int64
 	var opened time.Time
 	var last *time.Time
-	err := tx.QueryRow(ctx, `SELECT id,opened_at,last_notified_at FROM notification_incidents WHERE category=$1 AND scope=$2 AND recovered_at IS NULL FOR UPDATE`, o.category, o.scope).Scan(&id, &opened, &last)
+	err = tx.QueryRow(ctx, `SELECT id,opened_at,last_notified_at FROM notification_incidents WHERE category=$1 AND scope=$2 AND recovered_at IS NULL FOR UPDATE`, o.category, o.scope).Scan(&id, &opened, &last)
 	if errors.Is(err, pgx.ErrNoRows) {
 		if !o.active {
 			return nil
 		}
-		if err = tx.QueryRow(ctx, `INSERT INTO notification_incidents(category,scope,opened_at,last_observed_at) VALUES($1,$2,$3,$3) RETURNING id`, o.category, o.scope, now).Scan(&id); err != nil {
+		if err = tx.QueryRow(ctx, `INSERT INTO notification_incidents(category,scope,opened_at,last_observed_at,workload) VALUES($1,$2,$3,$3,$4) RETURNING id`, o.category, o.scope, now, workload).Scan(&id); err != nil {
 			return err
 		}
 		return enqueue(ctx, tx, id, "opened", now)
@@ -168,7 +200,7 @@ func (s *Store) observe(ctx context.Context, tx pgx.Tx, o observation, now time.
 	if err != nil {
 		return err
 	}
-	if _, err = tx.Exec(ctx, `UPDATE notification_incidents SET last_observed_at=$2 WHERE id=$1`, id, now); err != nil {
+	if _, err = tx.Exec(ctx, `UPDATE notification_incidents SET last_observed_at=$2,workload=$3 WHERE id=$1`, id, now, workload); err != nil {
 		return err
 	}
 	if !o.active {
@@ -180,8 +212,22 @@ func (s *Store) observe(ctx context.Context, tx pgx.Tx, o observation, now time.
 		}
 		return enqueue(ctx, tx, id, "recovered", now)
 	}
+	if o.category == "processing_backlog" && reminder > 0 && reminder < 24*time.Hour {
+		reminder = 24 * time.Hour
+	}
 	if reminder == 0 || last == nil || now.Before(last.Add(reminder)) {
 		return nil
+	}
+	// Historical failures remain inspectable. Only new terminal failures or
+	// explicit relaunches warrant another stage email; deferral polls do not.
+	if o.category == "processing_failed" {
+		var observed time.Time
+		if err = tx.QueryRow(ctx, `SELECT max(created_at) FROM notification_messages WHERE incident_id=$1 AND sent_at IS NOT NULL`, id).Scan(&observed); err != nil {
+			return err
+		}
+		if o.latestActivity == nil || !o.latestActivity.After(observed) {
+			return nil
+		}
 	}
 	var pending bool
 	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM notification_messages WHERE incident_id=$1 AND sent_at IS NULL)`, id).Scan(&pending); err != nil {
@@ -198,7 +244,8 @@ func enqueue(ctx context.Context, tx pgx.Tx, id int64, kind string, now time.Tim
 	if _, err := rand.Read(b); err != nil {
 		return err
 	}
-	_, err := tx.Exec(ctx, `INSERT INTO notification_messages(message_id,incident_id,kind,created_at,next_attempt_at) VALUES($1,$2,$3,$4,$4)`, hex.EncodeToString(b)+"@iwa.invalid", id, kind, now)
+	_, err := tx.Exec(ctx, `INSERT INTO notification_messages(message_id,incident_id,kind,created_at,next_attempt_at,workload)
+ SELECT $1,id,$3,$4,$4,workload FROM notification_incidents WHERE id=$2`, hex.EncodeToString(b)+"@iwa.invalid", id, kind, now)
 	return err
 }
 
@@ -207,6 +254,7 @@ type Message struct {
 	IncidentID                int64
 	CreatedAt, OpenedAt       time.Time
 	RecoveredAt               *time.Time
+	Workload                  Workload
 }
 type Sender interface {
 	Send(context.Context, Message) error
@@ -229,10 +277,10 @@ func (s *Store) DeliverOne(ctx context.Context, sender Sender, now time.Time) (b
 	var attempts int
 	var m Message
 	err = tx.QueryRow(ctx, `SELECT m.id,m.message_id,m.kind,m.created_at,m.attempts,i.id,i.category,i.scope,i.opened_at,i.recovered_at
- FROM notification_messages m JOIN notification_incidents i ON i.id=m.incident_id
+ ,m.workload FROM notification_messages m JOIN notification_incidents i ON i.id=m.incident_id
  WHERE m.sent_at IS NULL AND m.next_attempt_at<=$1 AND NOT EXISTS(
  SELECT 1 FROM notification_messages earlier WHERE earlier.incident_id=m.incident_id AND earlier.id<m.id AND earlier.sent_at IS NULL)
- ORDER BY m.id FOR UPDATE OF m SKIP LOCKED LIMIT 1`, now.UTC()).Scan(&id, &m.ID, &m.Kind, &m.CreatedAt, &attempts, &m.IncidentID, &m.Category, &m.Scope, &m.OpenedAt, &m.RecoveredAt)
+ ORDER BY m.id FOR UPDATE OF m SKIP LOCKED LIMIT 1`, now.UTC()).Scan(&id, &m.ID, &m.Kind, &m.CreatedAt, &attempts, &m.IncidentID, &m.Category, &m.Scope, &m.OpenedAt, &m.RecoveredAt, &m.Workload)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
 	}
@@ -267,6 +315,16 @@ func (m Message) Body() string {
 	body := fmt.Sprintf("IWA operational incident %d\nCategory: %s\nScope identifier: %q\nNotification: %s\nIncident observed at: %s\nNotification queued at: %s\n", m.IncidentID, m.Category, m.Scope, m.Kind, m.OpenedAt.UTC().Format(time.RFC3339), m.CreatedAt.UTC().Format(time.RFC3339))
 	if m.RecoveredAt != nil {
 		body += "Recovery observed at: " + m.RecoveredAt.UTC().Format(time.RFC3339) + "\n"
+	}
+	if m.Workload.Available && (m.Category == "processing_failed" || m.Category == "processing_backlog") {
+		body += fmt.Sprintf("Outstanding failed jobs: %d\nPending jobs: %d\nProvider-held pending jobs: %d\n", m.Workload.FailedJobs, m.Workload.PendingJobs, m.Workload.HeldJobs)
+	}
+	if m.Category == "processing_backlog" {
+		if m.Kind == "recovered" {
+			body += "The aged backlog has cleared. This does not certify provider recovery or complete document interpretation.\n"
+		} else {
+			body += "Queue summary: outstanding work has aged at least 24 hours. Unchanged stage failures are retained in administration without repeated stage emails.\n"
+		}
 	}
 	return body + "Details and retained errors are available in local administration. This is a service diagnostic, not an official weather warning.\n"
 }

@@ -37,7 +37,7 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 | [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
 | [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
-| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 176 | 9 |
+| [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 180 | 9 |
 | [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
 | [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
 | [Automatic changelog](changes/automate-changelog/proposal.md) | 18 | 0 |
@@ -300,3 +300,13 @@ Ordinary complete OCR pages populate the cache. Tasks 9.2–9.4 remain open for
 remote recovery, the broader warm-cache/quality canary and the actual 24-hour
 observation. See [the local runbook](../docs/operations/local-llm-fallback.md)
 and [LIV-011](../docs/territori/09-toscana/comuni/049009-livorno.md).
+
+The 11 October notification repair suppresses unchanged historical stage-failure
+reminders while keeping unresolved incidents inspectable. Daily queue backlog
+summaries retain failed/pending/provider-held counts in immutable message snapshots.
+Disposable PostgreSQL/SMTP, administration and Compose checks verify age/interval
+boundaries, restart, delayed delivery, explicit relaunches and workload clearance
+without claiming provider recovery. Development adoption and exact-version
+redundant-job retirement are documented in
+[actionable notifications](../docs/operations/actionable-notifications.md);
+source acceptance and production controls remain independent.

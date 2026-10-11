@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-11 [Changed] Suppress unchanged processing failure reminders, consolidate daily backlog notifications and verify targeted development adoption with audited redundant-job retirement.
 - 2026-10-09 [Changed] Record a complete local OCR page beyond the former timeout in the bounded Livorno capacity trial
 - 2026-10-09 [Changed] Enable reviewed Livorno reuse on one development worker and extend the bounded local timeout trial with retained rollback settings and histories.
 - 2026-10-09 [Fixed] Add reviewed Livorno CSRF equivalence and a development worker image selection for scoped OCR reuse rollout.

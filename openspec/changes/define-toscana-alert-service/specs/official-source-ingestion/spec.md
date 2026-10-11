@@ -441,11 +441,25 @@ Local-only administration SHALL expose source/configuration status, failed jobs,
 - **THEN** the summaries report those unknowns explicitly, preserve pricing history, separate overlapping campaigns and do not propose an operating budget until the completeness gate passes
 
 ### Requirement: Email incident notifications
-The service SHALL support private SMTP/recipient configuration and send administrative email for source delay thresholds, exhausted processing attempts and backup failures reported by the selected backup system or its notification integration. It SHALL group repeated errors, support configurable reminder intervals and send recovery notifications. Transient errors SHALL remain visible internally without requiring immediate email.
+The service SHALL support private SMTP/recipient configuration and send administrative email for source delay thresholds, exhausted processing attempts and backup failures reported by the selected backup system or its notification integration. It SHALL group repeated errors, support configurable reminder intervals and send recovery notifications. Transient errors SHALL remain visible internally without requiring immediate email. Unchanged historical processing failures SHALL remain visible without repeated stage emails; subsequent terminal failures or explicit relaunch activity MAY produce a grouped update after the configured interval. An unrelated successful job SHALL NOT establish recovery of failed work.
 
-#### Scenario: A source remains delayed then recovers
-- **WHEN** a source crosses its delay threshold, remains delayed and later completes a successful check
-- **THEN** email reports the incident, sends reminders according to configuration and reports recovery without emailing every failed check
+Unresolved unarchived failed or pending work older than 24 hours SHALL produce one consolidated backlog incident per queue, with immutable message snapshots of failed, pending and provider-held pending job counts. Backlog reminders SHALL run no more frequently than once per 24 hours, respecting a longer configured interval and disabled reminders. Clearing that backlog SHALL describe the absence of aged outstanding work, not verified provider recovery or complete document interpretation. Provider-deferred work SHALL retain retry budgets and wait without consuming new attempts. Archival SHALL retain original evidence and audit, and retirement as redundant SHALL require a validated replacement for the same version and stage/resource; mere age, newer unrelated versions and queue success without a supported result SHALL NOT suffice.
+
+#### Scenario: Repeated collection errors cross the threshold
+- **WHEN** a source delay exceeds its configured threshold
+- **THEN** email reports the incident, sends reminders according to configuration and reports recovery after a complete check
+
+#### Scenario: Historical failures are unchanged
+- **WHEN** old failed jobs remain unresolved and no newer failure or explicit relaunch occurred since the last stage notification
+- **THEN** their stage incident remains inspectable without repeating its email, while one daily queue backlog summary reports outstanding work
+
+#### Scenario: A provider hold leaves work pending
+- **WHEN** jobs remain deferred for more than 24 hours without new attempts
+- **THEN** the queue backlog message groups those jobs and reports the held count without one message per job or claiming provider recovery after queue clearance
+
+#### Scenario: A successful replacement covers only part of the failed work
+- **WHEN** a same-version validated replacement covers one failed job but other jobs remain uncovered
+- **THEN** only the verified redundant job may be retired, its historical failure remains available, and the remaining unresolved work stays visible
 
 ### Requirement: Configurable backups and verified recovery
 The MVP deployment SHALL protect the shared service VM through off-host Proxmox Backup Server whole-VM backups covering all three environments' structured data, acquired originals in VM-hosted S3-compatible storage and configuration required for recovery. Backup schedule and retention SHALL be configurable deployment values and documented before operational readiness. The production backup plan SHALL target no more than six hours of lost data, schedule backups with margin for a delayed or failed job, and alert operators before the latest successful recoverable backup exceeds that age. A separate production application-level object-storage backup SHALL NOT be required while whole-VM protection is active. Backup failures SHALL be visible to operators and routed through the selected operational notification path. An isolated restoration rehearsal SHALL precede public activation and verify service startup, document/evidence references, retained versions and truthful updating status. The rehearsal SHALL time recovery from outage detection to verified public API/MCP service against a one-hour target; configuration alone SHALL NOT be reported as meeting that target.

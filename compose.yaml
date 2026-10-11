@@ -51,6 +51,7 @@ services:
     ports: ["0.0.0.0:${IWA_PUBLIC_PORT:-8080}:8080"]
   admin:
     <<: *app
+    image: ${IWA_ADMIN_IMAGE:-${IWA_APP_IMAGE:-iwa-app:local}}
     secrets: [postgres_password, crawl_token, rustfs_access_key, rustfs_secret_key]
     environment:
       <<: *env

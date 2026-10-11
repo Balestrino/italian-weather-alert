@@ -13,6 +13,7 @@ services:
     mem_limit: 256m
     pids_limit: 128
   admin:
+    image: ${IWA_APP_IMAGE:-iwa-app:local}
     build: !reset null
     environment:
       IWA_ENVIRONMENT: production

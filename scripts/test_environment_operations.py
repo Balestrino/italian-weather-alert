@@ -318,6 +318,18 @@ class RuntimeTests(unittest.TestCase):
 
 
 class BackgroundSelectionTests(unittest.TestCase):
+    def test_admin_image_override_is_development_only(self):
+        if shutil.which('docker') is None:
+            self.skipTest('Docker Compose is needed for template parsing')
+        for name in ('development', 'staging', 'production'):
+            environment = Environment(name, example=True)
+            original = environment.config(all_services=True)
+            environment.process_environment['IWA_ADMIN_IMAGE'] = 'iwa-app:synthetic-admin'
+            resolved = environment.config(all_services=True)
+            for role in APPLICATIONS:
+                expected = 'iwa-app:synthetic-admin' if name == 'development' and role == 'admin' else original['services'][role]['image']
+                self.assertEqual(resolved['services'][role]['image'], expected)
+
     def test_worker_image_override_is_development_only(self):
         if shutil.which('docker') is None:
             self.skipTest('Docker Compose is needed for template parsing')
