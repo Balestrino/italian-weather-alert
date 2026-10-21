@@ -34,15 +34,15 @@ The original checklists are a **30 September 2026 snapshot** of work tracked in 
 
 | Change | Done | Open |
 | --- | ---: | ---: |
-| [Application separation and public status frontend](changes/reorganize-application-surfaces/proposal.md) | 6 | 0 |
+| [Application separation and public status frontend](changes/archive/2026-10-21-reorganize-application-surfaces/proposal.md) | 6 | 0 |
 | [Environment operations hardening](changes/harden-environment-operations/proposal.md) | 24 | 6 |
-| [Explicit workers and hierarchical CLI/admin territorial controls](changes/require-explicit-background-workers/proposal.md) | 16 | 0 |
+| [Explicit workers and hierarchical CLI/admin territorial controls](changes/archive/2026-10-21-require-explicit-background-workers/proposal.md) | 16 | 0 |
 | [Toscana alert service](changes/define-toscana-alert-service/proposal.md) | 183 | 9 |
-| [Admin dashboard](changes/modernize-admin-dashboard/proposal.md) | 21 | 0 |
-| [Territorial administration](changes/organize-admin-by-territory/proposal.md) | 20 | 0 |
-| [Automatic changelog](changes/automate-changelog/proposal.md) | 18 | 0 |
+| [Admin dashboard](changes/archive/2026-10-21-modernize-admin-dashboard/proposal.md) | 21 | 0 |
+| [Territorial administration](changes/archive/2026-10-21-organize-admin-by-territory/proposal.md) | 20 | 0 |
+| [Automatic changelog](changes/archive/2026-10-21-automate-changelog/proposal.md) | 18 | 0 |
 | [Evening alert email report](changes/add-evening-alert-email-report/proposal.md) | 7 | 1 |
-| [Unsuccessful job archival](changes/archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
+| [Unsuccessful job archival](changes/archive/2026-10-21-archive-unsuccessful-jobs/proposal.md) | 5 | 0 |
 | [Inference efficiency](changes/reduce-regolo-token-waste/proposal.md) | 32 | 3 |
 
 The Toscana service checklist includes seven subsequent development recovery tasks, verified against acquisition, interpretation canaries, queue progress and runtime checks. See the [recovery procedure](../docs/operations/acquisition-recovery.md). Five subsequent local fallback tasks verify opt-in Qwen chat/image tests and scoped development routing; three further tasks verify explicit register-wide fallback selection, worker configuration and local OCR progress. Three further two-request trial tasks verify server slots, concurrent development worker calls and stored OCR results, with documented scale-down and private rollback evidence. Three subsequent tasks verify expansion to four worker replicas, fix reproduced pre-claim deadlocks and validate concurrent processing on the corrected development image while distinguishing worker count from available server slots. One further task verifies an operator-requested six-worker expansion, preserved existing replicas and queue progress, with server/model concurrency reported separately. See [local fallback operations](../docs/operations/local-llm-fallback.md). Provider entitlement restoration is subsequently verified below; dependent semantic embeddings remain separate unverified work. These checks do not complete source acceptance or production readiness.

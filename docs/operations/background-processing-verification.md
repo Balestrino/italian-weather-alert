@@ -1,6 +1,6 @@
 # Background processing controls: repository verification
 
-Verified on 1 October 2026 for [explicit workers and hierarchical controls](../../openspec/changes/require-explicit-background-workers/proposal.md). These results cover repository behavior and synthetic fixtures. They do not establish source acceptance, a production deployment, host capacity or a live collector handover.
+Verified on 1 October 2026 for [explicit workers and hierarchical controls](../../openspec/changes/archive/2026-10-21-require-explicit-background-workers/proposal.md). These results cover repository behavior and synthetic fixtures. They do not establish source acceptance, a production deployment, host capacity or a live collector handover.
 
 ## Resolved service selection
 
