@@ -54,18 +54,24 @@ type TargetDisposition struct {
 // UnavailableTarget is an unrecovered 404/410 target of a source's active
 // configuration, classified as on the latest check that traversed listings.
 type UnavailableTarget struct {
-	URL                 string              `json:"url"`
-	Configuration       int                 `json:"configuration"`
-	HTTPStatus          int                 `json:"http_status"`
-	ConsecutiveFailures int                 `json:"consecutive_failures"`
-	FirstFailedAt       time.Time           `json:"first_failed_at"`
-	LastFailedAt        time.Time           `json:"last_failed_at"`
-	NextAttemptAt       time.Time           `json:"next_attempt_at"`
-	LastSeenAt          time.Time           `json:"last_seen_at"`
-	ExplicitReference   bool                `json:"explicit_reference"`
-	SupportsMeasure     bool                `json:"supports_measure"`
-	Classification      string              `json:"classification"`
-	Dispositions        []TargetDisposition `json:"dispositions"`
+	URL                 string    `json:"url"`
+	Configuration       int       `json:"configuration"`
+	HTTPStatus          int       `json:"http_status"`
+	ConsecutiveFailures int       `json:"consecutive_failures"`
+	FirstFailedAt       time.Time `json:"first_failed_at"`
+	LastFailedAt        time.Time `json:"last_failed_at"`
+	NextAttemptAt       time.Time `json:"next_attempt_at"`
+	LastSeenAt          time.Time `json:"last_seen_at"`
+	ExplicitReference   bool      `json:"explicit_reference"`
+	MeasureState        string    `json:"measure_state"`
+	// SupportsMeasure reports an ongoing or unresolved maintained measure
+	// state, which keeps the target blocking.
+	SupportsMeasure bool `json:"supports_measure"`
+	// DerivedMeasure reports any measure derived from the document; excluding
+	// such a target requires the operator acknowledgement.
+	DerivedMeasure bool                `json:"derived_measure"`
+	Classification string              `json:"classification"`
+	Dispositions   []TargetDisposition `json:"dispositions"`
 }
 
 type DispositionRequest struct {
@@ -88,7 +94,7 @@ func (s *DispositionStore) ListUnavailable(ctx context.Context, sourceID string)
 	if strings.TrimSpace(sourceID) == "" {
 		return nil, ErrDispositionInvalid
 	}
-	measure, err := measureSupportSQL(ctx, s.pool)
+	derived, err := derivedMeasureSQL(ctx, s.pool)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +102,7 @@ func (s *DispositionStore) ListUnavailable(ctx context.Context, sourceID string)
    SELECT max(c.started_at) AS started_at FROM acquisition_checks c JOIN registry_sources r ON r.id=c.source_id AND r.active_revision=c.configuration
    WHERE c.source_id=$1 AND c.listing_count>0)
  SELECT t.url,t.configuration,u.http_status,u.consecutive_failures,u.first_failed_at,u.last_failed_at,u.next_attempt_at,t.last_seen_at,
- t.explicit_reference,`+measure+`,
+ t.explicit_reference,t.measure_state,`+protectingMeasureSQL+`,`+derived+`,
  COALESCE(t.last_seen_at>=(SELECT started_at FROM traversal),true),
  COALESCE(latest.decision='exclude_stale_unavailable' AND t.last_seen_at<=latest.observed_last_seen_at,false)
  FROM acquisition_targets t
@@ -112,7 +118,7 @@ func (s *DispositionStore) ListUnavailable(ctx context.Context, sourceID string)
 	for rows.Next() {
 		var item UnavailableTarget
 		var listed, excluded bool
-		if err = rows.Scan(&item.URL, &item.Configuration, &item.HTTPStatus, &item.ConsecutiveFailures, &item.FirstFailedAt, &item.LastFailedAt, &item.NextAttemptAt, &item.LastSeenAt, &item.ExplicitReference, &item.SupportsMeasure, &listed, &excluded); err != nil {
+		if err = rows.Scan(&item.URL, &item.Configuration, &item.HTTPStatus, &item.ConsecutiveFailures, &item.FirstFailedAt, &item.LastFailedAt, &item.NextAttemptAt, &item.LastSeenAt, &item.ExplicitReference, &item.MeasureState, &item.SupportsMeasure, &item.DerivedMeasure, &listed, &excluded); err != nil {
 			rows.Close()
 			return nil, err
 		}
@@ -181,7 +187,7 @@ func (s *DispositionStore) RecordDisposition(ctx context.Context, request Dispos
 	if active == nil || *active != request.Configuration {
 		return TargetDisposition{}, ErrConfigurationInactive
 	}
-	measure, err := measureSupportSQL(ctx, tx)
+	measure, err := derivedMeasureSQL(ctx, tx)
 	if err != nil {
 		return TargetDisposition{}, err
 	}

@@ -305,6 +305,12 @@ func (e *Engine) scheduledAcquire(ctx context.Context, sourceID string, revision
 	}
 	state.newDocuments = discovery.NewDocuments
 	state.publicationObservedAt = discovery.NewestPublication
+	// Derive measure, relevance and reference state at this evaluation time so
+	// the plan and the withdrawn classification never use stale state.
+	if err = e.Tracking.RefreshInterpretationState(ctx, sourceID, observedAt, cfg.Discovery.EffectiveUnresolvedMeasureDays()); err != nil {
+		state.errorCode = "interpretation_state_failed"
+		return report, state, err
+	}
 	plan, err := e.Tracking.Plan(ctx, sourceID, revision, observedAt, cfg.Discovery.BootstrapDays)
 	if err != nil {
 		state.errorCode = "tracking_failed"

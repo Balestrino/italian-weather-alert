@@ -83,6 +83,13 @@ Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente in
 
 ## Registro delle scoperte
 
+### LIV-013 — Notizie con misure aperte di nuovo ricontrollate
+
+- **Data e ambito:** 2026-10-21; `livorno-municipal` dopo l'adozione della change `maintain-target-measure-state`.
+- **Comportamento verificato:** otto notizie con misure risultano `unresolved`, cinque delle quali riferite da misure successive collegate. Le notizie più vecchie della finestra recente sono state riscaricate nel primo controllo dopo l'adozione, che resta completo con il target ritirato di LIV-012.
+- **Limiti:** gli stati derivano da misure e collegamenti già validati; una notizia non ancora interpretata non ha stato misura. Le misure dalla fine ignota escono dai ricontrolli dopo 90 giorni.
+- **Evidenza:** comando `source-tracked-targets` e registro privato `target-state-20261021`.
+
 ### LIV-012 — Notizia sostituita e giro di nuovo completo
 
 - **Data e ambito:** 2026-10-21; `livorno-municipal` in development, target `allerta-gialla-per-forti-temporali-e-rischio-idrogeologico-e-idraulico-del-reticolo-minore`.

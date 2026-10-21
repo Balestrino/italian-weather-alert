@@ -80,6 +80,21 @@ type Discovery struct {
 	ListingDateLayout     string   `json:"listing_date_layout,omitempty"`
 	ListingDateLocale     string   `json:"listing_date_locale,omitempty"`
 	BootstrapDays         int      `json:"bootstrap_days,omitempty"`
+	// UnresolvedMeasureDays bounds how long a notice whose measures have no
+	// supported end stays in recurring revision checks; 0 means the default.
+	UnresolvedMeasureDays int `json:"unresolved_measure_days,omitempty"`
+}
+
+// DefaultUnresolvedMeasureDays applies when a configuration leaves the
+// open-ended measure limit unset, so stored configurations need no rewrite.
+const DefaultUnresolvedMeasureDays = 90
+
+// EffectiveUnresolvedMeasureDays returns the configured or default limit.
+func (d Discovery) EffectiveUnresolvedMeasureDays() int {
+	if d.UnresolvedMeasureDays == 0 {
+		return DefaultUnresolvedMeasureDays
+	}
+	return d.UnresolvedMeasureDays
 }
 
 // Every configuration is a complete snapshot, never a patch. Missing evidence
@@ -227,6 +242,9 @@ func (c Configuration) valid() bool {
 		return false
 	}
 	if d.BootstrapDays < 1 || d.BootstrapDays > 366 {
+		return false
+	}
+	if d.UnresolvedMeasureDays < 0 || d.UnresolvedMeasureDays > 366 {
 		return false
 	}
 	if expected := c.ExpectedPublication; expected != nil {

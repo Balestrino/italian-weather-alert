@@ -142,12 +142,24 @@ type fakeTracker struct {
 	plan     RevisionPlan
 	versions map[string]int64
 	complete bool
+	// calls records the order of Remember, RefreshInterpretationState and Plan.
+	calls        []string
+	refreshDays  int
+	refreshError error
+}
+
+func (f *fakeTracker) RefreshInterpretationState(_ context.Context, _ string, _ time.Time, days int) error {
+	f.calls = append(f.calls, "refresh")
+	f.refreshDays = days
+	return f.refreshError
 }
 
 func (f *fakeTracker) Remember(context.Context, string, int, []DiscoveredDocument, time.Time) (DiscoveryResult, error) {
+	f.calls = append(f.calls, "remember")
 	return DiscoveryResult{}, nil
 }
 func (f *fakeTracker) Plan(context.Context, string, int, time.Time, int) (RevisionPlan, error) {
+	f.calls = append(f.calls, "plan")
 	result := f.plan
 	result.Bootstrap = !f.complete
 	return result, nil

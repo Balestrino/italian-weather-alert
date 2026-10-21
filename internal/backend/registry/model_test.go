@@ -116,3 +116,23 @@ func TestRegionalProductContractValidation(t *testing.T) {
 		t.Fatal("unbounded regional resource prefix accepted")
 	}
 }
+
+func TestUnresolvedMeasureDaysValidation(t *testing.T) {
+	c := Configuration{URL: "https://official.example", Sections: []string{"https://official.example/news"}, AccessMethod: "html", Attribution: "official publisher"}
+	c.defaults()
+	if !c.valid() || c.Discovery.EffectiveUnresolvedMeasureDays() != DefaultUnresolvedMeasureDays {
+		t.Fatal("unset limit must keep existing configurations valid with the default")
+	}
+	for _, days := range []int{1, 90, 366} {
+		c.Discovery.UnresolvedMeasureDays = days
+		if !c.valid() || c.Discovery.EffectiveUnresolvedMeasureDays() != days {
+			t.Fatalf("limit %d rejected", days)
+		}
+	}
+	for _, days := range []int{-1, 367} {
+		c.Discovery.UnresolvedMeasureDays = days
+		if c.valid() {
+			t.Fatalf("limit %d accepted", days)
+		}
+	}
+}

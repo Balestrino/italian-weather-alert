@@ -9,19 +9,23 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/extraction"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/linking"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// A municipal measure derived from any retained version keeps an unlisted
-// unavailable target blocking, even when the tracked measure state was never
-// updated by interpretation.
+// A recent open-ended municipal measure keeps an unlisted unavailable target
+// blocking once its maintained state is refreshed.
 func TestDerivedMeasureProtectsUnlistedTarget(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	pool := domainTestDB(t)
-	for _, migrate := range []func(context.Context, *pgxpool.Pool) error{registry.Migrate, documents.Migrate, acquisition.Migrate, Migrate} {
+	for _, migrate := range []func(context.Context, *pgxpool.Pool) error{registry.Migrate, documents.Migrate, jobs.Migrate, processing.Migrate, classification.Migrate, extraction.Migrate, linking.Migrate, acquisition.Migrate, Migrate, MigrateTemporal} {
 		if err := migrate(ctx, pool); err != nil {
 			t.Fatal(err)
 		}
@@ -58,6 +62,10 @@ func TestDerivedMeasureProtectsUnlistedTarget(t *testing.T) {
 	measured := retain("withdrawn-coc", withMeasure)
 	retain("withdrawn-renamed", withoutMeasure)
 	if err := New(pool).PutLocalMeasure(ctx, LocalMeasure{ID: "withdrawn-coc-activation", DocumentVersionID: measured.ID, SourceID: "withdrawn-source", MunicipalityISTAT: "050004", Kind: "activation", Subject: "COC"}); err != nil {
+		t.Fatal(err)
+	}
+	// The maintained state is refreshed before planning, as in a scheduled check.
+	if err := tracker.RefreshInterpretationState(ctx, "withdrawn-source", now, 90); err != nil {
 		t.Fatal(err)
 	}
 	plan, err := tracker.Plan(ctx, "withdrawn-source", 1, now, 30)

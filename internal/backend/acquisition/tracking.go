@@ -16,6 +16,7 @@ type revisionTracker interface {
 	Plan(context.Context, string, int, time.Time, int) (RevisionPlan, error)
 	RecordVersion(context.Context, string, string, int64, time.Time) (bool, error)
 	CompleteBootstrap(context.Context, string, int, time.Time) error
+	RefreshInterpretationState(context.Context, string, time.Time, int) error
 }
 
 type TrackingStore struct{ pool *pgxpool.Pool }
@@ -122,22 +123,84 @@ type queryRower interface {
 	QueryRow(context.Context, string, ...any) pgx.Row
 }
 
-// measureSupportSQL returns a predicate over target alias t that is true when
-// the target supports an ongoing or unresolved measure: either its tracked
-// state says so or any retained version produced a municipal domain measure.
-// Domain measures are migrated after acquisition; without them only the
-// tracked target state applies.
-func measureSupportSQL(ctx context.Context, q queryRower) (string, error) {
+// protectingMeasureSQL is true when the maintained measure state, refreshed
+// before planning, says the target supports an ongoing or unresolved measure.
+const protectingMeasureSQL = "t.measure_state IN ('ongoing','unresolved')"
+
+// derivedMeasureSQL returns a predicate over target alias t that is true when
+// the target's maintained state protects it or any retained version produced a
+// municipal domain measure, even one that has ceased or aged. Operator
+// exclusions of such targets require an explicit acknowledgement. Domain
+// measures are migrated after acquisition; without them only the tracked state
+// applies.
+func derivedMeasureSQL(ctx context.Context, q queryRower) (string, error) {
 	var available bool
 	if err := q.QueryRow(ctx, `SELECT to_regclass('public.domain_local_measures') IS NOT NULL AND to_regclass('public.retained_documents') IS NOT NULL`).Scan(&available); err != nil {
 		return "", err
 	}
-	tracked := "t.measure_state IN ('ongoing','unresolved')"
+	tracked := protectingMeasureSQL
 	if !available {
 		return "(" + tracked + ")", nil
 	}
 	return "(" + tracked + ` OR EXISTS(SELECT 1 FROM retained_documents d JOIN retained_versions v ON v.document_id=d.id
    JOIN domain_local_measures m ON m.document_version_id=v.id WHERE d.source_id=t.source_id AND d.official_url=t.url))`, nil
+}
+
+// RefreshInterpretationState derives every tracked target's measure,
+// relevance and reference state of one source from validated interpretation
+// at the given evaluation time. A measure is closed by a supported validity end
+// in the past or an applied linked cancellation; partial reopenings and
+// extensions never close it. Open-ended measures stay unresolved until the
+// notice is older than unresolvedDays. Without the interpretation tables the
+// tracked states are left unchanged.
+func (s *TrackingStore) RefreshInterpretationState(ctx context.Context, sourceID string, now time.Time, unresolvedDays int) error {
+	if sourceID == "" || now.IsZero() || unresolvedDays < 1 || unresolvedDays > 366 {
+		return ErrInvalidConfiguration
+	}
+	var available bool
+	if err := s.pool.QueryRow(ctx, `SELECT to_regclass('public.domain_local_measures') IS NOT NULL AND to_regclass('public.domain_temporal_values') IS NOT NULL
+ AND to_regclass('public.domain_measure_updates') IS NOT NULL AND to_regclass('public.classification_results') IS NOT NULL
+ AND to_regclass('public.retained_documents') IS NOT NULL`).Scan(&available); err != nil || !available {
+		return err
+	}
+	_, err := s.pool.Exec(ctx, `WITH docs AS (
+   SELECT t.url,d.id AS document_id FROM acquisition_targets t
+   LEFT JOIN retained_documents d ON d.source_id=t.source_id AND d.official_url=t.url
+   WHERE t.source_id=$1),
+ measures AS (
+   SELECT docs.url,lm.id,validity.precision,validity.end_instant,
+   EXISTS(SELECT 1 FROM domain_measure_updates u WHERE u.target_measure_id=lm.id AND u.relation='cancels' AND u.applied_at<=$2) AS cancelled,
+   EXISTS(SELECT 1 FROM domain_measure_updates u JOIN domain_local_measures um ON um.id=u.update_measure_id
+     JOIN retained_versions uv ON uv.id=um.document_version_id
+     WHERE u.target_measure_id=lm.id AND u.applied_at<=$2 AND uv.document_id<>docs.document_id) AS referenced
+   FROM docs JOIN retained_versions v ON v.document_id=docs.document_id
+   JOIN domain_local_measures lm ON lm.document_version_id=v.id
+   LEFT JOIN LATERAL (SELECT precision,end_instant FROM domain_temporal_values tv
+     WHERE tv.entity_kind='local_measure' AND tv.entity_id=lm.id AND tv.meaning='validity' ORDER BY tv.id DESC LIMIT 1) validity ON true),
+ derived AS (
+   SELECT url,
+   bool_or(NOT cancelled AND precision='interval' AND end_instant>=$2) AS ongoing,
+   bool_or(NOT cancelled AND COALESCE(precision,'unknown')<>'interval') AS open_ended,
+   bool_or(referenced) AS referenced
+   FROM measures GROUP BY url),
+ relevance AS (
+   SELECT docs.url,(SELECT cr.relevant FROM classification_results cr WHERE cr.status='classified' AND cr.document_version_id=(
+     SELECT v.id FROM retained_versions v WHERE v.document_id=docs.document_id ORDER BY v.first_acquired_at DESC,v.id DESC LIMIT 1)
+     ORDER BY cr.created_at DESC,cr.run_id DESC LIMIT 1) AS relevant
+   FROM docs)
+ UPDATE acquisition_targets t SET
+   measure_state=CASE
+     WHEN m.url IS NULL THEN 'none'
+     WHEN m.ongoing THEN 'ongoing'
+     WHEN m.open_ended AND COALESCE(t.source_publication_date::timestamptz,t.first_discovered_at)+make_interval(days=>$3)<$2 THEN 'aged_unresolved'
+     WHEN m.open_ended THEN 'unresolved'
+     ELSE 'ceased' END,
+   relevance_state=CASE r.relevant WHEN true THEN 'relevant' WHEN false THEN 'irrelevant' ELSE 'unknown' END,
+   explicit_reference=t.explicit_reference OR COALESCE(m.referenced,false),
+   interpretation_state_at=$2
+ FROM relevance r LEFT JOIN derived m ON m.url=r.url
+ WHERE t.source_id=$1 AND t.url=r.url`, sourceID, now.UTC(), unresolvedDays)
+	return err
 }
 
 func (s *TrackingStore) Plan(ctx context.Context, sourceID string, revision int, now time.Time, bootstrapDays int) (RevisionPlan, error) {
@@ -153,13 +216,9 @@ func (s *TrackingStore) Plan(ctx context.Context, sourceID string, revision int,
 		return plan, err
 	}
 	cutoff := now.UTC().AddDate(0, 0, -bootstrapDays)
-	measure, err := measureSupportSQL(ctx, s.pool)
-	if err != nil {
-		return plan, err
-	}
 	rows, err := s.pool.Query(ctx, `SELECT t.url,t.source_publication_date,COALESCE(u.http_status,0),u.next_attempt_at,
  t.last_seen_at>=$5,
- CASE WHEN t.last_seen_at>=$5 THEN false ELSE t.explicit_reference OR `+measure+` END
+ CASE WHEN t.last_seen_at>=$5 THEN false ELSE t.explicit_reference OR `+protectingMeasureSQL+` END
  FROM acquisition_targets t
  LEFT JOIN acquisition_unavailable_targets u ON u.source_id=t.source_id AND u.configuration=t.configuration AND u.url=t.url AND u.recovered_at IS NULL
  LEFT JOIN LATERAL (

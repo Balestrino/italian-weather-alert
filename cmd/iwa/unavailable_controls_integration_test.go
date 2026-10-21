@@ -111,6 +111,24 @@ func TestUnavailableTargetCommandsListAndRecordDecisions(t *testing.T) {
 		}
 		return result, nil
 	}
+	if err := tracker.SetReviewState(ctx, "cli-s", stale, "relevant", "unresolved"); err != nil {
+		t.Fatal(err)
+	}
+	tracked, err := run([]string{"source-tracked-targets", "cli-s"}, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var followed []acquisition.FollowedTarget
+	if err := json.Unmarshal(tracked["followed_targets"], &followed); err != nil || len(followed) != 1 || followed[0].URL != stale || followed[0].MeasureState != "unresolved" || followed[0].Recheck != "window" || followed[0].LimitDays != 90 {
+		t.Fatalf("followed targets: %s %v", tracked["followed_targets"], err)
+	}
+	if _, err := run([]string{"source-tracked-targets", "missing-source"}, ""); err == nil || controlErrorCode(err) != "control_unavailable" {
+		t.Fatalf("unknown source: %v", err)
+	}
+	// Without a measure the stale notice is withdrawn and can be excluded below.
+	if err := tracker.SetReviewState(ctx, "cli-s", stale, "unknown", "none"); err != nil {
+		t.Fatal(err)
+	}
 	listed, err := run([]string{"source-unavailable-targets", "cli-s"}, "")
 	if err != nil {
 		t.Fatal(err)

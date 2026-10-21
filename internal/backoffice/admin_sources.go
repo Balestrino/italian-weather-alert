@@ -55,6 +55,9 @@ type AdminUnavailableTargets interface {
 	ListUnavailable(context.Context, string) ([]acquisition.UnavailableTarget, error)
 	RecordDisposition(context.Context, acquisition.DispositionRequest) (acquisition.TargetDisposition, error)
 }
+type AdminFollowedTargets interface {
+	FollowedTargets(context.Context, string, time.Time) ([]acquisition.FollowedTarget, error)
+}
 type AdminInterpretation interface {
 	ResumeInterpretation(context.Context, string, int, string, interpretation.Recovery) error
 	Reprocess(context.Context, interpretation.Selection) (string, int, error)
@@ -101,6 +104,7 @@ type AdminRuntime struct {
 	Registry           AdminRegistry
 	Preview            AdminPreview
 	UnavailableTargets AdminUnavailableTargets
+	FollowedTargets    AdminFollowedTargets
 }
 
 func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
@@ -179,6 +183,12 @@ func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
 			view.UnavailableTargets, view.UnavailableTargetsMissing = targets, listErr != nil
 		} else {
 			view.UnavailableTargetsMissing = true
+		}
+		if a.FollowedTargets != nil {
+			followed, followErr := a.FollowedTargets.FollowedTargets(r.Context(), id, time.Now())
+			view.FollowedTargets, view.FollowedTargetsMissing = followed, followErr != nil
+		} else {
+			view.FollowedTargetsMissing = true
 		}
 		if wantsAdminJSON(r) {
 			httpserver.Reply(w, 200, view)
@@ -371,6 +381,8 @@ type adminSourceView struct {
 	UnavailableTargets    []acquisition.UnavailableTarget
 	// UnavailableTargetsMissing reports that the list could not be read.
 	UnavailableTargetsMissing bool
+	FollowedTargets           []acquisition.FollowedTarget
+	FollowedTargetsMissing    bool
 }
 
 func wantsAdminJSON(r *http.Request) bool {
@@ -509,6 +521,20 @@ var adminTemplates = template.Must(uiTemplates("admin", template.FuncMap{
 	"event":   func(e registry.Event) string { return string(e.Evidence) },
 	"latest":  func(v []registry.Version) registry.Version { return v[len(v)-1] },
 	"instant": func(t time.Time) string { return t.UTC().Format(time.RFC3339Nano) },
+	"recheckReason": func(reason string) string {
+		switch reason {
+		case "window":
+			return "nella finestra recente"
+		case "ongoing":
+			return "misura in corso"
+		case "unresolved":
+			return "misura con fine ignota, entro il limite"
+		case "bootstrap_reference":
+			return "riferimento esplicito durante il bootstrap"
+		default:
+			return "non più ricontrollato"
+		}
+	},
 	"targetClass": func(class string) string {
 		switch class {
 		case "withdrawn":

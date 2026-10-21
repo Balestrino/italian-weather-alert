@@ -32,6 +32,9 @@ var targetDispositionsSchema string
 //go:embed withdrawn_schema.sql
 var withdrawnSchema string
 
+//go:embed interpretation_state_schema.sql
+var interpretationStateSchema string
+
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -161,6 +164,23 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 			return err
 		}
 		if _, err = tx.Exec(ctx, "INSERT INTO iwa_migrations(name,checksum) VALUES ('098_withdrawn_unavailable_targets',$1)", withdrawnChecksum); err != nil {
+			return err
+		}
+	}
+	stateHash := sha256.Sum256([]byte(interpretationStateSchema))
+	stateChecksum := hex.EncodeToString(stateHash[:])
+	err = tx.QueryRow(ctx, "SELECT checksum FROM iwa_migrations WHERE name='099_target_interpretation_state'").Scan(&previous)
+	if err == nil {
+		if previous != stateChecksum {
+			return errors.New("target interpretation state migration checksum mismatch")
+		}
+	} else if !errors.Is(err, pgx.ErrNoRows) {
+		return err
+	} else {
+		if _, err = tx.Exec(ctx, interpretationStateSchema); err != nil {
+			return err
+		}
+		if _, err = tx.Exec(ctx, "INSERT INTO iwa_migrations(name,checksum) VALUES ('099_target_interpretation_state',$1)", stateChecksum); err != nil {
 			return err
 		}
 	}

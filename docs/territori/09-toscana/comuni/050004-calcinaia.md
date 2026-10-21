@@ -161,10 +161,12 @@ specificata e collaudata; la sostituzione automatica di un URL con un altro non
 [handle-withdrawn-unavailable-targets](../../../../openspec/changes/archive/2026-10-21-handle-withdrawn-unavailable-targets/proposal.md)
 implementa questo trattamento ed è adottata in development (CLN-034).
 
-Lo stato misura e il riferimento esplicito dei target tracciati non sono
-alimentati dall'interpretazione (CLN-033): le protezioni basate solo su quei
-campi risultano sempre soddisfatte. Le esclusioni e la classificazione dei
-target non disponibili devono basarsi sulle misure di dominio ricavate.
+Lo stato misura e il riferimento esplicito dei target tracciati non erano
+alimentati dall'interpretazione (CLN-033). La change
+[maintain-target-measure-state](../../../../openspec/changes/maintain-target-measure-state/proposal.md)
+li ricava a ogni controllo dalle interpretazioni validate, con un limite
+configurabile per le misure dalla fine ignota; è adottata in development
+(CLN-035).
 
 La matrice CLN-027 circoscrive il lavoro successivo: interpretazioni recenti
 pendenti, confronto continuativo del canale aggiuntivo, atti richiamati e
@@ -210,6 +212,13 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-035 — Notizie con misure aperte di nuovo ricontrollate
+
+- **Data e ambito:** 2026-10-21; `calcinaia-municipal` e le altre fonti comunali del development dopo l'adozione della change `maintain-target-measure-state`.
+- **Comportamento verificato:** il primo controllo dopo l'adozione ricava gli stati di tutti i target. Per Calcinaia, sette notizie con misure risultano `unresolved` perché nessuna ha una fine di validità sostenuta, e una è marcata come riferita da una misura successiva. Le quattro più vecchie della finestra recente sono state riscaricate nello stesso controllo. Tutti i controlli successivi delle fonti attive sono completi.
+- **Limiti:** nessuna misura ha oggi una fine nota, quindi gli stati `ongoing` e `ceased` non sono ancora osservati su dati reali. Le notizie usciranno dai ricontrolli al compimento dei 90 giorni, salvo revoche collegate.
+- **Evidenza:** comando `source-tracked-targets`, sezione "Documenti seguiti" e registro privato `target-state-20261021`.
+
 ### CLN-034 — Target ritirati non bloccano più il controllo
 
 - **Data e ambito:** 2026-10-21; `calcinaia-municipal` e fonti attive del development dopo l'adozione della change `handle-withdrawn-unavailable-targets`.
@@ -222,8 +231,8 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Data e ambito:** 2026-10-21; target tracciati di `calcinaia-municipal` e delle altre fonti del development.
 - **Osservazione confermata:** tutti i target ispezionati hanno stato misura `none`, rilevanza `unknown` e nessun riferimento esplicito, anche per avvisi con un'attivazione COC estratta. Il codice non aggiorna questi campi dopo classificazione ed estrazione.
 - **Conseguenza:** la condizione "nessuna misura aperta" delle disposizioni manuali precedenti (CLN-031, CLN-032) era soddisfatta per costruzione; le misure di quei casi erano state verificate separatamente sul dominio. Il piano di revisione non mantiene automaticamente i documenti vecchi con misure in corso.
-- **Intervento:** la change `handle-withdrawn-unavailable-targets` protegge i target con misure di dominio ricavate da qualunque versione conservata e richiede una conferma esplicita per escluderli; non alimenta i campi mancanti.
-- **Prossima verifica:** decidere se alimentare stato misura e riferimenti dall'interpretazione, con una change dedicata; fino ad allora non usare quei campi come prova.
+- **Intervento:** la change `handle-withdrawn-unavailable-targets` protegge i target con misure di dominio ricavate da qualunque versione conservata e richiede una conferma esplicita per escluderli. La change `maintain-target-measure-state` ricava stato misura, rilevanza e riferimento a ogni controllo, riporta nei ricontrolli le notizie vecchie con misure in corso o dalla fine ignota entro il limite e usa lo stato aggiornato per la protezione dei target ritirati; la conferma per le esclusioni resta per qualunque misura ricavata.
+- **Prossima verifica:** adozione verificata in CLN-035; osservare le notizie che superano il limite di 90 giorni.
 - **Evidenza:** registro privato `calcinaia-stale-404-20261021`.
 
 ### CLN-032 — URL rinominati e controllo fallito per una settimana

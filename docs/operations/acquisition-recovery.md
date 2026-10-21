@@ -18,12 +18,14 @@ The same list appears under **URL non disponibili** on the source page in
 administration. Each unrecovered 404/410 target is classified on every check:
 
 - **withdrawn**: absent from the latest complete traversal of the configured
-  listings, with no explicit reference and no derived municipal measure. It is
+  listings, with no explicit reference and no `ongoing` or `unresolved`
+  maintained measure state (see below). It is
   retried with the bounded backoff (1h, 2h, … up to 24h) but does not make the
   check incomplete. `acquisition_checks.withdrawn_unavailable_count` records how
   many were seen. A renamed notice needs no manual action.
-- **blocking**: still listed, explicitly referenced, or supporting a measure
-  derived from any retained version. It keeps checks incomplete during retries.
+- **blocking**: still listed, explicitly referenced, or with an `ongoing` or
+  `unresolved` maintained measure state. It keeps checks incomplete during
+  retries.
 - **excluded**: covered by a reviewed `exclude_stale_unavailable` decision.
 
 A later HTTP 200 recovers any target and retains a new version. Rediscovery in
@@ -57,6 +59,41 @@ To verify a decision, bring forward only that source's `next_check_at` when no
 check is claimed, and let its normal worker run. A fresh check must have
 `complete=true`, an empty error code and a new `last_complete_at`.
 Reachability alone is insufficient.
+
+## Followed notices and maintained measure state
+
+At the start of every scheduled check of a listing-driven municipal source, the
+measure, relevance and reference state of each tracked notice is derived again
+from validated interpretation: projected municipal measures, their validity,
+applied linked updates and the latest classification. No model call, crawl or
+re-interpretation is involved.
+
+| Measure state | Meaning | Rechecked beyond the revision window |
+| --- | --- | --- |
+| `ongoing` | A measure has a supported end that has not passed | Yes, until the end passes |
+| `unresolved` | A measure has an unknown, start-only or conditional end and the notice is within the limit | Yes |
+| `aged_unresolved` | As `unresolved`, but older than the limit | No |
+| `ceased` | Every measure ended or was cancelled by a linked later measure | No |
+| `none` | No derived measure | No |
+
+Partial reopenings and extensions never end a measure by themselves. The limit
+is `discovery.unresolved_measure_days` (default 90, valid 1–366); changing it
+needs an ordinary configuration revision. A notice is marked explicitly
+referenced when a linked later measure from another document targets one of its
+measures; this keeps it in bootstrap plans and protects it from withdrawal, and
+is never cleared automatically.
+
+List followed notices, with the reason each is or is no longer rechecked:
+
+```sh
+scripts/compose-env.sh development run --rm --no-deps --pull never admin source-tracked-targets <source-id>
+```
+
+The same list appears under **Documenti seguiti** on the source page. Both read
+the state derived by the last check. A failed derivation makes the check
+incomplete with `interpretation_state_failed` and keeps the previous states.
+Excluding a notice that ever produced a measure, even one `ceased` or
+`aged_unresolved`, still requires the operator acknowledgement.
 
 ## Temporary interpretation recovery limits
 

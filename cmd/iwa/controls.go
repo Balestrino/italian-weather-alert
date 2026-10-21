@@ -55,7 +55,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		count = 1
 	case "embedding-enable", "embedding-disable":
 		count = 3
-	case "source-status", "region-status", "source-unavailable-targets":
+	case "source-status", "region-status", "source-unavailable-targets", "source-tracked-targets":
 		count = 2
 	case "source-unavailable-decide":
 		count = 5
@@ -99,7 +99,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		c.Revision, c.Decision, c.Actor = configuration, args[3], args[4]
 		return c, true, nil
 	}
-	if !strings.HasSuffix(c.Name, "-status") && c.Name != "source-unavailable-targets" {
+	if !strings.HasSuffix(c.Name, "-status") && c.Name != "source-unavailable-targets" && c.Name != "source-tracked-targets" {
 		rev, err := strconv.Atoi(args[len(args)-2])
 		if err != nil || rev < 0 || (c.Source != "" && rev == 0 && !strings.HasPrefix(c.Name, "source-embedding-")) {
 			return c, true, errControlArguments
@@ -178,6 +178,10 @@ func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, en
 			targets = []acquisition.UnavailableTarget{}
 		}
 		result = map[string]any{"source_id": c.Source, "unavailable_targets": targets, "guidance": "Withdrawn targets no longer fail checks. Blocking targets are still listed, referenced or support a measure; record a reviewed decision only after checking complete listings."}
+	case "source-tracked-targets":
+		var targets []acquisition.FollowedTarget
+		targets, err = acquisition.NewTrackingStore(pool).FollowedTargets(ctx, c.Source, time.Now())
+		result = map[string]any{"source_id": c.Source, "followed_targets": targets, "guidance": "States are derived at the start of each scheduled check from validated interpretation. Open-ended measures stop being rechecked after the source limit; listing only reads the last derived state."}
 	case "source-unavailable-decide":
 		var payload unavailableDecision
 		if c.Input == nil {

@@ -2,6 +2,8 @@ package acquisition
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -169,4 +171,34 @@ func (c *multiUnavailableCrawler) Crawl(ctx context.Context, raw string) (Page, 
 		return Page{URL: raw, StatusCode: status}, &CrawlFailure{Code: "source_http_error", StatusCode: status, Reachable: true}
 	}
 	return c.fixtureCrawler.Crawl(ctx, raw)
+}
+
+func TestScheduledCheckRefreshesInterpretationStateBeforePlanning(t *testing.T) {
+	now := time.Date(2026, 10, 21, 12, 0, 0, 0, time.UTC)
+	section := calcinaia + "/tipi-di-notizia/notizie"
+	later := calcinaia + "/novita/z-later"
+	for _, failing := range []bool{false, true} {
+		crawler := &fixtureCrawler{pages: map[string]Page{
+			section: {URL: section, StatusCode: 200, HTML: []byte(`<main id="configured"></main>`)},
+			later:   {URL: later, StatusCode: 200, HTML: []byte("later notice")},
+		}}
+		tracker := &fakeTracker{plan: RevisionPlan{Documents: []PlannedDocument{{URL: later, Listed: true}}}, complete: true}
+		if failing {
+			tracker.refreshError = errors.New("database unavailable")
+		}
+		cfg := registry.Configuration{
+			AccessMethod: "crawl4ai", Sections: []string{section}, Policy: registry.Policy{CollectionPermitted: true, RetentionPermitted: true},
+			Discovery: registry.Discovery{DocumentPathPrefixes: []string{"/novita/"}, PaginationParameter: "page", MaxPagesPerSection: 2, MaxDocuments: 20, ListingContentMarkers: []string{"configured"}, ListingItemClass: "card-body", ListingDateClass: "data", ListingDateLayout: "02 Jan 2006", ListingDateLocale: "it", BootstrapDays: 30, UnresolvedMeasureDays: 45},
+		}
+		out := (&Engine{Registry: &fakeRegistry{version: registry.Version{Configuration: cfg}}, Retained: &stableRetention{}, Crawler: crawler, Tracking: tracker, Now: func() time.Time { return now }}).Check(context.Background(), "calcinaia", 1, now)
+		if failing {
+			if out.Complete || out.ErrorCode != "interpretation_state_failed" || strings.Join(tracker.calls, ",") != "remember,refresh" {
+				t.Fatalf("refresh failure planned anyway: %+v calls=%v", out, tracker.calls)
+			}
+			continue
+		}
+		if !out.Complete || strings.Join(tracker.calls, ",") != "remember,refresh,plan" || tracker.refreshDays != 45 {
+			t.Fatalf("refresh not ordered before planning: %+v calls=%v days=%d", out, tracker.calls, tracker.refreshDays)
+		}
+	}
 }
