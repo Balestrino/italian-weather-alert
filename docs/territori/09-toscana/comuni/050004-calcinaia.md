@@ -157,7 +157,14 @@ mantiene fallito l'intero controllo (CLN-002, CLN-030, CLN-032). L'esito della
 fonte segnala quindi un ritardo anche quando le nuove pubblicazioni sono
 acquisite. Un trattamento distinto di questi target richiede una modifica
 specificata e collaudata; la sostituzione automatica di un URL con un altro non
-è ammessa senza verifica.
+è ammessa senza verifica. La change
+[handle-withdrawn-unavailable-targets](../../../../openspec/changes/handle-withdrawn-unavailable-targets/proposal.md)
+implementa questo trattamento; l'adozione in development resta da verificare.
+
+Lo stato misura e il riferimento esplicito dei target tracciati non sono
+alimentati dall'interpretazione (CLN-033): le protezioni basate solo su quei
+campi risultano sempre soddisfatte. Le esclusioni e la classificazione dei
+target non disponibili devono basarsi sulle misure di dominio ricavate.
 
 La matrice CLN-027 circoscrive il lavoro successivo: interpretazioni recenti
 pendenti, confronto continuativo del canale aggiuntivo, atti richiamati e
@@ -202,6 +209,15 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-033 — Stato misura e riferimenti dei target non alimentati
+
+- **Data e ambito:** 2026-10-21; target tracciati di `calcinaia-municipal` e delle altre fonti del development.
+- **Osservazione confermata:** tutti i target ispezionati hanno stato misura `none`, rilevanza `unknown` e nessun riferimento esplicito, anche per avvisi con un'attivazione COC estratta. Il codice non aggiorna questi campi dopo classificazione ed estrazione.
+- **Conseguenza:** la condizione "nessuna misura aperta" delle disposizioni manuali precedenti (CLN-031, CLN-032) era soddisfatta per costruzione; le misure di quei casi erano state verificate separatamente sul dominio. Il piano di revisione non mantiene automaticamente i documenti vecchi con misure in corso.
+- **Intervento:** la change `handle-withdrawn-unavailable-targets` protegge i target con misure di dominio ricavate da qualunque versione conservata e richiede una conferma esplicita per escluderli; non alimenta i campi mancanti.
+- **Prossima verifica:** decidere se alimentare stato misura e riferimenti dall'interpretazione, con una change dedicata; fino ad allora non usare quei campi come prova.
+- **Evidenza:** registro privato `calcinaia-stale-404-20261021`.
 
 ### CLN-032 — URL rinominati e controllo fallito per una settimana
 

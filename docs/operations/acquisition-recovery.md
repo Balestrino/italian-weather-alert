@@ -7,28 +7,56 @@ call ledgers private under ignored `.local/operations/`.
 
 ## Unavailable municipal documents
 
-Inspect `acquisition_source_status`, recent `acquisition_checks`,
-`acquisition_targets` and `acquisition_unavailable_targets`. A document HTTP
-404/410 allows later documents to be acquired, but keeps checks incomplete during
-bounded retries and backoff.
+Inspect `acquisition_source_status`, recent `acquisition_checks`, and the
+unavailable targets of the source:
 
-Traverse every page of every configured section and retain dated evidence before
-excluding a stale target. Confirm its URL remains unavailable, is absent from the
-complete traversal, and has no explicit reference or unresolved/ongoing measure
-requiring continued checking. Do not infer equivalence to another URL or
+```sh
+scripts/compose-env.sh development run --rm --no-deps --pull never admin source-unavailable-targets <source-id>
+```
+
+The same list appears under **URL non disponibili** on the source page in
+administration. Each unrecovered 404/410 target is classified on every check:
+
+- **withdrawn**: absent from the latest complete traversal of the configured
+  listings, with no explicit reference and no derived municipal measure. It is
+  retried with the bounded backoff (1h, 2h, … up to 24h) but does not make the
+  check incomplete. `acquisition_checks.withdrawn_unavailable_count` records how
+  many were seen. A renamed notice needs no manual action.
+- **blocking**: still listed, explicitly referenced, or supporting a measure
+  derived from any retained version. It keeps checks incomplete during retries.
+- **excluded**: covered by a reviewed `exclude_stale_unavailable` decision.
+
+A later HTTP 200 recovers any target and retains a new version. Rediscovery in
+a listing makes a still-unavailable target blocking again and lifts an earlier
+exclusion. Classification never asserts equivalence to another URL or
 cancellation of a provision.
 
-Record an `exclude_stale_unavailable` row in
-`acquisition_target_dispositions`, scoped to the active source, configuration and
-exact URL. Include actor, reason, evidence and observed `last_seen_at`. Use a
-guarded transaction asserting the reviewed target has not changed and exactly
-one decision is recorded. Preserve originals, unavailable-target records and
-failed checks. Rediscovery after the reviewed `last_seen_at` automatically restores
-checking; a later `resume` decision also restores it.
+Record a reviewed decision only for a blocking target that has stopped needing
+checks, or to resume an excluded one. Traverse every page of every configured
+section and retain dated evidence privately first. Confirm that the URL remains
+unavailable and is absent from the complete traversal. Confirm also that any
+derived measure no longer needs checking: excluding a measure-bearing target
+requires an explicit acknowledgement. Use the administration form or:
 
-When no check is claimed, bring only that source's `next_check_at` forward and
-let its normal worker run. Verify a fresh check has `complete=true`, an empty
-error code and a new `last_complete_at`. Reachability alone is insufficient.
+```sh
+scripts/compose-env.sh development run --rm -T --no-deps --pull never admin \
+  source-unavailable-decide <source-id> <configuration> exclude_stale_unavailable <operator> < decision.json
+```
+
+`decision.json` holds `url`, the `observed_last_seen_at` printed by the list
+command, `reason`, a non-empty `evidence` object and, when needed,
+`acknowledge_measures`. Use `resume` instead of `exclude_stale_unavailable` to
+return an excluded target to checking. The decision is rejected without changes
+when the target was seen again, recovered, belongs to an inactive configuration
+or was already decided. The error is a stable code such as `target_changed`,
+`target_recovered` or `measure_acknowledgement_required`. Reload the list before
+retrying. Decisions preserve originals, unavailable-target records and failed
+checks, and never start a check or change publication.
+
+To verify a decision, bring forward only that source's `next_check_at` when no
+check is claimed, and let its normal worker run. A fresh check must have
+`complete=true`, an empty error code and a new `last_complete_at`.
+Reachability alone is insufficient.
 
 ## Temporary interpretation recovery limits
 

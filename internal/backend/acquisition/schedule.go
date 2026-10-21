@@ -163,7 +163,7 @@ func (s *ScheduleStore) Heartbeat(ctx context.Context, claim CheckClaim, now tim
 }
 
 func (s *ScheduleStore) Finish(ctx context.Context, claim CheckClaim, outcome CheckOutcome) error {
-	if outcome.SourceID != claim.SourceID || outcome.Configuration != claim.Configuration || !outcome.StartedAt.Equal(claim.StartedAt) || outcome.StartedAt.IsZero() || outcome.FinishedAt.Before(outcome.StartedAt) || outcome.NewDocuments < 0 || (outcome.Complete && (!outcome.Reachable || !outcome.ContentRecognized || outcome.ErrorCode != "" || outcome.RetryAfter != nil)) || (!outcome.Complete && strings.TrimSpace(outcome.ErrorCode) == "") {
+	if outcome.SourceID != claim.SourceID || outcome.Configuration != claim.Configuration || !outcome.StartedAt.Equal(claim.StartedAt) || outcome.StartedAt.IsZero() || outcome.FinishedAt.Before(outcome.StartedAt) || outcome.NewDocuments < 0 || outcome.WithdrawnUnavailable < 0 || (outcome.Complete && (!outcome.Reachable || !outcome.ContentRecognized || outcome.ErrorCode != "" || outcome.RetryAfter != nil)) || (!outcome.Complete && strings.TrimSpace(outcome.ErrorCode) == "") {
 		return ErrInvalidConfiguration
 	}
 	tx, err := s.pool.Begin(ctx)
@@ -196,8 +196,8 @@ func (s *ScheduleStore) Finish(ctx context.Context, claim CheckClaim, outcome Ch
 		}
 		publicationState = publicationStateAt(expectedAnchor, expectedInterval, expectedTolerance, lastPublication, outcome.FinishedAt)
 	}
-	if _, err = tx.Exec(ctx, `INSERT INTO acquisition_checks(source_id,configuration,worker_id,started_at,finished_at,reachable,content_recognized,complete,error_code,retry_after,listing_count,document_count,revision_count,new_document_count,publication_observed_at,check_state,publication_state)
- VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`, outcome.SourceID, outcome.Configuration, claim.WorkerID, outcome.StartedAt.UTC(), outcome.FinishedAt.UTC(), outcome.Reachable, outcome.ContentRecognized, outcome.Complete, nullable(outcome.ErrorCode), outcome.RetryAfter, outcome.Listings, outcome.Documents, outcome.Revisions, outcome.NewDocuments, outcome.PublicationObservedAt, checkState, publicationState); err != nil {
+	if _, err = tx.Exec(ctx, `INSERT INTO acquisition_checks(source_id,configuration,worker_id,started_at,finished_at,reachable,content_recognized,complete,error_code,retry_after,listing_count,document_count,revision_count,new_document_count,publication_observed_at,check_state,publication_state,withdrawn_unavailable_count)
+ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`, outcome.SourceID, outcome.Configuration, claim.WorkerID, outcome.StartedAt.UTC(), outcome.FinishedAt.UTC(), outcome.Reachable, outcome.ContentRecognized, outcome.Complete, nullable(outcome.ErrorCode), outcome.RetryAfter, outcome.Listings, outcome.Documents, outcome.Revisions, outcome.NewDocuments, outcome.PublicationObservedAt, checkState, publicationState, outcome.WithdrawnUnavailable); err != nil {
 		return err
 	}
 	if outcome.Complete {
@@ -248,7 +248,7 @@ func (s *ScheduleStore) Status(ctx context.Context, sourceID string, now time.Ti
 }
 
 func (s *ScheduleStore) Checks(ctx context.Context, sourceID string) ([]StoredCheck, error) {
-	rows, err := s.pool.Query(ctx, `SELECT id,configuration,worker_id,started_at,finished_at,reachable,content_recognized,complete,COALESCE(error_code,''),retry_after,listing_count,document_count,revision_count,new_document_count,publication_observed_at,check_state,publication_state
+	rows, err := s.pool.Query(ctx, `SELECT id,configuration,worker_id,started_at,finished_at,reachable,content_recognized,complete,COALESCE(error_code,''),retry_after,listing_count,document_count,revision_count,new_document_count,publication_observed_at,check_state,publication_state,withdrawn_unavailable_count
  FROM acquisition_checks WHERE source_id=$1 ORDER BY id`, sourceID)
 	if err != nil {
 		return nil, err
@@ -257,7 +257,7 @@ func (s *ScheduleStore) Checks(ctx context.Context, sourceID string) ([]StoredCh
 	var result []StoredCheck
 	for rows.Next() {
 		item := StoredCheck{CheckOutcome: CheckOutcome{SourceID: sourceID}}
-		if err = rows.Scan(&item.ID, &item.Configuration, &item.WorkerID, &item.StartedAt, &item.FinishedAt, &item.Reachable, &item.ContentRecognized, &item.Complete, &item.ErrorCode, &item.RetryAfter, &item.Listings, &item.Documents, &item.Revisions, &item.NewDocuments, &item.PublicationObservedAt, &item.CheckState, &item.PublicationState); err != nil {
+		if err = rows.Scan(&item.ID, &item.Configuration, &item.WorkerID, &item.StartedAt, &item.FinishedAt, &item.Reachable, &item.ContentRecognized, &item.Complete, &item.ErrorCode, &item.RetryAfter, &item.Listings, &item.Documents, &item.Revisions, &item.NewDocuments, &item.PublicationObservedAt, &item.CheckState, &item.PublicationState, &item.WithdrawnUnavailable); err != nil {
 			return nil, err
 		}
 		result = append(result, item)

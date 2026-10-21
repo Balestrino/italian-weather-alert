@@ -33,6 +33,12 @@ type PlannedDocument struct {
 	URL               string
 	PublicationDate   *time.Time
 	Resources         []PlannedResource
+	// Listed reports that the current traversal rediscovered the URL.
+	Listed bool
+	// Protected reports an explicit reference or a supported measure that
+	// keeps an unlisted unavailable target blocking. It is only evaluated
+	// for unlisted targets.
+	Protected bool
 }
 
 type RevisionPlan struct {
@@ -112,6 +118,28 @@ func (s *TrackingStore) AddDependency(ctx context.Context, sourceID, parentURL, 
 	return err
 }
 
+type queryRower interface {
+	QueryRow(context.Context, string, ...any) pgx.Row
+}
+
+// measureSupportSQL returns a predicate over target alias t that is true when
+// the target supports an ongoing or unresolved measure: either its tracked
+// state says so or any retained version produced a municipal domain measure.
+// Domain measures are migrated after acquisition; without them only the
+// tracked target state applies.
+func measureSupportSQL(ctx context.Context, q queryRower) (string, error) {
+	var available bool
+	if err := q.QueryRow(ctx, `SELECT to_regclass('public.domain_local_measures') IS NOT NULL AND to_regclass('public.retained_documents') IS NOT NULL`).Scan(&available); err != nil {
+		return "", err
+	}
+	tracked := "t.measure_state IN ('ongoing','unresolved')"
+	if !available {
+		return "(" + tracked + ")", nil
+	}
+	return "(" + tracked + ` OR EXISTS(SELECT 1 FROM retained_documents d JOIN retained_versions v ON v.document_id=d.id
+   JOIN domain_local_measures m ON m.document_version_id=v.id WHERE d.source_id=t.source_id AND d.official_url=t.url))`, nil
+}
+
 func (s *TrackingStore) Plan(ctx context.Context, sourceID string, revision int, now time.Time, bootstrapDays int) (RevisionPlan, error) {
 	if sourceID == "" || revision < 1 || now.IsZero() || bootstrapDays < 1 {
 		return RevisionPlan{}, ErrInvalidConfiguration
@@ -125,7 +153,14 @@ func (s *TrackingStore) Plan(ctx context.Context, sourceID string, revision int,
 		return plan, err
 	}
 	cutoff := now.UTC().AddDate(0, 0, -bootstrapDays)
-	rows, err := s.pool.Query(ctx, `SELECT t.url,t.source_publication_date,COALESCE(u.http_status,0),u.next_attempt_at FROM acquisition_targets t
+	measure, err := measureSupportSQL(ctx, s.pool)
+	if err != nil {
+		return plan, err
+	}
+	rows, err := s.pool.Query(ctx, `SELECT t.url,t.source_publication_date,COALESCE(u.http_status,0),u.next_attempt_at,
+ t.last_seen_at>=$5,
+ CASE WHEN t.last_seen_at>=$5 THEN false ELSE t.explicit_reference OR `+measure+` END
+ FROM acquisition_targets t
  LEFT JOIN acquisition_unavailable_targets u ON u.source_id=t.source_id AND u.configuration=t.configuration AND u.url=t.url AND u.recovered_at IS NULL
  LEFT JOIN LATERAL (
    SELECT decision,observed_last_seen_at FROM acquisition_target_dispositions d
@@ -135,14 +170,14 @@ func (s *TrackingStore) Plan(ctx context.Context, sourceID string, revision int,
  WHERE t.source_id=$1 AND t.configuration=$2
    AND (t.source_publication_date IS NULL OR t.source_publication_date >= $3::date OR t.measure_state IN ('ongoing','unresolved') OR ($4 AND t.explicit_reference))
    AND (disposition.decision IS DISTINCT FROM 'exclude_stale_unavailable' OR t.last_seen_at > disposition.observed_last_seen_at)
- ORDER BY t.url`, sourceID, revision, cutoff, plan.Bootstrap)
+ ORDER BY t.url`, sourceID, revision, cutoff, plan.Bootstrap, now.UTC())
 	if err != nil {
 		return plan, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var document PlannedDocument
-		if err = rows.Scan(&document.URL, &document.PublicationDate, &document.UnavailableStatus, &document.NextAttemptAt); err != nil {
+		if err = rows.Scan(&document.URL, &document.PublicationDate, &document.UnavailableStatus, &document.NextAttemptAt, &document.Listed, &document.Protected); err != nil {
 			return plan, err
 		}
 		resourceRows, queryErr := s.pool.Query(ctx, `SELECT resource_url,required FROM acquisition_dependencies WHERE source_id=$1 AND parent_url=$2 ORDER BY resource_url`, sourceID, document.URL)
@@ -211,7 +246,8 @@ func dateValue(value *time.Time) any {
 func registryNotFound() error { return errors.New("tracked document not found") }
 
 // RecordUnavailable spaces permanent-looking HTTP failures 1h, 2h, 4h, ...
-// up to 24h. Targets stay in the plan, so deferral cannot make a check complete.
+// up to 24h. Targets stay in the plan, so deferring a blocking target cannot
+// make a check complete; withdrawn targets are retried without blocking it.
 func (s *TrackingStore) RecordUnavailable(ctx context.Context, source string, revision int, raw string, status int, at time.Time) error {
 	if (status != 404 && status != 410) || at.IsZero() {
 		return ErrInvalidConfiguration

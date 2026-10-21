@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
 )
 
 func TestControlArgumentsAndRole(t *testing.T) {
@@ -61,5 +64,49 @@ func TestDevelopmentPublicationCommands(t *testing.T) {
 		if !errors.Is(err, domain.ErrDevelopmentOnly) {
 			t.Fatal("strict control", err)
 		}
+	}
+}
+
+func TestUnavailableTargetCommands(t *testing.T) {
+	for _, args := range [][]string{
+		{"source-unavailable-targets", "calcinaia-municipal"},
+		{"source-unavailable-decide", "calcinaia-municipal", "1", "exclude_stale_unavailable", "operator"},
+		{"source-unavailable-decide", "calcinaia-municipal", "2", "resume", "operator"},
+	} {
+		c, ok, err := parseControlCommand(args)
+		if !ok || err != nil || c.Source != "calcinaia-municipal" {
+			t.Fatal(args, c, ok, err)
+		}
+		if err = executeControl(context.Background(), nil, "public", c, io.Discard); !errors.Is(err, errControlRole) {
+			t.Fatal("role bypass", err)
+		}
+	}
+	c, _, _ := parseControlCommand([]string{"source-unavailable-decide", "s", "3", "resume", "operator"})
+	if c.Revision != 3 || c.Decision != "resume" || c.Actor != "operator" {
+		t.Fatalf("decision arguments: %+v", c)
+	}
+	for _, args := range [][]string{
+		{"source-unavailable-targets"}, {"source-unavailable-targets", "s", "extra"},
+		{"source-unavailable-decide", "s", "0", "resume", "operator"}, {"source-unavailable-decide", "s", "x", "resume", "operator"},
+		{"source-unavailable-decide", "s", "1", "delete", "operator"}, {"source-unavailable-decide", "s", "1", "resume", " "},
+		{"source-unavailable-decide", "s", "1", "resume"},
+	} {
+		if _, ok, err := parseControlCommand(args); !ok || !errors.Is(err, errControlArguments) {
+			t.Fatal("invalid accepted", args, ok, err)
+		}
+	}
+	// Payload problems are rejected before any database access.
+	for _, input := range []io.Reader{nil, strings.NewReader("not json"), strings.NewReader(`{"url":"https://x.example","unexpected":true}`)} {
+		c, _, _ := parseControlCommand([]string{"source-unavailable-decide", "s", "1", "exclude_stale_unavailable", "operator"})
+		c.Input = input
+		if err := executeControl(context.Background(), nil, "admin", c, io.Discard); !errors.Is(err, errControlArguments) {
+			t.Fatal("invalid payload accepted", err)
+		}
+	}
+	if code := controlErrorCode(fmt.Errorf("wrapped: %w", acquisition.ErrTargetChanged)); code != "target_changed" {
+		t.Fatal("disposition code", code)
+	}
+	if code := controlErrorCode(acquisition.ErrMeasureAcknowledgementRequired); code != "measure_acknowledgement_required" {
+		t.Fatal("disposition code", code)
 	}
 }

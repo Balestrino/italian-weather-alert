@@ -74,6 +74,9 @@ type CheckOutcome struct {
 	NewDocuments          int
 	PublicationObservedAt *time.Time
 	Retained              []RetainedPage
+	// WithdrawnUnavailable counts unlisted, unprotected 404/410 targets that
+	// did not make this check incomplete.
+	WithdrawnUnavailable int
 }
 
 type acquisitionState struct {
@@ -83,6 +86,7 @@ type acquisitionState struct {
 	retryAfter            *time.Time
 	newDocuments          int
 	publicationObservedAt *time.Time
+	withdrawnUnavailable  int
 }
 
 func (e *Engine) Preview(ctx context.Context, sourceID string, revision int, actor string) (Preview, error) {
@@ -184,6 +188,7 @@ func (e *Engine) Check(ctx context.Context, sourceID string, revision int, start
 	outcome.Documents = len(report.Documents)
 	outcome.NewDocuments = state.newDocuments
 	outcome.PublicationObservedAt = state.publicationObservedAt
+	outcome.WithdrawnUnavailable = state.withdrawnUnavailable
 	outcome.Retained = append([]RetainedPage(nil), report.Documents...)
 	for _, document := range report.Documents {
 		if document.Changed {
@@ -314,12 +319,20 @@ func (e *Engine) scheduledAcquire(ctx context.Context, sourceID string, revision
 		if err := ctx.Err(); err != nil {
 			return report, state, err
 		}
+		// A target that left the complete traversal and supports no measure
+		// is withdrawn: it is retried, but cannot make the check incomplete.
+		withdrawn := !target.Listed && !target.Protected
 		if target.NextAttemptAt != nil && observedAt.Before(*target.NextAttemptAt) {
+			if withdrawn {
+				state.withdrawnUnavailable++
+				continue
+			}
 			state.errorCode = "source_http_error"
 			state.contentRecognized = false
 			unavailableErr = ErrCrawlUnavailable
 			continue
 		}
+		previous := state
 		retained, err := e.retainPlanned(ctx, sourceID, revision, target, observedAt, &state, cfg.Attachments)
 		if retained.VersionID > 0 {
 			retained.Workload = "ordinary"
@@ -334,6 +347,13 @@ func (e *Engine) scheduledAcquire(ctx context.Context, sourceID string, revision
 				if recordErr := e.Tracking.RecordUnavailable(ctx, sourceID, revision, target.URL, failure.StatusCode, now().UTC()); recordErr != nil {
 					state.errorCode = "tracking_failed"
 					return report, state, recordErr
+				}
+				if withdrawn {
+					// The failed fetch must not leave its error state on an
+					// otherwise complete check.
+					state.contentRecognized, state.errorCode, state.retryAfter = previous.contentRecognized, previous.errorCode, previous.retryAfter
+					state.withdrawnUnavailable++
+					continue
 				}
 				unavailableErr = err
 				continue

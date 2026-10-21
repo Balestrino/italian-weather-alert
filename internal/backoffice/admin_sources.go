@@ -51,6 +51,10 @@ type AdminRegistry interface {
 type AdminPreview interface {
 	Preview(context.Context, string, int, string) (acquisition.Preview, error)
 }
+type AdminUnavailableTargets interface {
+	ListUnavailable(context.Context, string) ([]acquisition.UnavailableTarget, error)
+	RecordDisposition(context.Context, acquisition.DispositionRequest) (acquisition.TargetDisposition, error)
+}
 type AdminInterpretation interface {
 	ResumeInterpretation(context.Context, string, int, string, interpretation.Recovery) error
 	Reprocess(context.Context, interpretation.Selection) (string, int, error)
@@ -94,8 +98,9 @@ type AdminRuntime struct {
 		Propose(context.Context, string, string, time.Time, registry.Evidence) (trialcost.Proposal, error)
 		Proposals(context.Context, string) ([]trialcost.Proposal, error)
 	}
-	Registry AdminRegistry
-	Preview  AdminPreview
+	Registry           AdminRegistry
+	Preview            AdminPreview
+	UnavailableTargets AdminUnavailableTargets
 }
 
 func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
@@ -167,6 +172,14 @@ func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
 		}
 		back, _ := r.Context().Value(territoryReturnKey{}).(string)
 		view := adminSourceView{Back: back, InterpretationHistory: history, State: st, Versions: versions, Events: events, Intervals: intervals, EffectiveCheckSeconds: check, EffectiveDelaySeconds: delay}
+		// The unavailable-target list is diagnostic: its failure must not hide
+		// the rest of the source controls.
+		if a.UnavailableTargets != nil {
+			targets, listErr := a.UnavailableTargets.ListUnavailable(r.Context(), id)
+			view.UnavailableTargets, view.UnavailableTargetsMissing = targets, listErr != nil
+		} else {
+			view.UnavailableTargetsMissing = true
+		}
 		if wantsAdminJSON(r) {
 			httpserver.Reply(w, 200, view)
 			return
@@ -264,6 +277,36 @@ func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
 		}
 		adminSuccess(w, r, map[string]int{"interval_revision": input.ExpectedRevision + 1})
 	})
+	mux.HandleFunc("POST /admin/sources/{id}/unavailable-targets/decisions", func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Configuration       int             `json:"configuration"`
+			URL                 string          `json:"url"`
+			ObservedLastSeenAt  time.Time       `json:"observed_last_seen_at"`
+			Decision            string          `json:"decision"`
+			Actor               string          `json:"actor"`
+			Reason              string          `json:"reason"`
+			Evidence            json.RawMessage `json:"evidence"`
+			AcknowledgeMeasures bool            `json:"acknowledge_measures"`
+		}
+		if !adminDecode(w, r, &input) {
+			return
+		}
+		if a.UnavailableTargets == nil {
+			adminFailure(w, registryUnavailable)
+			return
+		}
+		// Guided forms submit the evidence object as JSON text.
+		var text string
+		if json.Unmarshal(input.Evidence, &text) == nil {
+			input.Evidence = json.RawMessage(text)
+		}
+		recorded, err := a.UnavailableTargets.RecordDisposition(r.Context(), acquisition.DispositionRequest{SourceID: r.PathValue("id"), Configuration: input.Configuration, URL: input.URL, Decision: input.Decision, ObservedLastSeenAt: input.ObservedLastSeenAt, Actor: input.Actor, Reason: input.Reason, Evidence: input.Evidence, AcknowledgeMeasures: input.AcknowledgeMeasures})
+		if err != nil {
+			adminFailure(w, err)
+			return
+		}
+		adminSuccess(w, r, map[string]any{"url": input.URL, "disposition": recorded})
+	})
 	for _, action := range []string{"preview", "enable-collection", "suspend-collection"} {
 		mux.HandleFunc("POST /admin/sources/{id}/"+action, func(w http.ResponseWriter, r *http.Request) {
 			var input struct {
@@ -325,6 +368,9 @@ type adminSourceView struct {
 	Intervals             registry.Intervals
 	EffectiveCheckSeconds int
 	EffectiveDelaySeconds int
+	UnavailableTargets    []acquisition.UnavailableTarget
+	// UnavailableTargetsMissing reports that the list could not be read.
+	UnavailableTargetsMissing bool
 }
 
 func wantsAdminJSON(r *http.Request) bool {
@@ -403,6 +449,12 @@ func adminFailure(w http.ResponseWriter, err error) {
 		status, code = 409, "trial_cost_report_incomplete"
 	case errors.Is(err, trialcost.ErrConflict):
 		status, code = 409, "trial_cost_conflict"
+	case errors.Is(err, acquisition.ErrDispositionInvalid):
+		status, code = 400, acquisition.DispositionErrorCode(err)
+	case errors.Is(err, acquisition.ErrTargetNotFound):
+		status, code = 404, acquisition.DispositionErrorCode(err)
+	case acquisition.DispositionErrorCode(err) != "disposition_failed":
+		status, code = 409, acquisition.DispositionErrorCode(err)
 	case errors.Is(err, registry.ErrNotFound):
 		status, code = 404, "source_not_found"
 	case errors.Is(err, registry.ErrInvalid), errors.Is(err, acquisition.ErrInvalidConfiguration), errors.Is(err, interpretation.ErrInvalid), errors.Is(err, evaluation.ErrComparisonInvalid):
@@ -454,6 +506,17 @@ var adminTemplates = template.Must(uiTemplates("admin", template.FuncMap{
 	"edit": func(v registry.Version) string {
 		return adminJSON(map[string]any{"actor": "", "expected_revision": v.Revision, "configuration": v.Configuration})
 	},
-	"event":  func(e registry.Event) string { return string(e.Evidence) },
-	"latest": func(v []registry.Version) registry.Version { return v[len(v)-1] },
+	"event":   func(e registry.Event) string { return string(e.Evidence) },
+	"latest":  func(v []registry.Version) registry.Version { return v[len(v)-1] },
+	"instant": func(t time.Time) string { return t.UTC().Format(time.RFC3339Nano) },
+	"targetClass": func(class string) string {
+		switch class {
+		case "withdrawn":
+			return "Ritirato dagli elenchi: non blocca il controllo"
+		case "excluded":
+			return "Escluso con decisione revisionata"
+		default:
+			return "Bloccante: il controllo resta incompleto"
+		}
+	},
 }).ParseFS(adminUI, "ui/sources.html", "ui/fields.html", "ui/reports.html"))

@@ -78,7 +78,7 @@ A disposition store in `internal/backend/acquisition` provides two operations, u
 - `exclude_stale_unavailable` requires no explicit reference. If the target is `Protected` by a measure, it also requires `acknowledgeMeasures`.
 - `resume` requires that the latest decision is an exclusion.
 
-An additive column `acquisition_target_dispositions.measure_acknowledged boolean NOT NULL DEFAULT false` stores the acknowledgement. Errors are stable codes: `target_not_found`, `target_changed`, `target_recovered`, `configuration_inactive`, `measure_acknowledgement_required`, `nothing_to_resume`.
+An additive column `acquisition_target_dispositions.measure_acknowledged boolean NOT NULL DEFAULT false` stores the acknowledgement. Errors are stable codes: `invalid_disposition`, `target_not_found`, `target_changed`, `target_recovered`, `target_referenced`, `target_already_excluded`, `configuration_inactive`, `measure_acknowledgement_required`, `nothing_to_resume`. Evidence must be a non-empty JSON object.
 
 ### 6. CLI and administration surfaces
 - **CLI** (`cmd/iwa/controls.go`):

@@ -29,6 +29,9 @@ var unavailableSchema string
 //go:embed target_dispositions_schema.sql
 var targetDispositionsSchema string
 
+//go:embed withdrawn_schema.sql
+var withdrawnSchema string
+
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -141,6 +144,23 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 			return err
 		}
 		if _, err = tx.Exec(ctx, "INSERT INTO iwa_migrations(name,checksum) VALUES ('064_reviewed_target_dispositions',$1)", dispositionsChecksum); err != nil {
+			return err
+		}
+	}
+	withdrawnHash := sha256.Sum256([]byte(withdrawnSchema))
+	withdrawnChecksum := hex.EncodeToString(withdrawnHash[:])
+	err = tx.QueryRow(ctx, "SELECT checksum FROM iwa_migrations WHERE name='098_withdrawn_unavailable_targets'").Scan(&previous)
+	if err == nil {
+		if previous != withdrawnChecksum {
+			return errors.New("withdrawn unavailable targets migration checksum mismatch")
+		}
+	} else if !errors.Is(err, pgx.ErrNoRows) {
+		return err
+	} else {
+		if _, err = tx.Exec(ctx, withdrawnSchema); err != nil {
+			return err
+		}
+		if _, err = tx.Exec(ctx, "INSERT INTO iwa_migrations(name,checksum) VALUES ('098_withdrawn_unavailable_targets',$1)", withdrawnChecksum); err != nil {
 			return err
 		}
 	}

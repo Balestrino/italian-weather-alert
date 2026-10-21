@@ -49,6 +49,9 @@ func sourceFields(action string, v adminSourceView) []guidedField {
 			fields = append(fields, field("acceptance."+check.name, check.label, "bool", true))
 		}
 		fields = append(fields, field("acceptance.known_omissions", "Omissioni note", "number", true), field("acceptance.unsupported_assertions", "Asserzioni non supportate", "number", true))
+	case "decisions":
+		fields[0].Name, fields[0].Label, fields[0].Readonly = "configuration", "Configurazione", false
+		fields = append(fields, field("url", "URL", "text", true), field("observed_last_seen_at", "Ultima comparsa osservata", "time", true), field("decision", "Decisione", "text", true), field("reason", "Motivazione", "text", true), field("evidence", "Evidenze (oggetto JSON)", "text", true), field("acknowledge_measures", "Misura non più da seguire", "bool", true))
 	case "reprocess-interpretation":
 		fields = append(fields, field("from", "Acquisiti dal (incluso)", "time", false), field("through", "Acquisiti fino al", "time", false), field("error_code", "Codice errore da selezionare", "text", false), field("processing_evaluation_id", "Valutazione elaborazione (se applicabile)", "text", false))
 	case "resume-interpretation":

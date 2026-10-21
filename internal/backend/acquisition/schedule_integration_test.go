@@ -190,7 +190,7 @@ func TestExpiredLeaseBecomesVisibleFailure(t *testing.T) {
 		t.Fatalf("expired check should enter backoff, got %v", err)
 	}
 	checks, err := store.Checks(ctx, "s")
-	if err != nil || len(checks) != 1 || checks[0].ErrorCode != "check_lease_expired" {
+	if err != nil || len(checks) != 1 || checks[0].ErrorCode != "check_lease_expired" || checks[0].WithdrawnUnavailable != 0 {
 		t.Fatalf("expired lease not persisted: checks=%#v err=%v", checks, err)
 	}
 	// Replay the observed saturated municipal schedule: a lost 20-minute

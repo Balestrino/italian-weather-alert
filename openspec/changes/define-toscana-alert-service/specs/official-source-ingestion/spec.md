@@ -273,7 +273,7 @@ Collection SHALL respect source constraints and upstream retry instructions, use
 
 #### Scenario: A reviewed stale document remains unavailable
 - **WHEN** a previously discovered document still returns HTTP 404/410 and complete later traversals of the configured listings no longer contain it
-- **THEN** an operator may record an evidence-backed exclusion scoped to its source, configuration and URL, preserving acquisitions, failed checks and unavailable-target history; rediscovery automatically restores the target to checking
+- **THEN** it no longer makes checks incomplete unless it is explicitly referenced or supports a derived measure, as specified by `unavailable-municipal-targets`; an operator may still record an evidence-backed exclusion scoped to its source, configuration and URL, preserving acquisitions, failed checks and unavailable-target history, and rediscovery automatically restores the target to checking
 
 ### Requirement: Internal quality monitoring and DPC comparison
 The internal monitoring system SHALL retain diagnostic evidence for availability, timeliness and interpretation correctness, including ambiguous relationships, omitted publications, source disagreements and parsing failures. It SHALL support assessment of code and process improvements against retained cases. It SHALL NOT introduce editorial approval, manual content correction or a publication gate for individual notices. DPC products SHALL be used only for internal comparison in the first release, with comparison scope and non-comparability explicit; they SHALL NOT overwrite regional values or appear as public warning products.
@@ -331,9 +331,9 @@ Initial collection SHALL cover notices from the preceding 30 days in configured 
 - **THEN** the check retains the new attachment version and schedules interpretation of the affected evidence
 
 #### Scenario: A reviewed unavailable URL disappears from current listings
-- **WHEN** an operator documents that a previously discovered URL returns 404/410, has no retained original and no longer appears in later fully traversed configured listings
-- **THEN** an exact source/configuration/URL disposition may exclude that stale URL from subsequent revision plans while preserving its failure and check history, without asserting what the missing original contained or equivalence to another URL
-- **AND** a later rediscovery of that URL makes it eligible for checking again; unreviewed 404/410 targets continue to make checks incomplete during retry deferral
+- **WHEN** an operator documents that a previously discovered URL returns 404/410 and no longer appears in later fully traversed configured listings
+- **THEN** an exact source/configuration/URL disposition may exclude that stale URL from subsequent revision plans while preserving its retained originals, failure and check history, without asserting what a missing original contained or equivalence to another URL
+- **AND** a later rediscovery of that URL makes it eligible for checking again; unreviewed 404/410 targets that are still listed, explicitly referenced or supporting a derived measure continue to make checks incomplete during retry deferral, while other unlisted ones are withdrawn and retried without blocking the check
 
 ### Requirement: Scanned documents and supported extraction
 The service SHALL classify full content of new or changed notices, extract pertinent measures in structured form, and retain supporting passages for asserted fields. It SHALL include reading scanned PDFs and document images, with page references tied to retained originals. OCR formatting artifacts SHALL be normalized before inference without losing the retained page and position needed to verify a quotation against the OCR output and original document.

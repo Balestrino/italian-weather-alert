@@ -105,6 +105,7 @@ func run() bool {
 	}
 	defer pool.Close()
 	if controlRequested {
+		control.Input = os.Stdin
 		if err := executeControlEnvironment(ctx, pool, c.Role, c.Environment, control, os.Stdout); err != nil {
 			slog.Error("control command failed", "code", controlErrorCode(err))
 			return false
@@ -894,7 +895,7 @@ func run() bool {
 		evaluations := evaluation.New(pool)
 		adminScheduler := interpretation.New(pool, jobs.New(pool), inference.RetryPolicy{MaxAttempts: 3, BaseDelay: time.Second}, false)
 		adminScheduler.Evaluations = evaluations
-		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Embedding: jobs.New(pool), Registry: reg, Preview: engine, Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
+		adminRuntime = backoffice.AdminRuntime{Territories: operations.New(pool), TerritoryConfig: domain.New(pool), Alerts: operations.New(pool), Provider: processing.New(pool), TailscaleOrigin: c.AdminTailscaleOrigin, Backups: backups.New(pool), Notifications: notifications.New(pool), Operations: operations.New(pool), Diagnostics: diagnostics.New(pool), Jobs: jobs.New(pool), Embedding: jobs.New(pool), Registry: reg, Preview: engine, UnavailableTargets: acquisition.NewDispositionStore(pool), Interpretation: adminScheduler, Evaluations: evaluations, Observations: observation.New(pool), TrialCosts: trialcost.New(pool)}
 		if c.Environment == "development" {
 			adminRuntime.DevelopmentPublication = domain.NewDevelopmentPublication(pool, c.Environment)
 		}

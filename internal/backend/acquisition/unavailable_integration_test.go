@@ -99,3 +99,64 @@ func TestUnavailableTargetBackoffPersistenceAndRecovery(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestPlanReportsListedAndProtectedTargets(t *testing.T) {
+	ctx := context.Background()
+	pool := acquisitionTestDB(t)
+	if err := registry.Migrate(ctx, pool); err != nil {
+		t.Fatal(err)
+	}
+	if err := Migrate(ctx, pool); err != nil {
+		t.Fatal(err)
+	}
+	reg := registry.New(pool)
+	now := time.Date(2026, 10, 21, 12, 0, 0, 0, time.UTC)
+	evidence := registry.Evidence{URL: "https://source.example/reuse", Locator: "fixture", ObservedAt: now}
+	for _, err := range []error{
+		reg.CreateAuthority(ctx, registry.Authority{ID: "plan-a", Name: "A", OfficialURL: "https://source.example"}),
+		reg.CreateChannel(ctx, registry.Channel{ID: "plan-c", PublisherID: "plan-a", Platform: "fixture", URL: "https://source.example"}),
+		reg.CreateSource(ctx, registry.Source{ID: "plan-s", AuthorityID: "plan-a", ChannelID: "plan-c", ProductID: "municipal", Territory: "x"}, registry.Configuration{URL: "https://source.example", Sections: []string{"https://source.example/list"}, AccessMethod: "html", Attribution: "A", Policy: registry.Policy{Evidence: &evidence, CollectionPermitted: true}}, "test"),
+	} {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	tracker := NewTrackingStore(pool)
+	base := "https://source.example/notices/"
+	published := now.Add(-24 * time.Hour)
+	earlier := now.Add(-time.Hour)
+	var all []DiscoveredDocument
+	for _, name := range []string{"listed", "renamed", "referenced", "ongoing"} {
+		all = append(all, DiscoveredDocument{URL: base + name, PublicationDate: &published})
+	}
+	if _, err := tracker.Remember(ctx, "plan-s", 1, all, earlier); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := pool.Exec(ctx, "UPDATE acquisition_targets SET explicit_reference=true WHERE url=$1", base+"referenced"); err != nil {
+		t.Fatal(err)
+	}
+	if err := tracker.SetReviewState(ctx, "plan-s", base+"ongoing", "relevant", "ongoing"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tracker.Remember(ctx, "plan-s", 1, all[:1], now); err != nil {
+		t.Fatal(err)
+	}
+	plan, err := tracker.Plan(ctx, "plan-s", 1, now, 30)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string][2]bool{
+		base + "listed":     {true, false},
+		base + "renamed":    {false, false},
+		base + "referenced": {false, true},
+		base + "ongoing":    {false, true},
+	}
+	if len(plan.Documents) != len(want) {
+		t.Fatalf("plan: %+v", plan.Documents)
+	}
+	for _, document := range plan.Documents {
+		if got := [2]bool{document.Listed, document.Protected}; got != want[document.URL] {
+			t.Fatalf("%s listed/protected = %v, want %v", document.URL, got, want[document.URL])
+		}
+	}
+}

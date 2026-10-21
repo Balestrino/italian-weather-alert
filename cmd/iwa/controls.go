@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
@@ -22,6 +23,20 @@ var errControlRole = errors.New("controls require the admin role")
 type controlCommand struct {
 	Name, Source, Region, ISTAT, Actor string
 	Revision                           int
+	// Decision and Input carry a reviewed unavailable-target disposition; the
+	// decision payload is read from Input because it holds free text and a
+	// JSON evidence object.
+	Decision string
+	Input    io.Reader
+}
+
+// unavailableDecision is the stdin payload of source-unavailable-decide.
+type unavailableDecision struct {
+	URL                 string          `json:"url"`
+	ObservedLastSeenAt  time.Time       `json:"observed_last_seen_at"`
+	Reason              string          `json:"reason"`
+	Evidence            json.RawMessage `json:"evidence"`
+	AcknowledgeMeasures bool            `json:"acknowledge_measures"`
 }
 
 func parseControlCommand(args []string) (controlCommand, bool, error) {
@@ -40,8 +55,10 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		count = 1
 	case "embedding-enable", "embedding-disable":
 		count = 3
-	case "source-status", "region-status":
+	case "source-status", "region-status", "source-unavailable-targets":
 		count = 2
+	case "source-unavailable-decide":
+		count = 5
 	case "municipality-status", "municipality-development-publication-status":
 		count = 3
 	case "source-enable-collection", "source-suspend-collection", "region-enable", "region-disable":
@@ -74,7 +91,15 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 	if c.ISTAT != "" && !controlDigits(c.ISTAT, 6) {
 		return c, true, errControlArguments
 	}
-	if !strings.HasSuffix(c.Name, "-status") {
+	if c.Name == "source-unavailable-decide" {
+		configuration, err := strconv.Atoi(args[2])
+		if err != nil || configuration < 1 || (args[3] != acquisition.DecisionExclude && args[3] != acquisition.DecisionResume) {
+			return c, true, errControlArguments
+		}
+		c.Revision, c.Decision, c.Actor = configuration, args[3], args[4]
+		return c, true, nil
+	}
+	if !strings.HasSuffix(c.Name, "-status") && c.Name != "source-unavailable-targets" {
 		rev, err := strconv.Atoi(args[len(args)-2])
 		if err != nil || rev < 0 || (c.Source != "" && rev == 0 && !strings.HasPrefix(c.Name, "source-embedding-")) {
 			return c, true, errControlArguments
@@ -146,6 +171,26 @@ func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, en
 			state, err = reg.State(ctx, c.Source)
 			result = map[string]any{"source_id": state.Source.ID, "latest_revision": state.LatestRevision, "active_revision": state.ActiveRevision, "collection_enabled": state.CollectionEnabled, "public_enabled": state.PublicEnabled, "guidance": "Collection enablement is saved configuration. Automatic collection requires an active worker and enabled territories; publication is separate."}
 		}
+	case "source-unavailable-targets":
+		var targets []acquisition.UnavailableTarget
+		targets, err = acquisition.NewDispositionStore(pool).ListUnavailable(ctx, c.Source)
+		if targets == nil {
+			targets = []acquisition.UnavailableTarget{}
+		}
+		result = map[string]any{"source_id": c.Source, "unavailable_targets": targets, "guidance": "Withdrawn targets no longer fail checks. Blocking targets are still listed, referenced or support a measure; record a reviewed decision only after checking complete listings."}
+	case "source-unavailable-decide":
+		var payload unavailableDecision
+		if c.Input == nil {
+			return errControlArguments
+		}
+		decoder := json.NewDecoder(io.LimitReader(c.Input, 64<<10))
+		decoder.DisallowUnknownFields()
+		if decoder.Decode(&payload) != nil {
+			return errControlArguments
+		}
+		var recorded acquisition.TargetDisposition
+		recorded, err = acquisition.NewDispositionStore(pool).RecordDisposition(ctx, acquisition.DispositionRequest{SourceID: c.Source, Configuration: c.Revision, URL: payload.URL, Decision: c.Decision, ObservedLastSeenAt: payload.ObservedLastSeenAt, Actor: c.Actor, Reason: payload.Reason, Evidence: payload.Evidence, AcknowledgeMeasures: payload.AcknowledgeMeasures})
+		result = map[string]any{"source_id": c.Source, "url": payload.URL, "disposition": recorded, "guidance": "The decision changes only the revision plan of this exact URL. It does not start a check, change publication or accept the source."}
 	case "region-enable", "region-disable", "region-status":
 		if c.Name != "region-status" {
 			_, err = geo.SetRegionEnabled(ctx, c.Region, c.Revision, c.Name == "region-enable", c.Actor)
@@ -172,6 +217,9 @@ func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, en
 }
 
 func controlErrorCode(err error) string {
+	if code := acquisition.DispositionErrorCode(err); code != "disposition_failed" {
+		return code
+	}
 	switch {
 	case errors.Is(err, domain.ErrDevelopmentOnly):
 		return "development_environment_required"
