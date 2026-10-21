@@ -2,7 +2,7 @@
 
 ## Why
 
-The revision plan rechecks notices older than the bootstrap window only when their tracked `measure_state` is `ongoing` or `unresolved`. Bootstrap also includes explicitly referenced older documents. However, no production code writes `measure_state`, `relevance_state` or `explicit_reference`: every target in development is `none`, `unknown` and `false` ([CLN-033](../../../docs/territori/09-toscana/comuni/050004-calcinaia.md#cln-033--stato-misura-e-riferimenti-dei-target-non-alimentati)).
+The revision plan rechecks notices older than the bootstrap window only when their tracked `measure_state` is `ongoing` or `unresolved`. Bootstrap also includes explicitly referenced older documents. However, no production code writes `measure_state`, `relevance_state` or `explicit_reference`: every target in development is `none`, `unknown` and `false` ([CLN-033](../../../../docs/territori/09-toscana/comuni/050004-calcinaia.md#cln-033--stato-misura-e-riferimenti-dei-target-non-alimentati)).
 
 As a result, an ordinance whose closure or COC activation is still in force stops being rechecked as soon as it leaves the 30–60 day window. A later revocation, extension or correction published on the same page would then be missed. On 2026-10-21 every development notice with municipal measures has an unknown or conditional end, and several from Calcinaia and Livorno are already outside the window and no longer rechecked. The withdrawn-target protection added by `handle-withdrawn-unavailable-targets` had to fall back on "any derived measure", because the tracked state cannot be trusted.
 

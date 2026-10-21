@@ -163,7 +163,7 @@ implementa questo trattamento ed è adottata in development (CLN-034).
 
 Lo stato misura e il riferimento esplicito dei target tracciati non erano
 alimentati dall'interpretazione (CLN-033). La change
-[maintain-target-measure-state](../../../../openspec/changes/maintain-target-measure-state/proposal.md)
+[maintain-target-measure-state](../../../../openspec/changes/archive/2026-10-21-maintain-target-measure-state/proposal.md)
 li ricava a ogni controllo dalle interpretazioni validate, con un limite
 configurabile per le misure dalla fine ignota; è adottata in development
 (CLN-035).
