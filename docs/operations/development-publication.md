@@ -36,6 +36,12 @@ without rebuilding or restarting workers. Ordinary revocation on current softwar
 requires only the revision-checked municipal control above.
 
 
+On 2026-10-21 Cascina was also selected. Its situation now shows the
+regional A4 products. Municipal data remain unavailable because the active
+source policy does not permit publication. Calcinaia and Cascina are now both
+selected: a later same-zone isolation check must use another unselected A4
+municipality.
+
 On 2026-10-03 the primary municipal extraction path was connected to the domain
 and verified in development. Completed ordinary extractions retain action,
 subject, field evidence, literal validity and projection knowledge time; a COC

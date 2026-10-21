@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050008"
-ultima_revisione: "2026-10-04"
+ultima_revisione: "2026-10-21"
 ---
 
 # Cascina
@@ -17,11 +17,23 @@ Comune di Cascina, provincia di Pisa, ISTAT `050008`. Fonte IWA: `cascina-munici
 | --- | --- | --- |
 | Sito comunale | Punto di partenza ufficiale | [Sito del Comune](https://www.comune.cascina.pi.it/) |
 | Archivio Avvisi | Sezione da verificare | [Avvisi, pagina 1](https://www.comune.cascina.pi.it/it/news?type=3&page=1); verificare le pagine effettivamente configurate e la sezione tematica |
-| Categoria Protezione Civile | Elenco tematico con date | [Categoria 119346](https://www.comune.cascina.pi.it/it/news-category/119346?type=3); il 2026-10-02 mostra anche la notizia COC dell'8 ottobre 2024 |
+| Categoria Protezione Civile | Elenco tematico con date | [Categoria 119346](https://www.comune.cascina.pi.it/it/news-category/119346?type=3); il 2026-10-02 mostra anche la notizia COC dell'8 ottobre 2024. Senza filtro di tipo la [stessa categoria](https://www.comune.cascina.pi.it/it/news-category/119346) include anche notizie di tipo "Notizie" (CAS-008) |
+| Avvisi di criticità | Vista Municipium degli avvisi di protezione civile | [Avvisi di criticità](https://www.comune.cascina.pi.it/it/civil-defence-critical-alerts); al 2026-10-21 l'ultimo avviso è del 21 marzo 2025 (CAS-008) |
+| Allerte di Protezione civile | Riquadro che riporta i livelli della zona omogenea | [Allerte](https://www.comune.cascina.pi.it/it/civil-defence-alerts); ripete i livelli regionali, già acquisiti dai prodotti CFR della zona A4 |
+| App MAC, Facebook, WhatsApp | Canali dichiarati dal Comune per le allerte | [Informazioni di protezione civile](https://www.comune.cascina.pi.it/it/civil-defence-information); iscrizione SPID o piattaforme di terzi, non acquisiti da IWA |
 
 La prima consultazione web del 2026-10-02 non aveva restituito il contenuto dell'archivio. La successiva consultazione dello stesso giorno ha restituito gli Avvisi e la [notizia Allerta arancione, aperto il COC](https://www.comune.cascina.pi.it/it/news/119346/allerta-arancione-aperto-il-coc). Quest'ultima collega nel footer un Piano di miglioramento in PDF su un host S3 esterno. La nuova osservazione supera il limite della prima consultazione, senza dimostrare disponibilità continua del crawler.
 
 ## Guida operativa
+
+CAS-008 spiega l'assenza di allerte di Cascina nelle interfacce. Le allerte
+regionali arrivano dai prodotti CFR della zona A4 e, in development, sono
+visibili da quando Cascina è selezionata per la pubblicazione manuale. Il sito
+comunale non pubblica più avvisi di allerta per i normali livelli regionali:
+l'ultimo è del 21 marzo 2025, e il Comune dichiara di usare app, Facebook e
+WhatsApp. Un elenco senza allerte recenti non indica un guasto della raccolta. I
+dati comunali restano non pubblicati perché la policy della fonte esclude la
+pubblicazione.
 
 Il precollaudo del 2026-10-04 produce un report individuale **pending**,
 con valutazione, osservazione, accettazione e pubblicazione distinte. La
@@ -60,6 +72,14 @@ Vedere [elaborazione locale](../../../operations/local-processing.md).
 Il permesso per gli allegati esaminati appartiene alla revisione della sola fonte Cascina; questa scheda non abilita fonti, pubblicazione o eccezioni anti-bot.
 
 ## Problemi aperti
+
+La fonte legge Avvisi e la categoria Protezione Civile filtrata sul tipo Avvisi.
+Un provvedimento pubblicato come "Notizia" non sarebbe scoperto (CAS-008,
+ipotesi). Le bozze di revisione 5–7 non hanno superato la preview e resta attiva
+la revisione 4 (CAS-009). Estendere il perimetro richiede prima una revisione del
+permesso per l'host `cloud-ita.municipiumapp.it`, oppure una preview che tolleri
+le voci scadute. La pubblicazione dei dati comunali richiede una revisione
+separata delle condizioni di riuso.
 
 Verificare l'accesso dell'acquisitore e la riconoscibilità degli elenchi nell'ambiente interessato, includendo eventuali protezioni anti-bot. Chiudere il problema solo con un controllo completo sul perimetro dichiarato. Paginazione, atti originali, aggiornamenti e accettazione rimangono da valutare separatamente.
 
@@ -146,3 +166,22 @@ CAS-005 non risolve blocchi o entitlement del provider: un documento nuovo e non
 - **Conseguenza:** il report mantiene lo stato pending e i controlli esistenti; non estende il perimetro né dichiara copertura dei cinque comuni.
 - **Prossima verifica:** risolvere i prerequisiti dell'ambito, completare valutazione e osservazione, quindi accettare e abilitare separatamente la fonte verificata.
 - **Collegamenti:** CAS-004, CAS-005 e CAS-006; task 11.5 della [specifica Toscana](../../../../openspec/changes/define-toscana-alert-service/tasks.md).
+
+### CAS-008 — Allerte assenti dal sito e pubblicazione in development
+
+- **Data e ambito:** 2026-10-21; `cascina-municipal`, elenchi Notizie, Avvisi e Comunicati, categoria Protezione Civile, pagine Municipium di protezione civile, API pubblica di development.
+- **Osservazione confermata:** nessun elenco del sito contiene avvisi di allerta successivi al 21 marzo 2025; anche la pagina "Avvisi di criticità" termina con quella data. Nelle stesse finestre di ottobre 2026 Calcinaia e Livorno hanno pubblicato allerte, mentre IWA ha conservato per la zona A4 livelli gialli e arancioni dai bollettini di criticità. La pagina informativa del Comune indica app MAC, sito, Facebook e WhatsApp come canali per le allerte e rimanda al sito regionale.
+- **Osservazione confermata:** l'API di development restituiva per Cascina tutte le fonti come non disponibili, perché la pubblicazione manuale era selezionata solo per Calcinaia. Abilitata per 09/050008, la situazione mostra le allerte regionali della zona A4. I dati comunali restano non disponibili: la policy della configurazione attiva non permette la pubblicazione.
+- **Ipotesi:** la categoria Protezione Civile senza filtro include anche voci di tipo "Notizie", come l'avviso del 30 gennaio 2024 sull'app di allerta; la configurazione filtrata sul tipo Avvisi non le scopre.
+- **Intervento:** pubblicazione in development abilitata per Cascina; nessuna modifica di configurazione, policy, accettazione o pubblicazione di produzione. Sostituisce il comune A4 non selezionato usato come confronto nella verifica del 2 ottobre della [pubblicazione in development](../../../operations/development-publication.md).
+- **Prossima verifica:** revisione della configurazione con la categoria senza filtro e preview; revisione delle condizioni di riuso prima di ammettere la pubblicazione dei dati comunali.
+- **Evidenza:** [Avvisi di criticità](https://www.comune.cascina.pi.it/it/civil-defence-critical-alerts), [informazioni di protezione civile](https://www.comune.cascina.pi.it/it/civil-defence-information), registro privato `cascina-publication-20261021`.
+
+### CAS-009 — Bozze di perimetro più ampio non superano la preview
+
+- **Data e ambito:** 2026-10-21; revisioni bozza 5, 6 e 7 di `cascina-municipal` in development; la revisione attiva resta la 4.
+- **Osservazione confermata:** la categoria Protezione Civile senza filtro di tipo pubblica link di paginazione con il solo parametro `page`, che la preview segue oltre il limite di una pagina per sezione (revisione 5). Disattivando la paginazione (revisione 6), la preview scarica le voci elencate: dieci notizie del 2022–2023 ancora presenti nella categoria rispondono 410. Il controllo programmato le escluderebbe perché fuori finestra, ma la preview le scarica tutte.
+- **Osservazione confermata:** la prima pagina dell'elenco generale Notizie (revisione 7) contiene il [bando TARI 2026](https://www.comune.cascina.pi.it/it/news/bando-tari-2026), che collega nel contenuto un PDF del tenant `/s3/1520/allegati/` sull'host `cloud-ita.municipiumapp.it`. L'host autorizzato da CAS-004 è `cascina-api.cloud.municipiumapp.it`: l'allegato obbligatorio risulta non consentito e la preview fallisce. Gli altri PDF della pagina sono sull'host autorizzato.
+- **Intervento:** nessuna attivazione; per decisione dell'operatore resta la revisione 4. Le bozze restano nello storico della fonte.
+- **Prossima verifica:** revisione delle condizioni di riuso per il secondo host dello stesso tenant, limitata ai PDF nel contenuto della pagina, prima di riproporre l'elenco Notizie; in alternativa, una preview che applichi la stessa finestra temporale del controllo programmato.
+- **Evidenza:** registro privato `cascina-configuration-20261021`.
