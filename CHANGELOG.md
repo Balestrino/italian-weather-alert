@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-21 [Changed] Archive the completed handle-withdrawn-unavailable-targets change and publish unavailable-municipal-targets as a main capability specification.
 - 2026-10-21 [Changed] Explain missing Cascina weather alerts, record its development publication and the failed wider-scope configuration drafts.
 - 2026-10-21 [Changed] Verify the development adoption of withdrawn unavailable targets: every active source completes its first check and Livorno recovers from a two-week delay.
 - 2026-10-21 [Changed] Stop renamed or withdrawn 404/410 municipal notices from failing source checks, count them separately, and add guarded administration and CLI dispositions for unavailable targets.

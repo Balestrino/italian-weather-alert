@@ -158,7 +158,7 @@ fonte segnala quindi un ritardo anche quando le nuove pubblicazioni sono
 acquisite. Un trattamento distinto di questi target richiede una modifica
 specificata e collaudata; la sostituzione automatica di un URL con un altro non
 è ammessa senza verifica. La change
-[handle-withdrawn-unavailable-targets](../../../../openspec/changes/handle-withdrawn-unavailable-targets/proposal.md)
+[handle-withdrawn-unavailable-targets](../../../../openspec/changes/archive/2026-10-21-handle-withdrawn-unavailable-targets/proposal.md)
 implementa questo trattamento ed è adottata in development (CLN-034).
 
 Lo stato misura e il riferimento esplicito dei target tracciati non sono

@@ -2,7 +2,7 @@
 
 ## Why
 
-Municipal sites often correct a notice's slug after publication. The former URL then returns 404, disappears from the listings and keeps every later check incomplete until an operator writes a reviewed disposition by hand in SQL. Calcinaia stayed in `collection_failure` for seven days, with a continuous source-delay incident, while new notices were still being acquired and interpreted ([CLN-032](../../../docs/territori/09-toscana/comuni/050004-calcinaia.md#cln-032--url-rinominati-e-controllo-fallito-per-una-settimana)). The same pattern produced six stale URLs in one month, each needing a manual disposition. The check outcome therefore reports a delay that does not exist, hides real delays behind a permanent incident, and costs operator time.
+Municipal sites often correct a notice's slug after publication. The former URL then returns 404, disappears from the listings and keeps every later check incomplete until an operator writes a reviewed disposition by hand in SQL. Calcinaia stayed in `collection_failure` for seven days, with a continuous source-delay incident, while new notices were still being acquired and interpreted ([CLN-032](../../../../docs/territori/09-toscana/comuni/050004-calcinaia.md#cln-032--url-rinominati-e-controllo-fallito-per-una-settimana)). The same pattern produced six stale URLs in one month, each needing a manual disposition. The check outcome therefore reports a delay that does not exist, hides real delays behind a permanent incident, and costs operator time.
 
 ## What Changes
 
