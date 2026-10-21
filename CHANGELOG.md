@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-21 [Security] Upgrade Go to 1.27.3, golang.org/x/net to v0.61.0 and klauspost/compress to v1.18.7 to resolve reachable standard-library and HTTP/2 vulnerabilities reported by govulncheck.
 - 2026-10-21 [Changed] Archive six completed OpenSpec changes and publish their requirements as the first main capability specifications.
 - 2026-10-11 [Changed] Support exclusive local primary chat and OCR providers with independent credentials, configurable deadlines and retained catalog coexistence; verify development adoption.
 - 2026-10-11 [Changed] Suppress unchanged processing failure reminders, consolidate daily backlog notifications and verify targeted development adoption with audited redundant-job retirement.

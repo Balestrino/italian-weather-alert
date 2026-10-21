@@ -31,7 +31,7 @@ All projects share CPU, RAM and disk. Their named volumes, networks and credenti
 
 ## Prerequisites
 
-Use Bash, Python 3.9 or newer, Docker Engine with its Compose plugin, and curl. The environment commands and overlays were tested with Docker Compose **v5.5.1**; verify an older plugin can parse the `!reset` and `!override` overlays using the template check below before proceeding. Git is required for release images; basic setup and management also work from an extracted ZIP. Go 1.27.1 is needed only for native builds and Go tests. Docker pulls/builds need network access and several gigabytes of disk, especially for Crawl4AI.
+Use Bash, Python 3.9 or newer, Docker Engine with its Compose plugin, and curl. The environment commands and overlays were tested with Docker Compose **v5.5.1**; verify an older plugin can parse the `!reset` and `!override` overlays using the template check below before proceeding. Git is required for release images; basic setup and management also work from an extracted ZIP. Go 1.27.3 is needed only for native builds and Go tests. Docker pulls/builds need network access and several gigabytes of disk, especially for Crawl4AI.
 
 Run commands from the repository root unless a command uses an absolute script path. The wrapper itself also works from another working directory.
 

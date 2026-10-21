@@ -58,7 +58,7 @@ The assistant should show the regional warning and any municipal measures separa
 
 ## For developers
 
-From a checkout of this repository, with Go 1.27.1:
+From a checkout of this repository, with Go 1.27.3:
 
 ```sh
 go test ./...
