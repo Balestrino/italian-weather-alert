@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-21 [Planned] Plan maintaining tracked target measure, relevance and reference state from validated interpretation, with a configurable limit for open-ended measures.
 - 2026-10-21 [Changed] Archive the completed handle-withdrawn-unavailable-targets change and publish unavailable-municipal-targets as a main capability specification.
 - 2026-10-21 [Changed] Explain missing Cascina weather alerts, record its development publication and the failed wider-scope configuration drafts.
 - 2026-10-21 [Changed] Verify the development adoption of withdrawn unavailable targets: every active source completes its first check and Livorno recovers from a two-week delay.
