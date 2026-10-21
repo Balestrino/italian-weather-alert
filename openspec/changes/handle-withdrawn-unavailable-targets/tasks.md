@@ -30,7 +30,7 @@
 ## 5. Verification and development rollout
 
 - [x] 5.1 Run Go vet, the unit tests with race detection, and the acquisition, notification, backoffice and CLI integration tests. Record the results.
-- [ ] 5.2 Build a development image, run `admin migrate`, and recreate only `worker` and `admin` with preserved rollback settings. Verify:
+- [x] 5.2 Build a development image, run `admin migrate`, and recreate only `worker` and `admin` with preserved rollback settings. Verify:
   - The CLI lists Calcinaia's existing exclusions.
   - Fresh checks of active municipal sources are complete.
   - `withdrawn_unavailable_count` is persisted.

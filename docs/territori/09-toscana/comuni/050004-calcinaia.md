@@ -159,7 +159,7 @@ acquisite. Un trattamento distinto di questi target richiede una modifica
 specificata e collaudata; la sostituzione automatica di un URL con un altro non
 è ammessa senza verifica. La change
 [handle-withdrawn-unavailable-targets](../../../../openspec/changes/handle-withdrawn-unavailable-targets/proposal.md)
-implementa questo trattamento; l'adozione in development resta da verificare.
+implementa questo trattamento ed è adottata in development (CLN-034).
 
 Lo stato misura e il riferimento esplicito dei target tracciati non sono
 alimentati dall'interpretazione (CLN-033): le protezioni basate solo su quei
@@ -209,6 +209,13 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-034 — Target ritirati non bloccano più il controllo
+
+- **Data e ambito:** 2026-10-21; `calcinaia-municipal` e fonti attive del development dopo l'adozione della change `handle-withdrawn-unavailable-targets`.
+- **Comportamento verificato:** un URL 404/410 uscito dagli elenchi completi, senza riferimenti espliciti né misure ricavate, è classificato ritirato e non rende incompleto il controllo; i controlli ne registrano il numero. I sei URL di Calcinaia esclusi in precedenza risultano esclusi nell'elenco CLI e amministrativo. Il primo giro dopo l'adozione è completo per tutte le otto fonti attive; per Livorno sblocca un ritardo di due settimane (LIV-012 nella [guida di Livorno](049009-livorno.md)).
+- **Limiti:** la protezione delle misure si basa sulle misure di dominio ricavate (CLN-033); un documento non ancora interpretato non è protetto. Nuove decisioni passano dal pannello o dalla CLI, non da SQL manuale.
+- **Evidenza:** registro privato `withdrawn-targets-20261021`; [procedura target indisponibili](../../../operations/acquisition-recovery.md).
 
 ### CLN-033 — Stato misura e riferimenti dei target non alimentati
 

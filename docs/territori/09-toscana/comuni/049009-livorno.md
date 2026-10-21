@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "049009"
-ultima_revisione: "2026-10-09"
+ultima_revisione: "2026-10-21"
 ---
 
 # Livorno
@@ -34,9 +34,10 @@ riuscite e tentativi falliti. Le variazioni di testo, date, link, metadati,
 allegati o completezza mantengono una nuova identità interpretativa.
 
 Per `source_http_error`, distinguere il controllo complessivo dai singoli target
-e dai log del crawler (LIV-009). I target 404/410 non revisionati mantengono il
-giro incompleto anche durante il backoff, pur consentendo di acquisire altri
-documenti. Il messaggio strutturale «anti-bot» di Crawl4AI non dimostra da solo
+e dai log del crawler (LIV-009). Dal 2026-10-21 un target 404/410 uscito dagli
+elenchi completi, senza riferimenti né misure ricavate, è ritirato: viene
+ritentato ma non rende incompleto il giro (LIV-012). Restano bloccanti i target
+ancora elencati, citati o con misure. Il messaggio strutturale «anti-bot» di Crawl4AI non dimostra da solo
 un blocco del sito: verificare stato HTTP e contenuto restituito. Gli errori di
 elaborazione del modello hanno ricevute e retry separati dalla raccolta.
 
@@ -81,6 +82,14 @@ LIV-005 ha corretto il limite di accesso registrato in LIV-004: la prima prova H
 Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente interessato, conservare il risultato e validare il PDF, oltre allo stato HTTP. Un esito del browser o di un altro client non sostituisce la verifica di `DirectHTTP`. Prima di considerare completo un giro verificare anche persistenza, riferimenti e tutti gli allegati necessari. Gestire i fallimenti temporanei con retry limitati e cadenze della fonte; un rifiuto persistente richiede diagnosi o un canale ufficiale alternativo verificato.
 
 ## Registro delle scoperte
+
+### LIV-012 — Notizia sostituita e giro di nuovo completo
+
+- **Data e ambito:** 2026-10-21; `livorno-municipal` in development, target `allerta-gialla-per-forti-temporali-e-rischio-idrogeologico-e-idraulico-del-reticolo-minore`.
+- **Osservazione confermata:** dal 7 ottobre il target restituisce 410 e manca dagli elenchi; la notizia sostitutiva sull'allerta arancio del 7–8 ottobre è comparsa nello stesso giro. Le 25 versioni conservate sono classificate come rilancio dell'allerta regionale, senza misure comunali estratte. Il target era l'unico non disponibile e teneva incompleti tutti i giri: 342 fallimenti consecutivi e un ritardo segnalato per due settimane.
+- **Intervento verificato:** con la change `handle-withdrawn-unavailable-targets` il target è classificato ritirato. Il primo giro successivo all'adozione è completo, con un target ritirato conteggiato; i fallimenti consecutivi sono azzerati e il ritardo segnalato risulta chiuso. Originali, storico dei 410 e giri falliti sono conservati; nessuna equivalenza o revoca è dedotta.
+- **Prossima verifica:** osservare i giri successivi e i nuovi target indisponibili; accettazione e pubblicazione restano separate.
+- **Evidenza:** registro privato `withdrawn-targets-20261021`; [procedura target indisponibili](../../../operations/acquisition-recovery.md).
 
 ### LIV-011 — Equivalenza CSRF e riuso adottati nel perimetro revisionato
 
