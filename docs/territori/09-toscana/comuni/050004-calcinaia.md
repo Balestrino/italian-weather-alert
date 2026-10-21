@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050004"
-ultima_revisione: "2026-10-07"
+ultima_revisione: "2026-10-21"
 ---
 
 # Calcinaia
@@ -41,6 +41,13 @@ CFR originario per livelli regionali; non trasferire l'autorevolezza a tutti i
 contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
+
+CLN-032 registra un nuovo ciclo di URL rinominati: dal 14 ottobre il controllo
+ordinario risultava fallito per tre notizie diventate 404 dopo la correzione
+dell'indirizzo, pur acquisendo le pubblicazioni nuove. Dopo la revisione
+documentata e le tre disposizioni esatte, il controllo successivo è completo.
+Quando una fonte resta in `source_http_error` con elenchi e documenti ancora
+acquisiti, controllare prima i target indisponibili senza disposizione.
 
 CLN-031 registra il seguito delle correzioni: la disposizione revisionata
 dell'URL obsoleto consente nuovamente un controllo ordinario completo. I PDF
@@ -140,9 +147,17 @@ non applicabile a una misura locale; non è richiesto un accordo unanime di tre 
 | ID | Ambito | Regola corrente | Stato dell'intervento |
 | --- | --- | --- | --- |
 | CLN-001 | Gerarchia delle fonti | Sito comunale primario; Cittadino Informato come confronto; albo per atti citati | Regola di progetto documentata; verifiche di copertura separate |
-| CLN-002 | Target 404/410 | Esclusione solo con decisione motivata per fonte/configurazione/URL; rediscovery ripristina il controllo | Procedura e codice presenti; applicazione al singolo target da verificare |
+| CLN-002 | Target 404/410 | Esclusione solo con decisione motivata per fonte/configurazione/URL; rediscovery ripristina il controllo | Procedura e codice presenti; applicata ai singoli target revisionati fino a CLN-032; ogni nuovo 404 richiede ancora una decisione manuale |
 
 ## Problemi aperti
+
+Il Comune corregge spesso l'indirizzo delle notizie dopo la pubblicazione: il
+vecchio URL diventa 404 e, finché non riceve una disposizione revisionata,
+mantiene fallito l'intero controllo (CLN-002, CLN-030, CLN-032). L'esito della
+fonte segnala quindi un ritardo anche quando le nuove pubblicazioni sono
+acquisite. Un trattamento distinto di questi target richiede una modifica
+specificata e collaudata; la sostituzione automatica di un URL con un altro non
+è ammessa senza verifica.
 
 La matrice CLN-027 circoscrive il lavoro successivo: interpretazioni recenti
 pendenti, confronto continuativo del canale aggiuntivo, atti richiamati e
@@ -187,6 +202,16 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-032 — URL rinominati e controllo fallito per una settimana
+
+- **Data e ambito:** 2026-10-21; `calcinaia-municipal`, configurazione attiva, sezioni Notizie, Avvisi e Comunicati, development.
+- **Osservazione confermata:** dal 14 ottobre ogni controllo terminava con `source_http_error`. Gli elenchi venivano attraversati e le pubblicazioni nuove acquisite ed elaborate, ma tre target restavano 404 senza disposizione: `volontari-azione-il-mc-donalds-e-lambiente`, `allerta-meteo-martedi-20-ottobre` e `successi-del-circolo-scherma-arno-alle-prove-regionali-2026`. Per i primi due sono elencati e raggiungibili gli URL [volontari-azione-con-mc-donalds-lambiente](https://www.comune.calcinaia.pi.it/novita/volontari-azione-con-mc-donalds-lambiente) e [aggiornamento-allerta-meteo-martedi-20-e-mercoledi-21](https://www.comune.calcinaia.pi.it/novita/aggiornamento-allerta-meteo-martedi-20-e-mercoledi-21); per il terzo nessun candidato è stato individuato. Nessuna equivalenza è affermata.
+- **Revisione:** i tre URL restituivano ancora 404 ed erano assenti da tutte le 14 pagine configurate e dalle pagine Notizie oltre il limite fino alla 15; nessun riferimento esplicito, misura aperta o misura locale estratta. Il canale Cittadino Informato, con un'interruzione temporanea il 20 ottobre, era nuovamente completo.
+- **Intervento verificato:** tre disposizioni `exclude_stale_unavailable` esatte per fonte, configurazione e URL, con transazione protetta e backup preliminare. Il controllo successivo è completo e senza codice di errore; il ritardo segnalato dalle notifiche risulta chiuso. Originali, storico dei 404 e controlli falliti sono conservati.
+- **Interpretazione osservata:** gli avvisi del 19–20 ottobre sono classificati rilevanti e l'estrazione non produce misure. Il testo dell'aggiornamento rilancia l'allerta gialla regionale e le norme di comportamento, senza misure comunali dichiarate; l'esito è coerente ma non certifica la correttezza dell'intero corpus.
+- **Limiti e prossima verifica:** la sezione Notizie supera le 10 pagine attraversate; la finestra recente resta coperta, ma la completezza oltre il limite non è verificata. Nuovi URL rinominati riprodurranno il fallimento finché il trattamento resta manuale. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `calcinaia-stale-404-20261021`; [procedura target indisponibili](../../../operations/acquisition-recovery.md).
 
 ### CLN-031 — Recupero ordinario e tempi COC con fine ignota
 
