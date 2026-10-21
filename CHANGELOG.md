@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-21 [Planned] Plan non-blocking handling of withdrawn 404/410 municipal targets with guarded operator dispositions through administration and CLI.
 - 2026-10-21 [Changed] Record the reviewed Calcinaia exclusion of three renamed 404 notices that kept collection failed since 14 October, with the verified complete check and the open renamed-URL limit.
 - 2026-10-21 [Security] Upgrade Go to 1.27.3, golang.org/x/net to v0.61.0 and klauspost/compress to v1.18.7 to resolve reachable standard-library and HTTP/2 vulnerabilities reported by govulncheck.
 - 2026-10-21 [Changed] Archive six completed OpenSpec changes and publish their requirements as the first main capability specifications.
