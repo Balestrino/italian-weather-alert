@@ -6,7 +6,7 @@ revision, that version is reinterpreted instead of reusing the earlier result.
 From 22 October 2026, if the new interpretation fails or is still pending,
 public document reads present the most recent earlier validated interpretation
 of an equivalent input of the same document. Change:
-[`carry-forward-equivalent-interpretations`](../../openspec/changes/carry-forward-equivalent-interpretations/proposal.md).
+`carry-forward-equivalent-interpretations` ([specification](../../openspec/specs/equivalent-interpretation-carry-forward/spec.md)).
 
 ## Equivalence
 
