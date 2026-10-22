@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-22 [Changed] Record the saved-view instant matching fix and its development verification in the task 31.2 notes.
 - 2026-10-22 [Fixed] Accept any RFC 3339 spelling of the same evaluation_time and known_at when continuing a saved public view through HTTP pagination or MCP, instead of rejecting it with cursor_mismatch.
 - 2026-10-22 [Changed] Record that the PostgreSQL deadlocks in the development log all predate the 2 October queue-maintenance serialization fix.
 - 2026-10-22 [Changed] Complete task 31.2: bounded reprocessing of seven Calcinaia versions, API/MCP and unchanged-history verification, and record the recovered Livorno orange-alert measures.

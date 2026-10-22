@@ -795,14 +795,19 @@ API and MCP agree for all versions, now and at the pre-reprocessing boundary,
 where interpretations and measures are unchanged.
 
 Open observations, not part of 31.2:
-- MCP rejects a saved view requested with an all-zero fractional instant (`.000000Z`) because of a request-hash mismatch;
 - older failed Livorno and Cascina versions are not reprocessed.
 
 The 102 deadlocks in the PostgreSQL log all occurred on 2 October between 16:49
 and 16:56 UTC. They predate the queue-maintenance serialization fix (`53da4a9`),
 and none has occurred since.
 
-Private records: `reprocessing-31-2-20261022`, `measure-persistence-20261022`, `deadlocks-20261022`.
+Continuing a saved view (HTTP pagination or MCP `dataset_version`) rejected an
+equivalent spelling of `evaluation_time` or `known_at`, such as `.000000Z` or
+`+02:00`, with `cursor_mismatch`. Fixed in `e628640`: the two fields are compared
+as instants. The public service is replaced in development, and the 31.2 API/MCP
+comparison passes with the original `.000000Z` boundary.
+
+Private records: `reprocessing-31-2-20261022`, `measure-persistence-20261022`, `deadlocks-20261022`, `view-instants-20261022`.
 
 ## 32. Latest processing repairs — 7 October 2026
 
