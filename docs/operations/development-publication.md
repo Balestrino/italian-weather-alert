@@ -2,6 +2,12 @@
 
 In the development backoffice, open **Regioni → Toscana → comune → Configurazione → Pubblicazione in development**. Enter an operator name and select **Abilita pubblicazione in development**. The same panel reports its revision and provides **Revoca pubblicazione in development**. Only selected municipalities gain access to their retained municipal data and applicable regional products through API/MCP. A municipality without municipal facts still has no invented local measures; uncertain regional levels remain uncertain.
 
+**Current selection — verified 2026-10-22** with the status command and the
+publication history: Calcinaia (`050004`, selected 2026-10-02) and Cascina
+(`050008`, selected 2026-10-21) are both enabled at revision 1. Livorno, Pisa and
+Pontedera are configured but not selected, and no other municipality is selected.
+Cascina currently exposes only the applicable A4 regional products; see the notes below.
+
 This is separate from the controls enabling collection. Source acceptance and global source-publication flags are not changed. The [coverage tracker](../coverage.md) continues to describe acceptance; development publication does not close the observational trial, human reviews, failed source regressions or production release gates. Publication still requires source provenance, permitted policy without unresolved conditions and retained acquisitions under the active configuration. DPC comparisons remain internal. Regional document metadata can refer to a shared bulletin covering the whole region; regional fact searches are limited to zones of selected municipalities using the mapping available at the query knowledge boundary. Retained copies keep their independent strict authorization.
 
 For scripts, use the development admin image after migrating:

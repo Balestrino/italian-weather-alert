@@ -279,7 +279,8 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 
 ### TOS-007 — Scelta comunale di pubblicazione per development
 
-- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-02, fixture, PostgreSQL isolato, controllo nativo nel browser e confronto API/MCP in development; dettagli operativi conservati separatamente.
+- **Data:** 2026-10-02. **Ultima verifica:** 2026-10-22, stato della scelta in development tramite comando e storico; la verifica del 2026-10-02 comprende fixture, PostgreSQL isolato, controllo nativo nel browser e confronto API/MCP; dettagli operativi conservati separatamente.
+- **Selezione attuale (osservazione confermata, 2026-10-22):** Calcinaia dal 2026-10-02 e [Cascina](comuni/050008-cascina.md#cas-008--allerte-assenti-dal-sito-e-pubblicazione-in-development) dal 2026-10-21; Livorno, Pisa e Pontedera non selezionati.
 - **Ambito:** Comuni toscani selezionati in development e prodotti CFR applicabili.
 - **Conoscenza:** comportamento implementato; non certifica accettazione reale. **Intervento:** controlli separati per ambiente e comune.
 - **Osservazione:** un operatore può pubblicare dati comunali conservati e fatti regionali applicabili senza completare le verifiche di produzione. La scelta non si estende agli altri comuni della stessa zona, non cambia l’accettazione né autorizza copie pubbliche. Revoca e cambio di ambito fanno scadere le viste API/MCP conservate.

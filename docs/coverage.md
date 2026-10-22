@@ -6880,6 +6880,8 @@ or waived. See the [scope matrix](operations/calcinaia-coverage.md).
 
 ### Toscana (273 municipalities)
 
+Calcinaia and Cascina are also selected for [manual development publication](#development-municipality-publication--2026-10-02); this does not change the source states below.
+
 | Territory | ISTAT code | CAP | Implementation | Source checks |
 | --- | --- | --- | --- | --- |
 | **[Toscana — region](territori/09-toscana/README.md)** | 09 | — | Regional sources in internal pilot; public off | Observation and formal acceptance pending |
@@ -8220,3 +8222,9 @@ CFR products. It does not alter the dated source acceptance assessment above or 
 missing reviews, observational cases or regressions. Responses retain pending source
 states and identify development publication explicitly. Staging and production ignore
 these choices and retain their acceptance and release gates.
+
+**Current development selection — verified 2026-10-22:** Calcinaia (`050004`, since
+2026-10-02) and Cascina (`050008`, since 2026-10-21). Livorno, Pisa and Pontedera remain
+unselected. “Public off” in the Toscana table refers to source acceptance and
+publication, not to this development choice. Cascina exposes the applicable A4
+regional products; its municipal data remain unpublished under the active source policy.
