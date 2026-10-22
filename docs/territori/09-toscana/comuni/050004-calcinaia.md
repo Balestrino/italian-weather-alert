@@ -224,6 +224,18 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-039 — Misure duplicate tra versioni dello stesso avviso
+
+- **Data e ambito:** 2026-10-22; misure pubbliche di Calcinaia in development, lettura in sola consultazione.
+- **Osservazione confermata:** 5 documenti su 7 con misure pubbliche hanno misure provenienti da più versioni. Le misure di una versione più nuova si sommano a quelle precedenti, perché la sostituzione esiste solo tra estrazioni della stessa versione e il linking tra versioni le collega solo in parte. Due casi hanno input di interpretazione equivalente, quindi testo identico interpretato più volte:
+  - avviso di criticità del 9 settembre: 3 misure della prima versione e 5 della rielaborazione del 31.2, di cui una sola collegata;
+  - aggiornamento sull'avviso di criticità: elaborazione ordinaria del 21 ottobre.
+
+  Gli altri tre (allerta del 9–10 ottobre, ponte sull'Arno, via del Marrucco) sono revisioni reali del testo.
+- **Interpretazione:** per gli input equivalenti, la sostituzione già applicata alla stessa versione può estendersi senza dedurre cessazioni dalla scomparsa, perché il testo è identico. Per le revisioni reali, l'accumulo è conforme alla regola che la scomparsa non stabilisce la cessazione; il consolidamento resta affidato al linking.
+- **Prossima verifica:** proposta di una change per le versioni equivalenti; valutazione separata del linking tra revisioni. Accettazione invariata nel coverage tracker.
+- **Evidenza:** consultazione dell'API e del database del 22 ottobre; nessun dato modificato.
+
 ### CLN-038 — Rielaborazione delimitata del task 31.2
 
 - **Data e ambito:** 2026-10-22; sette versioni rielaborate una per una in development con la configurazione di estrazione `v29`, attore `operator-reprocessing-31-2-20261022`. La versione 29179 è esclusa di proposito: unico caso positivo reale della `v29`, ma non meteo e frutto di una classificazione errata.

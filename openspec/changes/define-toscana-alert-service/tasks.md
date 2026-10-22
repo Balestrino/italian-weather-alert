@@ -795,7 +795,9 @@ API and MCP agree for all versions, now and at the pre-reprocessing boundary,
 where interpretations and measures are unchanged.
 
 Open observations, not part of 31.2:
-- older failed Livorno and Cascina versions are not reprocessed.
+- the older failed Livorno versions (64 jobs, news item 133640) are neither reprocessed nor archived, by operator decision. Their documents already have extractions validated today. Reprocessing would add duplicate measures without changing history, and none of the jobs meets the documented retirement criterion. They remain in the daily backlog;
+- the 6 failed Calcinaia jobs and 1 Cascina job are not reviewed yet;
+- measures from different versions of one document accumulate in public search when linking leaves them unrelated (the 9 September Calcinaia notice after reprocessing). This is under investigation.
 
 The 102 deadlocks in the PostgreSQL log all occurred on 2 October between 16:49
 and 16:56 UTC. They predate the queue-maintenance serialization fix (`53da4a9`),
