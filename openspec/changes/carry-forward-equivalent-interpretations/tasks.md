@@ -41,7 +41,7 @@
 - `openspec validate --strict` passes.
 
 - [x] 3.1 Run the unit, race, vet and `-tags=integration` suites for the classification, interpretation, publicquery, transport and cmd packages, plus `openspec validate --strict` for this change, and record the results.
-- [ ] 3.2 Adopt in development with private rollback evidence:
+- [x] 3.2 Adopt in development with private rollback evidence:
   - archive the database and settings;
   - apply the migration;
   - replace admin, worker and public;
@@ -49,4 +49,4 @@
   - check the runtime readiness.
 
   Then verify through the public API and MCP that the three Calcinaia notices of CLN-036 show the carried-forward interpretation with the expected limitations, and that boundaries before the earlier results do not.
-- [ ] 3.3 Update the Calcinaia guide (new dated entry), the coverage matrix, the operations documentation on public interpretation states and the changelog with the verified behaviour and residual limits. Then hand back to task 31.2 of `define-toscana-alert-service`, which covers v29 adoption, bounded reprocessing and API/MCP comparison.
+- [x] 3.3 Update the Calcinaia guide (new dated entry), the coverage matrix, the operations documentation on public interpretation states and the changelog with the verified behaviour and residual limits. Then hand back to task 31.2 of `define-toscana-alert-service`, which covers v29 adoption, bounded reprocessing and API/MCP comparison.

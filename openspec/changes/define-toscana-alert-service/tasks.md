@@ -770,8 +770,13 @@ diagnostic no longer reports `normalization` for quotes the parser accepts. For 
 template-only versions with identical interpretation text failed under the new
 configuration. Their earlier measures stay published, but the document view
 reports `failed`. The fix is planned in `carry-forward-equivalent-interpretations`.
-Development adoption, bounded ordinary reprocessing and API/MCP comparison wait
-for that change, so 31.2 stays open. Private record: `quotation-diagnosis-20261022`.
+Private record: `quotation-diagnosis-20261022`.
+
+**31.2 adoption, 22 October 2026:** v29 is adopted in development together with
+`carry-forward-equivalent-interpretations`. The three notices present their
+earlier equivalent interpretation with explicit provenance; API/MCP and
+historical boundaries are verified. Bounded ordinary reprocessing and its API/MCP
+comparison remain, so 31.2 stays open. Private record: `carry-forward-20261022`.
 
 ## 32. Latest processing repairs — 7 October 2026
 

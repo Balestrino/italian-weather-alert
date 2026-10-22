@@ -48,9 +48,11 @@ citazione parafrasata, correttamente rifiutata. I fallimenti attuali sono di
 estrazione, con il modello locale del development. Prima di correggere un
 fallimento, rieseguire la risposta conservata con il parser reale: l'etichetta
 diagnostica `normalization` registrata prima del 22 ottobre può nascondere la
-causa effettiva. Una nuova versione che cambia solo il template, rielaborata con
-una configurazione diversa e fallita, risulta `failed` nell'API del documento,
-anche se le misure della versione precedente con testo identico restano pubblicate.
+causa effettiva. Dal 22 ottobre (CLN-037), una nuova versione che cambia solo il
+template ed è fallita o in attesa con un'altra configurazione mostra nell'API
+l'interpretazione valida della versione equivalente precedente. La risposta
+indica la versione d'origine e l'esito proprio della nuova versione. Leggere
+quei limiti prima di trattare il documento come interpretato di recente.
 
 CLN-032 registra un nuovo ciclo di URL rinominati: dal 14 ottobre il controllo
 ordinario risultava fallito per tre notizie diventate 404 dopo la correzione
@@ -222,6 +224,14 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-037 — Interpretazioni equivalenti portate avanti in development
+
+- **Data e ambito:** 2026-10-22; `calcinaia-municipal` e piattaforma in development, dopo l'adozione della change [`carry-forward-equivalent-interpretations`](../../../operations/equivalent-interpretations.md) e della configurazione di estrazione `v29` (CLN-036).
+- **Comportamento verificato:** le ultime versioni dell'avviso di criticità del 9 settembre, del monitoraggio del 21 agosto e dell'allerta del 7–8 ottobre, nate solo da cambi di template, risultano `supported` con l'interpretazione della versione precedente equivalente. I limiti indicano versione, run e configurazione d'origine e l'esito proprio della nuova versione (`extraction_merge_conflict`, `extraction_output_schema_invalid`, `extraction_evidence_invalid`). API e MCP coincidono sulla stessa vista salvata. Un secondo prima di ogni nuova versione, la storia mostra la versione precedente con il suo risultato.
+- **Copertura:** nella finestra di CLN-027 risultano supportati 53 avvisi su 54 (resta la citazione parafrasata del 4 settembre). Negli ultimi 30 giorni 66 su 67 (resta l'avviso non meteo sui lavori del ponte). Nessun candidato equivalente sulla piattaforma.
+- **Limiti:** l'interpretazione portata avanti viene dalla configurazione precedente e non certifica il nuovo modello. Il risultato proprio di una versione la sostituisce non appena viene registrato. Impronte scritte dal nuovo worker per nuovi run da osservare al prossimo ciclo ordinario. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `carry-forward-20261022`.
+
 ### CLN-036 — Interpretazioni pendenti diagnosticate dalle risposte conservate
 
 - **Data e ambito:** 2026-10-22; `calcinaia-municipal` e `calcinaia-cittadino-informato` in development, PostgreSQL in sola lettura, ricerca documentale API su un'unica vista salvata, task 31.2.
@@ -229,7 +239,7 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Cause attuali:** i fallimenti recenti sono di estrazione con il modello locale primario del development: riferimenti all'evidenza sbagliati o fuori tabella, `kind` non sostenuto dal predicato, citazione copiata senza lo spazio prima del punto, risposta troncata per aver copiato l'intera pagina, conflitto di unione non riproducibile senza nuova chiamata. Alcune notizie non meteo (lavori su ponte e strada provinciale, immobile pericolante) sono state classificate pertinenti. Questi rifiuti sono corretti.
 - **Difetti del software corretti:** `vieta`/`vietato` non erano riconosciuti come predicato di un divieto, ora accettati nelle forme positive con configurazione di estrazione `v29`, mentre il percorso legacy resta invariato. L'etichetta diagnostica `normalization` segnalava citazioni che il parser accetta, nascondendo la causa reale. Verifiche: casi sintetici positivi e negativi e riesecuzione delle sei risposte conservate.
 - **Regressione dello stato documento:** l'avviso di criticità del 9 settembre, il monitoraggio del 21 agosto e l'allerta del 7–8 ottobre avevano estrazioni valide su versioni precedenti. Le versioni del 15 e 21 ottobre hanno testo di interpretazione identico, ma sono state rielaborate con la nuova configurazione locale e sono fallite. Le misure della versione precedente restano pubblicate con la loro evidenza, mentre l'API del documento mostra l'ultima versione come `failed` senza rimandare all'interpretazione valida. Il comportamento segue i confini di configurazione attuali; la change `carry-forward-equivalent-interpretations` lo corregge.
-- **Prossima verifica:** adozione in development della `v29`, rielaborazione ordinaria delimitata e confronto API/MCP dopo la change `carry-forward-equivalent-interpretations`. Accettazione invariata nel coverage tracker.
+- **Prossima verifica:** la `v29` è adottata in development insieme al carry-forward (CLN-037). Restano la rielaborazione ordinaria delimitata e il relativo confronto API/MCP. Accettazione invariata nel coverage tracker.
 - **Evidenza:** registro privato `quotation-diagnosis-20261022`.
 
 ### CLN-035 — Notizie con misure aperte di nuovo ricontrollate

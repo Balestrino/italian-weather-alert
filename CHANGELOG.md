@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-22 [Changed] Adopt carry-forward of equivalent interpretations and extraction v29 in development; document equivalence, backfill, public limitations and the verified Calcinaia results.
 - 2026-10-22 [Added] Carry forward the latest earlier validated interpretation of an equivalent input when a document version's own interpretation failed or is pending, with configuration-independent manifest fingerprints, a backfill command and explicit provenance limitations.
 - 2026-10-22 [Planned] Plan carry-forward of validated interpretations across template-only versions with equivalent input, and correct the scope of the Calcinaia document-state regression.
 - 2026-10-22 [Fixed] Recognise positive finite forms of 'vietare' as prohibition evidence (extraction configuration v29) and report the actual cause of invalid extraction outputs; record the Calcinaia 31.2 diagnosis and the open template-version regression.

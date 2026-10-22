@@ -66,15 +66,20 @@ negativi: le forme positive di `vietare` ora sostengono un divieto (configurazio
 di estrazione `v29`) e l'etichetta diagnostica non attribuisce più il fallimento a
 citazioni accettate dalla normalizzazione.
 
-**Regressione aperta.** Tre avvisi meteo (9 settembre, 21 agosto, 7–8 ottobre)
-avevano estrazioni valide su versioni precedenti. Le nuove versioni, che cambiano
-solo il template e hanno lo stesso testo di interpretazione, sono state rielaborate
-con un'altra configurazione e sono fallite. Le misure della versione precedente
-restano pubblicate, ma l'API del documento presenta l'ultima versione come `failed`.
-La correzione è pianificata nella change `carry-forward-equivalent-interpretations`. Adozione della `v29`, rielaborazione delimitata e confronto API/MCP
-restano da completare. Dettagli in CLN-036 della
+**Regressione dello stato documento.** Tre avvisi meteo (9 settembre, 21 agosto,
+7–8 ottobre) avevano estrazioni valide su versioni precedenti. Le nuove versioni,
+che cambiano solo il template e hanno lo stesso testo di interpretazione, sono state
+rielaborate con un'altra configurazione e sono fallite. Le misure della versione
+precedente sono rimaste pubblicate, ma l'API del documento presentava l'ultima
+versione come `failed`. Dal 22 ottobre la change
+`carry-forward-equivalent-interpretations`, adottata in development insieme alla
+`v29`, presenta per queste versioni l'interpretazione equivalente precedente con
+provenienza e limiti espliciti ([dettagli](equivalent-interpretations.md)). Dopo
+l'adozione risultano supportati 53 avvisi su 54 nella finestra del 4 ottobre e 66 su
+67 negli ultimi 30 giorni. Restano da completare la rielaborazione delimitata e il
+relativo confronto API/MCP. Dettagli in CLN-036 e CLN-037 della
 [guida di Calcinaia](../territori/09-toscana/comuni/050004-calcinaia.md); evidenze
-private `quotation-diagnosis-20261022`.
+private `quotation-diagnosis-20261022` e `carry-forward-20261022`.
 
 ## Lavoro successivo e prove richieste
 
