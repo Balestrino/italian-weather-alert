@@ -766,10 +766,10 @@ relevant. Each retained response was replayed with the real parser. Two
 evidence-backed corrections pass synthetic positive and negative cases, race and
 integration checks: positive finite forms of `vietare` support a prohibition
 (extraction configuration v29, legacy path frozen), and the invalid-output
-diagnostic no longer reports `normalization` for quotes the parser accepts. Three weather notices
-lost their earlier validated extraction in the public view: template-only
-versions with identical interpretation text failed under the new configuration.
-Cross-configuration reuse of equivalent inputs is planned as a separate change.
+diagnostic no longer reports `normalization` for quotes the parser accepts. For three weather notices,
+template-only versions with identical interpretation text failed under the new
+configuration. Their earlier measures stay published, but the document view
+reports `failed`. The fix is planned in `carry-forward-equivalent-interpretations`.
 Development adoption, bounded ordinary reprocessing and API/MCP comparison wait
 for that change, so 31.2 stays open. Private record: `quotation-diagnosis-20261022`.
 

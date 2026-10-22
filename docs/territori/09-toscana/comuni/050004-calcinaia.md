@@ -49,8 +49,8 @@ estrazione, con il modello locale del development. Prima di correggere un
 fallimento, rieseguire la risposta conservata con il parser reale: l'etichetta
 diagnostica `normalization` registrata prima del 22 ottobre può nascondere la
 causa effettiva. Una nuova versione che cambia solo il template, rielaborata con
-una configurazione diversa e fallita, può nascondere nell'API un'interpretazione
-valida della versione precedente con testo identico.
+una configurazione diversa e fallita, risulta `failed` nell'API del documento,
+anche se le misure della versione precedente con testo identico restano pubblicate.
 
 CLN-032 registra un nuovo ciclo di URL rinominati: dal 14 ottobre il controllo
 ordinario risultava fallito per tre notizie diventate 404 dopo la correzione
@@ -228,8 +228,8 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Osservazione confermata:** dei 14 avvisi pendenti di CLN-027, tredici hanno ora una classificazione valida sull'ultima versione. Il quattordicesimo (interruzione di energia elettrica del 4 settembre, non meteo) conserva una citazione che parafrasa il testo: il rifiuto è corretto e non viene riparato. Nella finestra di CLN-027 risultano supportati 52 avvisi su 54; negli ultimi 30 giorni 65 su 67.
 - **Cause attuali:** i fallimenti recenti sono di estrazione con il modello locale primario del development: riferimenti all'evidenza sbagliati o fuori tabella, `kind` non sostenuto dal predicato, citazione copiata senza lo spazio prima del punto, risposta troncata per aver copiato l'intera pagina, conflitto di unione non riproducibile senza nuova chiamata. Alcune notizie non meteo (lavori su ponte e strada provinciale, immobile pericolante) sono state classificate pertinenti. Questi rifiuti sono corretti.
 - **Difetti del software corretti:** `vieta`/`vietato` non erano riconosciuti come predicato di un divieto, ora accettati nelle forme positive con configurazione di estrazione `v29`, mentre il percorso legacy resta invariato. L'etichetta diagnostica `normalization` segnalava citazioni che il parser accetta, nascondendo la causa reale. Verifiche: casi sintetici positivi e negativi e riesecuzione delle sei risposte conservate.
-- **Regressione pubblica:** l'avviso di criticità del 9 settembre, il monitoraggio del 21 agosto e l'allerta del 7–8 ottobre avevano estrazioni valide su versioni precedenti. Le versioni del 15 e 21 ottobre hanno testo di interpretazione identico, ma sono state rielaborate con la nuova configurazione locale e sono fallite: l'API mostra l'ultima versione come `failed`. Il comportamento segue i confini di configurazione attuali; serve una change separata.
-- **Prossima verifica:** adozione in development della `v29`, rielaborazione ordinaria delimitata e confronto API/MCP dopo la change sul riuso di input equivalenti. Accettazione invariata nel coverage tracker.
+- **Regressione dello stato documento:** l'avviso di criticità del 9 settembre, il monitoraggio del 21 agosto e l'allerta del 7–8 ottobre avevano estrazioni valide su versioni precedenti. Le versioni del 15 e 21 ottobre hanno testo di interpretazione identico, ma sono state rielaborate con la nuova configurazione locale e sono fallite. Le misure della versione precedente restano pubblicate con la loro evidenza, mentre l'API del documento mostra l'ultima versione come `failed` senza rimandare all'interpretazione valida. Il comportamento segue i confini di configurazione attuali; la change `carry-forward-equivalent-interpretations` lo corregge.
+- **Prossima verifica:** adozione in development della `v29`, rielaborazione ordinaria delimitata e confronto API/MCP dopo la change `carry-forward-equivalent-interpretations`. Accettazione invariata nel coverage tracker.
 - **Evidenza:** registro privato `quotation-diagnosis-20261022`.
 
 ### CLN-035 — Notizie con misure aperte di nuovo ricontrollate

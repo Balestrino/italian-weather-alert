@@ -69,9 +69,9 @@ citazioni accettate dalla normalizzazione.
 **Regressione aperta.** Tre avvisi meteo (9 settembre, 21 agosto, 7–8 ottobre)
 avevano estrazioni valide su versioni precedenti. Le nuove versioni, che cambiano
 solo il template e hanno lo stesso testo di interpretazione, sono state rielaborate
-con un'altra configurazione e sono fallite; l'API presenta quindi l'ultima versione
-come `failed`. La correzione richiede una change separata sul riuso di input
-equivalenti. Adozione della `v29`, rielaborazione delimitata e confronto API/MCP
+con un'altra configurazione e sono fallite. Le misure della versione precedente
+restano pubblicate, ma l'API del documento presenta l'ultima versione come `failed`.
+La correzione è pianificata nella change `carry-forward-equivalent-interpretations`. Adozione della `v29`, rielaborazione delimitata e confronto API/MCP
 restano da completare. Dettagli in CLN-036 della
 [guida di Calcinaia](../territori/09-toscana/comuni/050004-calcinaia.md); evidenze
 private `quotation-diagnosis-20261022`.
