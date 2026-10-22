@@ -302,3 +302,45 @@ func TestPublicationRevocationExpiresAPIAndMCPViews(t *testing.T) {
 	scope = "strict"
 	assertPublicError(t, server.Client(), server.URL+"/v1/sources/coverage?dataset_version="+first.Meta.DatasetVersion, http.StatusGone, "cursor_expired")
 }
+
+func TestFixedViewsAcceptEquivalentInstantSpellings(t *testing.T) {
+	clock := time.Date(2026, 9, 17, 12, 0, 30, 0, time.UTC)
+	queries := &mutableCoverageQueries{publicQueriesFake: &publicQueriesFake{}, prefix: "old", checkedAt: time.Date(2026, 9, 17, 12, 0, 0, 0, time.UTC)}
+	runtime := PublicRuntime{Limits: PublicLimits{Allowance: 120, Window: time.Minute, MaxPageSize: 10}, Views: &memoryViewStore{}, ViewLifetime: 30 * time.Minute, CursorKey: []byte(strings.Repeat("k", 32))}
+	testServer := httptest.NewServer(handlerWithRuntime(nil, func() time.Time { return clock }, runtime, queries))
+	defer testServer.Close()
+	// Fractional zeros are dropped when the view is stored; a client keeps its own spelling.
+	baseQuery := "municipality_istat=050004&page_size=1&evaluation_time=2026-09-17T12%3A00%3A00.000000Z&known_at=2026-09-17T13%3A30%3A00%2B02%3A00"
+	first := getCoverage(t, testServer.Client(), testServer.URL+"/v1/sources/coverage?"+baseQuery)
+	if first.Meta == nil || first.Meta.NextCursor == nil {
+		t.Fatalf("unexpected first page: %#v", first)
+	}
+	second := getCoverage(t, testServer.Client(), testServer.URL+"/v1/sources/coverage?"+baseQuery+"&cursor="+url.QueryEscape(*first.Meta.NextCursor))
+	if len(second.Data) != 1 || second.Data[0].SourceID != "old-1" || second.Meta.DatasetVersion != first.Meta.DatasetVersion {
+		t.Fatalf("HTTP continuation rejected an equivalent instant spelling: %#v", second)
+	}
+
+	client := mcp.NewClient(&mcp.Implementation{Name: "iwa-instant-test", Version: "1.0.0"}, nil)
+	session, err := client.Connect(t.Context(), &mcp.StreamableClientTransport{Endpoint: testServer.URL + "/mcp", HTTPClient: testServer.Client(), DisableStandaloneSSE: true}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	for _, instants := range [][2]string{
+		{"2026-09-17T12:00:00.000000Z", "2026-09-17T11:30:00.000Z"},
+		{"2026-09-17T12:00:00Z", "2026-09-17T11:30:00Z"},
+		{"2026-09-17T14:00:00+02:00", "2026-09-17T11:30:00+00:00"},
+	} {
+		tool, callErr := session.CallTool(t.Context(), &mcp.CallToolParams{Name: "get_source_coverage", Arguments: map[string]any{"municipality_istat": "050004", "page_size": 1, "evaluation_time": instants[0], "known_at": instants[1], "dataset_version": first.Meta.DatasetVersion}})
+		if callErr != nil || tool.IsError {
+			t.Fatalf("MCP fixed view rejected %v: %#v %v", instants, tool, callErr)
+		}
+	}
+	for _, different := range []string{"2026-09-17T12:00:00.000001Z", "2026-09-17T12:00:00+01:00"} {
+		tool, callErr := session.CallTool(t.Context(), &mcp.CallToolParams{Name: "get_source_coverage", Arguments: map[string]any{"municipality_istat": "050004", "page_size": 1, "evaluation_time": different, "known_at": "2026-09-17T11:30:00Z", "dataset_version": first.Meta.DatasetVersion}})
+		if callErr != nil || !tool.IsError {
+			t.Fatalf("MCP fixed view accepted a different instant %s: %#v %v", different, tool, callErr)
+		}
+	}
+	assertPublicError(t, testServer.Client(), testServer.URL+"/v1/sources/coverage?municipality_istat=050004&page_size=1&evaluation_time=2026-09-17T12%3A00%3A01Z&known_at=2026-09-17T11%3A30%3A00Z&cursor="+url.QueryEscape(*first.Meta.NextCursor), http.StatusBadRequest, "cursor_mismatch")
+}

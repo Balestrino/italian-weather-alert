@@ -258,11 +258,32 @@ func requestMatchesView(raw, stored json.RawMessage) error {
 	delete(incoming, "dataset_version")
 	for key, value := range incoming {
 		expected, ok := canonical[key]
-		if !ok || !equalJSON(value, expected) {
+		if !ok {
+			return errCursorMismatch
+		}
+		// The view stores these instants normalized to UTC without fractional
+		// zeros; any RFC 3339 spelling of the same instant matches.
+		if key == "evaluation_time" || key == "known_at" {
+			if !sameInstant(value, expected) {
+				return errCursorMismatch
+			}
+			continue
+		}
+		if !equalJSON(value, expected) {
 			return errCursorMismatch
 		}
 	}
 	return nil
+}
+
+func sameInstant(left, right json.RawMessage) bool {
+	var l, r string
+	if json.Unmarshal(left, &l) != nil || json.Unmarshal(right, &r) != nil {
+		return false
+	}
+	lt, lerr := time.Parse(time.RFC3339, l)
+	rt, rerr := time.Parse(time.RFC3339, r)
+	return lerr == nil && rerr == nil && lt.Equal(rt)
 }
 
 func equalJSON(left, right json.RawMessage) bool {
