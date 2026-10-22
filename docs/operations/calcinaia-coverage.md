@@ -76,8 +76,9 @@ versione come `failed`. Dal 22 ottobre la change
 `v29`, presenta per queste versioni l'interpretazione equivalente precedente con
 provenienza e limiti espliciti ([dettagli](equivalent-interpretations.md)). Dopo
 l'adozione risultano supportati 53 avvisi su 54 nella finestra del 4 ottobre e 66 su
-67 negli ultimi 30 giorni. Restano da completare la rielaborazione delimitata e il
-relativo confronto API/MCP. Dettagli in CLN-036 e CLN-037 della
+67 negli ultimi 30 giorni. La rielaborazione delimitata e il confronto API/MCP sono
+completati (CLN-038), con la correzione della persistenza delle misure
+completamente determinate. Dettagli in CLN-036, CLN-037 e CLN-038 della
 [guida di Calcinaia](../territori/09-toscana/comuni/050004-calcinaia.md); evidenze
 private `quotation-diagnosis-20261022` e `carry-forward-20261022`.
 

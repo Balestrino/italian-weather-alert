@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-22 [Changed] Complete task 31.2: bounded reprocessing of seven Calcinaia versions, API/MCP and unchanged-history verification, and record the recovered Livorno orange-alert measures.
 - 2026-10-22 [Fixed] Persist fully determined extracted measures with an empty indeterminate-field array instead of JSON null, which the database rejected and caused the whole document extraction to fail.
 - 2026-10-22 [Changed] Archive the completed carry-forward-equivalent-interpretations change and publish the equivalent-interpretation-carry-forward specification.
 - 2026-10-22 [Changed] Adopt carry-forward of equivalent interpretations and extraction v29 in development; document equivalence, backfill, public limitations and the verified Calcinaia results.

@@ -702,7 +702,7 @@ The checklist is now 160/166 complete, with six operational/release tasks open.
 ## 31. Calcinaia coverage continuation — 4 October 2026
 
 - [x] 31.1 Publish a dated channel/window coverage matrix from current active configuration and effective intervals, complete typed/general listing traversal, retained-resource inventory and one consistent paginated API view. Distinguish discovery, recent-window acquisition, supported interpretation, additional channels and acceptance; preserve private captures and prior sample results. Verify territorial guidance, local links, runtime/readiness and strict specifications without source/job/public-control mutations.
-- [ ] 31.2 Diagnose the exact recent quotation failures and indeterminate required-content result; implement only evidence-backed corrections, verify positive/negative redistributable cases and bounded ordinary reprocessing, and compare supported API/MCP results and unchanged history. Do not repair invented citations, manually classify notices or claim the earlier 14-check sample covers the current pending documents.
+- [x] 31.2 Diagnose the exact recent quotation failures and indeterminate required-content result; implement only evidence-backed corrections, verify positive/negative redistributable cases and bounded ordinary reprocessing, and compare supported API/MCP results and unchanged history. Do not repair invented citations, manually classify notices or claim the earlier 14-check sample covers the current pending documents.
 - [x] 31.3 Adopt separately scoped Calcinaia platform acquisition and automatic primary-counterpart discovery/comparisons after successful full-scope preview and required-dependency checks. Verify effective cadence, retry/failure handling, immutable receipts for new/changed evidence and independent municipal/CFR collection; retain diagnostic-only candidates and uncompleted wider scopes.
 - [ ] 31.4 Inventory necessary explicitly referenced municipal/albo acts and verify bounded acquisition/interpretation of their exact editions and resources. Resolve affected dates only from authoritative clarifying evidence; record inaccessible acts or absent clarification and preserve indeterminate validity when the source cannot establish it.
 - [ ] 31.5 Reassess each actual source dossier against the verified declared scope and current ordinary results, keeping real/reused/synthetic evidence explicit. Record source acceptance and its report review only when prerequisites pass; keep accepted limitations partial and preserve separate public/release controls and independent CFR evidence conditions.
@@ -775,8 +775,31 @@ Private record: `quotation-diagnosis-20261022`.
 **31.2 adoption, 22 October 2026:** v29 is adopted in development together with
 `carry-forward-equivalent-interpretations`. The three notices present their
 earlier equivalent interpretation with explicit provenance; API/MCP and
-historical boundaries are verified. Bounded ordinary reprocessing and its API/MCP
-comparison remain, so 31.2 stays open. Private record: `carry-forward-20261022`.
+historical boundaries are verified. Private record: `carry-forward-20261022`.
+
+**31.2 completed, 22 October 2026:** bounded reprocessing covered seven selected
+versions one by one; 29179 is excluded as a non-weather classification false
+positive. It revealed a persistence defect: fully determined measures were
+stored with `null` indeterminate fields, and the database rejected them. The
+whole extraction was lost (72 failed jobs since 1 October, including 64 versions
+of a Livorno orange alert). The fix stores an empty array, passes an integration
+test reproducing the failure and is adopted in the development worker. Ordinary
+processing has since stored the Livorno alert's seven closures. After the
+reprocessing:
+- the 4 September notice is classified not relevant;
+- the 9 September notice has its own extracted measures;
+- the two remaining weather notices stay rejected, with their equivalent interpretation carried forward;
+- the negative controls behave as expected.
+
+API and MCP agree for all versions, now and at the pre-reprocessing boundary,
+where interpretations and measures are unchanged.
+
+Open observations, not part of 31.2:
+- MCP rejects a saved view requested with an all-zero fractional instant (`.000000Z`) because of a request-hash mismatch;
+- the PostgreSQL log shows 102 deadlocks since 1 October;
+- older failed Livorno and Cascina versions are not reprocessed.
+
+Private records: `reprocessing-31-2-20261022`, `measure-persistence-20261022`.
 
 ## 32. Latest processing repairs — 7 October 2026
 

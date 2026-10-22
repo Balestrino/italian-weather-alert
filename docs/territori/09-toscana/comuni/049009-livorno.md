@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "049009"
-ultima_revisione: "2026-10-21"
+ultima_revisione: "2026-10-22"
 ---
 
 # Livorno
@@ -82,6 +82,14 @@ LIV-005 ha corretto il limite di accesso registrato in LIV-004: la prima prova H
 Per verificare il recupero usare il trasporto dell'applicazione nell'ambiente interessato, conservare il risultato e validare il PDF, oltre allo stato HTTP. Un esito del browser o di un altro client non sostituisce la verifica di `DirectHTTP`. Prima di considerare completo un giro verificare anche persistenza, riferimenti e tutti gli allegati necessari. Gestire i fallimenti temporanei con retry limitati e cadenze della fonte; un rifiuto persistente richiede diagnosi o un canale ufficiale alternativo verificato.
 
 ## Registro delle scoperte
+
+### LIV-014 — Misure dell'allerta arancione finalmente salvate
+
+- **Data e ambito:** 2026-10-22; `livorno-municipal` in development, [allerta arancione per forti temporali con rischio idrogeologico-idraulico del reticolo minore](https://www.comune.livorno.it/it/news/133640/allerta-arancione-per-forti-temporali-con-rischio-idrogeologico-idraulico-del-reticolo-minore).
+- **Osservazione confermata:** dal 2 al 12 ottobre l'estrazione di 64 versioni di questa notizia falliva con `extraction_result_unavailable` dopo tutti i tentativi. Le misure, con luogo, inizio e fine determinati, venivano rifiutate dal database perché i campi indeterminati erano serializzati come `null`. Nessuna misura della notizia era quindi salvata.
+- **Intervento verificato:** dopo la correzione della persistenza (CLN-038 nella [guida di Calcinaia](050004-calcinaia.md)), l'elaborazione ordinaria della versione più recente salva sette chiusure: impianto sportivo scolastico, parchi pubblici, cimiteri, canile, ludoteche, centri diurni e centri estivi. Sono valide dalla mezzanotte fino alla cessazione dell'allerta.
+- **Limiti e prossima verifica:** le versioni precedenti restano con il job fallito, senza rielaborazione. Va valutato se rielaborarle per la storia o affidarsi alla versione più recente. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `measure-persistence-20261022`.
 
 ### LIV-013 — Notizie con misure aperte di nuovo ricontrollate
 

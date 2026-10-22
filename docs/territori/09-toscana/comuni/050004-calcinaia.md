@@ -224,6 +224,20 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-038 — Rielaborazione delimitata del task 31.2
+
+- **Data e ambito:** 2026-10-22; sette versioni rielaborate una per una in development con la configurazione di estrazione `v29`, attore `operator-reprocessing-31-2-20261022`. La versione 29179 è esclusa di proposito: unico caso positivo reale della `v29`, ma non meteo e frutto di una classificazione errata.
+- **Esiti:**
+  - L'interruzione Enel del 4 settembre è ora classificata non pertinente.
+  - L'avviso di criticità del 9 settembre ha misure estratte con un risultato proprio, senza più carry-forward.
+  - L'allerta del 7–8 ottobre e il monitoraggio del 21 agosto restano rifiutati, con l'interpretazione equivalente portata avanti.
+  - I tre controlli negativi non meteo (strada provinciale 5 e via del Marrucco ancora rifiutati, il ponte sull'Arno estratto dopo la correzione qui sotto) danno l'esito atteso.
+  - Il modello locale non è risultato deterministico su questi casi: alcuni esiti cambiano rispetto all'elaborazione precedente.
+- **Difetto corretto:** una misura con luogo, inizio e fine tutti determinati veniva serializzata con campi indeterminati `null`, rifiutati dal database. L'intera estrazione del documento andava persa. La correzione salva un elenco vuoto; dopo l'adozione nel worker, il ponte sull'Arno risulta estratto.
+- **Verifiche:** API e MCP coincidono per tutte le versioni, ora e al confine precedente alla rielaborazione. A quel confine interpretazioni e misure sono identiche all'istantanea iniziale. Cambia solo lo stato di aggiornamento, che riflette il momento della consegna.
+- **Limiti:** le versioni rielaborate non certificano il modello sul resto del corpus. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `reprocessing-31-2-20261022`.
+
 ### CLN-037 — Interpretazioni equivalenti portate avanti in development
 
 - **Data e ambito:** 2026-10-22; `calcinaia-municipal` e piattaforma in development, dopo l'adozione della change [`carry-forward-equivalent-interpretations`](../../../operations/equivalent-interpretations.md) e della configurazione di estrazione `v29` (CLN-036).
@@ -239,7 +253,7 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 - **Cause attuali:** i fallimenti recenti sono di estrazione con il modello locale primario del development: riferimenti all'evidenza sbagliati o fuori tabella, `kind` non sostenuto dal predicato, citazione copiata senza lo spazio prima del punto, risposta troncata per aver copiato l'intera pagina, conflitto di unione non riproducibile senza nuova chiamata. Alcune notizie non meteo (lavori su ponte e strada provinciale, immobile pericolante) sono state classificate pertinenti. Questi rifiuti sono corretti.
 - **Difetti del software corretti:** `vieta`/`vietato` non erano riconosciuti come predicato di un divieto, ora accettati nelle forme positive con configurazione di estrazione `v29`, mentre il percorso legacy resta invariato. L'etichetta diagnostica `normalization` segnalava citazioni che il parser accetta, nascondendo la causa reale. Verifiche: casi sintetici positivi e negativi e riesecuzione delle sei risposte conservate.
 - **Regressione dello stato documento:** l'avviso di criticità del 9 settembre, il monitoraggio del 21 agosto e l'allerta del 7–8 ottobre avevano estrazioni valide su versioni precedenti. Le versioni del 15 e 21 ottobre hanno testo di interpretazione identico, ma sono state rielaborate con la nuova configurazione locale e sono fallite. Le misure della versione precedente restano pubblicate con la loro evidenza, mentre l'API del documento mostra l'ultima versione come `failed` senza rimandare all'interpretazione valida. Il comportamento segue i confini di configurazione attuali; la change `carry-forward-equivalent-interpretations` lo corregge.
-- **Prossima verifica:** la `v29` è adottata in development insieme al carry-forward (CLN-037). Restano la rielaborazione ordinaria delimitata e il relativo confronto API/MCP. Accettazione invariata nel coverage tracker.
+- **Prossima verifica:** la `v29` è adottata in development insieme al carry-forward (CLN-037). Rielaborazione delimitata e confronto API/MCP sono completati in CLN-038. Accettazione invariata nel coverage tracker.
 - **Evidenza:** registro privato `quotation-diagnosis-20261022`.
 
 ### CLN-035 — Notizie con misure aperte di nuovo ricontrollate
