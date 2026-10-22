@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-22 [Changed] Record that the PostgreSQL deadlocks in the development log all predate the 2 October queue-maintenance serialization fix.
 - 2026-10-22 [Changed] Complete task 31.2: bounded reprocessing of seven Calcinaia versions, API/MCP and unchanged-history verification, and record the recovered Livorno orange-alert measures.
 - 2026-10-22 [Fixed] Persist fully determined extracted measures with an empty indeterminate-field array instead of JSON null, which the database rejected and caused the whole document extraction to fail.
 - 2026-10-22 [Changed] Archive the completed carry-forward-equivalent-interpretations change and publish the equivalent-interpretation-carry-forward specification.

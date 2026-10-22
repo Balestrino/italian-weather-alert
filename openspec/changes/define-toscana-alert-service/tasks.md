@@ -796,10 +796,13 @@ where interpretations and measures are unchanged.
 
 Open observations, not part of 31.2:
 - MCP rejects a saved view requested with an all-zero fractional instant (`.000000Z`) because of a request-hash mismatch;
-- the PostgreSQL log shows 102 deadlocks since 1 October;
 - older failed Livorno and Cascina versions are not reprocessed.
 
-Private records: `reprocessing-31-2-20261022`, `measure-persistence-20261022`.
+The 102 deadlocks in the PostgreSQL log all occurred on 2 October between 16:49
+and 16:56 UTC. They predate the queue-maintenance serialization fix (`53da4a9`),
+and none has occurred since.
+
+Private records: `reprocessing-31-2-20261022`, `measure-persistence-20261022`, `deadlocks-20261022`.
 
 ## 32. Latest processing repairs — 7 October 2026
 
