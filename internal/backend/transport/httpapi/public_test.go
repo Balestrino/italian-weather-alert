@@ -69,7 +69,15 @@ func (f *publicQueriesFake) Document(_ context.Context, query publicquery.Docume
 		{Role: "municipal", SourceID: "calcinaia", VersionID: "11", EvidenceVisible: true, Complete: true, CheckedAt: time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC), Outcome: "corroborated", Reason: "same_primary", Fields: []publicquery.VerificationField{{Field: "kind", Outcome: "corroborated", Reason: "same_value", Evidence: []publicquery.Evidence{}}}},
 		{Role: "platform", CheckedAt: time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC), Outcome: "missing_evidence", Reason: "missing_evidence", Fields: []publicquery.VerificationField{}},
 	}, Limitations: []string{"synthetic scope only"}}}
-	return publicquery.DocumentResult{Document: document, Versions: []publicquery.Document{document}, History: fixtureHistory()}, nil
+	// A template-only version presenting the earlier equivalent interpretation.
+	carried := document
+	carried.Verifications = nil
+	carried.VersionID, carried.SHA256 = "12", strings.Repeat("b", 64)
+	carried.Quality = fixtureQuality()
+	locator := "equivalent_version_interpretation"
+	carried.Quality.Interpretation.Limitations = []string{"carried_forward_from_equivalent_version:11:run:35:configuration:extraction-config-a", "own_interpretation:failed:extraction_evidence_invalid"}
+	carried.Quality.Interpretation.Evidence = []publicquery.Evidence{{DocumentID: "7", VersionID: "11", SourceURL: "https://example.test/7", Locator: &locator}}
+	return publicquery.DocumentResult{Document: carried, Versions: []publicquery.Document{document, carried}, History: fixtureHistory()}, nil
 }
 
 func (f *publicQueriesFake) Coverage(_ context.Context, query publicquery.CoverageQuery) (publicquery.CoverageResult, error) {

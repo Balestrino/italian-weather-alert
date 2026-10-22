@@ -23,6 +23,9 @@ var manifestSchema string
 //go:embed reuse_schema.sql
 var reuseSchema string
 
+//go:embed equivalence_schema.sql
+var equivalenceSchema string
+
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -35,7 +38,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	if _, err = tx.Exec(ctx, `CREATE TABLE IF NOT EXISTS iwa_migrations (name text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())`); err != nil {
 		return err
 	}
-	for _, migration := range []struct{ name, sql string }{{"009_classification", schema}, {"033_classification_segments", segmentationSchema}, {"053_interpretation_manifests", manifestSchema}, {"054_interpretation_reuse", reuseSchema}} {
+	for _, migration := range []struct{ name, sql string }{{"009_classification", schema}, {"033_classification_segments", segmentationSchema}, {"053_interpretation_manifests", manifestSchema}, {"054_interpretation_reuse", reuseSchema}, {"100_interpretation_input_equivalences", equivalenceSchema}} {
 		hash := sha256.Sum256([]byte(migration.sql))
 		checksum := hex.EncodeToString(hash[:])
 		var previous string

@@ -194,5 +194,5 @@ func (s *Store) PutManifest(ctx context.Context, runID int64, m InputManifest) e
 	if hash != m.Hash {
 		return ErrConflict
 	}
-	return nil
+	return s.recordEquivalence(ctx, runID, m)
 }

@@ -205,6 +205,10 @@ func TestExtractionPersistsEvidenceAndExposesNewerUninterpretedVersion(t *testin
 	if stored.Status != "extracted" || len(stored.Measures) != 1 || len(stored.Measures[0].Evidence) != 4 || len(stored.Measures[0].TemporalCandidates) != 1 || stored.Measures[0].TemporalCandidates[0].OriginalExpression != "fino al perdurare dell'emergenza" || len(stored.Measures[0].TemporalCandidates[0].Evidence) != 1 || len(stored.Segments) != 1 || stored.Measures[0].Evidence[0].SegmentOrdinal != 1 || stored.Segments[0].CoreStartByte < stored.Segments[0].StartByte || stored.Segments[0].CoreEndByte > stored.Segments[0].EndByte {
 		t.Fatalf("persisted measure/evidence mismatch: %#v", stored)
 	}
+	var extractionEquivalences int
+	if countErr := pool.QueryRow(ctx, "SELECT count(*) FROM interpretation_input_equivalences e JOIN processing_runs r ON r.id=e.run_id WHERE e.version_id=$1 AND r.stage='extraction'", first.ID).Scan(&extractionEquivalences); countErr != nil || extractionEquivalences != 1 {
+		t.Fatalf("extraction manifest equivalence not recorded once: %d %v", extractionEquivalences, countErr)
+	}
 
 	equivalent := retain("extract-equivalent", "Il Comune dispone la chiusura del sottopasso di via Maremmana fino al perdurare dell'emergenza.")
 	equivalentClass := classify(equivalent, "equivalent")

@@ -200,6 +200,10 @@ func TestClassificationJobPersistsVersionedDecision(t *testing.T) {
 	if raw != version.Hash || meaningful != manifest.Hash {
 		t.Fatal("raw provenance changed or manifest missing")
 	}
+	var equivalences int
+	if err = pool.QueryRow(ctx, "SELECT count(*) FROM interpretation_input_equivalences WHERE run_id=$1 AND version_id=$2", runID, version.ID).Scan(&equivalences); err != nil || equivalences != 1 {
+		t.Fatalf("classification manifest equivalence not recorded once: %d %v", equivalences, err)
+	}
 
 	originalBody, err := retained.Read(ctx, version.ID, url)
 	if err != nil {

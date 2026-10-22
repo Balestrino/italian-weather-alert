@@ -241,6 +241,7 @@ func (r *Retention) cleanupDatabase(ctx context.Context, evaluatedAt time.Time) 
 		`DELETE FROM ocr_page_results WHERE run_id IN(SELECT id FROM retention_processing_runs) OR document_version_id IN(SELECT id FROM retention_candidates)`,
 		`DELETE FROM ocr_resource_results WHERE run_id IN(SELECT id FROM retention_processing_runs) OR document_version_id IN(SELECT id FROM retention_candidates)`,
 		`DELETE FROM interpretation_reuse WHERE run_id IN(SELECT id FROM retention_processing_runs)`,
+		`DELETE FROM interpretation_input_equivalences WHERE run_id IN(SELECT id FROM retention_processing_runs)`,
 		`DELETE FROM interpretation_input_manifests WHERE run_id IN(SELECT id FROM retention_processing_runs)`,
 		`DELETE FROM processing_segment_checkpoint_uses WHERE run_id IN(SELECT id FROM retention_processing_runs)`,
 		`DELETE FROM processing_segment_checkpoints WHERE call_id IN(SELECT id FROM processing_provider_calls WHERE run_id IN(SELECT id FROM retention_processing_runs))`,

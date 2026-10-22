@@ -64,10 +64,11 @@ func run() bool {
 	pendingArchiveCommand := len(os.Args) == 4 && os.Args[1] == "documents-archive-pending"
 	archiveCommand := len(os.Args) == 4 && os.Args[1] == "jobs-archive"
 	seedCommand := len(os.Args) == 4 && os.Args[1] == "ocr-seed"
+	equivalenceCommand := len(os.Args) == 4 && os.Args[1] == "interpretation-equivalence-backfill"
 	previewCommand := len(os.Args) == 4 && os.Args[1] == "preview"
 	backupResultCommand := len(os.Args) == 6 && os.Args[1] == "backup-result"
 	retentionPolicyCommand := len(os.Args) == 3 && os.Args[1] == "retention-policy"
-	if (!controlRequested && !reportCommand && !verificationCommand && !projectCommand && !zonesCommand && !preflightCommand && !pendingArchiveCommand && !archiveCommand && !seedCommand && !previewCommand && !retentionPolicyCommand && !backupResultCommand && len(os.Args) > 2) || (len(os.Args) == 2 && !controlRequested && !reportCommand && os.Args[1] != "check" && os.Args[1] != "inference-catalog-check" && os.Args[1] != "migrate" && os.Args[1] != "storage-init" && os.Args[1] != "storage-recover" && os.Args[1] != "retention-cleanup" && os.Args[1] != "worker" && os.Args[1] != "backup-worker") {
+	if (!controlRequested && !reportCommand && !verificationCommand && !projectCommand && !zonesCommand && !preflightCommand && !pendingArchiveCommand && !archiveCommand && !seedCommand && !equivalenceCommand && !previewCommand && !retentionPolicyCommand && !backupResultCommand && len(os.Args) > 2) || (len(os.Args) == 2 && !controlRequested && !reportCommand && os.Args[1] != "check" && os.Args[1] != "inference-catalog-check" && os.Args[1] != "migrate" && os.Args[1] != "storage-init" && os.Args[1] != "storage-recover" && os.Args[1] != "retention-cleanup" && os.Args[1] != "worker" && os.Args[1] != "backup-worker") {
 		slog.Error("unknown command")
 		return false
 	}
@@ -375,6 +376,9 @@ func run() bool {
 	}
 	if seedCommand {
 		return seedOCR(ctx, pool, c)
+	}
+	if equivalenceCommand {
+		return backfillEquivalences(ctx, pool, c)
 	}
 	if backupResultCommand {
 		if c.Role != "admin" {
