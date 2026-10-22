@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-22 [Fixed] Persist fully determined extracted measures with an empty indeterminate-field array instead of JSON null, which the database rejected and caused the whole document extraction to fail.
 - 2026-10-22 [Changed] Archive the completed carry-forward-equivalent-interpretations change and publish the equivalent-interpretation-carry-forward specification.
 - 2026-10-22 [Changed] Adopt carry-forward of equivalent interpretations and extraction v29 in development; document equivalence, backfill, public limitations and the verified Calcinaia results.
 - 2026-10-22 [Added] Carry forward the latest earlier validated interpretation of an equivalent input when a document version's own interpretation failed or is pending, with configuration-independent manifest fingerprints, a backfill command and explicit provenance limitations.

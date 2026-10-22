@@ -258,6 +258,28 @@ func TestExtractionPersistsEvidenceAndExposesNewerUninterpretedVersion(t *testin
 	if _, err = pool.Exec(ctx, "UPDATE extracted_temporal_candidates SET original_expression='10 luglio' WHERE run_id=$1", conflictRun.ID); err == nil {
 		t.Fatal("append-only temporal candidate accepted an update")
 	}
+	// A measure with place, start and end all supported has no indeterminate
+	// field; it must persist as an empty array, not JSON null.
+	place, from, to := "via Maremmana", "10 settembre", "fino a revoca"
+	determined := Measure{Ordinal: 1, Kind: "closure", Subject: "sottopasso", Place: &place, ValidFrom: &from, ValidUntil: &to, Evidence: []Evidence{
+		{Field: "kind", ResourceURL: url, Quote: "ORDINA la chiusura", SegmentOrdinal: 1}, {Field: "subject", ResourceURL: url, Quote: "sottopasso", SegmentOrdinal: 1},
+		{Field: "place", ResourceURL: url, Quote: place, SegmentOrdinal: 1}, {Field: "valid_from", ResourceURL: url, Quote: from, SegmentOrdinal: 1}, {Field: "valid_until", ResourceURL: url, Quote: to, SegmentOrdinal: 1},
+	}}
+	determined.IndeterminateFields = indeterminateFields(determined)
+	if determined.IndeterminateFields != nil {
+		t.Fatal("fixture must reproduce the parser's nil indeterminate fields")
+	}
+	determinedRun, err := process.StartRun(ctx, processing.RunRequest{IdempotencyKey: "extraction-integration-determined", Workload: "evaluation", Stage: "extraction", ConfigurationVersionID: extractCatalog.ConfigurationVersionID, SourceID: &source, DocumentVersionID: &conflictVersion.ID, Subject: json.RawMessage(`{"fixture":"fully-determined"}`), CreatedAt: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = extractStore.Put(ctx, Result{RunID: determinedRun.ID, DocumentVersionID: conflictVersion.ID, ClassificationRunID: conflictClass, Status: "extracted", ReasonCode: "measures_extracted", ContentSHA256: strings.Repeat("6", 64), ContentComplete: true, ProviderResponseID: "segmented:determined", ReturnedModel: "qwen3.8-27b", Measures: []Measure{determined}, Segments: segments[:1], CreatedAt: now}); err != nil {
+		t.Fatalf("fully determined measure not persisted: %v", err)
+	}
+	persistedDetermined, found, err := extractStore.Get(ctx, determinedRun.ID)
+	if err != nil || !found || len(persistedDetermined.Measures) != 1 || len(persistedDetermined.Measures[0].IndeterminateFields) != 0 || persistedDetermined.Measures[0].Place == nil || persistedDetermined.Measures[0].ValidUntil == nil {
+		t.Fatalf("fully determined measure did not round trip: %#v %v", persistedDetermined, err)
+	}
 
 	second := retain("extract-v2", "Il Comune pubblica un aggiornamento meteo, ma il provvedimento allegato non è leggibile.")
 	secondClass := classify(second, "v2")

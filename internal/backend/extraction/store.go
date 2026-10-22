@@ -61,7 +61,12 @@ func (s *Store) Put(ctx context.Context, result Result) error {
 				return err
 			}
 		}
-		fields, marshalErr := json.Marshal(measure.IndeterminateFields)
+		// A fully determined measure has no indeterminate field: store [], not null.
+		indeterminate := measure.IndeterminateFields
+		if indeterminate == nil {
+			indeterminate = []string{}
+		}
+		fields, marshalErr := json.Marshal(indeterminate)
 		if marshalErr != nil {
 			return ErrInvalid
 		}
