@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050004"
-ultima_revisione: "2026-10-21"
+ultima_revisione: "2026-10-22"
 ---
 
 # Calcinaia
@@ -41,6 +41,16 @@ CFR originario per livelli regionali; non trasferire l'autorevolezza a tutti i
 contenuti del dominio o dedurre assenza di avvisi da un elenco vuoto.
 
 ## Guida operativa
+
+CLN-036 chiude la diagnosi delle interpretazioni pendenti del 4 ottobre: 13 dei
+14 avvisi hanno ora una classificazione valida sull'ultima versione; resta una
+citazione parafrasata, correttamente rifiutata. I fallimenti attuali sono di
+estrazione, con il modello locale del development. Prima di correggere un
+fallimento, rieseguire la risposta conservata con il parser reale: l'etichetta
+diagnostica `normalization` registrata prima del 22 ottobre può nascondere la
+causa effettiva. Una nuova versione che cambia solo il template, rielaborata con
+una configurazione diversa e fallita, può nascondere nell'API un'interpretazione
+valida della versione precedente con testo identico.
 
 CLN-032 registra un nuovo ciclo di URL rinominati: dal 14 ottobre il controllo
 ordinario risultava fallito per tre notizie diventate 404 dopo la correzione
@@ -211,6 +221,16 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-036 — Interpretazioni pendenti diagnosticate dalle risposte conservate
+
+- **Data e ambito:** 2026-10-22; `calcinaia-municipal` e `calcinaia-cittadino-informato` in development, PostgreSQL in sola lettura, ricerca documentale API su un'unica vista salvata, task 31.2.
+- **Osservazione confermata:** dei 14 avvisi pendenti di CLN-027, tredici hanno ora una classificazione valida sull'ultima versione. Il quattordicesimo (interruzione di energia elettrica del 4 settembre, non meteo) conserva una citazione che parafrasa il testo: il rifiuto è corretto e non viene riparato. Nella finestra di CLN-027 risultano supportati 52 avvisi su 54; negli ultimi 30 giorni 65 su 67.
+- **Cause attuali:** i fallimenti recenti sono di estrazione con il modello locale primario del development: riferimenti all'evidenza sbagliati o fuori tabella, `kind` non sostenuto dal predicato, citazione copiata senza lo spazio prima del punto, risposta troncata per aver copiato l'intera pagina, conflitto di unione non riproducibile senza nuova chiamata. Alcune notizie non meteo (lavori su ponte e strada provinciale, immobile pericolante) sono state classificate pertinenti. Questi rifiuti sono corretti.
+- **Difetti del software corretti:** `vieta`/`vietato` non erano riconosciuti come predicato di un divieto, ora accettati nelle forme positive con configurazione di estrazione `v29`, mentre il percorso legacy resta invariato. L'etichetta diagnostica `normalization` segnalava citazioni che il parser accetta, nascondendo la causa reale. Verifiche: casi sintetici positivi e negativi e riesecuzione delle sei risposte conservate.
+- **Regressione pubblica:** l'avviso di criticità del 9 settembre, il monitoraggio del 21 agosto e l'allerta del 7–8 ottobre avevano estrazioni valide su versioni precedenti. Le versioni del 15 e 21 ottobre hanno testo di interpretazione identico, ma sono state rielaborate con la nuova configurazione locale e sono fallite: l'API mostra l'ultima versione come `failed`. Il comportamento segue i confini di configurazione attuali; serve una change separata.
+- **Prossima verifica:** adozione in development della `v29`, rielaborazione ordinaria delimitata e confronto API/MCP dopo la change sul riuso di input equivalenti. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `quotation-diagnosis-20261022`.
 
 ### CLN-035 — Notizie con misure aperte di nuovo ricontrollate
 

@@ -42,6 +42,11 @@ func InvalidOutputReason(raw, finish string, window Window, parseErr error) stri
 	}
 	for _, quote := range header.Evidence {
 		normalized := classification.Normalize(quote)
+		// The current parser accepts the reviewed OCR/typography normalization.
+		// Such a quote is not the failure; keep looking for the actual cause.
+		if !window.legacyLiteral && literalReference(window.Content(), window.ResourceURL, windowPage(window), normalized) {
+			continue
+		}
 		if !strings.Contains(strings.ToLower(window.Text), strings.ToLower(normalized)) {
 			if canonical := classification.NormalizeOCR(normalized).Text; canonical != "" && literalReference(window.Content(), window.ResourceURL, windowPage(window), canonical) {
 				return prefix + "normalization"

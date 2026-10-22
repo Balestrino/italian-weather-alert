@@ -1094,10 +1094,30 @@ func kindSupportedByEvidence(kind string, evidence []Evidence) bool {
 // activation; ordinary office openings and negated statements are not.
 var civilProtectionOpening = regexp.MustCompile(`(?i)\b(?:coc\s*\(centro operativo comunale\)|centro operativo comunale)\s+(?:sarà|sara|è|resta|rimane)\s+aperto\b`)
 
+// A finite form of "vietare" states a prohibition as directly as "divieto";
+// negated forms ("non è vietato") do not.
+var prohibitionVerb = regexp.MustCompile(`(?i)(\bnon\s+(?:(?:è|e'|sono|sarà|saranno|resta|restano|rimane|rimangono)\s+)?)?\bviet(?:a|ano|ato|ata|ati|ate)\b`)
+
+func positiveProhibitionVerb(quote string) bool {
+	for _, match := range prohibitionVerb.FindAllStringSubmatchIndex(quote, -1) {
+		if match[2] < 0 {
+			return true
+		}
+	}
+	return false
+}
+
 func windowKindSupportedByEvidence(kind string, evidence []Evidence, window Window) bool {
 	if kind == "activation" && !window.legacyLiteral {
 		for _, item := range evidence {
 			if civilProtectionOpening.MatchString(item.Quote) {
+				return true
+			}
+		}
+	}
+	if kind == "prohibition" && !window.legacyLiteral {
+		for _, item := range evidence {
+			if positiveProhibitionVerb(item.Quote) {
 				return true
 			}
 		}

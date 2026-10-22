@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-22 [Fixed] Recognise positive finite forms of 'vietare' as prohibition evidence (extraction configuration v29) and report the actual cause of invalid extraction outputs; record the Calcinaia 31.2 diagnosis and the open template-version regression.
 - 2026-10-22 [Changed] Document the current development publication selection: Calcinaia and Cascina.
 - 2026-10-21 [Changed] Archive the completed maintain-target-measure-state change, publish tracked-target-interpretation-state and update the unavailable-municipal-targets classification requirement.
 - 2026-10-21 [Changed] Maintain tracked target measure, relevance and reference state from validated interpretation, recheck older notices with open measures within a configurable limit, and verify the development adoption.

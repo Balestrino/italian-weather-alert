@@ -756,6 +756,23 @@ rejected and source acceptance stays pending. See [ordinary adoption](../../../d
 The checklist is now 162/171 complete, with three source-continuation tasks and
 six operational/release tasks open; deferred backup/restore checks remain mandatory.
 
+**31.2 diagnosis and corrections — 22 October 2026:** 13 of the 14 pending
+4 October notices now have a validated latest-version classification. The
+remaining one keeps a paraphrased quotation that is correctly rejected. Current
+failures are extraction outputs from the local development primary that are
+correctly rejected (wrong or out-of-range references, unsupported kinds,
+non-literal quotes, truncation); several non-weather notices were classified as
+relevant. Each retained response was replayed with the real parser. Two
+evidence-backed corrections pass synthetic positive and negative cases, race and
+integration checks: positive finite forms of `vietare` support a prohibition
+(extraction configuration v29, legacy path frozen), and the invalid-output
+diagnostic no longer reports `normalization` for quotes the parser accepts. Three weather notices
+lost their earlier validated extraction in the public view: template-only
+versions with identical interpretation text failed under the new configuration.
+Cross-configuration reuse of equivalent inputs is planned as a separate change.
+Development adoption, bounded ordinary reprocessing and API/MCP comparison wait
+for that change, so 31.2 stays open. Private record: `quotation-diagnosis-20261022`.
+
 ## 32. Latest processing repairs — 7 October 2026
 
 The operator authorizes the nine-step repair plan following TOS-021, CLN-030

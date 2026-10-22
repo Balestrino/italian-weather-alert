@@ -45,6 +45,37 @@ L'ispezione runtime/readiness passa; produzione e abilitazione pubblica ordinari
 restano ferme. Cadenza e soglia di ritardo vanno lette dagli **intervalli effettivi**,
 non soltanto dai valori iniziali della configurazione.
 
+## Diagnosi delle interpretazioni pendenti — 22 ottobre 2026
+
+Seguito del task 31.2 in sola lettura sul development: PostgreSQL, risposte non
+valide conservate e una vista API salvata. La matrice sopra resta l'audit del
+4 ottobre.
+
+| Perimetro | Esito API attuale | Note |
+| --- | --- | --- |
+| Finestra 4 settembre–4 ottobre | 52 su 54 `supported` | Uno `not_processed`: citazione parafrasata, rifiuto corretto. Uno `failed`: regressione descritta sotto |
+| Ultimi 30 giorni | 65 su 67 `supported` | L'allerta del 7–8 ottobre (regressione) e un avviso di lavori non meteo classificato pertinente |
+| Piattaforma | 57 su 61 `supported` | Due estrazioni rifiutate su un'ordinanza non meteo, un risultato parziale e l'elenco API |
+
+Tredici dei quattordici avvisi del 4 ottobre hanno ora una classificazione valida
+sull'ultima versione. Le cause attuali sono riferimenti, predicati o citazioni non
+sostenuti nelle risposte del modello locale primario: sono rifiutati correttamente
+e non vengono riparati. Ogni risposta conservata è stata rieseguita con il parser
+reale. Due difetti del software sono corretti con test sintetici positivi e
+negativi: le forme positive di `vietare` ora sostengono un divieto (configurazione
+di estrazione `v29`) e l'etichetta diagnostica non attribuisce più il fallimento a
+citazioni accettate dalla normalizzazione.
+
+**Regressione aperta.** Tre avvisi meteo (9 settembre, 21 agosto, 7–8 ottobre)
+avevano estrazioni valide su versioni precedenti. Le nuove versioni, che cambiano
+solo il template e hanno lo stesso testo di interpretazione, sono state rielaborate
+con un'altra configurazione e sono fallite; l'API presenta quindi l'ultima versione
+come `failed`. La correzione richiede una change separata sul riuso di input
+equivalenti. Adozione della `v29`, rielaborazione delimitata e confronto API/MCP
+restano da completare. Dettagli in CLN-036 della
+[guida di Calcinaia](../territori/09-toscana/comuni/050004-calcinaia.md); evidenze
+private `quotation-diagnosis-20261022`.
+
 ## Lavoro successivo e prove richieste
 
 1. **Interpretazioni pendenti — 31.2.** Conservare l'elenco esatto delle versioni
