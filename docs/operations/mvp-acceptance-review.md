@@ -172,6 +172,9 @@ Limiti dichiarati:
 - nessun rosso, neve o ghiaccio reale nel periodo;
 - solo development.
 
-La revisione registrata dell'accettazione e l'abilitazione pubblica restano
-passaggi separati.
+Alle 14.44 UTC è stata registrata anche la revisione dell'accettazione, con
+esito `accepted` e nessun problema. Lo stato di rilascio resta `partial`:
+criticità e monitoraggio risultano `accepted_with_limitations`, mentre
+vigilanza e fonti di Calcinaia restano `pending`. L'abilitazione pubblica resta
+un passaggio separato.
 
