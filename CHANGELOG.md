@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Archive the completed acquire-referenced-albo-acts change and publish the referenced-act-evidence specification.
 - 2026-10-23 [Changed] Adopt referenced-act retrieval in development: the Calcinaia 9 September notice resolves to Ordinanza 38/2026 and its measures become conditional from 10 September, the 20 August notice is clarified by its attached ordinance and the 21 August monitoring stays ambiguous; complete task 31.4 and document the procedure.
 - 2026-10-23 [Fixed] Identify the service with an explicit User-Agent on albo requests; the reviewed JCityGov portal rejects the default Go client with HTTP 403.
 - 2026-10-23 [Added] Expose referenced-act evidence on clarified public measures, add a read-only operator list (admin source page and source-act-references CLI) and a first-page albo preview; deny scheduled checks of albo sources.

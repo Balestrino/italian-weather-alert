@@ -4,7 +4,7 @@ Municipal notices often announce measures "by ordinance" without attaching the
 act, and their own dates can be wrong. From 23 October 2026 the service
 retrieves acts that relevant notices cite explicitly and uses their
 dispositive clause to clarify the citing notice's measures. Change:
-`acquire-referenced-albo-acts` ([specification](../../openspec/changes/acquire-referenced-albo-acts/specs/referenced-act-evidence/spec.md)).
+`acquire-referenced-albo-acts` ([specification](../../openspec/specs/referenced-act-evidence/spec.md)).
 
 ## References and resolution
 
