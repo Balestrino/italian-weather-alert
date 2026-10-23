@@ -100,3 +100,20 @@ i recuperi d'archivio sono di nuovo possibili. L'accettazione resta pending e
 richiede un periodo di osservazione sulla revisione 2
 ([CLN-044](../territori/09-toscana/comuni/050004-calcinaia.md)).
 
+### Criticità e monitoraggio (23 ottobre 2026)
+
+Su richiesta dell'operatore sono stati rivalutati anche i due ambiti rimasti.
+L'esito resta `pending` e non è stata registrata alcuna accettazione.
+
+| Ambito | Verifica | Esito |
+| --- | --- | --- |
+| Criticità CFR | 14 edizioni reali con allerta (5–23 ottobre, arancioni per temporali compresi). Le 5096 voci zona/rischio/giorno coincidono con le tabelle ufficiali e i 201 intervalli precisi con le righe. API e MCP coincidono sulla zona A4 in 54 istanti, senza falsi allarmi | Pending: le righe «in corso fino alle ore …» restano a precisione giornaliera. L'8 ottobre l'arancione risulta attivo dopo le 17:00 anziché il giallo |
+| Monitoraggio CFR | 16 bollettini operativi reali con evento confrontati con l'originale: narrativa parziale con l'ora di emissione, nessun colore, fatto o misura dedotti. API e MCP coincidono sulla situazione in 19 istanti | Condizione del dossier soddisfatta; l'accettazione resta da registrare con decisione esplicita |
+
+Restano da trattare altri limiti, già nella [voce TOS-023](../territori/09-toscana/README.md):
+- nessun verde esplicito fuori dagli intervalli;
+- record mancanti il 7 ottobre prima della riproiezione;
+- stato «in ritardo» nelle viste storiche.
+
+Evidenze private: `criticality-monitoring-31-5-20261023`.
+

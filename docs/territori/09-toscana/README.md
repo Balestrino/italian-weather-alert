@@ -146,6 +146,25 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 
 ## Registro delle scoperte
 
+### TOS-023 — Criticità e monitoraggio rivalutati su casi reali (task 31.5)
+
+- **Data e ambito:** 2026-10-23; edizioni CFR conservate in development dal 5 al 23 ottobre.
+- **Criticità:**
+  - **Edizioni:** le 14 edizioni con allerta coincidono con le tabelle ufficiali delle criticità previste in tutte le 5096 voci zona/rischio/giorno. Comprendono gli arancioni per temporali del 7, 8 e 20 ottobre e i gialli per vento, mareggiate e reticolo principale.
+  - **Intervalli:** i 201 intervalli precisi corrispondono esattamente alle righe ufficiali.
+  - **API e MCP:** sulla zona A4, l'unica nel perimetro pubblico di development, coincidono in 54 istanti, senza falsi allarmi.
+- **Difetto osservato:** le righe «in corso fino alle ore …» non vengono convertite in intervallo, quindi resta il livello giornaliero della mappa. L'8 ottobre l'arancione su A4 risulta attivo dopo le 17:00, quando la tabella indica giallo.
+- **Altri limiti:**
+  - Fuori dagli intervalli espliciti il resto della giornata non ha un verde esplicito.
+  - Il 7 ottobre, prima della riproiezione v5, i rischi senza allerta non avevano record.
+  - Nelle viste storiche lo stato di aggiornamento risulta «in ritardo», perché è ricalcolato all'ora della richiesta.
+- **Monitoraggio:**
+  - I 16 bollettini con evento del 5, 7–8 e 20 ottobre sono proiettati come narrativa parziale, con l'ora di emissione dell'originale.
+  - Nessun fatto, colore o misura è stato dedotto.
+  - API e MCP coincidono sulla situazione di Calcinaia in 19 istanti, e il riepilogo cita sempre l'ultimo bollettino noto.
+- **Esito:** nessuna accettazione registrata. Le condizioni dei dossier sono riportate nella [revisione MVP](../../operations/mvp-acceptance-review.md).
+- **Evidenza:** registro privato `criticality-monitoring-31-5-20261023`.
+
 ### TOS-022 — Fusione corretta e limiti della legenda conservati
 
 - **Data e ambito:** 2026-10-07; tre prodotti CFR conservati per Toscana, collaudo sintetico e sviluppo delimitato.
