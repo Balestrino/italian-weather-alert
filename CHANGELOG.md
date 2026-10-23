@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Added] Add deterministic detection of explicit act references in notice text and their resolution as attached, numbered or unique albo candidates, recording not-found, ambiguous and unavailable outcomes append-only.
 - 2026-10-23 [Added] Add append-only referenced-act tables with retention participation, a reviewed JCityGov albo source configuration and a bounded, session-aware JCityGov albo client with synthetic fixtures.
 - 2026-10-23 [Planned] Record the task 31.4 inventory of acts cited by Calcinaia notices (Ordinanza 38/2026 resolves the 9 September date conflict), the audited recovery of the archived 20 August notice, and plan acquire-referenced-albo-acts for bounded albo acquisition and measure-date clarification.
 - 2026-10-23 [Changed] Archive the completed replace-equivalent-version-measures change and add the current-measure requirement to the equivalent-interpretation-carry-forward specification.

@@ -19,10 +19,10 @@
 
 ## 3. Detection and resolution
 
-- [ ] 3.1 Implement deterministic reference detection over interpreted notice content with the reviewed patterns and the navigation fingerprint exclusion. Verify with synthetic fixtures:
+- [x] 3.1 Implement deterministic reference detection over interpreted notice content with the reviewed patterns and the navigation fingerprint exclusion. Verify with synthetic fixtures:
   - positive: numbered with year, numbered with date, unnumbered operative forms;
   - negative: footer link, "Visto" boilerplate, negated or hypothetical forms.
-- [ ] 3.2 Implement resolution in the order `attached`, `numbered`, `unique_candidate`, then `not_found`, `ambiguous` or `unavailable`, with the category, date-window and disposition-term rules, appending outcomes. Verify with unit and integration tests for each outcome:
+- [x] 3.2 Implement resolution in the order `attached`, `numbered`, `unique_candidate`, then `not_found`, `ambiguous` or `unavailable`, with the category, date-window and disposition-term rules, appending outcomes. Verify with unit and integration tests for each outcome:
   - an ordinance and a decree with the same object;
   - two matching ordinances;
   - an unreachable albo, then a later successful retry.
