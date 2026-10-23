@@ -224,6 +224,14 @@ func sameSections(a, b []string) bool {
 	slices.Sort(y)
 	return slices.Equal(x, y)
 }
+
+// sameOfficialHost treats a host and its "www." form as the same official site;
+// any other subdomain or domain remains distinct.
+func sameOfficialHost(a, b string) bool {
+	a, b = strings.TrimPrefix(strings.ToLower(a), "www."), strings.TrimPrefix(strings.ToLower(b), "www.")
+	return a != "" && a == b
+}
+
 func (s *Store) Accept(ctx context.Context, id string, rev int, actor string, a Acceptance) error {
 	if !validEvidence(a.Report) || a.PeriodStart.IsZero() || a.PeriodEnd.Sub(a.PeriodStart) < 7*24*time.Hour || a.PeriodEnd.After(a.Report.ObservedAt) || !a.ExtractionVerified || !a.UpdatesVerified || !a.AttachmentsVerified || !a.ScannedAttachmentsVerified || !a.HistoryVerified || !a.FailureBehaviorVerified || !a.InterfacesEquivalent || a.KnownOmissions != 0 || a.UnsupportedAssertions != 0 || !validCoverageStatus(a.CoverageStatus, a.CoverageLimitations) {
 		return ErrInvalid
@@ -260,12 +268,12 @@ func (s *Store) Accept(ctx context.Context, id string, rev int, actor string, a 
 				return ErrPrerequisite
 			}
 			referring, _ := url.Parse(r.Evidence.URL)
-			if referring.Hostname() != officialURL.Hostname() {
+			if !sameOfficialHost(referring.Hostname(), officialURL.Hostname()) {
 				return ErrPrerequisite
 			}
 		} else {
 			origin, _ := url.Parse(c.Provenance.URL)
-			if origin.Hostname() != officialURL.Hostname() {
+			if !sameOfficialHost(origin.Hostname(), officialURL.Hostname()) {
 				return ErrPrerequisite
 			}
 		}

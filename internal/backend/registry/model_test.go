@@ -136,3 +136,23 @@ func TestUnresolvedMeasureDaysValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestSameOfficialHostAcceptsOnlyTheWWWForm(t *testing.T) {
+	for _, tc := range []struct {
+		a, b string
+		want bool
+	}{
+		{"www.cfr.toscana.it", "www.cfr.toscana.it", true},
+		{"cfr.toscana.it", "www.cfr.toscana.it", true},
+		{"WWW.CFR.toscana.it", "cfr.toscana.it", true},
+		{"toscana.it", "www.cfr.toscana.it", false},
+		{"www2.cfr.toscana.it", "cfr.toscana.it", false},
+		{"evil-cfr.toscana.it", "cfr.toscana.it", false},
+		{"cfr.toscana.it.example", "cfr.toscana.it", false},
+		{"", "www.", false},
+	} {
+		if got := sameOfficialHost(tc.a, tc.b); got != tc.want {
+			t.Fatal(tc.a, tc.b, got)
+		}
+	}
+}
