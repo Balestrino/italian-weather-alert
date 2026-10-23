@@ -2,8 +2,8 @@
 
 ## 1. Selection
 
-- [ ] 1.1 Extend the replacement predicate of `publicquery.measures()` with the equivalent-version branch of design decision 1: fingerprints within the cutoff, later `(first_acquired_at, id)`, validated complete non-evaluation extraction with a newer binding. Keep the same-version branch unchanged. Verify with `go vet` and the existing publicquery unit tests.
-- [ ] 1.2 Add publicquery PostgreSQL integration tests for every scenario of the delta spec:
+- [x] 1.1 Extend the replacement predicate of `publicquery.measures()` with the equivalent-version branch of design decision 1: fingerprints within the cutoff, later `(first_acquired_at, id)`, validated complete non-evaluation extraction with a newer binding. Keep the same-version branch unchanged. Verify with `go vet` and the existing publicquery unit tests.
+- [x] 1.2 Add publicquery PostgreSQL integration tests for every scenario of the delta spec:
   - template-only reinterpretation with reworded subjects;
   - a genuine revision omitting a closure;
   - a newer equivalent result that is not relevant, has no measures, or failed;
@@ -11,11 +11,13 @@
   - same-version replacement unchanged.
 
   Also assert that reads write no row.
-- [ ] 1.3 Verify bounds and interfaces: a municipality with at least 40 template-only versions keeps a fixed number of measure-selection round trips (query-count harness), and HTTP/MCP return the identical selection for measure search and the municipality situation (transport equivalence test).
+- [x] 1.3 Verify bounds and interfaces: a municipality with at least 40 template-only versions keeps a fixed number of measure-selection round trips (query-count harness), and HTTP/MCP return the identical selection for measure search and the municipality situation (transport equivalence test).
 
 ## 2. Verification and adoption
 
-- [ ] 2.1 Run unit, race, vet and `-tags=integration` for publicquery, transport and cmd, plus `openspec validate --strict`, and record the results.
+- [x] 2.1 Run unit, race, vet and `-tags=integration` for publicquery, transport and cmd, plus `openspec validate --strict`, and record the results.
+
+  Results on 2026-10-23: unit and `-race` pass for publicquery, transport/httpapi and every `cmd` package. `go vet ./...` passes with and without `-tags=integration`. The `-tags=integration` suites pass for publicquery (18.9 s), transport/httpapi and cmd/iwa (6.8 s). `openspec validate --strict` passes. The new integration test fails against the previous predicate, which returned both measures of the template-only document at 45 s.
 - [ ] 2.2 Adopt the public service in development with a settings backup. Verify through API and MCP:
   - Calcinaia documents 60 and 58 return only the measures of their latest equivalent projection;
   - documents 43, 15668 and 34667 keep their measures;

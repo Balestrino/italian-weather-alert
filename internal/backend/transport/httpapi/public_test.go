@@ -47,11 +47,14 @@ func (f *publicQueriesFake) MunicipalitySituation(_ context.Context, query publi
 	if query.MunicipalityISTAT != "050004" || !fixedQueryTime(query.QueryTime) {
 		return publicquery.Situation{}, publicquery.ErrInvalidParameters
 	}
-	return publicquery.Situation{Municipality: publicquery.Municipality{ISTAT: "050004", Name: "Calcinaia", Zones: []string{"A4"}, MappingLimitations: []string{}, LocalCoverage: "enabled"}, LocalMeasures: []publicquery.Measure{}, OperationalPhases: []publicquery.OperationalPhase{}, RegionalProducts: []publicquery.RegionalWarning{}, DocumentsRequiringAttention: []publicquery.Document{}, Coverage: []publicquery.Coverage{}, History: fixtureHistory()}, nil
+	return publicquery.Situation{Municipality: publicquery.Municipality{ISTAT: "050004", Name: "Calcinaia", Zones: []string{"A4"}, MappingLimitations: []string{}, LocalCoverage: "enabled"}, LocalMeasures: []publicquery.Measure{fixtureMeasure()}, OperationalPhases: []publicquery.OperationalPhase{}, RegionalProducts: []publicquery.RegionalWarning{}, DocumentsRequiringAttention: []publicquery.Document{}, Coverage: []publicquery.Coverage{}, History: fixtureHistory()}, nil
 }
 
 func (f *publicQueriesFake) Search(_ context.Context, query publicquery.SearchQuery) (publicquery.SearchResult, error) {
 	f.called("search_alerts")
+	if query.Kind == "measure" && query.MunicipalityISTAT == "050004" && fixedQueryTime(query.QueryTime) {
+		return publicquery.SearchResult{Kind: "measure", Documents: []publicquery.Document{}, Measures: []publicquery.Measure{fixtureMeasure()}, Regional: []publicquery.RegionalWarning{}, History: fixtureHistory()}, nil
+	}
 	if query.Kind != "regional" || query.Product != "vigilance" || !fixedQueryTime(query.QueryTime) {
 		return publicquery.SearchResult{}, publicquery.ErrInvalidParameters
 	}
@@ -142,6 +145,12 @@ func fixtureQuality() publicquery.Quality {
 	return publicquery.Quality{Provenance: publicquery.Dimension{State: "verified", Limitations: []string{}, Evidence: []publicquery.Evidence{}}, Interpretation: publicquery.Dimension{State: "supported", Limitations: []string{}, Evidence: []publicquery.Evidence{}}, Updating: publicquery.Updating{State: "ok", DelayThresholdSeconds: 3600, Limitations: []string{}}}
 }
 
+// fixtureMeasure is a current measure of the replacing equivalent version 12.
+func fixtureMeasure() publicquery.Measure {
+	locator, passage, place := "subject", "ponte", "Via Sintetica"
+	return publicquery.Measure{ID: "local-measure-12-1", RevisionID: "local-measure-12-1", MunicipalityISTAT: "050004", Action: "closure", Subject: "ponte", Place: &place, TerritorialScope: "place", Validity: publicquery.Temporal{Precision: "unknown"}, Status: "undetermined", Evidence: []publicquery.Evidence{{DocumentID: "7", VersionID: "12", SourceURL: "https://example.test/7", Locator: &locator, Passage: &passage}}, Quality: fixtureQuality(), RelatedMeasureIDs: []string{}, RelationshipStatus: "not_applicable", NewerUninterpretedDocumentIDs: []string{}}
+}
+
 func fixedQueryTime(value publicquery.QueryTime) bool {
 	return value.EvaluationTime.Equal(time.Date(2026, 9, 17, 12, 0, 0, 0, time.UTC)) && value.KnownAt.Equal(time.Date(2026, 9, 17, 11, 30, 0, 0, time.UTC))
 }
@@ -195,6 +204,7 @@ func TestPublicAPIAndRealMCPClientAreEquivalent(t *testing.T) {
 		{"discover_municipalities", "/v1/municipalities?istat=050004&" + commonQuery, with(commonArguments, "istat", "050004")},
 		{"get_municipality_situation", "/v1/municipalities/050004/situation?" + commonQuery, with(commonArguments, "municipality_istat", "050004")},
 		{"search_alerts", "/v1/search?kind=regional&product=vigilance&" + commonQuery, with(with(commonArguments, "kind", "regional"), "product", "vigilance")},
+		{"search_alerts", "/v1/search?kind=measure&municipality_istat=050004&" + commonQuery, with(with(commonArguments, "kind", "measure"), "municipality_istat", "050004")},
 		{"get_document", "/v1/documents/7?include_versions=true&" + commonQuery, with(with(commonArguments, "document_id", "7"), "include_versions", true)},
 		{"get_source_coverage", "/v1/sources/coverage?municipality_istat=050004&" + commonQuery, with(commonArguments, "municipality_istat", "050004")},
 	}
@@ -249,8 +259,12 @@ func TestPublicAPIAndRealMCPClientAreEquivalent(t *testing.T) {
 	fake.mu.Lock()
 	defer fake.mu.Unlock()
 	for _, name := range wantTools {
-		if fake.calls[name] != 1 {
-			t.Errorf("%s calls = %d, want one snapshot query shared by API and MCP", name, fake.calls[name])
+		want := 1
+		if name == "search_alerts" {
+			want = 2 // regional and measure searches
+		}
+		if fake.calls[name] != want {
+			t.Errorf("%s calls = %d, want %d: one snapshot query per request shared by API and MCP", name, fake.calls[name], want)
 		}
 	}
 }

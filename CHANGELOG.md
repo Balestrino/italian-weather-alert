@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Replace current public measures of an earlier document version once a later version with an equivalent interpretation input has a validated projection; genuine revisions keep accumulating and earlier knowledge boundaries are unchanged.
 - 2026-10-22 [Planned] Plan replacing current public measures of earlier versions with the latest validated projection of an equivalent interpretation input of the same document.
 - 2026-10-22 [Changed] Record the decision not to reprocess or archive the failed Livorno orange-alert versions and the diagnosis of duplicate measures across versions of the same document.
 - 2026-10-22 [Changed] Record the saved-view instant matching fix and its development verification in the task 31.2 notes.
