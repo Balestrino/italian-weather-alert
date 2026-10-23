@@ -10,11 +10,9 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
-	"github.com/Balestrino/italian-weather-alert/internal/backend/embedding"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/extraction"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/inference"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
-	"github.com/Balestrino/italian-weather-alert/internal/backend/linking"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/jackc/pgx/v5"
 )
@@ -142,7 +140,8 @@ func (s *Scheduler) Guard(next jobs.Handler) jobs.Handler {
 				selection = input.SelectionID
 			} else if job.Kind == extraction.Kind {
 				classificationRunID = input.ClassificationRunID
-			} else if job.Kind == embedding.Kind || job.Kind == linking.Kind {
+			} else if input.ExtractionRunID > 0 {
+				// Embedding, linking and referenced-act work descend from an extraction.
 				extractionRunID = input.ExtractionRunID
 			}
 			allowed, err := s.archiveRecoveryAllowed(ctx, input.DocumentVersionID, selection, classificationRunID, extractionRunID)

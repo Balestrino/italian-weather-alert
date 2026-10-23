@@ -24,6 +24,12 @@ type JCityGovAlboContract struct {
 
 const JCityGovAlboAccess = "jcitygov-albo"
 
+// The JCityGov albo portlet and the action path serving its downloads.
+const (
+	JCityGovAlboPortlet    = "jcitygovalbopubblicazioni_WAR_jcitygovalbiportlet"
+	JCityGovAlboActionPath = "/web/trasparenza/papca-ap"
+)
+
 // ReferenceKinds are the act kinds a notice reference can name.
 var ReferenceKinds = []string{"ordinanza", "decreto", "delibera", "determina"}
 
@@ -40,6 +46,17 @@ func (p *JCityGovAlboContract) AllowsDetail(raw string) bool {
 	}
 	id := strings.TrimPrefix(u.Path, p.DetailPathPrefix)
 	return id != "" && strings.Trim(id, "0123456789") == "" && len(id) <= 18
+}
+
+// AllowsDownload reports whether raw is an unsigned attachment download of this albo.
+func (p *JCityGovAlboContract) AllowsDownload(raw string) bool {
+	u, err := url.Parse(raw)
+	if err != nil || u.Scheme+"://"+u.Host != p.Origin || u.Path != JCityGovAlboActionPath || u.User != nil || u.Fragment != "" {
+		return false
+	}
+	q := u.Query()
+	param := "_" + JCityGovAlboPortlet + "_"
+	return q.Get("p_p_id") == JCityGovAlboPortlet && q.Get("p_p_resource_id") == "downloadAllegato" && q.Get(param+"downloadSigned") == "false" && q.Get(param+"id") != ""
 }
 
 func (p *JCityGovAlboContract) Valid(c Configuration) bool {

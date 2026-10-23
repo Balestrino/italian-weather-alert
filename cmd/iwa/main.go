@@ -691,6 +691,14 @@ func run() bool {
 		interpretationScheduler.EmbeddingEnabled = queue.EmbeddingAllowedForRun
 		interpretationScheduler.ProjectExtraction = domain.New(pool).ProjectMunicipalExtraction
 		interpretationScheduler.ProjectLinks = domain.New(pool).ProjectMunicipalLinks
+		actsRunner := &acts.Runner{Pool: pool, Store: acts.NewStore(pool), Documents: retained, OCR: ocr.NewStore(pool), Queue: queue, Policy: inference.RetryPolicy{MaxAttempts: inferenceConfig.MaxAttempts, BaseDelay: inferenceConfig.RetryBase},
+			NewAlbo: func(contract *registry.JCityGovAlboContract) acts.AlboClient {
+				return &acquisition.JCityGovAlbo{Contract: contract, Client: &http.Client{Timeout: 60 * time.Second}}
+			}}
+		interpretationScheduler.AfterProjection = actsRunner.AfterProjection
+		for kind, handler := range actsRunner.Handlers() {
+			handlers[kind] = handler
+		}
 		interpretationScheduler.Preflight, err = makePreflight(ctx, pool, retained, inferenceConfig, rollout)
 		if err != nil {
 			slog.Error("preflight configuration invalid")

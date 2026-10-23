@@ -1060,6 +1060,10 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		testEquivalentVersionMeasures(ctx, t, pool, createSource)
 	})
 
+	t.Run("referenced-act-evidence", func(t *testing.T) {
+		testReferencedActs(ctx, t, pool, createSource)
+	})
+
 	t.Run("CFR graphics preserve weather and prior knowledge", func(t *testing.T) {
 		if e := domain.MigrateTerritories(ctx, pool); e != nil {
 			t.Fatal(e)

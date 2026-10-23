@@ -33,8 +33,10 @@ type Scheduler struct {
 	EmbeddingEnabled  func(context.Context, int64) (bool, error)
 	ProjectExtraction func(context.Context, int64, time.Time) (int, error)
 	ProjectLinks      func(context.Context, int64, time.Time) error
-	Preflight         *Preflight
-	Evaluations       interface {
+	// AfterProjection receives the projected extraction run and measure count.
+	AfterProjection func(context.Context, int64, int, string, time.Time) error
+	Preflight       *Preflight
+	Evaluations     interface {
 		Passed(context.Context, string) (string, error)
 	}
 }
@@ -139,7 +141,20 @@ func (s *Scheduler) ocrResources(ctx context.Context, versionID int64) ([]string
 	return resources, nil
 }
 
+// supportingOnly reports a version of a source retained only as supporting
+// evidence (a referenced albo act), which is never classified or extracted.
+func (s *Scheduler) supportingOnly(ctx context.Context, versionID int64) (bool, error) {
+	var supporting bool
+	err := s.pool.QueryRow(ctx, `SELECT COALESCE(bool_or(c.body->>'access_method'='jcitygov-albo'),false) FROM retained_versions v
+ JOIN retained_documents d ON d.id=v.document_id JOIN registry_sources src ON src.id=d.source_id
+ JOIN registry_configurations c ON c.source_id=src.id AND c.revision=COALESCE(src.active_revision,src.latest_revision) WHERE v.id=$1`, versionID).Scan(&supporting)
+	return supporting, err
+}
+
 func (s *Scheduler) scheduleClassification(ctx context.Context, versionID int64, workload string, at time.Time) (bool, error) {
+	if supporting, err := s.supportingOnly(ctx, versionID); err != nil || supporting {
+		return false, err
+	}
 	// OCR completion can be observed by a later collection cycle. Preserve the
 	// first trigger's accounting identity for the downstream job as well.
 	err := s.pool.QueryRow(ctx, "SELECT workload FROM interpretation_triggers WHERE document_version_id=$1", versionID).Scan(&workload)
@@ -285,8 +300,14 @@ func (s *Scheduler) AfterExtraction(ctx context.Context, r extraction.Result, wo
 	}
 	r.RunID = canonical
 	if s.ProjectExtraction != nil && workload != "evaluation" {
-		if _, err := s.ProjectExtraction(ctx, canonical, at); err != nil {
+		projected, err := s.ProjectExtraction(ctx, canonical, at)
+		if err != nil {
 			return 0, err
+		}
+		if s.AfterProjection != nil {
+			if err = s.AfterProjection(ctx, canonical, projected, workload, at); err != nil {
+				return 0, err
+			}
 		}
 	}
 	semantic := s.Semantic

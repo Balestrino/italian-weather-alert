@@ -29,9 +29,9 @@ var (
 )
 
 const (
-	alboPortlet    = "jcitygovalbopubblicazioni_WAR_jcitygovalbiportlet"
+	alboPortlet    = registry.JCityGovAlboPortlet
 	alboParam      = "_" + alboPortlet + "_"
-	alboActionPath = "/web/trasparenza/papca-ap"
+	alboActionPath = registry.JCityGovAlboActionPath
 	alboPageSize   = 50
 )
 
@@ -282,14 +282,7 @@ func (a *JCityGovAlbo) Download(ctx context.Context, raw string) ([]byte, string
 	return a.do(ctx, http.MethodGet, raw, nil, documents.MaxAcquisitionBytes)
 }
 
-func (a *JCityGovAlbo) allowsDownload(raw string) bool {
-	u, err := url.Parse(raw)
-	if err != nil || u.Scheme+"://"+u.Host != a.Contract.Origin || u.Path != alboActionPath || u.User != nil || u.Fragment != "" {
-		return false
-	}
-	q := u.Query()
-	return q.Get("p_p_id") == alboPortlet && q.Get("p_p_resource_id") == "downloadAllegato" && q.Get(alboParam+"downloadSigned") == "false" && q.Get(alboParam+"id") != ""
-}
+func (a *JCityGovAlbo) allowsDownload(raw string) bool { return a.Contract.AllowsDownload(raw) }
 
 var (
 	alboPaging = regexp.MustCompile(`Pagina (\d+) di (\d+) \((\d+) risultati\)`)

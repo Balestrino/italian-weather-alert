@@ -29,9 +29,9 @@
 
 ## 4. Acquisition and clarification
 
-- [ ] 4.1 Add the `resolve_act_references` and `acquire_albo_act` jobs. Enqueue them after a projection with measures, at most 3 references per version. Retain the detail and the PDF once per albo record, run only OCR on albo versions, and exclude albo sources from classification, extraction, projection and coverage. Verify with integration tests: idempotent jobs, a shared act for two notices, no interpretation runs for albo versions, unchanged coverage.
-- [ ] 4.2 Implement the literal dispositive-clause parser for municipal emergency ordinances (start, end or condition, dispositions with kinds and items). Verify with fixtures from both ordinance texts and negative templates that yield `clarification_unavailable`.
-- [ ] 4.3 Implement the `clarify_act_measures` job. Match notice measures to dispositions by kind and subject head term. Append the validity and the interpretation event for measures that are unknown or conflicting; record conflicts for determinate differing validity. Verify each spec scenario in integration tests, including the conditional start of 2026-09-10T00:00 Europe/Rome, the conflict case and an unmatched disposition.
+- [x] 4.1 Add the `resolve_act_references` and `acquire_albo_act` jobs. Enqueue them after a projection with measures, at most 3 references per version. Retain the detail and the PDF once per albo record, run only OCR on albo versions, and exclude albo sources from classification, extraction, projection and coverage. Verify with integration tests: idempotent jobs, a shared act for two notices, no interpretation runs for albo versions, unchanged coverage.
+- [x] 4.2 Implement the literal dispositive-clause parser for municipal emergency ordinances (start, end or condition, dispositions with kinds and items). Verify with fixtures from both ordinance texts and negative templates that yield `clarification_unavailable`.
+- [x] 4.3 Implement the `clarify_act_measures` job. Match notice measures to dispositions by kind and subject head term. Append the validity and the interpretation event for measures that are unknown or conflicting; record conflicts for determinate differing validity. Verify each spec scenario in integration tests, including the conditional start of 2026-09-10T00:00 Europe/Rome, the conflict case and an unmatched disposition.
 
 ## 5. Interfaces
 

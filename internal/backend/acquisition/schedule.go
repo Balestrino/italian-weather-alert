@@ -77,7 +77,7 @@ func (s *ScheduleStore) SyncEnabled(ctx context.Context, now time.Time) error {
         NULLIF(c.body#>>'{expected_publication,tolerance_seconds}','')::integer,
         CASE WHEN c.body->'expected_publication' IS NULL THEN 'not_expected' ELSE 'awaiting' END
  FROM registry_sources s JOIN registry_configurations c ON c.source_id=s.id AND c.revision=s.active_revision
- WHERE s.collection_enabled `+gate+`
+ WHERE s.collection_enabled `+gate+` AND c.body->>'access_method' IS DISTINCT FROM 'jcitygov-albo'
  ON CONFLICT(source_id) DO UPDATE SET
    configuration=EXCLUDED.configuration,check_seconds=EXCLUDED.check_seconds,delay_seconds=EXCLUDED.delay_seconds,
    backoff_base_seconds=EXCLUDED.backoff_base_seconds,backoff_max_seconds=EXCLUDED.backoff_max_seconds,
@@ -120,6 +120,7 @@ func (s *ScheduleStore) ClaimDue(ctx context.Context, workerID string, now time.
 	err = s.pool.QueryRow(ctx, `WITH candidate AS (
  SELECT a.source_id FROM acquisition_source_status a JOIN registry_sources r ON r.id=a.source_id
  WHERE r.collection_enabled `+gate+` AND r.active_revision=a.configuration AND a.next_check_at<=$1
+   AND NOT EXISTS(SELECT 1 FROM registry_configurations c WHERE c.source_id=r.id AND c.revision=r.active_revision AND c.body->>'access_method'='jcitygov-albo')
    AND a.claim_token IS NULL
  ORDER BY a.next_check_at,a.source_id FOR UPDATE OF a SKIP LOCKED LIMIT 1)
  UPDATE acquisition_source_status a SET claimed_by=$2,claim_token=$3,lease_expires_at=$4,last_started_at=$1

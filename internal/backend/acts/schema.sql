@@ -58,9 +58,11 @@ CREATE TABLE act_clarifications (
  act_page_number integer CHECK (act_page_number > 0),
  act_passage text NOT NULL DEFAULT '',
  notice_passage text NOT NULL DEFAULT '',
+ reason text NOT NULL DEFAULT '',
  parser_version text NOT NULL CHECK (parser_version <> ''),
  recorded_at timestamptz NOT NULL,
  CHECK ((outcome='clarification_unavailable') = (local_measure_id IS NULL)),
+ CHECK (outcome<>'clarification_unavailable' OR reason <> ''),
  CHECK (outcome NOT IN ('clarified','conflict') OR (disposition_ordinal IS NOT NULL AND act_passage <> '' AND act_resource_url IS NOT NULL))
 );
 CREATE UNIQUE INDEX act_clarifications_once ON act_clarifications(resolution_id, COALESCE(local_measure_id,''), parser_version);

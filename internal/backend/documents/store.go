@@ -70,6 +70,11 @@ func (s *Store) Stage(ctx context.Context, input Acquisition) error {
 			r.Missing == "" && (r.Role == "resource" || r.Role == "original" && !c.CittadinoInformato.AllowsOriginal(r.URL) || r.Role == "attachment" && !c.CittadinoInformato.AllowsAttachment(r.URL))) {
 			return ErrPolicy
 		}
+		// An albo retains only a record's detail page and its unsigned documents.
+		if c.JCityGovAlbo != nil && (c.Policy.CopiesPermitted || r.Missing == "" && (r.Role == "resource" ||
+			r.Role == "original" && !c.JCityGovAlbo.AllowsDetail(r.URL) || r.Role == "attachment" && !c.JCityGovAlbo.AllowsDownload(r.URL))) {
+			return ErrPolicy
+		}
 		if r.Missing == "" && (!c.Policy.CollectionPermitted || !c.Policy.RetentionPermitted || c.Policy.Evidence == nil) {
 			return ErrPolicy
 		}
