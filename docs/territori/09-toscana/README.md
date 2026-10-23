@@ -167,7 +167,10 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
   - L'inizio delle allerte «in corso» è l'emissione dell'edizione, non l'inizio effettivo.
   - Il verde derivato si basa sulla completezza della tabella ufficiale.
   - La causa della proiezione solo tabellare del 7 ottobre (v4) è compatibile con lo stesso errore, ma non è verificata.
-  - Nessuna accettazione della criticità è registrata.
+- **Accettazione:**
+  - Su decisione dell'operatore, l'accettazione di `cfr-criticality` è registrata con limitazioni sulla revisione 3. La revisione 3 aggiorna il limite superato sulle mappe.
+  - Prima è stato corretto il controllo di provenienza, che ora tratta `cfr.toscana.it` e `www.cfr.toscana.it` come lo stesso sito.
+  - Revisione registrata dell'accettazione e abilitazione pubblica restano separate.
 - **Evidenza:** [politica grafica](../../operations/cfr-graphics.md); registro privato `criticality-monitoring-31-5-20261023`.
 
 ### TOS-023 — Criticità e monitoraggio rivalutati su casi reali (task 31.5)

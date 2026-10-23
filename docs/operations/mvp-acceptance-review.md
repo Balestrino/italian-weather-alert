@@ -150,7 +150,28 @@ di TOS-023 sono state riproiettate e verificate senza discrepanze:
 - su A4, 378 controlli istantanei tornano tutti;
 - API e MCP coincidono.
 
-La condizione del dossier criticità è quindi soddisfatta, ma l'accettazione non
-è registrata e richiede una decisione esplicita dell'operatore
+La condizione del dossier criticità è quindi soddisfatta
 ([TOS-024](../territori/09-toscana/README.md)).
+
+Su decisione dell'operatore, il 23 ottobre alle 14.34 UTC è registrata
+l'accettazione di `cfr-criticality`, con copertura `accepted_with_limitations`.
+Riguarda la revisione 3 della configurazione, che rispetto alla 2 aggiorna solo
+il limite sulle mappe.
+
+Prima di accettare è stato corretto anche il controllo di provenienza:
+l'autorità CFR è registrata come `www.cfr.toscana.it`, mentre la provenienza
+della criticità usa `cfr.toscana.it`. Ora il controllo ignora soltanto un
+`www.` iniziale.
+
+Limiti dichiarati:
+- inizio delle allerte «in corso» all'emissione;
+- verde derivato dalla completezza della tabella;
+- immagini PNG non interpretate;
+- comportamento di errore basato su controlli sintetici;
+- API e MCP verificati solo sulla zona A4;
+- nessun rosso, neve o ghiaccio reale nel periodo;
+- solo development.
+
+La revisione registrata dell'accettazione e l'abilitazione pubblica restano
+passaggi separati.
 

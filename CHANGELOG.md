@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Record the operator's acceptance of cfr-criticality configuration revision 3 with declared limitations in development, after updating the stale map limitation and fixing the official-host provenance check.
 - 2026-10-23 [Fixed] Source acceptance treats an official host and its www. form as the same site when matching provenance or referral evidence to the authority; any other subdomain stays distinct.
 - 2026-10-23 [Changed] Archive bound-ongoing-criticality-rows and sync its regional-criticality-validity and public-view-freshness specifications.
 - 2026-10-23 [Changed] Record the development adoption of cfr-graphics-v7 (TOS-024): 14 CFR criticality editions reprojected and matching the official tables, bounded ongoing rows and explicit derived green, API/MCP equal; the v6 pilot incident and the disk-full recovery are documented.
