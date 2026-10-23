@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Record the development adoption of cfr-graphics-v7 (TOS-024): 14 CFR criticality editions reprojected and matching the official tables, bounded ongoing rows and explicit derived green, API/MCP equal; the v6 pilot incident and the disk-full recovery are documented.
 - 2026-10-23 [Fixed] A CFR PDF tooling failure (no writable temporary directory, missing executable) no longer stores an immutable table-only fallback projection; the admin service gets a /tmp tmpfs and the projection logic moves to cfr-graphics-v7 to supersede the degraded v6 pilot records.
 - 2026-10-23 [Fixed] CFR criticality rows reading 'in corso fino alle ore …' now keep their stated end (cfr-graphics-v6), the rest of an alert day is explicit derived green, and historical public views keep the updating state of their evaluation time.
 - 2026-10-23 [Changed] Record the accepted review of the cfr-monitoring acceptance after re-recording it with the configuration limitation verbatim; release readiness becomes partial in development.

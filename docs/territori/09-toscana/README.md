@@ -146,6 +146,30 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
 
 ## Registro delle scoperte
 
+### TOS-024 — Allerte «in corso» limitate e verde esplicito (cfr-graphics-v7)
+
+- **Data e ambito:** 2026-10-23; change `bound-ongoing-criticality-rows`, adottata in development e verificata sulle 14 edizioni di TOS-023.
+- **Correzione:**
+  - Le righe «in corso fino alle ore …» valgono dall'emissione all'ora indicata, con l'ipotesi esplicita che l'allerta fosse già in corso. La tabella non viene più scartata.
+  - Le ore di un giorno con allerte non coperte dagli intervalli sono verdi derivati, dichiarati come tali.
+  - Le viste storiche riportano lo stato di aggiornamento all'istante valutato.
+- **Incidente in adozione:**
+  - La prima riproiezione (v6) di due edizioni è stata eseguita dal container admin in sola lettura. Il PDF non era leggibile, quindi sono stati salvati record di ripiego solo tabellari.
+  - Da allora un errore d'ambiente dei programmi di lettura PDF non salva nulla e si riprova. L'admin ha una `/tmp` scrivibile.
+  - La logica `cfr-graphics-v7` sostituisce quei record, che restano nello storico.
+  - Durante la costruzione dell'immagine il disco è arrivato al 100%. PostgreSQL ha fallito solo file temporanei di query, senza errori sui dati. Sono state liberate le cache di build, senza toccare immagini né volumi.
+- **Verifica:**
+  - Le 14 edizioni riproiettate coincidono con le tabelle ufficiali in tutte le 5096 voci e negli intervalli espliciti.
+  - I 239 verdi derivati non si sovrappongono ad alcuna allerta.
+  - Sulla zona A4, nei 54 istanti di TOS-023, tutti i 378 controlli tornano: 17 livelli non verdi esatti e nessun dato mancante. L'8 ottobre l'arancione termina alle 17:00.
+  - API e MCP coincidono. La vista nota prima della riproiezione resta invariata.
+- **Limiti:**
+  - L'inizio delle allerte «in corso» è l'emissione dell'edizione, non l'inizio effettivo.
+  - Il verde derivato si basa sulla completezza della tabella ufficiale.
+  - La causa della proiezione solo tabellare del 7 ottobre (v4) è compatibile con lo stesso errore, ma non è verificata.
+  - Nessuna accettazione della criticità è registrata.
+- **Evidenza:** [politica grafica](../../operations/cfr-graphics.md); registro privato `criticality-monitoring-31-5-20261023`.
+
 ### TOS-023 — Criticità e monitoraggio rivalutati su casi reali (task 31.5)
 
 - **Data e ambito:** 2026-10-23; edizioni CFR conservate in development dal 5 al 23 ottobre.

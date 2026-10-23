@@ -140,3 +140,17 @@ risulta `accepted_with_limitations`, gli altri ambiti restano `pending`.
 L'abilitazione pubblica resta separata e non è stata modificata. Vigilanza,
 criticità e Calcinaia non sono accettate.
 
+### Criticità dopo `cfr-graphics-v7` (23 ottobre 2026)
+
+La change `bound-ongoing-criticality-rows` risolve il difetto delle righe
+«in corso fino alle ore …», aggiunge il verde esplicito fuori dagli intervalli
+di allerta e rende corretta la freschezza nelle viste storiche. Le 14 edizioni
+di TOS-023 sono state riproiettate e verificate senza discrepanze:
+- livelli giornalieri e intervalli coincidono con le tabelle ufficiali;
+- su A4, 378 controlli istantanei tornano tutti;
+- API e MCP coincidono.
+
+La condizione del dossier criticità è quindi soddisfatta, ma l'accettazione non
+è registrata e richiede una decisione esplicita dell'operatore
+([TOS-024](../territori/09-toscana/README.md)).
+
