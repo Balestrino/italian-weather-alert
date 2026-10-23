@@ -224,6 +224,20 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-041 — Atti citati dagli avvisi pertinenti (task 31.4)
+
+- **Data e ambito:** 2026-10-23; inventario in sola lettura dell'ultima versione dei 427 documenti di `calcinaia-municipal` e della piattaforma, consultazione dell'albo pretorio comunale (JCityGov, «Storico atti»).
+- **Osservazione confermata:**
+  - Su 23 avvisi pertinenti, gli atti citati per misure meteo sono due ordinanze sindacali di protezione civile.
+  - **Ordinanza 34/2026** (20 agosto): allegata all'avviso arancione del 20 agosto e già conservata. Il monitoraggio del 21 agosto la richiama come «ordinanza comunale», senza estremi.
+  - **Ordinanza 38/2026** (9 settembre, registro 660): non allegata né collegata. L'avviso del 9 settembre la cita come «apposita ordinanza».
+  - L'ordinanza 1050/2026 di via del Marrucco è conservata come allegato, ma non riguarda il meteo.
+  - Il link all'albo nel footer delle pagine è navigazione, non un riferimento.
+- **Chiarimento autorevole:** l'ordinanza 38/2026 dispone chiusure, divieti e sospensione delle scuole «a partire dalle ore 00.00 del giorno 10 settembre 2026, fino al perdurare dell'emergenza». Il conflitto agosto/settembre dell'avviso (CLN-016) è quindi chiarito dall'atto, che fa fede rispetto al testo dell'avviso. Nel sistema le cinque misure restano con validità indeterminata, perché oggi il servizio non acquisisce atti dall'albo.
+- **Avviso del 20 agosto rielaborato:** la classificazione era fallita il 18 settembre (`provider_rejected`) e l'interpretazione era stata archiviata il 23 settembre. Con un recupero d'archivio autorizzato e limitato alla sola versione, l'avviso risulta pertinente e pubblica 4 misure, 3 con evidenza nell'ordinanza allegata. La validità resta indeterminata anche qui, perché la fine «fino al perdurare dell'emergenza» non è un termine. API e MCP coincidono; prima del recupero la selezione è identica (24 misure).
+- **Prossima verifica:** la change [`acquire-referenced-albo-acts`](../../../../openspec/changes/acquire-referenced-albo-acts/proposal.md) pianifica l'acquisizione delimitata degli atti citati e il chiarimento delle date delle misure. Il task 31.4 resta aperto. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `referenced-acts-20261023`.
+
 ### CLN-040 — Misure correnti dall'ultima proiezione equivalente
 
 - **Data e ambito:** 2026-10-23; misure pubbliche di Calcinaia in development dopo l'adozione nel servizio `public` della change [`replace-equivalent-version-measures`](../../../operations/equivalent-interpretations.md#current-measures).

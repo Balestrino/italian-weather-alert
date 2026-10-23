@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Planned] Record the task 31.4 inventory of acts cited by Calcinaia notices (Ordinanza 38/2026 resolves the 9 September date conflict), the audited recovery of the archived 20 August notice, and plan acquire-referenced-albo-acts for bounded albo acquisition and measure-date clarification.
 - 2026-10-23 [Changed] Archive the completed replace-equivalent-version-measures change and add the current-measure requirement to the equivalent-interpretation-carry-forward specification.
 - 2026-10-23 [Changed] Adopt current-measure replacement across equivalent versions in development: Calcinaia shows only the latest equivalent projection of two notices (29 to 24 current measures), with API/MCP agreement and unchanged history; document the selection rule and the conservative tracked-target union.
 - 2026-10-23 [Changed] Compute equivalent-version measure replacement once per public query instead of per measure, avoiding a fan-out across every equivalent template version (659 ms to 70 ms on development data) with identical selections.
