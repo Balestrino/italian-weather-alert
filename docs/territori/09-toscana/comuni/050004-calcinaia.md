@@ -224,6 +224,30 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-044 — Estrazione stabilizzata con il corpo dell'articolo
+
+- **Data e ambito:** 2026-10-23; seguito di CLN-043.
+- **Causa osservata:** le finestre di estrazione contenevano l'intera pagina, cioè 4,4–4,6 KB di cui circa 2 KB di intestazione, navigazione e footer del sito. Il modello locale a volte copiava l'intera finestra come citazione, due volte. Le citazioni oltre i 1000 byte vengono scartate, oppure la risposta raggiunge il limite di 4096 token. Lo stesso errore compare nelle esecuzioni ordinarie del 21 e 22 ottobre.
+- **Correzione:** la revisione 2 della configurazione dichiara il contenitore `#block-comuni-theme-content` come corpo dell'articolo (`local_processing`).
+  - Verificato su tutte le 8241 versioni conservate (368 documenti): una sola corrispondenza non vuota ogni volta.
+  - Il testo escluso è solo la cornice fissa del sito. Titolo, date, testo e ultimo aggiornamento restano inclusi.
+  - L'input HTML si riduce del 35%.
+  - La stessa revisione aggiorna i limiti di provenienza: Cittadino Informato e albo sono fonti separate, non esclusioni.
+- **Difetto collaterale:** con `local_processing` attivo, la chiave del run di estrazione superava i 200 byte e ogni avvio falliva. La chiave ora è limitata come per la classificazione; le identità esistenti non cambiano.
+- **Esito:**
+  - Stesso contratto di quattordici controlli: tutte le chiamate concluse regolarmente, nessuna omissione. Il conflitto di date mantiene la riserva già nota.
+  - La rielaborazione delimitata delle versioni 28211 e 28213 sulla revisione 2 dà le stesse misure:
+    - l'aggiornamento conserva la chiusura del sottopasso di via Maremmana;
+    - il monitoraggio non ha più il divieto aggregato.
+  - API e MCP coincidono; la vista al momento dell'adozione è invariata.
+  - La regressione superata è registrata sulla revisione 2.
+- **Limiti:**
+  - Le 297 versioni create dalla preview della revisione 2 non sono interpretate.
+  - Le altre versioni restano con l'input precedente fino a nuova acquisizione o rielaborazione.
+  - L'accettazione richiede ancora un periodo di osservazione sulla revisione 2.
+  - Il modello locale resta non deterministico: la stabilità è osservata su questi casi, non dimostrata.
+- **Evidenza:** registro privato `extraction-stabilization-20261023`.
+
 ### CLN-043 — Rivalutazione del dossier: regressione v29 non superata
 
 - **Data e ambito:** 2026-10-23; task 31.5. Lo stesso contratto di quattordici controlli è stato rieseguito sulla configurazione corrente: estrazione v29, modello locale `qwen3.5-9b`, temperatura 0, seed 42, senza thinking, tre tentativi.

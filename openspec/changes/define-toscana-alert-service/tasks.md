@@ -725,6 +725,7 @@ The checklist is now 160/166 complete, with six operational/release tasks open.
   - Criticality and monitoring now have real positive cases or event bulletins and remain to be compared.
 
   No acceptance was recorded. See [MVP acceptance review](../../../docs/operations/mvp-acceptance-review.md). Private record: `acceptance-31-5-20261023`.
+  - Follow-up on the same day: Calcinaia configuration revision 2 reads only the reviewed article body (`local_processing`) and updates the provenance limitations. The unchanged contract passes on it, the passing regression is recorded, and the ordinary reprocessing of the two failing notices matches. This also fixed over-long extraction run keys under local processing. Acceptance still needs an observation period on revision 2 (CLN-044).
 
 The 31.1 audit verifies 286 tracked declared-section URLs and 57 complete recent
 originals. The same saved API view exposes 43 supported recent interpretations

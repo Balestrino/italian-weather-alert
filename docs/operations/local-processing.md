@@ -202,3 +202,20 @@ remote price. Native/structured attempts recorded usage and cost as not
 applicable. Real database receipts and the private browser view confirmed all
 sixteen jobs completed, and the temporary worker exited. Ordinary acquisition
 and source configurations were preserved.
+
+## Calcinaia article body — 23 October 2026
+
+Development configuration revision 2 of `calcinaia-municipal` declares
+`#block-comuni-theme-content`. The selector was checked on all 8,241 retained
+versions (368 documents) and matched exactly one nonempty container in each.
+The only text it excludes is the constant site header, navigation and footer.
+The aim is stable extraction, not cost: on full pages the local model sometimes
+copied the whole window as one evidence quote, producing invalid or truncated
+outputs. The same fourteen-check contract now passes, and the ordinary
+reprocessing of two notices gave the same measures.
+
+Activation exposed a defect: extraction run keys combining a local-processing
+configuration with an input manifest exceeded the processing store's 200-byte
+limit. They are now bounded the same way as classification keys. Details are
+recorded in [CLN-044](../territori/09-toscana/comuni/050004-calcinaia.md).
+

@@ -91,3 +91,12 @@ Per la criticità esistono ora edizioni reali non verdi: arancione per temporali
 
 Evidenze private: `ACCEPTANCE-31-5-20261023`.
 
+### Seguito per Calcinaia (23 ottobre 2026)
+
+La revisione 2 della configurazione legge solo il corpo dell'articolo e
+aggiorna i limiti di provenienza. Su questa revisione il contratto di
+quattordici controlli è superato e la regressione superata è registrata, quindi
+i recuperi d'archivio sono di nuovo possibili. L'accettazione resta pending e
+richiede un periodo di osservazione sulla revisione 2
+([CLN-044](../territori/09-toscana/comuni/050004-calcinaia.md)).
+

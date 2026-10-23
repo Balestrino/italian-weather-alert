@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Calcinaia configuration revision 2 reads only the reviewed article body; the same fourteen-check contract now passes in development, and the ordinary reprocessing of the two failing notices matches (CLN-044).
 - 2026-10-23 [Fixed] Bound extraction run identities that include a local-processing configuration and input manifest to the processing store's 200-byte limit, as classification already does; existing identities are unchanged.
 - 2026-10-23 [Changed] Record the task 31.5 reassessment: vigilance matches the 20–21 October wind and sea tables but lacks snow and ice cases; the Calcinaia fourteen-check contract fails on the v29 local configuration with two extraction omissions; no acceptance recorded.
 - 2026-10-23 [Changed] Archive the completed acquire-referenced-albo-acts change and publish the referenced-act-evidence specification.
