@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acts"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/backups"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/classification"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/config"
@@ -253,6 +254,10 @@ func run() bool {
 		}
 		if err := domain.MigrateRetention(migrationCtx, pool); err != nil {
 			slog.Error("retention migration failed")
+			return false
+		}
+		if err := acts.Migrate(migrationCtx, pool); err != nil {
+			slog.Error("referenced acts migration failed")
 			return false
 		}
 		if err := publicquery.Migrate(migrationCtx, pool); err != nil {

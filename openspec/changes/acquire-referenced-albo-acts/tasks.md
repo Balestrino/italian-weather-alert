@@ -2,12 +2,12 @@
 
 ## 1. Data model and registry
 
-- [ ] 1.1 Add migration `101_referenced_acts` with `act_references`, `act_resolutions`, `act_albo_records` and `act_clarifications`. All four are append-only (`processing_catalog_immutable()` triggers) and take part in retention. Verify idempotent migration and that UPDATE and DELETE are rejected, in a PostgreSQL integration test.
-- [ ] 1.2 Add the `jcitygov-albo` access method and the `JCityGovAlbo` configuration (origin, list and detail paths, allowed categories, page bound, served primary source) with validation mirroring Cittadino Informato. The policy must permit collection and retention and must not permit copies. Verify with unit tests for valid configurations and for each invalid one.
+- [x] 1.1 Add migration `101_referenced_acts` with `act_references`, `act_resolutions`, `act_albo_records` and `act_clarifications`. All four are append-only (`processing_catalog_immutable()` triggers) and take part in retention. Verify idempotent migration and that UPDATE and DELETE are rejected, in a PostgreSQL integration test.
+- [x] 1.2 Add the `jcitygov-albo` access method and the `JCityGovAlbo` configuration (origin, list and detail paths, allowed categories, page bound, served primary source) with validation mirroring Cittadino Informato. The policy must permit collection and retention and must not permit copies. Verify with unit tests for valid configurations and for each invalid one.
 
 ## 2. Albo client
 
-- [ ] 2.1 Run a private, read-only preview of the Calcinaia albo:
+- [x] 2.1 Run a private, read-only preview of the Calcinaia albo:
   - list paging;
   - exact registry search;
   - detail parsing;
@@ -15,7 +15,7 @@
   - whether the OpenFormat export is complete and stable.
 
   Record redistributable synthetic fixtures of the page shapes. Keep captures under `.local/operations/`. Verify that the fixtures reproduce the observed fields for Ordinanze 34/2026 and 38/2026.
-- [ ] 2.2 Implement the JCityGov client: bounded binary search of list pages by registry order for a date window, page reads within the bound, exact registry lookup, detail parsing (category, act number and date, registry, object, attachments) and attachment download with hash. Every failure is typed and fails closed. Verify with fixture-based unit tests, including truncated pages, markup changes and the page bound.
+- [x] 2.2 Implement the JCityGov client: bounded binary search of list pages by registry order for a date window, page reads within the bound, exact registry lookup, detail parsing (category, act number and date, registry, object, attachments) and attachment download with hash. Every failure is typed and fails closed. Verify with fixture-based unit tests, including truncated pages, markup changes and the page bound.
 
 ## 3. Detection and resolution
 

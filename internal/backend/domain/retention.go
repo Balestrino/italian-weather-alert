@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/evidenceguard"
+	"slices"
 	"strings"
 	"time"
 
@@ -265,6 +266,23 @@ func (r *Retention) cleanupDatabase(ctx context.Context, evaluatedAt time.Time) 
 	}
 	if verificationInstalled {
 		statements[2] = strings.Replace(statements[2], " ), needed(id) AS (", " UNION SELECT evidence_version_id,supported_version_id FROM domain_verification_dependencies\n ), needed(id) AS (", 1)
+	}
+	var actsInstalled bool
+	if err = tx.QueryRow(ctx, "SELECT to_regclass('act_references') IS NOT NULL").Scan(&actsInstalled); err != nil {
+		return result, err
+	}
+	if actsInstalled {
+		// A notice keeps every act that clarified one of its measures.
+		statements[2] = strings.Replace(statements[2], " ), needed(id) AS (", ` UNION SELECT c.act_document_version_id,f.document_version_id FROM act_clarifications c
+ JOIN act_resolutions r ON r.id=c.resolution_id JOIN act_references f ON f.id=r.reference_id
+ ), needed(id) AS (`, 1)
+		first := slices.IndexFunc(statements, func(s string) bool { return strings.HasPrefix(s, "DELETE FROM domain_preceding_state_warnings") })
+		statements = slices.Insert(statements, first,
+			`DELETE FROM act_clarifications WHERE local_measure_id IN(SELECT id FROM retention_local_measures) OR act_document_version_id IN(SELECT id FROM retention_candidates)
+ OR resolution_id IN(SELECT r.id FROM act_resolutions r JOIN act_references f ON f.id=r.reference_id WHERE f.document_version_id IN(SELECT id FROM retention_candidates))`,
+			`DELETE FROM act_resolutions WHERE reference_id IN(SELECT id FROM act_references WHERE document_version_id IN(SELECT id FROM retention_candidates))`,
+			`DELETE FROM act_references WHERE document_version_id IN(SELECT id FROM retention_candidates)`,
+			`DELETE FROM act_albo_records WHERE document_version_id IN(SELECT id FROM retention_candidates)`)
 	}
 	for index, statement := range statements {
 		if index == 1 {

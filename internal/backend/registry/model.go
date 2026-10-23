@@ -101,6 +101,7 @@ func (d Discovery) EffectiveUnresolvedMeasureDays() int {
 // remains explicit; no source/product inherits another source's permissions.
 type Configuration struct {
 	CittadinoInformato   *CittadinoInformatoContract `json:"cittadino_informato,omitempty"`
+	JCityGovAlbo         *JCityGovAlboContract       `json:"jcitygov_albo,omitempty"`
 	LocalProcessing      *LocalProcessing            `json:"local_processing,omitempty"`
 	ProcessingProfile    string                      `json:"processing_profile,omitempty"`
 	InferenceEligibility *InferenceEligibility       `json:"inference_eligibility,omitempty"`
@@ -188,6 +189,9 @@ func (c *Configuration) defaults() {
 }
 func (c Configuration) valid() bool {
 	if (c.AccessMethod == CittadinoInformatoAccess) != (c.CittadinoInformato != nil) || c.CittadinoInformato != nil && !c.CittadinoInformato.Valid(c) {
+		return false
+	}
+	if (c.AccessMethod == JCityGovAlboAccess) != (c.JCityGovAlbo != nil) || c.JCityGovAlbo != nil && !c.JCityGovAlbo.Valid(c) {
 		return false
 	}
 	if !c.LocalProcessing.valid(c.RegionalProduct) {
