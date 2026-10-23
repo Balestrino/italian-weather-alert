@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Adopt current-measure replacement across equivalent versions in development: Calcinaia shows only the latest equivalent projection of two notices (29 to 24 current measures), with API/MCP agreement and unchanged history; document the selection rule and the conservative tracked-target union.
 - 2026-10-23 [Changed] Compute equivalent-version measure replacement once per public query instead of per measure, avoiding a fan-out across every equivalent template version (659 ms to 70 ms on development data) with identical selections.
 - 2026-10-23 [Changed] Replace current public measures of an earlier document version once a later version with an equivalent interpretation input has a validated projection; genuine revisions keep accumulating and earlier knowledge boundaries are unchanged.
 - 2026-10-22 [Planned] Plan replacing current public measures of earlier versions with the latest validated projection of an equivalent interpretation input of the same document.

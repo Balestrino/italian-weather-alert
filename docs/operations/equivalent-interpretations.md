@@ -47,10 +47,35 @@ hash and acquisition time, and adds:
 A version's own later result, including a not-relevant one, takes precedence
 from its recording time. Historical queries use only the versions, manifest runs
 and results known within the source interpretation cutoff. No interpretation,
-receipt, measure or projection is written. Domain measures were already read
-from every retained version and are unchanged. API and MCP share the same read
+receipt, measure or projection is written. API and MCP share the same read
 path. Each batch of document reads adds two round trips, however many versions
 it contains.
+
+## Current measures
+
+From 23 October 2026, public measure search and the municipality situation
+exclude a measure of version A when version B of the same document and source
+has a validated, complete, non-evaluation extraction with projected measures.
+B is either A with a later run, or a later version (`first_acquired_at`, id)
+whose fingerprint matches A's. Both fingerprints and the replacing measures must
+be known within the source interpretation cutoff. Change:
+`replace-equivalent-version-measures`.
+
+- Genuine text revisions have different fingerprints and keep accumulating;
+  disappearance never ends a measure, and only linking relates them.
+- A newer equivalent result that is not relevant, failed or has no projected
+  measure replaces nothing.
+- Earlier knowledge boundaries return the earlier measures. Nothing is written;
+  measure detail by identifier, linking and statuses are unchanged.
+- Tracked-target measure state (`tracked-target-interpretation-state`) still
+  counts the measures of every version. This is conservative: a target can stay
+  `unresolved` longer than the public selection suggests.
+
+The replaced versions are computed once per query, over the versions that have
+measures in the sources of the requested municipality. A per-measure lookup
+visited every equivalent template version: 659 ms for Livorno's 606 measures on
+development data, against 70 ms for the set-based form across all
+municipalities.
 
 ## Verification
 
@@ -64,3 +89,12 @@ The development adoption on 22 October 2026 shows:
 
 Rollback restores the previous public, admin and worker images. The additive
 table can stay. Detailed evidence is kept private (`carry-forward-20261022`).
+
+The adoption of current-measure replacement on 23 October 2026 replaced only the
+public service. Calcinaia's current measures went from 29 to 24: only the earlier
+template-only versions of two notices left the selection
+([CLN-040](../territori/09-toscana/comuni/050004-calcinaia.md#cln-040--misure-correnti-dallultima-proiezione-equivalente)).
+The selection before the 21–22 October projections is unchanged, and API and MCP
+agree on search and situation. Rollback restores the previous public image; no
+migration is involved. Detailed evidence is kept private
+(`equivalent-measures-20261023`).

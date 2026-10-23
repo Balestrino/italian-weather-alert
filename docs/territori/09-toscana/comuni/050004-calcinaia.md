@@ -2,7 +2,7 @@
 tipo: "comune"
 codice_regione: "09"
 codice_istat: "050004"
-ultima_revisione: "2026-10-22"
+ultima_revisione: "2026-10-23"
 ---
 
 # Calcinaia
@@ -223,6 +223,18 @@ attesi revisionati e i casi non eseguiti completati. Un recupero dell'acquisizio
 o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
+
+### CLN-040 — Misure correnti dall'ultima proiezione equivalente
+
+- **Data e ambito:** 2026-10-23; misure pubbliche di Calcinaia in development dopo l'adozione nel servizio `public` della change [`replace-equivalent-version-measures`](../../../operations/equivalent-interpretations.md#current-measures).
+- **Comportamento verificato:** la ricerca delle misure e la situazione comunale escludono le misure di una versione quando una versione successiva dello stesso documento, con input di interpretazione equivalente, ha un'estrazione valida con misure proiettate. Rispetto a CLN-039, le misure correnti passano da 29 a 24:
+  - l'avviso di criticità del 9 settembre mostra solo le 5 misure della versione rielaborata;
+  - l'aggiornamento sull'avviso di criticità mostra solo le 2 misure dell'elaborazione del 21 ottobre.
+
+  Le revisioni reali (allerta del 9–10 ottobre, ponte sull'Arno, via del Marrucco) mantengono tutte le misure. Due versioni equivalenti dell'allerta del 9–10 ottobre non erano già nella selezione pubblica e restano escluse.
+- **Verifiche:** API e MCP coincidono per ricerca e situazione. Prima delle proiezioni del 21–22 ottobre la selezione è identica a quella precedente all'adozione (23 misure). Nessuna misura, estrazione o ricevuta è modificata: la sostituzione riguarda solo la presentazione.
+- **Limiti:** lo stato dei documenti seguiti (CLN-035) continua a contare le misure di tutte le versioni, in modo conservativo. Le revisioni reali del testo restano affidate al linking. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `equivalent-measures-20261023`.
 
 ### CLN-039 — Misure duplicate tra versioni dello stesso avviso
 
