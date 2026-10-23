@@ -35,14 +35,20 @@
 
 ## 5. Interfaces
 
-- [ ] 5.1 Add act evidence items to public measure evidence within the cutoff, and deny copies for albo versions. Verify:
+- [x] 5.1 Add act evidence items to public measure evidence within the cutoff, and deny copies for albo versions. Verify:
   - integration tests for a boundary before and after a clarification, and for a copy request;
   - a transport test that HTTP and MCP return identical clarified measures.
-- [ ] 5.2 Add the read-only admin view and the CLI command `source-act-references <source>`. Verify with handler and CLI tests, including no edit routes.
+- [x] 5.2 Add the read-only admin view and the CLI command `source-act-references <source>`. Verify with handler and CLI tests, including no edit routes.
 
 ## 6. Verification and adoption
 
-- [ ] 6.1 Run unit, race, vet and `-tags=integration` for the touched packages and `cmd`, plus `openspec validate --strict`, and record the results.
+- [x] 6.1 Run unit, race, vet and `-tags=integration` for the touched packages and `cmd`, plus `openspec validate --strict`, and record the results.
+
+  Results on 2026-10-23: `go vet ./...` passes with and without `-tags=integration`. Unit and `-race` tests pass for acts, acquisition, registry, documents, interpretation, domain, publicquery, backoffice, transport and every `cmd` package. The `-tags=integration` suites pass for the same packages (domain 106 s, backoffice 88 s, interpretation 47 s, acquisition 43 s, publicquery 21 s, acts 10 s). `openspec validate --strict` passes.
+
+  Implementation needed two additions beyond the task list, both covered by tests:
+  - an albo preview in the acquisition engine, which reads only the first list page, because collection requires a recorded preview;
+  - a registry migration (`102_public_scope_supporting_sources`) that keeps albo sources out of the public perimeter. Without it, the development municipality override would have exposed albo documents.
 - [ ] 6.2 Adopt in development: apply the migration through admin, register and preview `calcinaia-albo` with a settings backup, and deploy admin, worker and public from one revision. Process the acceptance notices with bounded reprocessing and verify through API and MCP:
   - doc 60: `unique_candidate` → Ordinanza 38/2026, measures conditional from 2026-09-10T00:00;
   - doc 213: resolution to Ordinanza 34/2026, or `ambiguous`/`not_found` with the reason;

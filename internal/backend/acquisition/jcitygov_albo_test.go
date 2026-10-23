@@ -226,3 +226,19 @@ func TestJCityGovAlboRequiresSession(t *testing.T) {
 		t.Fatalf("page without session accepted: %v", err)
 	}
 }
+
+func TestAlboPreviewReadsOnlyTheFirstPage(t *testing.T) {
+	server, requests := alboServer(t, 120, time.Date(2026, 10, 22, 0, 0, 0, 0, time.UTC))
+	contract := alboContract(server.URL)
+	cfg := registry.Configuration{JCityGovAlbo: contract, AccessMethod: registry.JCityGovAlboAccess, URL: contract.ListURL(), Sections: []string{contract.ListURL()}}
+	engine := &Engine{Albo: server.Client()}
+	report, state, err := engine.acquire(context.Background(), "albo", 1, cfg)
+	if err != nil || !state.reachable || !state.contentRecognized || len(report.Documents) != 0 || len(report.Sections) != 1 || report.Sections[0].SectionURL != contract.ListURL() || *requests != 2 {
+		t.Fatalf("preview %+v %+v %v requests=%d", report, state, err, *requests)
+	}
+	broken := &Engine{Albo: server.Client()}
+	cfg.JCityGovAlbo = alboContract(server.URL + "/missing")
+	if _, state, err = broken.acquire(context.Background(), "albo", 1, cfg); err == nil || state.errorCode != "albo_unavailable" {
+		t.Fatalf("unreachable albo preview: %+v %v", state, err)
+	}
+}

@@ -117,3 +117,94 @@ func (s *Store) LatestResolution(ctx context.Context, referenceID int64, at time
 	}
 	return r, true, json.Unmarshal(raw, &r.Candidates)
 }
+
+// ReferenceView is the read-only operator view of one notice reference.
+type ReferenceView struct {
+	DocumentID     int64               `json:"document_id"`
+	VersionID      int64               `json:"version_id"`
+	NoticeURL      string              `json:"notice_url"`
+	Ordinal        int                 `json:"ordinal"`
+	Kind           string              `json:"kind"`
+	Number         int                 `json:"number,omitempty"`
+	Year           int                 `json:"year,omitempty"`
+	Passage        string              `json:"passage"`
+	DetectedAt     time.Time           `json:"detected_at"`
+	Outcome        string              `json:"outcome"`
+	Reason         string              `json:"reason,omitempty"`
+	ResolvedAt     *time.Time          `json:"resolved_at"`
+	Candidates     []Candidate         `json:"candidates"`
+	ActURL         string              `json:"act_url,omitempty"`
+	ActVersionID   *int64              `json:"act_document_version_id"`
+	Clarifications []ClarificationView `json:"clarifications"`
+}
+
+type ClarificationView struct {
+	MeasureID  string    `json:"local_measure_id,omitempty"`
+	Outcome    string    `json:"outcome"`
+	Reason     string    `json:"reason,omitempty"`
+	RecordedAt time.Time `json:"recorded_at"`
+}
+
+// SourceReferences lists the latest references of a source's notices with
+// their latest outcome, acquired act and clarifications, newest first.
+func (s *Store) SourceReferences(ctx context.Context, source string, limit int) ([]ReferenceView, error) {
+	if source == "" || limit < 1 || limit > 500 {
+		return nil, ErrInvalid
+	}
+	rows, err := s.pool.Query(ctx, `SELECT d.id,v.id,d.official_url,f.ordinal,f.kind,COALESCE(f.act_number,0),COALESCE(f.act_year,0),f.passage,f.detected_at,
+ COALESCE(r.outcome,'pending'),COALESCE(r.reason,''),r.recorded_at,COALESCE(r.candidates,'[]'::jsonb),COALESCE(a.detail_url,r.attached_resource_url,''),
+ COALESCE(a.document_version_id,CASE WHEN r.outcome='attached' THEN v.id END),r.id
+ FROM act_references f JOIN retained_versions v ON v.id=f.document_version_id JOIN retained_documents d ON d.id=v.document_id
+ LEFT JOIN LATERAL (SELECT * FROM act_resolutions x WHERE x.reference_id=f.id ORDER BY x.recorded_at DESC,x.id DESC LIMIT 1) r ON true
+ LEFT JOIN act_albo_records a ON a.source_id=r.albo_source_id AND a.record_id=r.albo_record_id
+ WHERE d.source_id=$1 ORDER BY f.detected_at DESC,f.id DESC LIMIT $2`, source, limit)
+	if err != nil {
+		return nil, err
+	}
+	var result []ReferenceView
+	var resolutions []*int64
+	for rows.Next() {
+		var v ReferenceView
+		var raw []byte
+		var resolution *int64
+		if err = rows.Scan(&v.DocumentID, &v.VersionID, &v.NoticeURL, &v.Ordinal, &v.Kind, &v.Number, &v.Year, &v.Passage, &v.DetectedAt, &v.Outcome, &v.Reason, &v.ResolvedAt, &raw, &v.ActURL, &v.ActVersionID, &resolution); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		if err = json.Unmarshal(raw, &v.Candidates); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		v.Clarifications = []ClarificationView{}
+		result, resolutions = append(result, v), append(resolutions, resolution)
+	}
+	rows.Close()
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	for i, resolution := range resolutions {
+		if resolution == nil {
+			continue
+		}
+		clarifications, err := s.pool.Query(ctx, `SELECT COALESCE(local_measure_id,''),outcome,reason,recorded_at FROM act_clarifications WHERE resolution_id=$1 ORDER BY recorded_at,id`, *resolution)
+		if err != nil {
+			return nil, err
+		}
+		for clarifications.Next() {
+			var c ClarificationView
+			if err = clarifications.Scan(&c.MeasureID, &c.Outcome, &c.Reason, &c.RecordedAt); err != nil {
+				clarifications.Close()
+				return nil, err
+			}
+			result[i].Clarifications = append(result[i].Clarifications, c)
+		}
+		clarifications.Close()
+		if err = clarifications.Err(); err != nil {
+			return nil, err
+		}
+	}
+	if result == nil {
+		result = []ReferenceView{}
+	}
+	return result, nil
+}

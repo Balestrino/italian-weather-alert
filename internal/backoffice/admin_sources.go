@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acts"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/diagnostics"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/evaluation"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/interpretation"
@@ -55,6 +56,10 @@ type AdminUnavailableTargets interface {
 	ListUnavailable(context.Context, string) ([]acquisition.UnavailableTarget, error)
 	RecordDisposition(context.Context, acquisition.DispositionRequest) (acquisition.TargetDisposition, error)
 }
+type AdminActReferences interface {
+	SourceReferences(context.Context, string, int) ([]acts.ReferenceView, error)
+}
+
 type AdminFollowedTargets interface {
 	FollowedTargets(context.Context, string, time.Time) ([]acquisition.FollowedTarget, error)
 }
@@ -105,6 +110,7 @@ type AdminRuntime struct {
 	Preview            AdminPreview
 	UnavailableTargets AdminUnavailableTargets
 	FollowedTargets    AdminFollowedTargets
+	ActReferences      AdminActReferences
 }
 
 func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
@@ -189,6 +195,12 @@ func adminSourceRoutes(mux *http.ServeMux, a AdminRuntime) {
 			view.FollowedTargets, view.FollowedTargetsMissing = followed, followErr != nil
 		} else {
 			view.FollowedTargetsMissing = true
+		}
+		if a.ActReferences != nil {
+			references, referencesErr := a.ActReferences.SourceReferences(r.Context(), id, 100)
+			view.ActReferences, view.ActReferencesMissing = references, referencesErr != nil
+		} else {
+			view.ActReferencesMissing = true
 		}
 		if wantsAdminJSON(r) {
 			httpserver.Reply(w, 200, view)
@@ -383,6 +395,8 @@ type adminSourceView struct {
 	UnavailableTargetsMissing bool
 	FollowedTargets           []acquisition.FollowedTarget
 	FollowedTargetsMissing    bool
+	ActReferences             []acts.ReferenceView
+	ActReferencesMissing      bool
 }
 
 func wantsAdminJSON(r *http.Request) bool {

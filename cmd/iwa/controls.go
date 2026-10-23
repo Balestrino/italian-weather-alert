@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/acts"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
@@ -55,7 +56,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		count = 1
 	case "embedding-enable", "embedding-disable":
 		count = 3
-	case "source-status", "region-status", "source-unavailable-targets", "source-tracked-targets":
+	case "source-status", "region-status", "source-unavailable-targets", "source-tracked-targets", "source-act-references":
 		count = 2
 	case "source-unavailable-decide":
 		count = 5
@@ -99,7 +100,7 @@ func parseControlCommand(args []string) (controlCommand, bool, error) {
 		c.Revision, c.Decision, c.Actor = configuration, args[3], args[4]
 		return c, true, nil
 	}
-	if !strings.HasSuffix(c.Name, "-status") && c.Name != "source-unavailable-targets" && c.Name != "source-tracked-targets" {
+	if !strings.HasSuffix(c.Name, "-status") && c.Name != "source-unavailable-targets" && c.Name != "source-tracked-targets" && c.Name != "source-act-references" {
 		rev, err := strconv.Atoi(args[len(args)-2])
 		if err != nil || rev < 0 || (c.Source != "" && rev == 0 && !strings.HasPrefix(c.Name, "source-embedding-")) {
 			return c, true, errControlArguments
@@ -182,6 +183,10 @@ func executeControlEnvironment(ctx context.Context, pool *pgxpool.Pool, role, en
 		var targets []acquisition.FollowedTarget
 		targets, err = acquisition.NewTrackingStore(pool).FollowedTargets(ctx, c.Source, time.Now())
 		result = map[string]any{"source_id": c.Source, "followed_targets": targets, "guidance": "States are derived at the start of each scheduled check from validated interpretation. Open-ended measures stop being rechecked after the source limit; listing only reads the last derived state."}
+	case "source-act-references":
+		var references []acts.ReferenceView
+		references, err = acts.NewStore(pool).SourceReferences(ctx, c.Source, 200)
+		result = map[string]any{"source_id": c.Source, "act_references": references, "guidance": "Acts explicitly cited by this source's notices, with the latest resolution and the clarifications of measure validity. Outcomes are appended and never edited; an unavailable albo is retried automatically."}
 	case "source-unavailable-decide":
 		var payload unavailableDecision
 		if c.Input == nil {

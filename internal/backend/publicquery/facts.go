@@ -58,7 +58,18 @@ func (s *Store) versionEvidence(ctx context.Context, versionID int64, locator st
 	return value, nil
 }
 
-func (s *Store) measureEvidence(ctx context.Context, measureID string) ([]Evidence, error) {
+// actEvidenceSQL lists the referenced acts that clarified a measure within the
+// source interpretation cutoff, by official link only (never a retained copy).
+const actEvidenceSQL = `SELECT d.id,v.id,COALESCE(a.detail_url,c.act_resource_url),c.act_page_number,
+ 'referenced_act:'||f.kind||COALESCE(' '||a.act_number||'/'||a.act_year,''),c.act_passage
+ FROM act_clarifications c JOIN act_resolutions r ON r.id=c.resolution_id JOIN act_references f ON f.id=r.reference_id
+ LEFT JOIN act_albo_records a ON a.source_id=r.albo_source_id AND a.record_id=r.albo_record_id
+ JOIN retained_versions v ON v.id=c.act_document_version_id JOIN retained_documents d ON d.id=v.document_id
+ JOIN domain_local_measures m ON m.id=c.local_measure_id
+ WHERE c.local_measure_id=$1 AND c.outcome='clarified' AND c.recorded_at<=registry_interpretation_cutoff(m.source_id,$2)
+ ORDER BY c.recorded_at,c.id`
+
+func (s *Store) measureEvidence(ctx context.Context, measureID string, knownAt time.Time) ([]Evidence, error) {
 	rows, err := s.pool.Query(ctx, `SELECT d.id,v.id,e.resource_url,e.page_number,e.field_name,e.quote
  FROM domain_measure_bindings b JOIN extraction_evidence e ON e.run_id=b.extraction_run_id AND e.measure_ordinal=b.extraction_ordinal
  JOIN domain_local_measures m ON m.id=b.local_measure_id JOIN retained_versions v ON v.id=m.document_version_id JOIN retained_documents d ON d.id=v.document_id
@@ -82,7 +93,7 @@ func (s *Store) measureEvidence(ctx context.Context, measureID string) ([]Eviden
 		return nil, err
 	}
 	if len(result) > 0 {
-		return result, nil
+		return s.appendActEvidence(ctx, result, measureID, knownAt)
 	}
 	var versionID int64
 	if err = s.pool.QueryRow(ctx, `SELECT document_version_id FROM domain_local_measures WHERE id=$1`, measureID).Scan(&versionID); err != nil {
@@ -92,7 +103,35 @@ func (s *Store) measureEvidence(ctx context.Context, measureID string) ([]Eviden
 	if err != nil {
 		return nil, err
 	}
-	return []Evidence{value}, nil
+	return s.appendActEvidence(ctx, []Evidence{value}, measureID, knownAt)
+}
+
+func (s *Store) appendActEvidence(ctx context.Context, result []Evidence, measureID string, knownAt time.Time) ([]Evidence, error) {
+	if s.actsInstalled == nil || !s.actsInstalled.Load() {
+		var installed bool
+		if err := s.pool.QueryRow(ctx, "SELECT to_regclass('act_clarifications') IS NOT NULL").Scan(&installed); err != nil || !installed {
+			return result, err
+		}
+		if s.actsInstalled != nil {
+			s.actsInstalled.Store(true)
+		}
+	}
+	rows, err := s.pool.Query(ctx, actEvidenceSQL, measureID, knownAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var documentID, versionID int64
+		var value Evidence
+		var locator, passage string
+		if err = rows.Scan(&documentID, &versionID, &value.SourceURL, &value.Page, &locator, &passage); err != nil {
+			return nil, err
+		}
+		value.DocumentID, value.VersionID, value.Locator, value.Passage = stringID(documentID), stringID(versionID), &locator, &passage
+		result = append(result, value)
+	}
+	return result, rows.Err()
 }
 
 func (s *Store) measure(ctx context.Context, id string, qt QueryTime) (Measure, error) {
@@ -117,7 +156,7 @@ func (s *Store) measure(ctx context.Context, id string, qt QueryTime) (Measure, 
 		return Measure{}, err
 	}
 	value.Status = statusForTemporal(value.Validity, qt.EvaluationTime)
-	value.Evidence, err = s.measureEvidence(ctx, value.ID)
+	value.Evidence, err = s.measureEvidence(ctx, value.ID, qt.KnownAt)
 	if err != nil {
 		return Measure{}, err
 	}

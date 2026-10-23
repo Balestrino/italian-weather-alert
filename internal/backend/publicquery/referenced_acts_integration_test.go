@@ -24,6 +24,7 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/backend/jobs"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/ocr"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
+	"github.com/Balestrino/italian-weather-alert/internal/backend/publiccopy"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/registry"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -388,5 +389,84 @@ func testReferencedActs(ctx context.Context, t *testing.T, pool *pgxpool.Pool, c
 			t.Fatalf("measure changed by an unparseable act: %s", precision)
 		}
 	})
-	_ = beforeClarification
+	t.Run("operator view of references", func(t *testing.T) {
+		views, err := acts.NewStore(pool).SourceReferences(ctx, primary, 50)
+		if err != nil || len(views) != 3 {
+			t.Fatalf("references %d %v", len(views), err)
+		}
+		byVersion := map[int64]acts.ReferenceView{}
+		for _, v := range views {
+			byVersion[v.VersionID] = v
+		}
+		a := byVersion[noticeA.ID]
+		if a.Outcome != "unique_candidate" || a.ActURL != alboDetail || a.ActVersionID == nil || *a.ActVersionID != actVersion || len(a.Candidates) != 1 || len(a.Clarifications) != 5 {
+			t.Fatalf("notice A view %+v", a)
+		}
+		var unavailable bool
+		for _, v := range views {
+			for _, c := range v.Clarifications {
+				unavailable = unavailable || c.Outcome == "clarification_unavailable" && c.Reason == "clause_not_recognized" && c.MeasureID == ""
+			}
+		}
+		if !unavailable {
+			t.Fatal("unrecognized clause missing from the operator view")
+		}
+	})
+	t.Run("public measures show the clarification only from its recording", func(t *testing.T) {
+		read := func(at time.Time) map[string]Measure {
+			t.Helper()
+			found, err := New(pool).Search(ctx, SearchQuery{Kind: "measure", SourceID: primary, MunicipalityISTAT: "050004", QueryTime: QueryTime{EvaluationTime: at, KnownAt: at}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			result := map[string]Measure{}
+			for _, m := range found.Measures {
+				result[m.ID] = m
+			}
+			return result
+		}
+		actEvidence := func(m Measure) *Evidence {
+			for i, e := range m.Evidence {
+				if e.Locator != nil && strings.HasPrefix(*e.Locator, "referenced_act:") {
+					return &m.Evidence[i]
+				}
+			}
+			return nil
+		}
+		before := read(beforeClarification)[measureID(runA, 1)]
+		if before.Validity.Precision != "unknown" || actEvidence(before) != nil {
+			t.Fatalf("clarification visible before its recording: %+v", before)
+		}
+		after := read(clock.Add(time.Hour))
+		clarified := after[measureID(runA, 1)]
+		evidence := actEvidence(clarified)
+		if clarified.Validity.Precision != "conditional" || clarified.Validity.Instant == nil || !clarified.Validity.Instant.Equal(time.Date(2026, 9, 9, 22, 0, 0, 0, time.UTC)) ||
+			clarified.Validity.Condition == nil || *clarified.Validity.Condition != "fino al perdurare dell'emergenza" || evidence == nil {
+			t.Fatalf("clarified measure %+v", clarified)
+		}
+		if *evidence.Locator != "referenced_act:ordinanza 38/2026" || evidence.SourceURL != alboDetail || evidence.Page == nil || *evidence.Page != 2 ||
+			evidence.Passage == nil || !strings.Contains(*evidence.Passage, "a partire dalle ore 00.00 del giorno 10 settembre 2026") || evidence.VersionID != stringID(actVersion) {
+			t.Fatalf("act evidence %+v", evidence)
+		}
+		if conflict := after[measureID(runA, 5)]; actEvidence(conflict) != nil || conflict.Validity.Precision != "instant" {
+			t.Fatalf("conflicting measure shows act evidence: %+v", conflict)
+		}
+		if unmatched := after[measureID(runA, 4)]; actEvidence(unmatched) != nil || unmatched.Validity.Precision != "unknown" {
+			t.Fatalf("unmatched measure changed: %+v", unmatched)
+		}
+		var actDocument int64
+		if err := pool.QueryRow(ctx, `SELECT document_id FROM retained_versions WHERE id=$1`, actVersion).Scan(&actDocument); err != nil {
+			t.Fatal(err)
+		}
+		copies, err := publiccopy.New(pool, retained, true, "https://iwa.example")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err = copies.Read(ctx, stringID(actDocument), stringID(actVersion)); err == nil {
+			t.Fatal("public copy of an albo act served")
+		}
+		if _, err = New(pool).Document(ctx, DocumentQuery{DocumentID: stringID(actDocument), QueryTime: QueryTime{EvaluationTime: clock.Add(time.Hour), KnownAt: clock.Add(time.Hour)}}); err == nil {
+			t.Fatal("albo act readable as a public document")
+		}
+	})
 }

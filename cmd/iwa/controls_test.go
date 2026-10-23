@@ -71,6 +71,7 @@ func TestUnavailableTargetCommands(t *testing.T) {
 	for _, args := range [][]string{
 		{"source-unavailable-targets", "calcinaia-municipal"},
 		{"source-tracked-targets", "calcinaia-municipal"},
+		{"source-act-references", "calcinaia-municipal"},
 		{"source-unavailable-decide", "calcinaia-municipal", "1", "exclude_stale_unavailable", "operator"},
 		{"source-unavailable-decide", "calcinaia-municipal", "2", "resume", "operator"},
 	} {
@@ -89,6 +90,7 @@ func TestUnavailableTargetCommands(t *testing.T) {
 	for _, args := range [][]string{
 		{"source-unavailable-targets"}, {"source-unavailable-targets", "s", "extra"},
 		{"source-tracked-targets"}, {"source-tracked-targets", "s", "1", "operator"},
+		{"source-act-references"}, {"source-act-references", "s", "1", "operator"},
 		{"source-unavailable-decide", "s", "0", "resume", "operator"}, {"source-unavailable-decide", "s", "x", "resume", "operator"},
 		{"source-unavailable-decide", "s", "1", "delete", "operator"}, {"source-unavailable-decide", "s", "1", "resume", " "},
 		{"source-unavailable-decide", "s", "1", "resume"},

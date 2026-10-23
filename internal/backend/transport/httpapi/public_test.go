@@ -145,10 +145,16 @@ func fixtureQuality() publicquery.Quality {
 	return publicquery.Quality{Provenance: publicquery.Dimension{State: "verified", Limitations: []string{}, Evidence: []publicquery.Evidence{}}, Interpretation: publicquery.Dimension{State: "supported", Limitations: []string{}, Evidence: []publicquery.Evidence{}}, Updating: publicquery.Updating{State: "ok", DelayThresholdSeconds: 3600, Limitations: []string{}}}
 }
 
-// fixtureMeasure is a current measure of the replacing equivalent version 12.
+// fixtureMeasure is a current measure of the replacing equivalent version 12,
+// whose validity was clarified by a referenced albo ordinance.
 func fixtureMeasure() publicquery.Measure {
 	locator, passage, place := "subject", "ponte", "Via Sintetica"
-	return publicquery.Measure{ID: "local-measure-12-1", RevisionID: "local-measure-12-1", MunicipalityISTAT: "050004", Action: "closure", Subject: "ponte", Place: &place, TerritorialScope: "place", Validity: publicquery.Temporal{Precision: "unknown"}, Status: "undetermined", Evidence: []publicquery.Evidence{{DocumentID: "7", VersionID: "12", SourceURL: "https://example.test/7", Locator: &locator, Passage: &passage}}, Quality: fixtureQuality(), RelatedMeasureIDs: []string{}, RelationshipStatus: "not_applicable", NewerUninterpretedDocumentIDs: []string{}}
+	actLocator, actPassage, condition, page := "referenced_act:ordinanza 38/2026", "a partire dalle ore 00.00 del giorno 10 settembre 2026, fino al perdurare dell'emergenza", "fino al perdurare dell'emergenza", 2
+	start, zone, assumption := time.Date(2026, 9, 9, 22, 0, 0, 0, time.UTC), "Europe/Rome", "Clarified from the dispositive clause of ordinanza 38/2026 cited by the notice; Europe/Rome."
+	return publicquery.Measure{ID: "local-measure-12-1", RevisionID: "local-measure-12-1", MunicipalityISTAT: "050004", Action: "closure", Subject: "ponte", Place: &place, TerritorialScope: "place",
+		Validity: publicquery.Temporal{Original: actPassage, Precision: "conditional", Instant: &start, Timezone: &zone, Assumption: &assumption, Condition: &condition}, Status: "undetermined",
+		Evidence: []publicquery.Evidence{{DocumentID: "7", VersionID: "12", SourceURL: "https://example.test/7", Locator: &locator, Passage: &passage}, {DocumentID: "9", VersionID: "21", SourceURL: "https://albo.example.test/display/9000660", Page: &page, Locator: &actLocator, Passage: &actPassage}},
+		Quality:  fixtureQuality(), RelatedMeasureIDs: []string{}, RelationshipStatus: "not_applicable", NewerUninterpretedDocumentIDs: []string{}}
 }
 
 func fixedQueryTime(value publicquery.QueryTime) bool {

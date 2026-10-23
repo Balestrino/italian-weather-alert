@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/Balestrino/italian-weather-alert/internal/backend/domain"
@@ -28,9 +29,13 @@ type Store struct {
 		QueryRow(context.Context, string, ...any) pgx.Row
 	}
 	geography *domain.Store
+	// actsInstalled caches that referenced-act tables exist; shared by copies.
+	actsInstalled *atomic.Bool
 }
 
-func New(pool *pgxpool.Pool) *Store { return &Store{pool: pool, geography: domain.New(pool)} }
+func New(pool *pgxpool.Pool) *Store {
+	return &Store{pool: pool, geography: domain.New(pool), actsInstalled: &atomic.Bool{}}
+}
 
 func (s *Store) DiscoverMunicipalities(ctx context.Context, query DiscoveryQuery) (DiscoveryResult, error) {
 	qt, err := normalizeTime(query.QueryTime)

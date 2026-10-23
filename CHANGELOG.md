@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Added] Expose referenced-act evidence on clarified public measures, add a read-only operator list (admin source page and source-act-references CLI) and a first-page albo preview; deny scheduled checks of albo sources.
 - 2026-10-23 [Added] Add referenced-act jobs: resolve notice references after projection, retain resolved albo acts once with OCR only, and clarify unknown measure validity from the act's dispositive clause; exclude albo sources from classification, listing checks and the public perimeter.
 - 2026-10-23 [Added] Add deterministic detection of explicit act references in notice text and their resolution as attached, numbered or unique albo candidates, recording not-found, ambiguous and unavailable outcomes append-only.
 - 2026-10-23 [Added] Add append-only referenced-act tables with retention participation, a reviewed JCityGov albo source configuration and a bounded, session-aware JCityGov albo client with synthetic fixtures.

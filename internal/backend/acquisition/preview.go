@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"slices"
 	"strings"
@@ -27,11 +28,13 @@ type retentionStore interface {
 }
 
 type Engine struct {
-	Registry    registryStore
-	Retained    retentionStore
-	Crawler     Crawler
-	Resources   Crawler
-	Tracking    revisionTracker
+	Registry  registryStore
+	Retained  retentionStore
+	Crawler   Crawler
+	Resources Crawler
+	Tracking  revisionTracker
+	// Albo is the HTTP client of supporting albo sources; nil uses a default.
+	Albo        *http.Client
 	Now         func() time.Time
 	validatePDF func(context.Context, Page) error
 }
@@ -168,6 +171,12 @@ func (e *Engine) Check(ctx context.Context, sourceID string, revision int, start
 		outcome.FinishedAt = now().UTC()
 		return outcome
 	}
+	if v.Configuration.JCityGovAlbo != nil {
+		// A supporting albo is read only for referenced acts, never checked.
+		outcome.ErrorCode = "supporting_source_not_checked"
+		outcome.FinishedAt = now().UTC()
+		return outcome
+	}
 	var report Preview
 	var state acquisitionState
 	if v.Configuration.CittadinoInformato != nil {
@@ -206,6 +215,9 @@ func (e *Engine) Check(ctx context.Context, sourceID string, revision int, start
 }
 
 func (e *Engine) acquire(ctx context.Context, sourceID string, revision int, cfg registry.Configuration) (Preview, acquisitionState, error) {
+	if cfg.JCityGovAlbo != nil {
+		return e.previewAlbo(ctx, sourceID, revision, cfg)
+	}
 	if cfg.CittadinoInformato != nil {
 		return e.acquireCittadinoInformato(ctx, sourceID, revision, cfg, false)
 	}
@@ -669,6 +681,12 @@ func validateDiscovery(cfg registry.Configuration) error {
 }
 
 func validateAcquisitionConfiguration(cfg registry.Configuration) error {
+	if cfg.JCityGovAlbo != nil {
+		if !cfg.JCityGovAlbo.Valid(cfg) {
+			return ErrInvalidConfiguration
+		}
+		return nil
+	}
 	if cfg.CittadinoInformato != nil {
 		if !cfg.CittadinoInformato.Valid(cfg) {
 			return ErrInvalidConfiguration
@@ -775,4 +793,32 @@ func listingCount(sections []SectionPreview) int {
 		total += len(section.Listings)
 	}
 	return total
+}
+
+// previewAlbo reads only the first page of the albo list to show that the
+// reviewed portal shape is reachable and recognized. Nothing is retained.
+func (e *Engine) previewAlbo(ctx context.Context, sourceID string, revision int, cfg registry.Configuration) (Preview, acquisitionState, error) {
+	now := time.Now
+	if e.Now != nil {
+		now = e.Now
+	}
+	report := Preview{SourceID: sourceID, Configuration: revision, ObservedAt: now().UTC(), Sections: []SectionPreview{{SectionURL: cfg.JCityGovAlbo.ListURL()}}}
+	client := e.Albo
+	if client == nil {
+		client = &http.Client{Timeout: 60 * time.Second}
+	}
+	page, err := (&JCityGovAlbo{Contract: cfg.JCityGovAlbo, Client: client}).Page(ctx, 1)
+	state := acquisitionState{reachable: !errors.Is(err, ErrAlboUnavailable), contentRecognized: err == nil && len(page.Records) > 0}
+	if err != nil {
+		state.errorCode = "albo_unavailable"
+		if errors.Is(err, ErrAlboMarkup) {
+			state.errorCode = "albo_markup_not_recognized"
+		}
+		return report, state, err
+	}
+	if len(page.Records) == 0 {
+		state.errorCode = "unrecognized_content"
+		return report, state, fmt.Errorf("%w: empty albo list", ErrUnrecognizedContent)
+	}
+	return report, state, nil
 }
