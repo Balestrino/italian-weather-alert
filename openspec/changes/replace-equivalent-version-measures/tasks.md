@@ -17,7 +17,7 @@
 
 - [x] 2.1 Run unit, race, vet and `-tags=integration` for publicquery, transport and cmd, plus `openspec validate --strict`, and record the results.
 
-  Results on 2026-10-23: unit and `-race` pass for publicquery, transport/httpapi and every `cmd` package. `go vet ./...` passes with and without `-tags=integration`. The `-tags=integration` suites pass for publicquery (18.9 s), transport/httpapi and cmd/iwa (6.8 s). `openspec validate --strict` passes. The new integration test fails against the previous predicate, which returned both measures of the template-only document at 45 s.
+  Results on 2026-10-23: unit and `-race` pass for publicquery, transport/httpapi and every `cmd` package. `go vet ./...` passes with and without `-tags=integration`. The `-tags=integration` suites pass for publicquery (18.9 s), transport/httpapi and cmd/iwa (6.8 s). `openspec validate --strict` passes. The new integration test fails against the previous predicate, which returned both measures of the template-only document at 45 s. The suites were rerun with the same results after the predicate became set-based (design decision 4).
 - [ ] 2.2 Adopt the public service in development with a settings backup. Verify through API and MCP:
   - Calcinaia documents 60 and 58 return only the measures of their latest equivalent projection;
   - documents 43, 15668 and 34667 keep their measures;

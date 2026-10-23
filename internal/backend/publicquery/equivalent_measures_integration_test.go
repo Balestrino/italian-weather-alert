@@ -262,7 +262,7 @@ func testEquivalentVersionMeasures(ctx context.Context, t *testing.T, pool *pgxp
 		}
 		selections := 0
 		for sql, count := range counted.calls {
-			if strings.HasPrefix(sql, "SELECT m.id FROM domain_local_measures m") {
+			if strings.HasPrefix(sql, equivalentReplacedSQL) {
 				selections += count
 			}
 		}

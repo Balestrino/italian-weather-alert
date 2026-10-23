@@ -230,12 +230,38 @@ func (s *Store) newerWarnings(ctx context.Context, id string, knownAt time.Time)
 	return result, rows.Err()
 }
 
+// Versions whose measures are replaced by a later version of the same document
+// and source with an equivalent input (fingerprints within the cutoff) and a
+// validated complete extraction with projected measures. Computed once per
+// query over versions that have measures: a per-measure lookup fans out to
+// every equivalent template version and costs seconds on large sources.
+const equivalentReplacedSQL = `WITH measured AS MATERIALIZED (
+ SELECT m.document_version_id version_id,m.source_id,registry_interpretation_cutoff(m.source_id,$2) cutoff FROM domain_local_measures m
+ WHERE $1='' OR m.source_id IN (SELECT source_id FROM domain_local_measures WHERE municipality_istat=$1) GROUP BY m.document_version_id,m.source_id
+), prints AS MATERIALIZED (
+ SELECT DISTINCT x.version_id,x.source_id,e.document_id,e.fingerprint FROM measured x
+ JOIN interpretation_input_equivalences e ON e.version_id=x.version_id
+ JOIN processing_runs r ON r.id=e.run_id AND r.created_at<=x.cutoff
+), projected AS MATERIALIZED (
+ SELECT DISTINCT newer.document_version_id version_id,newer.source_id FROM domain_local_measures newer
+ JOIN measured x ON x.version_id=newer.document_version_id AND x.source_id=newer.source_id
+ JOIN domain_measure_bindings b ON b.local_measure_id=newer.id
+ JOIN extraction_results r ON r.run_id=b.extraction_run_id AND r.document_version_id=newer.document_version_id AND r.status='extracted' AND r.content_complete
+ WHERE newer.recorded_at<=x.cutoff
+), replaced AS MATERIALIZED (
+ SELECT DISTINCT a.version_id,a.source_id FROM prints a
+ JOIN prints b ON b.document_id=a.document_id AND b.fingerprint=a.fingerprint AND b.source_id=a.source_id AND b.version_id<>a.version_id
+ JOIN projected p ON p.version_id=b.version_id AND p.source_id=b.source_id
+ JOIN retained_versions va ON va.id=a.version_id
+ JOIN retained_versions vb ON vb.id=b.version_id AND (vb.first_acquired_at,vb.id)>(va.first_acquired_at,va.id) AND vb.first_acquired_at<=$2
+) `
+
 // measures excludes a measure once a later validated extraction projected
 // measures of the same source, either for the same version or for a later
 // version whose interpretation input is equivalent within the cutoff.
 // Genuine revisions keep accumulating: disappearance never ends a measure.
 func (s *Store) measures(ctx context.Context, municipality string, qt QueryTime) ([]Measure, error) {
-	rows, err := s.pool.Query(ctx, `SELECT m.id FROM domain_local_measures m JOIN retained_versions v ON v.id=m.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=m.source_id
+	rows, err := s.pool.Query(ctx, equivalentReplacedSQL+`SELECT m.id FROM domain_local_measures m JOIN retained_versions v ON v.id=m.document_version_id JOIN `+s.sourcesSQL()+` s ON s.id=m.source_id
 	 WHERE ($1='' OR m.municipality_istat=$1) AND v.first_acquired_at<=$2 AND m.recorded_at<=registry_interpretation_cutoff(s.id,$2) AND `+s.visibilitySQL()+`
 	   AND domain_verification_record_current('local_measure',m.id,registry_interpretation_cutoff(s.id,$2))
 	   AND NOT EXISTS(SELECT 1 FROM domain_measure_bindings prior
@@ -244,15 +270,7 @@ func (s *Store) measures(ctx context.Context, municipality string, qt QueryTime)
 	     JOIN domain_measure_bindings newer_binding ON newer_binding.extraction_run_id=replacement.run_id
 	     JOIN domain_local_measures newer ON newer.id=newer_binding.local_measure_id AND newer.source_id=m.source_id
 	     WHERE prior.local_measure_id=m.id AND newer.recorded_at<=registry_interpretation_cutoff(s.id,$2))
-	   AND NOT EXISTS(SELECT 1 FROM interpretation_input_equivalences own
-	     JOIN processing_runs own_run ON own_run.id=own.run_id AND own_run.created_at<=registry_interpretation_cutoff(s.id,$2)
-	     JOIN interpretation_input_equivalences other ON other.document_id=own.document_id AND other.fingerprint=own.fingerprint AND other.version_id<>own.version_id
-	     JOIN processing_runs other_run ON other_run.id=other.run_id AND other_run.created_at<=registry_interpretation_cutoff(s.id,$2)
-	     JOIN retained_versions later ON later.id=other.version_id AND (later.first_acquired_at,later.id)>(v.first_acquired_at,v.id) AND later.first_acquired_at<=$2
-	     JOIN extraction_results replacement ON replacement.document_version_id=later.id AND replacement.status='extracted' AND replacement.content_complete
-	     JOIN domain_measure_bindings newer_binding ON newer_binding.extraction_run_id=replacement.run_id
-	     JOIN domain_local_measures newer ON newer.id=newer_binding.local_measure_id AND newer.source_id=m.source_id
-	     WHERE own.version_id=m.document_version_id AND newer.recorded_at<=registry_interpretation_cutoff(s.id,$2))
+	   AND NOT EXISTS(SELECT 1 FROM replaced r WHERE r.version_id=m.document_version_id AND r.source_id=m.source_id)
 	   AND COALESCE((SELECT state FROM domain_interpretation_events i WHERE i.local_measure_id=m.id AND i.recorded_at<=registry_interpretation_cutoff(s.id,$2) ORDER BY i.recorded_at DESC,i.id DESC LIMIT 1),'not_processed') IN ('supported','partial','unreliable')
 	 ORDER BY m.id`, municipality, qt.KnownAt)
 	if err != nil {

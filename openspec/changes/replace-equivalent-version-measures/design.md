@@ -38,7 +38,9 @@
    *Alternative:* select only the latest version's measures for every document. It was rejected because it would make disappearance in genuine revisions end measures, which violates the cessation rule.
 2. **Fingerprint knowledge boundary.** Both fingerprints count only if their manifest runs were created within the cutoff, as in carry-forward. The replacing binding already has to be recorded within the cutoff.
 3. **No change to the newer-uninterpreted warnings or to statuses** (`superseded`, `relationship_status`). Replaced measures simply leave the current selection, as same-version replacement does today.
-4. **Query cost.** The added branch is an indexed join on `document_id` and `fingerprint`, executed inside the existing per-measure `NOT EXISTS`. The publicquery latency and query-count checks are repeated on a municipality with many template-only versions.
+4. **Query cost.** The equivalent branch is computed once per query as a set of replaced `(version, source)` pairs (materialized CTEs), not as a per-measure `NOT EXISTS`. The CTEs cover only versions that have measures, in the sources of the requested municipality. The publicquery latency and query-count checks are repeated on a municipality with many template-only versions.
+
+   *Measured during implementation (23 October 2026, development data):* the per-measure form fanned out to every equivalent template version of a document, about 40 for Livorno. It cost 659 ms for Livorno's 606 measures and 23 ms for Calcinaia. A variant starting from later versions cost 1,015 ms. The set-based form computes the replaced versions of every municipality in 70 ms, with identical counts per municipality. Only 224 versions have measures.
 
 ## Risks / Trade-offs
 
