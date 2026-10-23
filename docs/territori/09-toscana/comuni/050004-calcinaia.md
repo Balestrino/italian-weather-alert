@@ -224,6 +224,16 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-045 — Ordinanze di agosto e settembre senza revoca documentata
+
+- **Data e ambito:** 2026-10-23. L'operatore ha chiesto di togliere dal riepilogo le misure di agosto e settembre ormai superate.
+- **Verifica:**
+  - Dal 15 agosto al 23 ottobre l'albo pretorio contiene 165 atti. Nessuno revoca le ordinanze 34/2026 e 38/2026, valide «fino al termine dell'emergenza», né quelle di attivazione del COC.
+  - Nei 423 avvisi comunali e di Cittadino Informato successivi al 10 settembre non ci sono riaperture né dichiarazioni di fine emergenza.
+  - Gli unici indizi indiretti riguardano i cimiteri: la consultazione degli elenchi sul posto del 16 settembre e «Cimiteri sempre aperti» del 20 ottobre. Per quest'ultimo il sito comunale e Cittadino Informato indicano date diverse.
+- **Decisione:** l'operatore ha scelto di lasciare le misure con «validità non determinabile». L'età di una misura non ne stabilisce la cessazione, e non è stata introdotta né una cessazione dichiarata né un collegamento automatico alla fine dell'allerta regionale.
+- **Evidenza:** registro privato `calcinaia-revocations-20261023`.
+
 ### CLN-044 — Estrazione stabilizzata con il corpo dell'articolo
 
 - **Data e ambito:** 2026-10-23; seguito di CLN-043.
