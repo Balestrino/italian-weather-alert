@@ -35,6 +35,9 @@ const (
 	alboPageSize   = 50
 )
 
+// AlboUserAgent identifies the service to albo portals.
+const AlboUserAgent = "IWA/1.0 (+https://github.com/Balestrino/italian-weather-alert)"
+
 // AlboRecord is one albo publication as listed or detailed. ActDate is zero
 // when only list data is known; PublishedFrom is the list's publication start.
 type AlboRecord struct {
@@ -123,9 +126,12 @@ func (a *JCityGovAlbo) do(ctx context.Context, method, target string, form url.V
 	if form != nil {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-	if a.UserAgent != "" {
-		req.Header.Set("User-Agent", a.UserAgent)
+	// Some portals reject the default Go client; identify the service instead.
+	agent := a.UserAgent
+	if agent == "" {
+		agent = AlboUserAgent
 	}
+	req.Header.Set("User-Agent", agent)
 	a.reads++
 	resp, err := client.Do(req)
 	if err != nil {

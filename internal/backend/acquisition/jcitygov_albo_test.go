@@ -134,6 +134,10 @@ func alboServer(t *testing.T, n int, newest time.Time) (*httptest.Server, *int) 
 	var server *httptest.Server
 	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests++
+		if r.UserAgent() != AlboUserAgent {
+			http.Error(w, "unidentified client", http.StatusForbidden)
+			return
+		}
 		session, err := r.Cookie("JSESSIONID")
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/web/trasparenza/papca-ap/-/papca/igrid/1/2":
