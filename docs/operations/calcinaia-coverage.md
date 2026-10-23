@@ -34,8 +34,8 @@ senza presentarle come nuovi confronti MCP di questo audit.
 | Allegati municipali | Nessun riferimento obbligatorio mancante nelle ultime versioni ispezionate; 64 riferimenti ad allegati censiti | Completezza delle risorse registrate distinta dalla scoperta di atti non collegati, dal readback degli oggetti e dall'accuratezza OCR delle ordinanze scansionate |
 | Interpretazione della finestra recente | Nella stessa vista API, 43 dei 57 avvisi sono `supported`; 14 sono `not_processed`. Per questi ultimi, tredici job di classificazione sono falliti per citazione non valida e uno conserva un risultato indeterminato per contenuto richiesto incompleto | Correggere la causa dai request/response conservati, senza accettare parafrasi o marcare a mano le notizie come irrilevanti. Verificare nuove esecuzioni ordinarie e proiezioni. Un job riuscito non basta; i casi 14/14 già revisionati non certificano tutto il corpus |
 | [Cittadino Informato](https://cittadinoinformato.it/calcinaia/) | Referral municipale e identità API nuovamente osservati. L'elenco API delimitato dalla data di visualizzazione dal 4 settembre restituisce 36 comunicazioni su una pagina. Il successivo seguito 31.3 registra e abilita una sorgente distinta in development: preview e due controlli ordinari completi, 16 PDF necessari riletti con hash, raccolta 600/1.800 secondi e confronti ogni minuto | Le prime 50 ricevute restano diagnostiche: 24 riscontri mancanti e 26 non comparabilità. Errori di citazione dell'interpretazione ordinaria rimangono rifiutati; atti/edizioni e metadati CFR mancanti non sono inferiti. Il filtro di visualizzazione non prova copertura per data di pubblicazione o validità. La motivazione storica di esclusione per termini di riuso nella configurazione primaria è superata dal piano 26.2, ma non da un'attivazione automatica |
-| Albo e atti richiamati | Il sito comunale espone un referral all'albo; non risulta una raccolta generale configurata | Recuperare gli atti esplicitamente citati quando necessari a misura, luogo o validità. La specifica non richiede l'acquisizione indiscriminata dell'albo |
-| Date e aggiornamenti | La pagina sulle disposizioni meteo conserva ancora il conflitto settembre/agosto nel testo ufficiale | Cercare l'atto richiamato o una rettifica riferita alla stessa misura. Se nessuna evidenza chiarisce il campo, mantenerlo indeterminato; le date di pagina o del CFR non possono correggerlo |
+| Albo e atti richiamati | Dal 23 ottobre una fonte separata `calcinaia-albo` recupera solo gli atti citati dagli avvisi pertinenti ([atti richiamati](referenced-acts.md)); l'albo non è raccolto come canale di allerta | Esiti `ambiguous` o `not_found` restano registrati senza scelte; riferimenti di avvisi non riproiettati non sono ancora risolti |
+| Date e aggiornamenti | Il conflitto settembre/agosto dell'avviso del 9 settembre è chiarito dall'ordinanza 38/2026 recuperata dall'albo: misure condizionali dal 10 settembre alle 00:00 ([CLN-042](../territori/09-toscana/comuni/050004-calcinaia.md#cln-042--atti-citati-recuperati-e-validità-chiarita)) | Il monitoraggio del 21 agosto resta indeterminato: tre ordinanze compatibili nella finestra. Le date di pagina o del CFR non correggono i campi |
 | Prodotti CFR per Calcinaia/A4 | Pipeline e casi conservati verificati nei rispettivi perimetri; dossier di accettazione revisionati | Casi positivi reali di vigilanza e bollettino operativo reale di monitoraggio restano condizioni dei dossier. Una nuova verifica degli elenchi comunali non le chiude |
 
 Le date degli elenchi e i conteggi sono osservazioni di questo audit. Le
@@ -96,10 +96,11 @@ private `quotation-diagnosis-20261022` e `carry-forward-20261022`.
    versioni, ricevute e interpretazioni secondo la [procedura](cittadino-informato.md#adozione-ordinaria-verificata--4-ottobre-2026). Un passaggio più stretto che evita un PDF necessario non
    chiude il perimetro fallito. Nessun candidato senza primaria diventa misura
    confermata; indisponibilità, non comparabilità e conflitto restano distinti.
-3. **Atti e tempi — 31.4.** Censire riferimenti espliciti degli avvisi pertinenti,
-   recuperare le risorse necessarie entro un perimetro revisionato e verificare
-   lo stesso atto/versione. Conservare assenze, dinieghi e conflitti non chiariti;
-   non dedurre revoche o validità attuale dall'età del documento.
+3. **Atti e tempi — 31.4 conclusa.** Riferimenti espliciti censiti, atti citati
+   recuperati dall'albo in un perimetro revisionato e validità chiarite solo dalla
+   clausola dispositiva dell'atto ([atti richiamati](referenced-acts.md)). Restano
+   registrati esiti ambigui e conflitti; nessuna revoca o validità attuale è
+   dedotta dall'età del documento.
 4. **Accettazione — 31.5.** Rivalutare i dossier sul perimetro effettivamente
    collaudato, con le nuove esecuzioni e gli originali. Registrare separatamente
    accettazione e revisione del relativo report; se restano limitazioni,

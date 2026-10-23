@@ -224,6 +224,17 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-042 — Atti citati recuperati e validità chiarita
+
+- **Data e ambito:** 2026-10-23; development, dopo l'adozione della change [`acquire-referenced-albo-acts`](../../../operations/referenced-acts.md) e la registrazione della fonte `calcinaia-albo`. La fonte non è mai pianificata né pubblica e serve solo gli atti citati da `calcinaia-municipal`.
+- **Comportamento verificato:** rielaborazione delimitata delle tre versioni di CLN-041, scelta dall'operatore.
+  - **Avviso del 9 settembre:** il riferimento «apposita ordinanza» si risolve nell'unica ordinanza compatibile, la 38/2026 (registro 660). Il decreto 9/2026 con lo stesso oggetto è escluso. L'atto è conservato una sola volta, con pagina di dettaglio e PDF non firmato, e passa solo dall'OCR. Le cinque misure diventano condizionali dalle 00:00 del 10 settembre, «fino al perdurare dell'emergenza», con l'atto come evidenza tramite link ufficiale.
+  - **Avviso del 20 agosto:** l'ordinanza 34/2026 allegata chiarisce tre misure dalle 18:00 del 20 agosto. L'attivazione delle funzioni di supporto sta nel DISPONE, non nell'ORDINA, e resta indeterminata.
+  - **Monitoraggio del 21 agosto:** esito `ambiguous`, perché tre ordinanze (33, 34 e 35/2026) sono compatibili per categoria, data e oggetto. La validità resta indeterminata.
+- **Verifiche:** API e MCP coincidono per ricerca e situazione. Al confine precedente l'adozione misure e validità sono identiche. La rielaborazione del monitoraggio ha sostituito le 8 misure della versione precedente equivalente con 9 nuove (CLN-040).
+- **Limiti:** gli avvisi già proiettati prima dell'adozione si risolvono solo a una nuova proiezione. Il locator dell'atto allegato non riporta il numero. Il parser riconosce il modello delle ordinanze contingibili e urgenti di protezione civile; gli altri modelli restano `clarification_unavailable`. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `referenced-acts-20261023` (sottocartella `adoption`).
+
 ### CLN-041 — Atti citati dagli avvisi pertinenti (task 31.4)
 
 - **Data e ambito:** 2026-10-23; inventario in sola lettura dell'ultima versione dei 427 documenti di `calcinaia-municipal` e della piattaforma, consultazione dell'albo pretorio comunale (JCityGov, «Storico atti»).

@@ -49,11 +49,22 @@
   Implementation needed two additions beyond the task list, both covered by tests:
   - an albo preview in the acquisition engine, which reads only the first list page, because collection requires a recorded preview;
   - a registry migration (`102_public_scope_supporting_sources`) that keeps albo sources out of the public perimeter. Without it, the development municipality override would have exposed albo documents.
-- [ ] 6.2 Adopt in development: apply the migration through admin, register and preview `calcinaia-albo` with a settings backup, and deploy admin, worker and public from one revision. Process the acceptance notices with bounded reprocessing and verify through API and MCP:
+- [x] 6.2 Adopt in development: apply the migration through admin, register and preview `calcinaia-albo` with a settings backup, and deploy admin, worker and public from one revision. Process the acceptance notices with bounded reprocessing and verify through API and MCP:
   - doc 60: `unique_candidate` → Ordinanza 38/2026, measures conditional from 2026-09-10T00:00;
   - doc 213: resolution to Ordinanza 34/2026, or `ambiguous`/`not_found` with the reason;
   - doc 59: `attached` Ordinanza 34/2026;
   - earlier boundaries unchanged.
 
   Record the private evidence.
-- [ ] 6.3 Update the Calcinaia guide, the operations documentation and the changelog, and update task 31.4 of `define-toscana-alert-service` with the verified results and the remaining limitations.
+
+  Results on 2026-10-23: admin, worker and public run the same revision after migrations `101` and `102`. Runtime readiness and smoke pass. A first image was rejected by the albo with HTTP 403; the fixed one sends an identifying User-Agent. `calcinaia-albo` is registered, previewed (first list page only) and enabled. It is never scheduled and never public.
+
+  Bounded reprocessing of 28212 and 28213 and an audited archive recovery of 326 (operator choice) gave these outcomes:
+  - Doc 60 resolves `unique_candidate` to Ordinanza 38/2026 (the decree with the same object is excluded). The act is retained once and processed by OCR, and its 5 measures are conditional from 2026-09-10T00:00 Europe/Rome.
+  - Doc 59 resolves `attached`: 3 measures are clarified, and the support-function activation is `not_matched`.
+  - Doc 213 is `ambiguous` between Ordinanze 33, 34 and 35/2026, so its validity stays unknown.
+
+  API and MCP agree at T0 and now, and T0 measures and validities are unchanged. Doc 213's equivalent-version replacement changed its current measures (8 → 9).
+
+  Limitation: the evidence locator of an attached act carries no number.
+- [x] 6.3 Update the Calcinaia guide, the operations documentation and the changelog, and update task 31.4 of `define-toscana-alert-service` with the verified results and the remaining limitations.
