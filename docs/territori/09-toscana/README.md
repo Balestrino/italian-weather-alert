@@ -162,7 +162,7 @@ registra la revisione dell’assistente su delega esplicita dell’operatore.
   - I 16 bollettini con evento del 5, 7–8 e 20 ottobre sono proiettati come narrativa parziale, con l'ora di emissione dell'originale.
   - Nessun fatto, colore o misura è stato dedotto.
   - API e MCP coincidono sulla situazione di Calcinaia in 19 istanti, e il riepilogo cita sempre l'ultimo bollettino noto.
-- **Esito:** su decisione dell'operatore, l'accettazione del monitoraggio è registrata con limitazioni (revisione 3, 23 ottobre). Revisione registrata dell'accettazione e abilitazione pubblica restano separate. La criticità non è accettata e il difetto è affidato alla change `bound-ongoing-criticality-rows`. Le condizioni dei dossier sono riportate nella [revisione MVP](../../operations/mvp-acceptance-review.md).
+- **Esito:** su decisione dell'operatore, l'accettazione del monitoraggio è registrata con limitazioni (revisione 3, 23 ottobre). Dopo una prima revisione `pending` per un limite della configurazione non riportato testualmente, è stata corretta e revisionata con esito `accepted`. Lo stato di rilascio è `partial` e l'abilitazione pubblica resta separata. La criticità non è accettata e il difetto è affidato alla change `bound-ongoing-criticality-rows`. Le condizioni dei dossier sono riportate nella [revisione MVP](../../operations/mvp-acceptance-review.md).
 - **Evidenza:** registro privato `criticality-monitoring-31-5-20261023`.
 
 ### TOS-022 — Fusione corretta e limiti della legenda conservati

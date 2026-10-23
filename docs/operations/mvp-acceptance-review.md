@@ -126,7 +126,17 @@ Il 23 ottobre alle 13.46 UTC l'operatore ha registrato l'accettazione di
 - comportamento di errore basato sui controlli sintetici del 4 ottobre;
 - solo development.
 
-Restano separate la revisione registrata dell'accettazione, senza la quale lo
-stato di rilascio resta `pending`, e l'abilitazione pubblica. Vigilanza,
+La prima revisione dell'accettazione è rimasta `pending`
+(`configuration_limitation_omitted`): il limite della configurazione era stato
+riformulato invece che riportato testualmente. Su conferma dell'operatore è
+stata registrata una seconda accettazione, con lo stesso contenuto e quel limite
+testuale, e poi una seconda revisione, con esito `accepted` e nessun problema.
+Il resoconto della seconda accettazione indica come ora dell'osservazione le
+13.55, cioè 3,5 minuti dopo la sua registrazione. È un errore di compilazione,
+conservato perché il registro è immutabile.
+
+Lo stato di rilascio complessivo passa da `pending` a `partial`: il monitoraggio
+risulta `accepted_with_limitations`, gli altri ambiti restano `pending`.
+L'abilitazione pubblica resta separata e non è stata modificata. Vigilanza,
 criticità e Calcinaia non sono accettate.
 
