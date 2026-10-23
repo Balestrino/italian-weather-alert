@@ -177,7 +177,11 @@ func (s *publicService) page(ctx context.Context, view publicview.View, data any
 			return s.failure(servedAt, errCursorExpired, nil)
 		}
 	}
-	data = refreshData(data, servedAt)
+	// Views evaluated more than one view lifetime before their creation describe
+	// the past: their updating state stays as of the evaluation time.
+	if !view.EvaluationTime.Before(view.CreatedAt.Add(-s.viewLifetime)) {
+		data = refreshData(data, servedAt)
+	}
 	if situation, ok := data.(publicquery.Situation); ok {
 		data = summarizeSituation(situation)
 	}

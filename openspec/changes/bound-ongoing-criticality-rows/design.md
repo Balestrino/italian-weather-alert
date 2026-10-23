@@ -52,7 +52,7 @@ Evidence and counts: TOS-023 and the private register `criticality-monitoring-31
      - the map locator plus «derived: no listed alert for this period»;
      - the original expression of the map day heading;
      - the derivation assumption.
-   - Gaps shorter than one minute, such as the 23.59 boundary, are skipped. The CFR uses 23.59 as end of day, so a one-minute green at 23:59 would be noise.
+   - Gaps of one minute or less, such as the 23.59 boundary, are skipped. The CFR uses 23.59 as end of day, so a one-minute green at 23:59 would be noise.
    - Alternative rejected: keep the day fact alongside the intervals. That reintroduces the midnight-extension problem the existing requirement forbids.
 
 4. **Logic version `cfr-graphics-v6`.**
@@ -62,11 +62,14 @@ Evidence and counts: TOS-023 and the private register `criticality-monitoring-31
      - the criticality editions since 4 October that have explicit intervals.
    - Vigilance and monitoring reprojected under v6 must produce facts identical to v5 apart from identifiers. This is verified on the same retained editions and not reprojected unless needed.
 
-5. **Freshness refresh only for current and future views.**
-   - In `refreshData`, refresh at `servedAt` only when `view.EvaluationTime` is not before `view.CreatedAt`.
-   - Otherwise keep the state computed by `publicquery` at the evaluation time.
+5. **Freshness refresh only for current, recent and future views.**
+   - In `refreshData`, refresh at `servedAt` only when `view.EvaluationTime` is no earlier than `view.CreatedAt` minus the view lifetime (30 minutes by default).
+   - Older evaluation times keep the state computed by `publicquery` at the evaluation time.
+   - Why the threshold: the existing requirement and test keep refreshing a fixed view evaluated seconds before its creation. A view lifetime is the window in which a view is treated as current, and it separates such views from historical requests days in the past.
    - The decision uses stored view fields, so cursor pages and MCP calls behave the same.
-   - Alternative rejected: a request flag. It adds a public parameter and lets API and MCP diverge.
+   - Alternatives rejected:
+     - any evaluation time before creation: contradicts the existing freshness requirement;
+     - a request flag: adds a public parameter and lets API and MCP diverge.
 
 ## Risks / Trade-offs
 

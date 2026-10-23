@@ -136,3 +136,38 @@ eight actual SDK API/MCP comparisons, three pinned pagination pages and four
 before/after projection and COC history boundaries. The exact yellow–orange–yellow
 intervals and independent daily/cumulative weather metadata are verified. Source
 acceptance remains separate, as documented in TOS-022.
+
+## Ongoing alerts and derived green — `cfr-graphics-v6`
+
+The task 31.5 reassessment (TOS-023) found that rows reading «in corso fino alle
+ore …» were not parsed, so the whole criticality table was dropped. Only the
+daily maps remained: on 8 October 2026 orange stayed current on zone A4 after
+17:00, when the table had already switched to yellow. `cfr-graphics-v6` changes
+three things.
+
+- **Ongoing rows.** Such a row is an alert already in effect at issuance. Its
+  interval starts at the edition's literal issuance and ends at the stated
+  Europe/Rome instant. The validity keeps the original expression and an
+  assumption stating that the earlier start belongs to preceding editions. A row
+  is unsupported, and the table falls back as before, if its end is missing or
+  ambiguous, not later than issuance, a repeated or nonexistent local time, or if
+  the issuance is unreadable. Tables with ongoing rows now keep every row
+  interval and are merged with the daily maps.
+- **Derived green.** When a zone, risk and day has explicit alert intervals, the
+  uncovered parts of the local day become green intervals. The assumption and
+  evidence locator mark them as derived from the absence of a listed alert.
+  There is no derivation when the map is not applicable or unresolved, when the
+  table or maps are unsupported, or for gaps of one minute or less (the 23.59 day
+  end).
+- **Freshness in historical views.** Some public views are evaluated more than
+  one view lifetime (30 minutes) before they are created. They report updating
+  as of their evaluation time, so a past view no longer reads «delayed» just
+  because it is served later. Current, recent and future views still refresh
+  at every delivery. API and MCP stay identical.
+
+New records are appended under `cfr-graphics-v6`. v5 and earlier records stay
+readable at their own knowledge time. Queries always serve each version's
+latest projection, so restoring an older image does not hide v6 records; a
+defect is corrected by a later logic version. Reprojection of retained editions
+is explicit and bounded to selected versions with `project-regional-version`.
+Change: `bound-ongoing-criticality-rows`.

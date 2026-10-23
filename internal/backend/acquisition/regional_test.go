@@ -3,6 +3,7 @@ package acquisition
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"slices"
 	"strings"
 	"testing"
@@ -141,5 +142,62 @@ func TestRegionalCheckTracksStableURLRevisions(t *testing.T) {
 	third := engine.Check(context.Background(), "cfr-monitoring", 1, checkedAt.Add(time.Minute))
 	if !third.Complete || third.Revisions != 1 {
 		t.Fatalf("changed stable regional URL not tracked: %#v", third)
+	}
+}
+
+func ongoingCriticalityFixture(issuance, rows string) []byte {
+	return []byte(`<html><body>
+<h1>BOLLETTINO DI VALUTAZIONE DELLE CRITICITÀ</h1>` + issuance + `
+<p>Legenda: VERDE GIALLO ARANCIONE ROSSO; tutte le zone A1, A2, A3, A4, A5, A6, B, C, E1, E2, E3, F1, F2, I, L, M, O1, O2, O3, R1, R2, S1, S2, S3, T, V.</p>
+<table><tr><th>ZONE DI ALLERTA</th><th>RISCHIO</th><th>TEMPI</th><th>CRITICITÀ</th></tr>` + rows + `</table>
+</body></html>`)
+}
+
+func TestCriticalityOngoingRowsKeepTheirStatedEnd(t *testing.T) {
+	issued := `<p>Emissione di <b>Giovedì, 08 Ottobre 2026</b>, ore <b>13.17</b></p>`
+	rows := `<tr><td>A4, B</td><td>TEMPORALI FORTI CON RISCHIO IDROGEOLOGICO-IDRAULICO RETICOLO MINORE</td><td>in corso fino alle ore 17.00 di Giovedì, 08 Ottobre 2026</td><td>ARANCIONE</td></tr>
+<tr><td>A4, B</td><td>TEMPORALI FORTI CON RISCHIO IDROGEOLOGICO-IDRAULICO RETICOLO MINORE</td><td>dalle ore 17.00 di Giovedì, 08 Ottobre 2026 alle ore 14.00 di Venerdì, 09 Ottobre 2026</td><td>GIALLO</td></tr>`
+	projection, err := ProjectRegionalHTML("criticality", ongoingCriticalityFixture(issued, rows))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ongoing, scheduled int
+	for _, fact := range projection.Facts {
+		if fact.Precision != "interval" || fact.Start == nil || fact.End == nil {
+			t.Fatalf("explicit row without bounded validity: %#v", fact)
+		}
+		switch fact.Level {
+		case "orange":
+			ongoing++
+			if fact.Start.Format(time.RFC3339) != "2026-10-08T11:17:00Z" || fact.End.Format(time.RFC3339) != "2026-10-08T15:00:00Z" || fact.Assumption != OngoingRowAssumption || fact.Original != "in corso fino alle ore 17.00 di Giovedì, 08 Ottobre 2026" {
+				t.Fatalf("ongoing row not bounded by issuance and stated end: %#v", fact)
+			}
+		case "yellow":
+			scheduled++
+			if fact.Start.Format(time.RFC3339) != "2026-10-08T15:00:00Z" || fact.Assumption != "" {
+				t.Fatalf("scheduled row changed: %#v", fact)
+			}
+		}
+	}
+	if ongoing != 2 || scheduled != 2 {
+		t.Fatalf("ongoing table rows dropped: %#v", projection.Facts)
+	}
+	unsupported := map[string]string{
+		"end before issuance": `<tr><td>A4</td><td>VENTO</td><td>in corso fino alle ore 12.00 di Giovedì, 08 Ottobre 2026</td><td>GIALLO</td></tr>`,
+		"end at issuance":     `<tr><td>A4</td><td>VENTO</td><td>in corso fino alle ore 13.17 di Giovedì, 08 Ottobre 2026</td><td>GIALLO</td></tr>`,
+		"missing end":         `<tr><td>A4</td><td>VENTO</td><td>in corso</td><td>GIALLO</td></tr>`,
+	}
+	for name, row := range unsupported {
+		if _, err := ProjectRegionalHTML("criticality", ongoingCriticalityFixture(issued, row)); !errors.Is(err, ErrUnrecognizedContent) {
+			t.Fatalf("%s: unsupported ongoing row accepted: %v", name, err)
+		}
+	}
+	dst := ongoingCriticalityFixture(`<p>Emissione di <b>Sabato, 24 Ottobre 2026</b>, ore <b>12.00</b></p>`,
+		`<tr><td>A4</td><td>VENTO</td><td>in corso fino alle ore 02.30 di Domenica, 25 Ottobre 2026</td><td>GIALLO</td></tr>`)
+	if _, err := ProjectRegionalHTML("criticality", dst); !errors.Is(err, ErrUnrecognizedContent) {
+		t.Fatalf("repeated local end accepted: %v", err)
+	}
+	if _, _, err := ongoingRowInterval("in corso fino alle ore 17.00 di Giovedì, 08 Ottobre 2026", nil); err == nil {
+		t.Fatal("ongoing row accepted without an issuance instant")
 	}
 }

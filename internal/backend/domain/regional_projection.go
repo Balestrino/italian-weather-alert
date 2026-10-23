@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const RegionalProjectionLogic = "cfr-graphics-v5"
+const RegionalProjectionLogic = "cfr-graphics-v6"
 
 type RegionalDocuments interface {
 	Version(context.Context, int64) (documents.Version, error)
@@ -165,6 +165,9 @@ func (s *Store) ProjectCFRWithReader(ctx context.Context, docs RegionalDocuments
 		var zone, assumption *string
 		if f.Precision == "interval" {
 			z, a := "Europe/Rome", "CFR official local bulletin times interpreted in Europe/Rome; original minute precision retained."
+			if f.Assumption != "" {
+				a = f.Assumption
+			}
 			zone, assumption = &z, &a
 		}
 		_, err = tx.Exec(ctx, `INSERT INTO domain_temporal_values(entity_kind,entity_id,meaning,original_expression,precision,instant,date_value,end_instant,timezone,assumption,evidence_document_version_id,created_at) VALUES('regional_record',$1,'validity',$2,$3,$4,$5,$6,$7,$8,$9,$10)`, key, f.Original, f.Precision, f.Start, dateValue(f.Date), f.End, zone, assumption, id, at)

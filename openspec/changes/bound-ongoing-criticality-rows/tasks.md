@@ -2,20 +2,20 @@
 
 ## 1. Ongoing criticality rows
 
-- [ ] 1.1 Parse «in corso fino alle ore HH.MM di <giorno>, DD <mese> YYYY» rows in the criticality table as intervals.
+- [x] 1.1 Parse «in corso fino alle ore HH.MM di <giorno>, DD <mese> YYYY» rows in the criticality table as intervals.
   - Start at the edition's literal issuance instant (`IssuanceExpression`) and end at the stated Europe/Rome instant.
   - Keep the original expression and set a per-fact assumption that the alert was already in effect at issuance.
   - Reject a row as unsupported when its end is missing or ambiguous, not later than issuance, falls in a nonexistent or repeated local time, or when the issuance cannot be parsed.
 
   Verify with synthetic HTML unit tests: a valid ongoing row, an end before issuance, a DST-ambiguous end and a missing issuance.
-- [ ] 1.2 Add an optional per-fact assumption to `RegionalFact`. The domain store writes it to `domain_temporal_values.assumption` and keeps the existing fixed text when it is empty. Verify that v5-shaped facts keep their assumption, in an existing or new domain integration test.
-- [ ] 1.3 Verify that a table mixing ongoing and scheduled rows reaches `MergeCriticalityMaps` with every row interval, using a synthetic table and map set reproducing the 8 October shape: orange ongoing until 17.00, then yellow. Peaks must match, no false conflict, and a contradictory overlap must still fail.
+- [x] 1.2 Add an optional per-fact assumption to `RegionalFact`. The domain store writes it to `domain_temporal_values.assumption` and keeps the existing fixed text when it is empty. Verify that v5-shaped facts keep their assumption, in an existing or new domain integration test.
+- [x] 1.3 Verify that a table mixing ongoing and scheduled rows reaches `MergeCriticalityMaps` with every row interval, using a synthetic table and map set reproducing the 8 October shape: orange ongoing until 17.00, then yellow. Peaks must match, no false conflict, and a contradictory overlap must still fail.
 
 ## 2. Remainder green
 
-- [ ] 2.1 In `MergeCriticalityMaps`, for each zone/risk/day with explicit intervals, emit green intervals for the uncovered parts of the local day.
+- [x] 2.1 In `MergeCriticalityMaps`, for each zone/risk/day with explicit intervals, emit green intervals for the uncovered parts of the local day.
   - Compute the day in Europe/Rome, handling 23 and 25 hour days.
-  - Skip gaps shorter than one minute.
+  - Skip gaps of one minute or less.
   - Do not emit them when the map level is `not_applicable` or `unknown`, or when the table is not recognized.
   - Mark each derived fact by locator suffix and assumption.
 
@@ -25,19 +25,19 @@
   - an ongoing morning alert;
   - a not-applicable coastal mask;
   - a DST day.
-- [ ] 2.2 Bump `RegionalProjectionLogic` to `cfr-graphics-v6`. Verify that re-running projection on a v5-projected synthetic version appends v6 records without changing v5 rows, and that vigilance and monitoring facts are unchanged apart from identifiers, in a domain integration test.
+- [x] 2.2 Bump `RegionalProjectionLogic` to `cfr-graphics-v6`. Verify that re-running projection on a v5-projected synthetic version appends v6 records without changing v5 rows, and that vigilance and monitoring facts are unchanged apart from identifiers, in a domain integration test.
 
 ## 3. Historical freshness
 
-- [ ] 3.1 In `refreshData`, refresh updating at `servedAt` only when the view's evaluation time is not before its creation time. Otherwise keep the state computed at the evaluation time. Verify with HTTP and MCP tests:
-  - a historical view stays `ok` within the threshold although served days later;
-  - a current view turns `delayed` on a later page;
+- [x] 3.1 Refresh updating at `servedAt` only when the view's evaluation time is no earlier than its creation time minus the view lifetime. Otherwise keep the state computed at the evaluation time. Verify with HTTP and MCP tests:
+  - a historical view (days earlier) stays `ok` within the threshold although served days later;
+  - the existing fixed view evaluated 30 seconds before creation still turns `delayed` on a later page;
   - a future evaluation time keeps refreshing;
   - API and MCP stay equal.
 
 ## 4. Documentation and repository checks
 
-- [ ] 4.1 Update `docs/operations/cfr-graphics.md` with ongoing rows, derived green, `cfr-graphics-v6` and the freshness rule. Record the changelog entry. Verify with `openspec validate bound-ongoing-criticality-rows --strict`, `go vet ./...`, `go test ./...` and the relevant integration tests passing.
+- [x] 4.1 Update `docs/operations/cfr-graphics.md` with ongoing rows, derived green, `cfr-graphics-v6` and the freshness rule. Record the changelog entry. Verify with `openspec validate bound-ongoing-criticality-rows --strict`, `go vet ./...`, `go test ./...` and the relevant integration tests passing.
 
 ## 5. Development adoption and verification
 

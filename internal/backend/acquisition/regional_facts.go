@@ -17,6 +17,9 @@ type RegionalFact struct {
 	EvidenceURL                                            string
 	Page                                                   int
 	Weather                                                *VigilanceWeather
+	// Assumption replaces the default Europe/Rome interval assumption when a
+	// fact's validity rests on an additional, explicitly stated interpretation.
+	Assumption string
 }
 
 // VigilanceWeather describes depicted meteorology, never a warning color or
@@ -68,6 +71,60 @@ func parseRegionalDay(value string) (*time.Time, error) {
 var sharedItalianInterval = regexp.MustCompile(`(?i)^dalle ore ([0-9]{1,2})[:.]([0-9]{2}) alle ore ([0-9]{1,2})[:.]([0-9]{2}) di (?:[a-zàèéìíòù]+,? )?([0-9]{1,2} [a-z]+ [0-9]{4})$`)
 var separateItalianInterval = regexp.MustCompile(`(?i)^dalle ore ([0-9]{1,2})[:.]([0-9]{2}) (?:di )?(?:[a-zàèéìíòù]+,? )?([0-9]{1,2} [a-z]+ [0-9]{4}) alle ore ([0-9]{1,2})[:.]([0-9]{2}) (?:di )?(?:[a-zàèéìíòù]+,? )?([0-9]{1,2} [a-z]+ [0-9]{4})$`)
 
+var ongoingItalianEnd = regexp.MustCompile(`(?i)^in corso fino alle ore ([0-9]{1,2})[:.]([0-9]{2}) (?:di )?(?:[a-zàèéìíòù]+,? )?([0-9]{1,2} [a-z]+ [0-9]{4})$`)
+
+// OngoingRowAssumption names the interpretation of "in corso fino alle ...":
+// the edition asserts the alert from its issuance; earlier editions own the
+// alert's actual start.
+const OngoingRowAssumption = "Alert already in effect at issuance: interval starts at the edition's literal issuance; its earlier start belongs to preceding editions. CFR official local bulletin times interpreted in Europe/Rome; original minute precision retained."
+
+// ongoingRowInterval bounds an alert already in progress by the edition's
+// issuance and the row's stated end. It never invents an open or whole-day validity.
+func ongoingRowInterval(value string, issued *time.Time) (*time.Time, *time.Time, error) {
+	m := ongoingItalianEnd.FindStringSubmatch(strings.Join(strings.Fields(value), " "))
+	if m == nil || issued == nil {
+		return nil, nil, fmt.Errorf("ongoing regional interval unrecognized")
+	}
+	day, err := parseRegionalDay(m[3])
+	if err != nil {
+		return nil, nil, err
+	}
+	end, err := romeInstant(fmt.Sprintf("%s:%s del %s", m[1], m[2], day.Format("02/01/2006")))
+	if err != nil {
+		return nil, nil, err
+	}
+	if !end.After(*issued) {
+		return nil, nil, fmt.Errorf("ongoing regional interval ends before issuance")
+	}
+	start := issued.UTC()
+	return &start, &end, nil
+}
+
+func romeInstant(value string) (time.Time, error) {
+	m := clockDate.FindStringSubmatch(value)
+	if m == nil {
+		return time.Time{}, fmt.Errorf("regional instant unrecognized")
+	}
+	loc, err := time.LoadLocation("Europe/Rome")
+	if err != nil {
+		return time.Time{}, err
+	}
+	n := make([]int, 5)
+	for i := range n {
+		n[i], _ = strconv.Atoi(m[i+1])
+	}
+	t := time.Date(n[4], time.Month(n[3]), n[2], n[0], n[1], 0, 0, loc)
+	if t.Hour() != n[0] || t.Minute() != n[1] || t.Day() != n[2] || t.Month() != time.Month(n[3]) {
+		return time.Time{}, fmt.Errorf("invalid local interval")
+	}
+	for _, other := range []time.Time{t.Add(-time.Hour), t.Add(time.Hour)} {
+		if other.Format("2006-01-02 15:04") == t.Format("2006-01-02 15:04") {
+			return time.Time{}, fmt.Errorf("ambiguous local interval")
+		}
+	}
+	return t.UTC(), nil
+}
+
 func rowInterval(value string) (*time.Time, *time.Time, error) {
 	value = strings.Join(strings.Fields(value), " ")
 	if m := sharedItalianInterval.FindStringSubmatch(value); m != nil {
@@ -88,30 +145,17 @@ func rowInterval(value string) (*time.Time, *time.Time, error) {
 		value = fmt.Sprintf("%s:%s del %s %s:%s del %s", m[1], m[2], start.Format("02/01/2006"), m[4], m[5], end.Format("02/01/2006"))
 	}
 
-	matches := clockDate.FindAllStringSubmatch(value, -1)
+	matches := clockDate.FindAllString(value, -1)
 	if len(matches) != 2 {
 		return nil, nil, fmt.Errorf("regional interval unrecognized")
 	}
-	loc, err := time.LoadLocation("Europe/Rome")
-	if err != nil {
-		return nil, nil, err
-	}
 	var times []time.Time
 	for _, m := range matches {
-		n := make([]int, 5)
-		for i := range n {
-			n[i], _ = strconv.Atoi(m[i+1])
+		t, err := romeInstant(m)
+		if err != nil {
+			return nil, nil, err
 		}
-		t := time.Date(n[4], time.Month(n[3]), n[2], n[0], n[1], 0, 0, loc)
-		if t.Hour() != n[0] || t.Minute() != n[1] || t.Day() != n[2] || t.Month() != time.Month(n[3]) {
-			return nil, nil, fmt.Errorf("invalid local interval")
-		}
-		for _, other := range []time.Time{t.Add(-time.Hour), t.Add(time.Hour)} {
-			if other.Format("2006-01-02 15:04") == t.Format("2006-01-02 15:04") {
-				return nil, nil, fmt.Errorf("ambiguous local interval")
-			}
-		}
-		times = append(times, t.UTC())
+		times = append(times, t)
 	}
 	if !times[1].After(times[0]) {
 		return nil, nil, fmt.Errorf("reversed regional interval")
@@ -167,6 +211,7 @@ func ProjectRegionalHTML(product string, body []byte) (RegionalProjection, error
 	}
 	tables := htmlTableRows(root)
 	if product == "criticality" {
+		issued := regionalIssuanceInstant(obs.IssuanceExpression)
 		for ti, rows := range tables {
 			if len(rows) < 2 || len(rows[0]) < 4 {
 				continue
@@ -207,11 +252,16 @@ func ProjectRegionalHTML(product string, body []byte) (RegionalProjection, error
 				level := map[string]string{"verde": "green", "giallo": "yellow", "arancione": "orange", "rosso": "red"}[strings.ToLower(row[3])]
 				zones := zonePattern.FindAllString(row[0], -1)
 				start, end, e := rowInterval(row[2])
+				assumption := ""
+				if e != nil && ongoingItalianEnd.MatchString(strings.Join(strings.Fields(row[2]), " ")) {
+					start, end, e = ongoingRowInterval(row[2], issued)
+					assumption = OngoingRowAssumption
+				}
 				if risk == "" || level == "" || len(zones) == 0 || e != nil {
 					return out, fmt.Errorf("unsupported criticality row: %w", ErrUnrecognizedContent)
 				}
 				for _, z := range uniqueSorted(zones) {
-					out.Facts = append(out.Facts, RegionalFact{Risk: risk, Label: row[1], Zone: z, Level: level, Original: row[2], Precision: "interval", Start: start, End: end, Locator: fmt.Sprintf("HTML criticality table %d row %d: %s", ti+1, ri+2, strings.Join(row, " | "))})
+					out.Facts = append(out.Facts, RegionalFact{Risk: risk, Label: row[1], Zone: z, Level: level, Original: row[2], Precision: "interval", Start: start, End: end, Locator: fmt.Sprintf("HTML criticality table %d row %d: %s", ti+1, ri+2, strings.Join(row, " | ")), Assumption: assumption})
 				}
 			}
 		}

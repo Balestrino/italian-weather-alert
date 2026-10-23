@@ -29,8 +29,8 @@ The criticality dossier cannot be accepted while a published level can outlast i
 - Bounded reprojection of the retained criticality editions affected (13961, 15089, 24693, 27743) and of those with explicit intervals. Earlier knowledge stays readable at its own boundary.
 
 **Freshness in views**
-- A view requested for an explicit past evaluation time reports updating as of that evaluation time.
-- Views for the current or a future evaluation time keep refreshing freshness at delivery.
+- A view requested for an evaluation time more than one view lifetime (30 minutes) before its creation reports updating as of that evaluation time.
+- Current, recent and future views keep refreshing freshness at delivery.
 
 ## Capabilities
 

@@ -344,3 +344,60 @@ func TestFixedViewsAcceptEquivalentInstantSpellings(t *testing.T) {
 	}
 	assertPublicError(t, testServer.Client(), testServer.URL+"/v1/sources/coverage?municipality_istat=050004&page_size=1&evaluation_time=2026-09-17T12%3A00%3A01Z&known_at=2026-09-17T11%3A30%3A00Z&cursor="+url.QueryEscape(*first.Meta.NextCursor), http.StatusBadRequest, "cursor_mismatch")
 }
+
+// anyTimeCoverage answers a past evaluation time with a source checked shortly
+// before it, as publicquery computes updating at that time.
+type anyTimeCoverage struct {
+	*publicQueriesFake
+}
+
+func (q anyTimeCoverage) Coverage(_ context.Context, request publicquery.CoverageQuery) (publicquery.CoverageResult, error) {
+	quality := fixtureQuality()
+	checkedAt := request.EvaluationTime.Add(-5 * time.Minute)
+	if request.EvaluationTime.After(time.Date(2026, 10, 23, 13, 0, 0, 0, time.UTC)) {
+		// For a future evaluation the latest real check is an hour before delivery.
+		checkedAt = time.Date(2026, 10, 23, 12, 0, 0, 0, time.UTC)
+	}
+	quality.Updating.LastAttemptAt, quality.Updating.LastCompleteAt, quality.Updating.DelayThresholdSeconds = &checkedAt, &checkedAt, 1800
+	return publicquery.CoverageResult{Sources: []publicquery.Coverage{{SourceID: "cfr-monitoring", Product: "monitoring", Territory: "Toscana", DeclaredSections: []string{"https://example.test/source"}, PublicState: "enabled", CoverageStatus: "accepted_declared_scope", CoverageLimitations: []string{}, Quality: quality}}, History: fixtureHistory()}, nil
+}
+
+func TestHistoricalViewsKeepFreshnessAtEvaluationTime(t *testing.T) {
+	clock := time.Date(2026, 10, 23, 13, 0, 0, 0, time.UTC)
+	runtime := PublicRuntime{Limits: PublicLimits{Allowance: 120, Window: time.Minute, MaxPageSize: 10}, Views: &memoryViewStore{}, ViewLifetime: 30 * time.Minute, CursorKey: []byte(strings.Repeat("k", 32))}
+	testServer := httptest.NewServer(handlerWithRuntime(nil, func() time.Time { return clock }, runtime, anyTimeCoverage{&publicQueriesFake{}}))
+	defer testServer.Close()
+	session, err := mcp.NewClient(&mcp.Implementation{Name: "iwa-freshness-test", Version: "1.0.0"}, nil).Connect(t.Context(), &mcp.StreamableClientTransport{Endpoint: testServer.URL + "/mcp", HTTPClient: testServer.Client(), DisableStandaloneSSE: true}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	for _, tc := range []struct {
+		name, evaluation, want string
+	}{
+		{"historical days earlier", "2026-10-20T19:00:00Z", "ok"},
+		{"future evaluation still refreshed", "2026-10-23T14:00:00Z", "delayed"},
+	} {
+		query := "municipality_istat=050004&evaluation_time=" + url.QueryEscape(tc.evaluation) + "&known_at=" + url.QueryEscape(tc.evaluation)
+		if tc.want == "delayed" {
+			query = "municipality_istat=050004&evaluation_time=" + url.QueryEscape(tc.evaluation)
+		}
+		api := getCoverage(t, testServer.Client(), testServer.URL+"/v1/sources/coverage?"+query)
+		if len(api.Data) != 1 || api.Data[0].Quality.Updating.State != tc.want {
+			t.Fatalf("%s: updating %#v", tc.name, api)
+		}
+		arguments := map[string]any{"municipality_istat": "050004", "evaluation_time": tc.evaluation, "dataset_version": api.Meta.DatasetVersion}
+		if tc.want == "ok" {
+			arguments["known_at"] = tc.evaluation
+		}
+		tool, err := session.CallTool(t.Context(), &mcp.CallToolParams{Name: "get_source_coverage", Arguments: arguments})
+		if err != nil || tool.IsError {
+			t.Fatalf("%s: MCP %#v %v", tc.name, tool, err)
+		}
+		encoded, _ := json.Marshal(publicResponse{Data: api.Data, Meta: api.Meta})
+		var apiValue any
+		if json.Unmarshal(encoded, &apiValue) != nil || !reflect.DeepEqual(apiValue, jsonValue(t, tool.StructuredContent)) {
+			t.Fatalf("%s: API/MCP differ: API=%s MCP=%#v", tc.name, encoded, tool.StructuredContent)
+		}
+	}
+}

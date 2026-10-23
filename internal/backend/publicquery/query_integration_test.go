@@ -1143,6 +1143,92 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 			t.Fatal("preceding state or failure warning lost", len(found.Regional), e)
 		}
 	})
+
+	t.Run("CFR criticality bounds ongoing rows and derives green", func(t *testing.T) {
+		if e := domain.MigrateTerritories(ctx, pool); e != nil {
+			t.Fatal(e)
+		}
+		if e := domainStore.BackfillToscana(ctx); e != nil {
+			t.Fatal(e)
+		}
+		sourceID, url := "criticality-ongoing", "https://regione.example/cfr/criticality-ongoing"
+		createSource(registry.Source{ID: sourceID, AuthorityID: "regione-toscana", ChannelID: "cfr", ProductID: "criticality", Territory: "Toscana"}, url, false)
+		html, bbox, pages := cfrgraphics.Criticality()
+		reader := graphicsFixtureReader{acquisition.VectorEvidence{BBox: bbox, Pages: pages}}
+		version, e := documentStore.Retain(ctx, documents.Acquisition{ID: "criticality-ongoing-version", SourceID: sourceID, Configuration: 1, URL: url, Metadata: json.RawMessage(`{}`), Resources: []documents.Resource{
+			{URL: url, Role: "original", Required: true, SourceID: sourceID, Configuration: 1, MediaType: "text/html", Bytes: html},
+			{URL: url + ".pdf", Role: "resource", Required: true, SourceID: sourceID, Configuration: 1, MediaType: "application/pdf", Bytes: []byte("%PDF-synthetic-reader-fixture")},
+		}})
+		if e != nil {
+			t.Fatal(e)
+		}
+		// The preceding v5 knowledge: day precision orange for the whole day.
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_regional_projections(document_version_id,logic_version,source_id,product,status,statement,limitations) VALUES($1,'cfr-graphics-v5',$2,'criticality','partial','v5 daily maps','[]')`, version.ID, sourceID); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_regional_records(id,document_version_id,source_id,product,originating_authority_id,publisher_id,platform,municipal_republication,projection_logic,evidence_locator) VALUES('v5-criticality',$1,$2,'criticality','regione-toscana','regione-toscana','CFR',false,'cfr-graphics-v5','v5 daily map')`, version.ID, sourceID); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_regional_facts(regional_record_id,product,ordinal,risk,official_risk_label,zone,level) VALUES('v5-criticality','criticality',1,'thunderstorms','TEMPORALI FORTI CON RISCHIO IDROGEOLOGICO-IDRAULICO RETICOLO MINORE','A4','orange')`); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = pool.Exec(ctx, `INSERT INTO domain_temporal_values(entity_kind,entity_id,meaning,original_expression,precision,date_value,evidence_document_version_id,created_at) VALUES('regional_record','v5-criticality','validity','Giovedì, 08 Ottobre 2026','date','2026-10-08',$1,now())`, version.ID); e != nil {
+			t.Fatal(e)
+		}
+		before := time.Now().UTC()
+		for i := 0; i < 2; i++ {
+			report, e := domainStore.ProjectCFRWithReader(ctx, documentStore, version.ID, reader)
+			if e != nil || report.Facts != 366 || report.Status != "partial" {
+				t.Fatal("v6 projection", report, e)
+			}
+		}
+		var v5, v6 int
+		if e = pool.QueryRow(ctx, `SELECT count(*) FILTER (WHERE projection_logic='cfr-graphics-v5'),count(*) FILTER (WHERE projection_logic='cfr-graphics-v6') FROM domain_regional_records WHERE document_version_id=$1`, version.ID).Scan(&v5, &v6); e != nil || v5 != 1 || v6 != 366 {
+			t.Fatal("v5 history changed or v6 duplicated", v5, v6, e)
+		}
+		current, e := store.Search(ctx, SearchQuery{Kind: "regional", SourceID: sourceID, Zone: "A4", Risk: "thunderstorms"})
+		if e != nil {
+			t.Fatal(e)
+		}
+		// Known validity of the corrected edition at each local instant.
+		level := func(local string) (RegionalWarning, bool) {
+			instant, _ := time.ParseInLocation("2006-01-02 15:04", local, time.FixedZone("CEST", 2*3600))
+			for _, w := range current.Regional {
+				v := w.Validity
+				if v.Precision == "interval" && v.Instant != nil && v.EndInstant != nil && !instant.Before(*v.Instant) && instant.Before(*v.EndInstant) {
+					return w, true
+				}
+			}
+			return RegionalWarning{}, false
+		}
+		for local, want := range map[string]string{"2026-10-08 12:00": "green", "2026-10-08 16:00": "orange", "2026-10-08 17:01": "yellow", "2026-10-09 15:00": "green"} {
+			w, ok := level(local)
+			if !ok || w.Level != want {
+				t.Fatal("bounded validity", local, want, w, ok)
+			}
+			if w.Validity.Assumption == nil {
+				t.Fatal("assumption not persisted", w)
+			}
+			switch want {
+			case "orange":
+				if *w.Validity.Assumption != acquisition.OngoingRowAssumption {
+					t.Fatal("ongoing assumption lost", *w.Validity.Assumption)
+				}
+			case "green":
+				if *w.Validity.Assumption != acquisition.DerivedGreenAssumption || w.Evidence[0].Locator == nil || !strings.Contains(*w.Evidence[0].Locator, "derived: no listed alert") {
+					t.Fatal("derived green not labelled", w)
+				}
+			case "yellow":
+				if !strings.HasPrefix(*w.Validity.Assumption, "CFR official local bulletin times") {
+					t.Fatal("scheduled row assumption changed", *w.Validity.Assumption)
+				}
+			}
+		}
+		past, e := store.Search(ctx, SearchQuery{QueryTime: QueryTime{EvaluationTime: before, KnownAt: before}, Kind: "regional", SourceID: sourceID, Zone: "A4", Risk: "thunderstorms"})
+		if e != nil || len(past.Regional) != 1 || past.Regional[0].ID != "v5-criticality:1" && !strings.HasPrefix(past.Regional[0].ID, "v5-criticality") {
+			t.Fatal("v5 knowledge rewritten", past, e)
+		}
+	})
 }
 
 func stringPointer(value string) *string { return &value }

@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -704,11 +705,14 @@ func MergeCriticalityMaps(maps, rows RegionalProjection) (RegionalProjection, er
 			if value, ok := rank[f.Level]; f.Level != "unknown" && (!ok || value != peak) {
 				return maps, fmt.Errorf("explicit table/map level conflict")
 			}
+			if _, ok := rank[f.Level]; ok {
+				intervals = append(intervals, remainderGreen(f, intervals, loc)...)
+			}
 		} else {
 			intervals = append(intervals, f)
 		}
 		for _, fact := range intervals {
-			if fact.Precision == "interval" {
+			if fact.Precision == "interval" && fact.Assumption != DerivedGreenAssumption {
 				fact.Locator = f.Locator + "; precise validity from explicit HTML criticality row: " + fact.Original
 			}
 			key := fmt.Sprintf("%s:%s:%s:%s:%v:%v:%v", fact.Risk, fact.Zone, fact.Level, fact.Precision, fact.Start, fact.End, fact.Date)
@@ -721,4 +725,47 @@ func MergeCriticalityMaps(maps, rows RegionalProjection) (RegionalProjection, er
 	}
 	maps.Facts = merged
 	return maps, nil
+}
+
+// DerivedGreenAssumption marks green read from the absence of a listed alert,
+// not from a map fill.
+const DerivedGreenAssumption = "Derived green: the edition's alert table lists no alert for this zone and risk in this period of the mapped day. CFR official local bulletin times interpreted in Europe/Rome."
+
+// remainderGreen covers the parts of the mapped local day that no explicit
+// interval covers. Gaps of a minute or less (the CFR 23.59 day end) are not facts.
+func remainderGreen(f RegionalFact, intervals []RegionalFact, loc *time.Location) []RegionalFact {
+	dayStart := time.Date(f.Date.Year(), f.Date.Month(), f.Date.Day(), 0, 0, 0, 0, loc)
+	dayEnd := dayStart.AddDate(0, 0, 1)
+	sorted := slices.Clone(intervals)
+	slices.SortFunc(sorted, func(a, b RegionalFact) int { return a.Start.Compare(*b.Start) })
+	var out []RegionalFact
+	cursor := dayStart
+	emit := func(from, to time.Time) {
+		if to.Sub(from) <= time.Minute {
+			return
+		}
+		start, end := from.UTC(), to.UTC()
+		out = append(out, RegionalFact{Risk: f.Risk, Label: f.Label, Zone: f.Zone, Level: "green", Original: f.Original, Precision: "interval", Start: &start, End: &end,
+			Locator: f.Locator + "; derived: no listed alert for this period", EvidenceURL: f.EvidenceURL, Page: f.Page, Assumption: DerivedGreenAssumption})
+	}
+	for _, row := range sorted {
+		if row.Start.After(cursor) {
+			emit(cursor, minTime(*row.Start, dayEnd))
+		}
+		if row.End.After(cursor) {
+			cursor = *row.End
+		}
+		if !cursor.Before(dayEnd) {
+			return out
+		}
+	}
+	emit(cursor, dayEnd)
+	return out
+}
+
+func minTime(a, b time.Time) time.Time {
+	if a.Before(b) {
+		return a
+	}
+	return b
 }
