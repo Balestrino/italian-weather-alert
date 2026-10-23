@@ -71,3 +71,23 @@ restano gate operativi separati, riportati nello [stato Toscana](toscana-readine
 Originali, risposte, quattro dossier con manifest di integrità e log dei controlli
 restano nel registro operativo privato `TOSCANA-ACCEPTANCE-101-20261004`.
 Questa sintesi pubblica non redistribuisce catture o dettagli dell'ambiente.
+
+## Rivalutazione del 23 ottobre 2026 (task 31.5)
+
+L'operatore ha scelto di rivalutare la vigilanza CFR, limitatamente ai casi reali disponibili, e Calcinaia. Criticità e monitoraggio non sono stati rivalutati in questa sessione. Per tutti e quattro gli ambiti l'esito resta `pending` e il registro non contiene alcuna accettazione.
+
+| Ambito | Verifica | Esito |
+| --- | --- | --- |
+| Vigilanza CFR | Edizioni del 20 e 21 ottobre con vento e mare reali. Le 416 voci zona/giorno di vento, mare, neve e ghiaccio coincidono con le tabelle degli originali: le zone elencate risultano «in valutazione», senza intensità dedotte, e le altre non rappresentate. API e MCP coincidono | Pending: mancano casi reali di neve e ghiaccio |
+| Calcinaia | Stesso contratto di quattordici controlli sulla configurazione corrente (estrazione v29, modello locale), registrato nel registro di development. Classificazione 7 su 7 e linking 2 su 2 superati; discovery e mappatura OCR riusate con provenienza dichiarata | Pending: omissioni nell'estrazione dell'aggiornamento con strade liberate e della riapertura parziale |
+
+Per la riapertura parziale, l'elaborazione ordinaria dello stesso giorno, con la stessa configurazione, estrae le misure attese con un divieto aggregato in più. L'esito del modello locale quindi non è riproducibile. Finché la suite non passa, i recuperi d'archivio della fonte restano bloccati e la regressione fallita impedisce l'accettazione.
+
+Altri limiti di Calcinaia:
+- I limiti di provenienza nella configurazione attiva della fonte sono superati: indicano ancora Cittadino Informato e l'albo come esclusi.
+- Lo stesso vale per una revisione della configurazione, che richiederebbe una nuova accettazione.
+
+Per la criticità esistono ora edizioni reali non verdi: arancione per temporali il 7 e il 20 ottobre; gialle per vento, mareggiate e reticolo principale. Per il monitoraggio esistono bollettini con evento del 5, 7–8 e 20 ottobre, proiettati come narrativa parziale. Entrambi restano da confrontare in una sessione dedicata.
+
+Evidenze private: `ACCEPTANCE-31-5-20261023`.
+

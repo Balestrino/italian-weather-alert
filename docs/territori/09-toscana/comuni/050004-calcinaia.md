@@ -224,6 +224,19 @@ o un test sintetico positivo non chiude da solo quel report. Vedere CLN-005.
 
 ## Registro delle scoperte
 
+### CLN-043 — Rivalutazione del dossier: regressione v29 non superata
+
+- **Data e ambito:** 2026-10-23; task 31.5. Lo stesso contratto di quattordici controlli è stato rieseguito sulla configurazione corrente: estrazione v29, modello locale `qwen3.5-9b`, temperatura 0, seed 42, senza thinking, tre tentativi.
+- **Esito:**
+  - Classificazione 7 su 7, compresi museo e scacchi non pertinenti.
+  - Linking 2 su 2.
+  - Conflitto agosto/settembre conservato sui cimiteri.
+  - Due omissioni in estrazione: l'aggiornamento con le strade liberate ha dato tre risposte non valide, e il sottopasso di via Maremmana manca anche nell'ultima versione ordinaria; la riapertura parziale ha dato tre risposte troncate per lunghezza.
+  - L'elaborazione ordinaria dello stesso giorno estrae invece la riapertura parziale: il modello locale non è riproducibile su questi casi.
+- **Decisione:** l'esito fallito è registrato nel registro di development, collegato alla v27 del 4 ottobre. L'accettazione resta pending, i recuperi d'archivio della fonte sono bloccati fino a una suite superata e nessuna configurazione è stata modificata.
+- **Limiti:** i limiti di provenienza della configurazione attiva sono superati, perché indicano ancora Cittadino Informato e l'albo come esclusi. Correggerli richiede una nuova revisione della configurazione e quindi una nuova accettazione. Accettazione invariata nel coverage tracker.
+- **Evidenza:** registro privato `acceptance-31-5-20261023`.
+
 ### CLN-042 — Atti citati recuperati e validità chiarita
 
 - **Data e ambito:** 2026-10-23; development, dopo l'adozione della change [`acquire-referenced-albo-acts`](../../../operations/referenced-acts.md) e la registrazione della fonte `calcinaia-albo`. La fonte non è mai pianificata né pubblica e serve solo gli atti citati da `calcinaia-municipal`.

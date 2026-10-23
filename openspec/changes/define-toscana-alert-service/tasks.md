@@ -719,6 +719,12 @@ The checklist is now 160/166 complete, with six operational/release tasks open.
 
   API and MCP agree and earlier boundaries are unchanged. See [referenced acts](../../../docs/operations/referenced-acts.md).
 - [ ] 31.5 Reassess each actual source dossier against the verified declared scope and current ordinary results, keeping real/reused/synthetic evidence explicit. Record source acceptance and its report review only when prerequisites pass; keep accepted limitations partial and preserve separate public/release controls and independent CFR evidence conditions.
+  **31.5 progress — 23 October 2026:** at the operator's choice, the vigilance dossier (real cases only) and the Calcinaia dossier were reassessed.
+  - Vigilance: the 20–21 October wind and sea editions match the official tables in all 416 zone/day entries, and API and MCP agree. Real snow and ice cases are still missing, so the dossier stays pending.
+  - Calcinaia: the unchanged fourteen-check contract on the current v29 local configuration is recorded as failed, with two extraction omissions. Classification and linking pass. Local outputs are not reproducible: the same-day ordinary run extracted one of the omitted cases. Acceptance stays pending, archive recoveries are blocked until the suite passes, and the active configuration's provenance limitations are outdated.
+  - Criticality and monitoring now have real positive cases or event bulletins and remain to be compared.
+
+  No acceptance was recorded. See [MVP acceptance review](../../../docs/operations/mvp-acceptance-review.md). Private record: `acceptance-31-5-20261023`.
 
 The 31.1 audit verifies 286 tracked declared-section URLs and 57 complete recent
 originals. The same saved API view exposes 43 supported recent interpretations
