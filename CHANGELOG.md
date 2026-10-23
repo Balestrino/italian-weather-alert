@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Changed] Record the operator's acceptance of cfr-monitoring revision 3 with declared limitations in development; release readiness stays pending until the acceptance review is recorded.
 - 2026-10-23 [Added] Plan bound-ongoing-criticality-rows: bounded validity for CFR criticality rows already in progress at issuance, explicit derived green outside listed alert intervals, and evaluation-time freshness for historical public views.
 - 2026-10-23 [Changed] Record the task 31.5 reassessment of CFR criticality and monitoring on real cases (TOS-023): criticality tables and intervals match, with one defect for rows reading 'in corso'; monitoring event bulletins are projected without inferred colours; no acceptance recorded.
 - 2026-10-23 [Changed] Calcinaia configuration revision 2 reads only the reviewed article body; the same fourteen-check contract now passes in development, and the ordinary reprocessing of the two failing notices matches (CLN-044).

@@ -117,3 +117,16 @@ Restano da trattare altri limiti, già nella [voce TOS-023](../territori/09-tosc
 
 Evidenze private: `criticality-monitoring-31-5-20261023`.
 
+Il 23 ottobre alle 13.46 UTC l'operatore ha registrato l'accettazione di
+`cfr-monitoring` (revisione 3, periodo 4–23 ottobre), con copertura
+`accepted_with_limitations`. I limiti dichiarati sono:
+- narrativa parziale, senza colori;
+- prodotto a evento;
+- allegati e scansioni assenti dal prodotto;
+- comportamento di errore basato sui controlli sintetici del 4 ottobre;
+- solo development.
+
+Restano separate la revisione registrata dell'accettazione, senza la quale lo
+stato di rilascio resta `pending`, e l'abilitazione pubblica. Vigilanza,
+criticità e Calcinaia non sono accettate.
+
