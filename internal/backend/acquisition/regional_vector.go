@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -29,6 +30,12 @@ type VectorPDFReader interface {
 }
 type PopplerVectorReader struct{}
 
+// ErrVectorToolingUnavailable reports that the local PDF tools could not run
+// (no writable temporary directory, missing executable). It describes the
+// environment, not the retained PDF, so callers retry instead of recording a
+// fallback projection.
+var ErrVectorToolingUnavailable = errors.New("vector PDF tooling unavailable")
+
 func (PopplerVectorReader) Read(ctx context.Context, body []byte) (VectorEvidence, error) {
 	ctx, cancel := context.WithTimeout(ctx, 45*time.Second)
 	defer cancel()
@@ -38,7 +45,7 @@ func (PopplerVectorReader) Read(ctx context.Context, body []byte) (VectorEvidenc
 	}
 	cache, err := os.MkdirTemp("", "iwa-vector-fonts-")
 	if err != nil {
-		return out, err
+		return out, fmt.Errorf("%w: %v", ErrVectorToolingUnavailable, err)
 	}
 	defer os.RemoveAll(cache)
 	run := func(input []byte, name string, args ...string) ([]byte, error) {
@@ -48,6 +55,11 @@ func (PopplerVectorReader) Read(ctx context.Context, body []byte) (VectorEvidenc
 		var w boundedVectorOutput
 		cmd.Stdout = &w
 		err := cmd.Run()
+		var exit *exec.ExitError
+		if err != nil && !errors.As(err, &exit) && ctx.Err() == nil {
+			// The tool never ran; a crash or timeout on this PDF stays a content failure.
+			err = fmt.Errorf("%w: %v", ErrVectorToolingUnavailable, err)
+		}
 		return w.Bytes(), err
 	}
 	out.BBox, err = run(body, "pdftotext", "-bbox", "-", "-")

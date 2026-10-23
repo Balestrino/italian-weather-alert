@@ -27,6 +27,13 @@
   - a DST day.
 - [x] 2.2 Bump `RegionalProjectionLogic` to `cfr-graphics-v6`. Verify that re-running projection on a v5-projected synthetic version appends v6 records without changing v5 rows, and that vigilance and monitoring facts are unchanged apart from identifiers, in a domain integration test.
 
+- [x] 2.3 Fail closed on PDF tooling failures and give the admin service a `/tmp` tmpfs. Bump the logic to `cfr-graphics-v7`, superseding the degraded v6 pilot records of 13961 and 26641.
+  - `PopplerVectorReader` returns `ErrVectorToolingUnavailable` when no temporary directory can be created or a tool cannot start. `ProjectCFR` then returns the error without persisting.
+  - Verify with:
+    - a unit test with an unwritable `TMPDIR`, a missing executable and a non-PDF;
+    - an integration test where a failing reader persists nothing and a later run projects the maps;
+    - the compose configuration check.
+
 ## 3. Historical freshness
 
 - [x] 3.1 Refresh updating at `servedAt` only when the view's evaluation time is no earlier than its creation time minus the view lifetime. Otherwise keep the state computed at the evaluation time. Verify with HTTP and MCP tests:
@@ -42,13 +49,13 @@
 ## 5. Development adoption and verification
 
 - [ ] 5.1 Build the image from HEAD and adopt admin, worker and public in development with private backups of settings. Verify that `check-deployment-config.py --runtime` and `smoke-compose.py development` pass.
-- [ ] 5.2 Reproject editions 13961 and 26641 with `project-regional-version`, then compare them with the official tables using the TOS-023 tooling. Verify:
+- [ ] 5.2 Reproject editions 13961 and 26641 with `project-regional-version`, then compare them with the official tables using the TOS-023 tooling. The first attempt under v6 ran in the read-only admin container and stored table-only fallback records (see design decision 4); the attempt that counts is under v7. Verify:
   - no mismatch;
   - 13961 orange on A4 ends at 17.00;
   - every derived green lies outside the listed rows.
 
   Only then reproject the rest of the bounded set: 15089, 24693, 27743 and the criticality editions since 4 October with explicit intervals. Record the receipts privately.
-- [ ] 5.3 Rerun the A4 API/MCP instant comparison with the same plan and knowledge after the reprojection, plus one view before the reprojection. Verify:
+- [ ] 5.3 Rerun the A4 API/MCP comparison after the reprojection, plus one view before it. Public queries require `known_at` ≤ `evaluation_time`, so the corrected validity of past instants is checked from the current view's intervals rather than from a past view. Verify:
   - all non-green levels are exact;
   - green is explicit where the table lists no alert;
   - API equals MCP;

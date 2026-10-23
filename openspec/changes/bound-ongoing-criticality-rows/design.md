@@ -55,12 +55,16 @@ Evidence and counts: TOS-023 and the private register `criticality-monitoring-31
    - Gaps of one minute or less, such as the 23.59 boundary, are skipped. The CFR uses 23.59 as end of day, so a one-minute green at 23:59 would be noise.
    - Alternative rejected: keep the day fact alongside the intervals. That reintroduces the midnight-extension problem the existing requirement forbids.
 
-4. **Logic version `cfr-graphics-v6`.**
-   - Bump `RegionalProjectionLogic`. New acquisitions use v6 automatically.
+4. **Logic version `cfr-graphics-v7`.**
+   - `cfr-graphics-v6` was the first bump.
+     - During development adoption, editions 13961 and 26641 were reprojected under v6 from the read-only admin container. The PDF reader could not create its font cache, so table-only fallback records were stored as v6.
+     - These records are immutable, and queries serve each version's latest projection. Only a later logic version can supersede them, so the logic is bumped to `cfr-graphics-v7` with the same interpretation.
+     - New acquisitions use v7 automatically.
    - Retained editions are reprojected explicitly with `project-regional-version`, bounded to:
      - the four editions with ongoing rows;
+     - the two degraded v6 editions;
      - the criticality editions since 4 October that have explicit intervals.
-   - Vigilance and monitoring reprojected under v6 must produce facts identical to v5 apart from identifiers. This is verified on the same retained editions and not reprojected unless needed.
+   - Vigilance and monitoring code paths are unchanged. Their unit and integration tests still pass under the new logic version.
 
 5. **Freshness refresh only for current, recent and future views.**
    - In `refreshData`, refresh at `servedAt` only when `view.EvaluationTime` is no earlier than `view.CreatedAt` minus the view lifetime (30 minutes by default).
@@ -71,11 +75,18 @@ Evidence and counts: TOS-023 and the private register `criticality-monitoring-31
      - any evaluation time before creation: contradicts the existing freshness requirement;
      - a request flag: adds a public parameter and lets API and MCP diverge.
 
+6. **PDF tooling failures do not persist a fallback.**
+   - `PopplerVectorReader` reports `ErrVectorToolingUnavailable` when it cannot create a temporary directory or start a Poppler executable. A tool that runs and fails, or a timeout, stays a content failure with the existing fallback.
+   - `ProjectCFR` returns that error without writing anything, so the acquisition check or the operator retries in a working environment.
+   - The admin service gets a small `/tmp` tmpfs, so `project-regional-version` can read PDFs.
+   - Alternative rejected: keep the fallback and rely on operators running the command in the worker. That is the failure that produced the degraded v6 records.
+
 ## Risks / Trade-offs
 
 - [Derived green states something the bulletin does not draw.] → It is limited to editions whose table and full map set are recognized, labelled as derived, and never produced for not-applicable or unresolved zones. The TOS-023 comparison rerun checks every derived interval against the official table.
 - [Ongoing start at issuance understates the true start.] → The assumption text says so. Earlier editions keep serving their own intervals at their knowledge times.
 - [Merge conflicts may increase once ongoing rows enter the merge (table/map peak mismatch).] → The existing failure path keeps the supported fallback and reports the limitation. The reprojection report is checked for `partial` or `unsupported` statuses before adoption.
+- [A persistently broken PDF tool environment now blocks regional projection of new editions instead of degrading them.] → The error is visible in the acquisition check and job history, and the worker's tmpfs and image tools are covered by the runtime checks. A degraded but immutable projection was the worse outcome.
 - [Historical freshness differs from what clients saw before.] → This is intended. Current views keep their behavior, and the change is covered by API/MCP equivalence tests.
 
 ## Migration Plan
@@ -95,4 +106,4 @@ Evidence and counts: TOS-023 and the private register `criticality-monitoring-31
    - Restoring the previous images stops new v6 projections.
    - v6 records already appended stay current, because queries select each version's latest projection whatever the running code.
    - A defect in them is corrected by a later logic version and a bounded reprojection, never by deletion.
-   - For this reason the reprojection set is first run on two editions (13961 and 26641) and compared before the rest.
+   - For this reason the reprojection set is first run on two editions (13961 and 26641) and compared before the rest. The first v6 pilot exposed the read-only admin environment (decision 4).

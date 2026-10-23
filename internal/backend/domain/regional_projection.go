@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/acquisition"
 	"github.com/Balestrino/italian-weather-alert/internal/backend/documents"
@@ -10,7 +11,7 @@ import (
 	"time"
 )
 
-const RegionalProjectionLogic = "cfr-graphics-v6"
+const RegionalProjectionLogic = "cfr-graphics-v7"
 
 type RegionalDocuments interface {
 	Version(context.Context, int64) (documents.Version, error)
@@ -80,6 +81,10 @@ func (s *Store) ProjectCFRWithReader(ctx context.Context, docs RegionalDocuments
 				if e == nil {
 					var evidence acquisition.VectorEvidence
 					evidence, e = reader.Read(ctx, pdf)
+					if errors.Is(e, acquisition.ErrVectorToolingUnavailable) {
+						// An unusable environment must not become immutable fallback knowledge.
+						return out, e
+					}
 					if e == nil {
 						var maps acquisition.RegionalProjection
 						if product == "criticality" {

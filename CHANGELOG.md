@@ -4,6 +4,7 @@ This file records repository plans, fixes, implementation, documentation, and op
 
 ## Unreleased
 
+- 2026-10-23 [Fixed] A CFR PDF tooling failure (no writable temporary directory, missing executable) no longer stores an immutable table-only fallback projection; the admin service gets a /tmp tmpfs and the projection logic moves to cfr-graphics-v7 to supersede the degraded v6 pilot records.
 - 2026-10-23 [Fixed] CFR criticality rows reading 'in corso fino alle ore …' now keep their stated end (cfr-graphics-v6), the rest of an alert day is explicit derived green, and historical public views keep the updating state of their evaluation time.
 - 2026-10-23 [Changed] Record the accepted review of the cfr-monitoring acceptance after re-recording it with the configuration limitation verbatim; release readiness becomes partial in development.
 - 2026-10-23 [Changed] Record the operator's acceptance of cfr-monitoring revision 3 with declared limitations in development; release readiness stays pending until the acceptance review is recorded.

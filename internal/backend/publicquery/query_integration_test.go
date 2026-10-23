@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"os"
 	"os/exec"
@@ -1175,6 +1176,14 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 		if _, e = pool.Exec(ctx, `INSERT INTO domain_temporal_values(entity_kind,entity_id,meaning,original_expression,precision,date_value,evidence_document_version_id,created_at) VALUES('regional_record','v5-criticality','validity','Giovedì, 08 Ottobre 2026','date','2026-10-08',$1,now())`, version.ID); e != nil {
 			t.Fatal(e)
 		}
+		// An unusable PDF tool environment records nothing, so a later run can project the maps.
+		if _, e = domainStore.ProjectCFRWithReader(ctx, documentStore, version.ID, failingVectorReader{}); !errors.Is(e, acquisition.ErrVectorToolingUnavailable) {
+			t.Fatal("tooling failure not reported", e)
+		}
+		var persisted int
+		if e = pool.QueryRow(ctx, `SELECT count(*) FROM domain_regional_projections WHERE document_version_id=$1 AND logic_version=$2`, version.ID, domain.RegionalProjectionLogic).Scan(&persisted); e != nil || persisted != 0 {
+			t.Fatal("tooling failure persisted a fallback projection", persisted, e)
+		}
 		before := time.Now().UTC()
 		for i := 0; i < 2; i++ {
 			report, e := domainStore.ProjectCFRWithReader(ctx, documentStore, version.ID, reader)
@@ -1183,7 +1192,7 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 			}
 		}
 		var v5, v6 int
-		if e = pool.QueryRow(ctx, `SELECT count(*) FILTER (WHERE projection_logic='cfr-graphics-v5'),count(*) FILTER (WHERE projection_logic='cfr-graphics-v6') FROM domain_regional_records WHERE document_version_id=$1`, version.ID).Scan(&v5, &v6); e != nil || v5 != 1 || v6 != 366 {
+		if e = pool.QueryRow(ctx, `SELECT count(*) FILTER (WHERE projection_logic='cfr-graphics-v5'),count(*) FILTER (WHERE projection_logic=$2) FROM domain_regional_records WHERE document_version_id=$1`, version.ID, domain.RegionalProjectionLogic).Scan(&v5, &v6); e != nil || v5 != 1 || v6 != 366 {
 			t.Fatal("v5 history changed or v6 duplicated", v5, v6, e)
 		}
 		current, e := store.Search(ctx, SearchQuery{Kind: "regional", SourceID: sourceID, Zone: "A4", Risk: "thunderstorms"})
@@ -1232,6 +1241,12 @@ func TestFiveSharedPublicQueryGroups(t *testing.T) {
 }
 
 func stringPointer(value string) *string { return &value }
+
+type failingVectorReader struct{}
+
+func (failingVectorReader) Read(context.Context, []byte) (acquisition.VectorEvidence, error) {
+	return acquisition.VectorEvidence{}, fmt.Errorf("%w: read-only file system", acquisition.ErrVectorToolingUnavailable)
+}
 
 type graphicsFixtureReader struct{ evidence acquisition.VectorEvidence }
 

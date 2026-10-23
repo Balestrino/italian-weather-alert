@@ -25,7 +25,8 @@ The criticality dossier cannot be accepted while a published level can outlast i
   - No green is derived when the table or maps are unsupported, or when the map marks the zone not applicable.
 
 **Projection and history**
-- A new immutable projection logic, `cfr-graphics-v6`.
+- A new immutable projection logic, `cfr-graphics-v7`. v6 was superseded during adoption, after a reprojection from the read-only admin container stored degraded records.
+- A PDF tooling failure, such as no writable temporary directory or a missing executable, stores no projection and is retried, instead of becoming an immutable fallback.
 - Bounded reprojection of the retained criticality editions affected (13961, 15089, 24693, 27743) and of those with explicit intervals. Earlier knowledge stays readable at its own boundary.
 
 **Freshness in views**
@@ -49,7 +50,8 @@ The criticality dossier cannot be accepted while a published level can outlast i
 **Code**
 - `internal/backend/acquisition/regional_facts.go`: ongoing row parsing; issuance is available from the HTML observation.
 - `internal/backend/acquisition/regional_vector.go`: `MergeCriticalityMaps` remainder intervals.
-- `internal/backend/domain/regional_projection.go`: logic version `cfr-graphics-v6`.
+- `internal/backend/domain/regional_projection.go`: logic version `cfr-graphics-v7`, with no projection stored on tooling failure.
+- `compose.yaml`: `/tmp` tmpfs for the admin service.
 - `internal/backend/transport/httpapi/views.go`: the refresh rule.
 - Tests with synthetic HTML/PDF fixtures.
 

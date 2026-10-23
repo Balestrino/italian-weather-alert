@@ -1,6 +1,7 @@
 package acquisition
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -349,5 +350,21 @@ func TestRemainderGreenOutsideListedIntervals(t *testing.T) {
 	if _, err := MergeCriticalityMaps(RegionalProjection{Product: "criticality", Facts: []RegionalFact{{Risk: "thunderstorms", Zone: "A4", Level: "not_applicable", Precision: "date", Date: date(2026, 10, 20)}}},
 		RegionalProjection{Product: "criticality", Facts: []RegionalFact{interval("yellow", at(2026, 10, 20, 18, 0), at(2026, 10, 20, 23, 59))}}); err == nil {
 		t.Fatal("alert on a not-applicable mask accepted")
+	}
+}
+
+func TestVectorReaderReportsUnusableEnvironment(t *testing.T) {
+	pdf := []byte("%PDF-1.4 synthetic")
+	t.Setenv("TMPDIR", t.TempDir()+"/missing")
+	if _, err := (PopplerVectorReader{}).Read(t.Context(), pdf); !errors.Is(err, ErrVectorToolingUnavailable) {
+		t.Fatal("unwritable temporary directory reported as PDF content", err)
+	}
+	t.Setenv("TMPDIR", t.TempDir())
+	t.Setenv("PATH", t.TempDir())
+	if _, err := (PopplerVectorReader{}).Read(t.Context(), pdf); !errors.Is(err, ErrVectorToolingUnavailable) {
+		t.Fatal("missing Poppler reported as PDF content", err)
+	}
+	if _, err := (PopplerVectorReader{}).Read(t.Context(), []byte("not a pdf")); errors.Is(err, ErrVectorToolingUnavailable) || !errors.Is(err, ErrUnrecognizedContent) {
+		t.Fatal("content failure reported as environment", err)
 	}
 }

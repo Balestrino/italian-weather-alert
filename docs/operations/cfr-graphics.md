@@ -137,12 +137,12 @@ before/after projection and COC history boundaries. The exact yellow–orange–
 intervals and independent daily/cumulative weather metadata are verified. Source
 acceptance remains separate, as documented in TOS-022.
 
-## Ongoing alerts and derived green — `cfr-graphics-v6`
+## Ongoing alerts and derived green — `cfr-graphics-v7`
 
 The task 31.5 reassessment (TOS-023) found that rows reading «in corso fino alle
 ore …» were not parsed, so the whole criticality table was dropped. Only the
 daily maps remained: on 8 October 2026 orange stayed current on zone A4 after
-17:00, when the table had already switched to yellow. `cfr-graphics-v6` changes
+17:00, when the table had already switched to yellow. `cfr-graphics-v7` changes
 three things.
 
 - **Ongoing rows.** Such a row is an alert already in effect at issuance. Its
@@ -165,7 +165,20 @@ three things.
   because it is served later. Current, recent and future views still refresh
   at every delivery. API and MCP stay identical.
 
-New records are appended under `cfr-graphics-v6`. v5 and earlier records stay
+**Environment failures do not persist a fallback.** The first adoption used
+`cfr-graphics-v6` and reprojected editions 13961 and 26641 from the admin
+container. Its read-only filesystem had no `/tmp`, so the PDF reader failed and
+table-only fallback records were stored under v6. Since then:
+- a PDF tooling failure (no temporary directory, a tool that cannot start)
+  stores nothing and returns an error to retry;
+- the admin service has a 64 MB `/tmp` tmpfs;
+- the logic is `cfr-graphics-v7`, which supersedes those degraded records.
+
+The 7 October `cfr-graphics-v4` projection of edition 12845, which held only
+table intervals, fits the same failure. That cause is an inference and has not
+been verified.
+
+New records are appended under `cfr-graphics-v7`. v5 and earlier records stay
 readable at their own knowledge time. Queries always serve each version's
 latest projection, so restoring an older image does not hide v6 records; a
 defect is corrected by a later logic version. Reprojection of retained editions

@@ -62,6 +62,8 @@ services:
       IWA_LISTEN: 0.0.0.0:8081
       IWA_CONTAINER_ADMIN: "true"
       IWA_ADMIN_TAILSCALE_ORIGIN: ${IWA_ADMIN_TAILSCALE_ORIGIN:-}
+    # project-regional-version reads retained PDFs with Poppler, which needs a font cache.
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=64m"]
     ports: ["127.0.0.1:${IWA_ADMIN_PORT:-8081}:8081"]
   worker:
     <<: *app
