@@ -17,6 +17,16 @@ import (
 	"github.com/Balestrino/italian-weather-alert/internal/backend/processing"
 )
 
+func extractionRunKey(versionID, classificationRunID int64, contentHash, configuration, manifestSuffix string) string {
+	key := fmt.Sprintf("extraction:%d:%d:%s:%s", versionID, classificationRunID, contentHash, configuration) + manifestSuffix
+	// Preserve existing identities while bounding keys that include local
+	// processing configurations and manifests to the processing store's limit.
+	if len(key) <= 200 {
+		return key
+	}
+	return fmt.Sprintf("extraction:%d:%d:%x", versionID, classificationRunID, sha256.Sum256([]byte(key)))
+}
+
 type documentStore interface {
 	Version(context.Context, int64) (documents.Version, error)
 	Read(context.Context, int64, string) ([]byte, error)
@@ -162,7 +172,7 @@ func (r *Runner) run(ctx context.Context, job jobs.Job, payload Payload) (jobs.R
 	if len(version.Resources) > 0 {
 		sourceID = &version.Resources[0].SourceID
 	}
-	run, err := r.Processing.StartRun(ctx, processing.RunRequest{IdempotencyKey: fmt.Sprintf("extraction:%d:%d:%s:%s", version.ID, classified.RunID, content.Hash, r.ConfigurationVersion) + manifestSuffix, Workload: payload.Workload, Stage: "extraction", ConfigurationVersionID: r.ConfigurationVersion, SourceID: sourceID, DocumentVersionID: &version.ID, Subject: subject, CreatedAt: now().UTC()})
+	run, err := r.Processing.StartRun(ctx, processing.RunRequest{IdempotencyKey: extractionRunKey(version.ID, classified.RunID, content.Hash, r.ConfigurationVersion, manifestSuffix), Workload: payload.Workload, Stage: "extraction", ConfigurationVersionID: r.ConfigurationVersion, SourceID: sourceID, DocumentVersionID: &version.ID, Subject: subject, CreatedAt: now().UTC()})
 	if err != nil {
 		return jobs.Result{}, failure("extraction_run_unavailable", true)
 	}
